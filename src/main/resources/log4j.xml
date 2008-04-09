@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+  <!-- set <log4j:configuration debug="true"> for log4j initialization messages -->
+  <!--  debug appender, write to stdout -->
+  <appender name="console" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-5p  %c %F(%M:%L) %d{dd.MM.yyyy HH:mm:ss}  %m%n" />
+    </layout>
+  </appender>
+  <appender name="aperto-appender" class="com.aperto.webkit.log4j.ApertoAppender">
+    <param name="SmtpHost" value="mail.aperto.de" />
+    <param name="From" value="editor@tomcat.localhost" />
+    <!-- Uncomment to get emails ... -->
+    <!-- param name="To" value="your.name@aperto.de" /-->
+    <param name="NewErrorSubject" value="New Error in editor-webapp." />
+    <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-9t %d{yyyy-MM-dd HH:mm:ss.SSS}] %5p: %m (%c - %F:%L)%n" />
+    </layout>
+    <filter class="com.aperto.webkit.debug.DontLogMeExceptionFilter" />
+  </appender>	
+  <appender name="sync-log-debug" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="${magnolia.app.rootdir}/logs/magnolia-debug.log" />
+    <param name="MaxFileSize" value="1MB" />
+    <param name="Threshold" value="ERROR" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-5p  %c %d{dd.MM.yyyy HH:mm:ss} -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="log-debug" class="org.apache.log4j.AsyncAppender">
+    <appender-ref ref="sync-log-debug" />
+  </appender>
+  <appender name="sync-log-error" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="${magnolia.app.rootdir}/logs/magnolia-error.log" />
+    <param name="MaxFileSize" value="1MB" />
+    <param name="Threshold" value="ERROR" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-5p  %c %d{dd.MM.yyyy HH:mm:ss} -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="log-error" class="org.apache.log4j.AsyncAppender">
+    <appender-ref ref="sync-log-error" />
+  </appender>
+  <appender name="sync-log-activation" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="${magnolia.app.rootdir}/logs/magnolia-activation.log" />
+    <param name="MaxFileSize" value="1MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-5p  %c %d{dd.MM.yyyy HH:mm:ss} -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="log-activation" class="org.apache.log4j.AsyncAppender">
+    <appender-ref ref="sync-log-activation" />
+  </appender>
+  <appender name="log-bootstrap" class="org.apache.log4j.FileAppender">
+    <param name="File" value="${magnolia.app.rootdir}/logs/bootstrap.log" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-5p %d{dd.MM.yyyy HH:mm:ss}  %m%n" />
+    </layout>
+  </appender>
+  <!-- log for external libraries is set to WARN -->
+  <category name="org">
+    <priority value="WARN" />
+  </category>
+  <category name="com">
+    <priority value="WARN" />
+  </category>
+  <category name="com.aperto">
+    <priority value="DEBUG" />
+  </category>
+  <category name="org.springframework">
+    <priority value="ERROR" />
+  </category>
+  <category name="org.apache.axis.client.Call">
+    <priority value="DEBUG" />
+  </category>
+  <category name="org.apache.axis.transport.http.HTTPSender">
+    <priority value="DEBUG" />
+  </category>
+  <!-- magnolia -->
+  <category name="info.magnolia">
+    <priority value="INFO" />
+  </category>
+  <category name="org.apache.jackrabbit">
+    <priority value="WARN" />
+  </category>
+  <category name="freemarker">
+    <priority value="WARN" />
+  </category>
+  <category name="httpclient">
+    <priority value="WARN" />
+  </category>
+  <category name="openwfe">
+    <priority value="WARN" />
+  </category>
+  <category name="openwfe.org.embed.impl.engine.AbstractEmbeddedParticipant">
+    <priority value="INFO" />
+  </category>
+  <category name="info.magnolia.cms.filters.MagnoliaManagedFilter">
+    <priority value="ERROR" />
+    <!--  debug  -->
+    <appender-ref ref="console" />
+  </category>
+  <category name="info.magnolia.cms.exchange" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="log-activation" />
+    <!--  debug  -->
+    <appender-ref ref="console" />
+  </category>
+  <category name="info.magnolia.cms.beans.config.Bootstrapper" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="log-bootstrap" />
+    <!--  debug  -->
+    <appender-ref ref="console" />
+  </category>
+  <root>
+    <priority value="info" />
+    <appender-ref ref="log-error" />
+    <appender-ref ref="log-debug" />
+    <appender-ref ref="aperto-appender" />
+    <!--  debug  -->
+    <appender-ref ref="console" />
+    <!--  enable this too to get mail notifications  -->
+    <!--
+      <appender-ref ref="mail" />
+    -->
+  </root>
+</log4j:configuration>

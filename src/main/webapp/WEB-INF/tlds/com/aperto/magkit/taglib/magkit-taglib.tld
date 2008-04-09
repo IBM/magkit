@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN" "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+<taglib>
+  <tlib-version>2.1</tlib-version>
+  <jsp-version>1.2</jsp-version>
+  <short-name>mk</short-name>
+  <uri>http://www.aperto.de/</uri>
+  <display-name>Aperto Magnolia Tags</display-name>
+  <description><![CDATA[ <h2>Aperto Magnolia Tag Library</h2>
+]]></description>
+  <tag>
+    <name>linkTarget</name>
+    <tag-class>com.aperto.magkit.taglib.LinkTargetTag</tag-class>
+    <body-content>JSP</body-content>
+    <description><![CDATA[<p>Creates link target by the given nodedata.
+ <code>target="_blank"</code></p>]]></description>
+    <attribute>
+      <name>nodeDataName</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>convertLink</name>
+    <tag-class>com.aperto.magkit.taglib.ConvertLinkTag</tag-class>
+    <body-content>JSP</body-content>
+    <description><![CDATA[<p>Convert uuid to a link from the given node data (@see LinkTool).
+ If it is an internal link the contextPath will be added.</p>]]></description>
+    <attribute>
+      <name>nodeDataName</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>linkValue</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>addContextPath</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>createList</name>
+    <tag-class>com.aperto.magkit.taglib.CreateListTag</tag-class>
+    <body-content>JSP</body-content>
+    <description><![CDATA[<p>Create a html list from a formatted string.
+ E.g. <br/>
+ Input: List1|item1;item2;item3 <br/>
+ Output: <code><h4>List1</h4><ul><li>item1</li>...</ul></code></p>]]></description>
+    <attribute>
+      <name>hlTag</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>listTag</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>listValue</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>nodeDataName</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  <tag>
+    <name>paging</name>
+    <tag-class>com.aperto.magkit.taglib.PagingTag</tag-class>
+    <body-content>JSP</body-content>
+    <description><![CDATA[<p>Draws a paging div container.</p>]]></description>
+    <attribute>
+      <name>pages</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>actPage</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+</taglib>
