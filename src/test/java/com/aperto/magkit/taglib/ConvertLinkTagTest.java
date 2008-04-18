@@ -6,9 +6,12 @@ import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.text.StringEndsWith.endsWith;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
+import static org.junit.matchers.StringContains.containsString;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -25,7 +28,7 @@ import javax.servlet.jsp.PageContext;
 public class ConvertLinkTagTest extends MagKitTagTest {
     private static final String LOCAL_CONTENT_OBJ = "contentObj";
     private static final String CONTEXT_PATH = "/author";
-    private static final String LINK_VALUE_EXT = "http://www.aperto.de";
+    private static final String LINK_VALUE_EXT = "http://www.aperto.de/test.html";
     private static final String LINK_VALUE_INT = "/sammeln/infos";
 
     @Test
@@ -35,8 +38,8 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         PageContext pageContext = runLifeCycle(tag);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
-        assertFalse(output.contains(CONTEXT_PATH));
-        assertTrue(output.contains(LINK_VALUE_EXT));
+        assertThat(output, not(containsString(CONTEXT_PATH)));
+        assertThat(output, is(LINK_VALUE_EXT));
     }
 
     @Test
@@ -46,8 +49,9 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         PageContext pageContext = runLifeCycle(tag);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
-        assertTrue(output.contains(CONTEXT_PATH));
-        assertTrue(output.contains(LINK_VALUE_INT));
+        assertThat(output, containsString(CONTEXT_PATH));
+        assertThat(output, containsString(LINK_VALUE_INT));
+        assertThat(output, endsWith("html"));
     }
 
     @Override

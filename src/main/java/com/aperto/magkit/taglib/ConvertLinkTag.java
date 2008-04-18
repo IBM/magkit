@@ -30,6 +30,7 @@ public class ConvertLinkTag extends TagSupport {
     private String _nodeDataName;
     private String _linkValue;
     private boolean _addContextPath = true;
+    private boolean _addExtension = true;
 
     @TagAttribute
     public void setNodeDataName(String nodeDataName) {
@@ -44,6 +45,11 @@ public class ConvertLinkTag extends TagSupport {
     @TagAttribute
     public void setAddContextPath(String addContextPath) {
         _addContextPath = Boolean.getBoolean(addContextPath);
+    }
+
+    @TagAttribute
+    public void setAddExtension(String addExtension) {
+        _addExtension = Boolean.getBoolean(addExtension);
     }
 
     /**
@@ -76,7 +82,7 @@ public class ConvertLinkTag extends TagSupport {
         if (!StringUtils.isBlank(_linkValue)) {
             try {
                 if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
-                    String link = LinkTool.convertLink(_linkValue);
+                    String link = LinkTool.convertLink(_linkValue, _addExtension);
                     if (_addContextPath) {
                         out.write(request.getContextPath());
                     }
