@@ -15,6 +15,7 @@ import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import com.aperto.magkit.utils.ImageData;
 
 /**
  * Modified @see ImgTag from magnolia.
@@ -27,6 +28,16 @@ public class ImageTag extends BaseContentTag {
 
     private Map<String, String> _htmlAttributes = new HashMap<String, String>();
     private String _altNodeDataName;
+    private String _imageDataName;
+
+    /**
+     * Setter for the request attribute name of an ImageData object.
+     * @param imageDataName Name of the request attribute.
+     */
+    @TagAttribute
+    public void setImageDataName(String imageDataName) {
+        _imageDataName = imageDataName;
+    }
 
     /**
      * Setter for <code>nodeDataName</code>.
@@ -97,76 +108,74 @@ public class ImageTag extends BaseContentTag {
     public int doEndTag() throws JspException {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
         int returnValue = EVAL_PAGE;
-        Content contentNode = getFirstMatchingNode();
-        if (contentNode != null) {
-            NodeData imageNodeData = contentNode.getNodeData(nodeDataName);
-            if (imageNodeData.isExist()) {
-                JspWriter out = pageContext.getOut();
-                FileProperties props = new FileProperties(contentNode, nodeDataName);
-                String imgSrc = props.getProperty(FileProperties.PATH);
-                String alt = retrieveAltText(contentNode, props);
+        ImageData imageData = null;
+        JspWriter out = pageContext.getOut();
 
-                // don't modify the original map, remember tag pooling
-                Map<String, String> attributes = new HashMap<String, String>(_htmlAttributes);
-                retrieveMeasures(attributes, props);
+        if (!StringUtils.isBlank(_imageDataName)) {
+            imageData = (ImageData) request.getAttribute(_imageDataName);
+        }
 
-                try {
-                    if (StringUtils.lowerCase(imgSrc).endsWith(".swf")) {
-                        // TODO: handle flash movies like aperto
-                        out.write("<object type=\"application/x-shockwave-flash\" data=\"");
-                        out.write(request.getContextPath());
-                        out.write(imgSrc);
-                        out.write("\" ");
-                        writeAttributes(out, attributes);
-                        out.write(">");
-                        out.write("<param name=\"movie\" value=\"");
-                        out.write(request.getContextPath());
-                        out.write(imgSrc);
-                        out.write("\"/>");
-                        out.write("<param name=\"wmode\" value=\"transparent\"/>");
-                        out.write("</object>");
-                    } else {
-                        attributes.put("alt", alt);
-                        out.write("<img src=\"");
-                        out.write(request.getContextPath());
-                        out.write(imgSrc);
-                        out.write("\" ");
-                        writeAttributes(out, attributes);
-                        out.write("/>");
+        if (imageData != null) {
+            writeToJsp(out, imageData, request.getContextPath());
+            returnValue = super.doEndTag();
+        } else {
+            Content contentNode = getFirstMatchingNode();
+            if (contentNode != null) {
+                NodeData imageNodeData = contentNode.getNodeData(nodeDataName);
+                if (imageNodeData.isExist()) {
+                    imageData = new ImageData(imageNodeData, retrieveAltText(contentNode));
+                    if (!StringUtils.isBlank(_htmlAttributes.get("width")) && !StringUtils.isBlank(_htmlAttributes.get("height"))) {
+                        imageData.setHeight(_htmlAttributes.get("height"));
+                        imageData.setWidth(_htmlAttributes.get("width"));
                     }
-                } catch (IOException e) {
-                    // should never happen
-                    throw new NestableRuntimeException(e);
+                    writeToJsp(out, imageData, request.getContextPath());                    
+                    returnValue = super.doEndTag();
                 }
-                returnValue = super.doEndTag();
             }
         }
+
         return returnValue;
     }
 
-    private void retrieveMeasures(Map<String, String> attributes, FileProperties props) {
-        if (StringUtils.isBlank(attributes.get("width")) || StringUtils.isBlank(attributes.get("height"))) {
-            String width = props.getProperty(FileProperties.PROPERTY_WIDTH);
-            if (StringUtils.isNotEmpty(width)) {
-                attributes.put("width", width);
+    private void writeToJsp(JspWriter out, ImageData imageData, String contextPath) {
+        // don't modify the original map, remember tag pooling
+        Map<String, String> attributes = new HashMap<String, String>(_htmlAttributes);
+        try {
+            if (StringUtils.lowerCase(imageData.getHandle()).endsWith(".swf")) {
+                // TODO: handle flash movies like aperto
+                out.write("<object type=\"application/x-shockwave-flash\" data=\"");
+                out.write(contextPath);
+                out.write(imageData.getHandle());
+                out.write("\" ");
+                writeAttributes(out, attributes);
+                out.write(">");
+                out.write("<param name=\"movie\" value=\"");
+                out.write(contextPath);
+                out.write(imageData.getHandle());
+                out.write("\"/>");
+                out.write("<param name=\"wmode\" value=\"transparent\"/>");
+                out.write("</object>");
+            } else {
+                attributes.put("alt", imageData.getAlt());
+                out.write("<img src=\"");
+                out.write(contextPath);
+                out.write(imageData.getHandle());
+                out.write("\" ");
+                writeAttributes(out, attributes);
+                out.write("/>");
             }
-            String height = props.getProperty(FileProperties.PROPERTY_HEIGHT);
-            if (StringUtils.isNotEmpty(height)) {
-                attributes.put("height", height);
-            }
+        } catch (IOException e) {
+            // should never happen
+            throw new NestableRuntimeException(e);
         }
     }
 
-    private String retrieveAltText(Content contentNode, FileProperties props) {
+    private String retrieveAltText(Content contentNode) {
         String altNodeDataNameDef = _altNodeDataName;
         if (StringUtils.isEmpty(altNodeDataNameDef)) {
             altNodeDataNameDef = nodeDataName + "Alt";
         }
-        String alt = contentNode.getNodeData(altNodeDataNameDef).getString();
-        if (StringUtils.isEmpty(alt)) {
-            alt = props.getProperty(FileProperties.NAME_WITHOUT_EXTENSION);
-        }
-        return alt;
+        return contentNode.getNodeData(altNodeDataNameDef).getString();
     }
 
     private void writeAttributes(JspWriter out, Map<String, String> attributes) throws IOException {

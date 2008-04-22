@@ -1,7 +1,7 @@
-package com.aperto.magkit.beans;
+package com.aperto.magkit.utils;
 
+import info.magnolia.cms.beans.runtime.FileProperties;
 import info.magnolia.cms.core.NodeData;
-import com.aperto.magkit.utils.LinkTool;
 
 /**
  * Class to capsulate the image data.
@@ -13,9 +13,6 @@ public class ImageData {
     private String _alt;
     private String _handle;
     private String _filesize;
-    public static final String ATTR_HEIGHT = "height";
-    public static final String ATTR_WIDTH = "width";
-    public static final String ATTR_SIZE_KB = "sizeKB";
 
     /**
      * Constructor with some given data.
@@ -26,9 +23,9 @@ public class ImageData {
     public ImageData(NodeData imageNode, String alt, String repository) {
         _alt = alt;
         _handle = LinkTool.getBinaryLink(imageNode, repository);
-        _height = imageNode.getAttribute(ATTR_HEIGHT);
-        _width = imageNode.getAttribute(ATTR_WIDTH);
-        _filesize = imageNode.getAttribute(ATTR_SIZE_KB);
+        _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
+        _width = imageNode.getAttribute(FileProperties.PROPERTY_WIDTH);
+        _filesize = imageNode.getAttribute(FileProperties.SIZE_KB);
     }
 
     /**
@@ -39,9 +36,9 @@ public class ImageData {
     public ImageData(NodeData imageNode, String alt) {
         _alt = alt;
         _handle = LinkTool.getBinaryLink(imageNode);
-        _height = imageNode.getAttribute(ATTR_HEIGHT);
-        _width = imageNode.getAttribute(ATTR_WIDTH);
-        _filesize = imageNode.getAttribute(ATTR_SIZE_KB);
+        _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
+        _width = imageNode.getAttribute(FileProperties.PROPERTY_WIDTH);
+        _filesize = imageNode.getAttribute(FileProperties.SIZE_KB);
     }
 
     /**
@@ -49,11 +46,11 @@ public class ImageData {
      * @param imageNode image node
      */
     public ImageData(NodeData imageNode) {
-        _alt = "";
+        _alt = imageNode.getAttribute(FileProperties.NAME_WITHOUT_EXTENSION);
         _handle = LinkTool.getBinaryLink(imageNode);
-        _height = imageNode.getAttribute(ATTR_HEIGHT);
-        _width = imageNode.getAttribute(ATTR_WIDTH);
-        _filesize = imageNode.getAttribute(ATTR_SIZE_KB);
+        _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
+        _width = imageNode.getAttribute(FileProperties.PROPERTY_WIDTH);
+        _filesize = imageNode.getAttribute(FileProperties.SIZE_KB);
     }
 
     /**

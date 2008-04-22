@@ -1,4 +1,4 @@
-package com.aperto.magkit.beans;
+package com.aperto.magkit.utils;
 
 import org.apache.commons.lang.math.NumberUtils;
 

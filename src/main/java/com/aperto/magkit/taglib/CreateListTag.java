@@ -1,6 +1,6 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.beans.Item;
+import com.aperto.magkit.utils.Item;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.util.Resource;
 import org.apache.commons.lang.StringUtils;
