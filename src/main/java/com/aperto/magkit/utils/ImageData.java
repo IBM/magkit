@@ -1,7 +1,10 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.cms.beans.runtime.FileProperties;
+import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
+import org.apache.commons.lang.StringUtils;
+import javax.jcr.RepositoryException;
 
 /**
  * Class to capsulate the image data.
@@ -13,6 +16,7 @@ public class ImageData {
     private String _alt;
     private String _handle;
     private String _filesize;
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(LinkTool.class);
 
     /**
      * Constructor with some given data.
@@ -43,9 +47,73 @@ public class ImageData {
 
     /**
      * Constructor.
+     * @param content content with image node data
+     * @param imageKey node data key for image.
+     */
+    public ImageData(Content content, String imageKey) {
+        _alt = "";
+        _handle = "";
+        _height = "";
+        _width = "";
+        _filesize = "";
+        try {
+            if (content.hasNodeData(imageKey)) {
+                NodeData imageNode = content.getNodeData(imageKey);
+                if (imageNode != null) {
+                    retrieveDataFromNode(imageNode);
+                }
+            }
+            String altKey = imageKey + "Alt";
+            if (content.hasNodeData(altKey)) {
+                NodeData altNode = content.getNodeData(altKey);
+                if (altNode != null && !StringUtils.isBlank(altNode.getString())) {
+                    _alt = altNode.getString();
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.warn("Can not access repository.", e);
+        }
+    }
+
+    /**
+     * Constructor.
+     * @param content content with image node data.
+     * @param imageKey node data key for image.
+     * @param altKey node data key for alt text.
+     */
+    public ImageData(Content content, String imageKey, String altKey) {
+        _alt = "";
+        _handle = "";
+        _height = "";
+        _width = "";
+        _filesize = "";
+        try {
+            if (content.hasNodeData(imageKey)) {
+                NodeData imageNode = content.getNodeData(imageKey);
+                if (imageNode != null) {
+                    retrieveDataFromNode(imageNode);
+                }
+            }
+            if (content.hasNodeData(altKey)) {
+                NodeData altNode = content.getNodeData(altKey);
+                if (altNode != null && !StringUtils.isBlank(altNode.getString())) {
+                    _alt = altNode.getString();
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.warn("Can not access repository.", e);
+        }
+    }
+
+    /**
+     * Constructor.
      * @param imageNode image node
      */
     public ImageData(NodeData imageNode) {
+        retrieveDataFromNode(imageNode);
+    }
+
+    private void retrieveDataFromNode(NodeData imageNode) {
         _alt = imageNode.getAttribute(FileProperties.NAME_WITHOUT_EXTENSION);
         _handle = LinkTool.getBinaryLink(imageNode);
         _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
