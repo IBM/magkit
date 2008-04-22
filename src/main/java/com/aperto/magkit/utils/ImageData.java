@@ -29,7 +29,7 @@ public class ImageData {
         _handle = LinkTool.getBinaryLink(imageNode, repository);
         _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
         _width = imageNode.getAttribute(FileProperties.PROPERTY_WIDTH);
-        _filesize = imageNode.getAttribute(FileProperties.SIZE_KB);
+        _filesize = imageNode.getAttribute(FileProperties.SIZE);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ImageData {
         _handle = LinkTool.getBinaryLink(imageNode);
         _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
         _width = imageNode.getAttribute(FileProperties.PROPERTY_WIDTH);
-        _filesize = imageNode.getAttribute(FileProperties.SIZE_KB);
+        _filesize = imageNode.getAttribute(FileProperties.SIZE);
     }
 
     /**
@@ -114,11 +114,11 @@ public class ImageData {
     }
 
     private void retrieveDataFromNode(NodeData imageNode) {
-        _alt = imageNode.getAttribute(FileProperties.NAME_WITHOUT_EXTENSION);
+        _alt = "";
         _handle = LinkTool.getBinaryLink(imageNode);
         _height = imageNode.getAttribute(FileProperties.PROPERTY_HEIGHT);
         _width = imageNode.getAttribute(FileProperties.PROPERTY_WIDTH);
-        _filesize = imageNode.getAttribute(FileProperties.SIZE_KB);
+        _filesize = imageNode.getAttribute(FileProperties.SIZE);
     }
 
     /**
