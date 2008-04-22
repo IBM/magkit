@@ -1,6 +1,6 @@
 package com.aperto.magkit.taglib;
 
-import info.magnolia.cms.beans.runtime.FileProperties;
+import com.aperto.magkit.utils.ImageData;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.taglibs.BaseContentTag;
@@ -15,11 +15,9 @@ import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import com.aperto.magkit.utils.ImageData;
 
 /**
  * Modified @see ImgTag from magnolia.
- * TODO: Make usage of ImageData
  *
  * @author frank.sommer (21.04.2008)
  */
