@@ -138,6 +138,8 @@ public class ImageTag extends BaseContentTag {
     private void writeToJsp(JspWriter out, ImageData imageData, String contextPath) {
         // don't modify the original map, remember tag pooling
         Map<String, String> attributes = new HashMap<String, String>(_htmlAttributes);
+        attributes.put("height", imageData.getHeight());
+        attributes.put("width", imageData.getWidth());
         try {
             if (StringUtils.lowerCase(imageData.getHandle()).endsWith(".swf")) {
                 // TODO: handle flash movies like aperto
