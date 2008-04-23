@@ -1,5 +1,6 @@
 package com.aperto.magkit.export;
 
+import com.aperto.webkit.utils.ExceptionEater;
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.cms.core.ie.DataTransporter;
@@ -7,19 +8,19 @@ import info.magnolia.cms.security.AccessDeniedException;
 import info.magnolia.cms.security.Permission;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.admininterface.pages.ExportPage;
-import java.io.OutputStream;
-import java.util.*;
+import org.apache.commons.lang.StringUtils;
+import org.dom4j.*;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import javax.jcr.Session;
 import javax.jcr.Workspace;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
-import org.dom4j.*;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.io.OutputFormat;
-import com.aperto.webkit.utils.ExceptionEater;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 /**
  * Extends {@link ExportPage} so that the export xml will use alphabetic
@@ -90,23 +91,25 @@ public class ExportPageAlphabetically extends ExportPage {
         return VIEW_EXPORT;
     }
 
-    private Document parse(OutputStream outputStream) {
+    private Document parse(ByteArrayOutputStream outputStream) {
         Document document = null;
         try {
-            document = DocumentHelper.parseText(outputStream.toString());
+            document = DocumentHelper.parseText(outputStream.toString("UTF-8"));
         } catch (DocumentException e) {
             ExceptionEater.eat(e);
+        } catch (UnsupportedEncodingException e) {
+            ExceptionEater.eat(e);            
         }
 
         if (document != null) {
             List list = document.selectNodes("//sv:node[@sv:name]");
-            for (Iterator i = list.iterator(); i.hasNext();) {
-                Element parentNode = (Element) i.next();
+            for (Object aList : list) {
+                Element parentNode = (Element) aList;
 
                 List properties = parentNode.selectNodes("sv:property");
                 Map<String, Node> sortedProperties = new TreeMap<String, Node>();
-                for (Iterator j = properties.iterator(); j.hasNext();) {
-                    Node property = (Node) j.next();
+                for (Object property1 : properties) {
+                    Node property = (Node) property1;
                     // select parentNode name
                     String name = property.valueOf("@sv:name");
                     // sort nodes after parentNode name                      
@@ -115,9 +118,9 @@ public class ExportPageAlphabetically extends ExportPage {
                     property.detach();
                 }
 
-                List remainingNodes = new ArrayList();
-                for (Iterator j = parentNode.elements().iterator(); j.hasNext();) {
-                    Node child = (Node) j.next();
+                List<Node> remainingNodes = new ArrayList<Node>();
+                for (Object o : parentNode.elements()) {
+                    Node child = (Node) o;
                     remainingNodes.add(child);
                     child.detach();
                 }
@@ -127,8 +130,8 @@ public class ExportPageAlphabetically extends ExportPage {
                     parentNode.add(entry.getValue());
                 }
                 // re-attach remaining nodes in original order
-                for (Iterator j = remainingNodes.iterator(); j.hasNext();) {
-                    Node child = (Node) j.next();
+                for (Object remainingNode : remainingNodes) {
+                    Node child = (Node) remainingNode;
                     parentNode.add(child);
                 }
             }
