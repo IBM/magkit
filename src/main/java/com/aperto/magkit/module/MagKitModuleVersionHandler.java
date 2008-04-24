@@ -38,6 +38,10 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     });
 
     private final Task _setAdminInterfaceExportClassTask = new SetPropertyTask(ContentRepository.CONFIG, "/modules/adminInterface/pages/export", "class", "com.aperto.magkit.export.ExportPageAlphabetically");
+    private final Task _setI18nContentSupportTask = new ArrayDelegateTask("Filter", "Add the Validator filter.", new Task[]{
+        new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
+        new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "enabled", "true")
+    });
 
     /**
      * Whithin the default constructor the DeltaBuilder is updated with all nessesary Tasks for an update to module version 1.5 (for Magnolia 3.5.x).
@@ -56,6 +60,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_addValidatorFilterTask);
         tasks.add(_addValidatorFilterBypassTask);
         tasks.add(_setAdminInterfaceExportClassTask);
+        tasks.add(_setI18nContentSupportTask);
         return tasks;
     }
 }
