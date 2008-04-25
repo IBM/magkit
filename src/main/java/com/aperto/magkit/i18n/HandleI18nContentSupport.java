@@ -1,26 +1,82 @@
 package com.aperto.magkit.i18n;
 
-import org.apache.log4j.Logger;
-import org.apache.commons.lang.StringUtils;
-import info.magnolia.cms.i18n.DefaultI18nContentSupport;
+import info.magnolia.cms.core.Content;
+import info.magnolia.cms.core.NodeData;
+import info.magnolia.cms.i18n.I18nContentSupport;
+import info.magnolia.cms.i18n.LocaleDefinition;
 import info.magnolia.context.MgnlContext;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import javax.jcr.RepositoryException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Collection;
 
 /**
- * Extends the default content support by retrieving the locale from handle not only by a subnode.
- * The actual node is also neccessary.
+ * Implements the I18nContent Support to set the locale from handles real node in the repository.
  *
  * @author frank.sommer (24.04.2008)
  */
-public class HandleI18nContentSupport extends DefaultI18nContentSupport {
+public class HandleI18nContentSupport implements I18nContentSupport {
     private static final Logger LOGGER = Logger.getLogger(HandleI18nContentSupport.class);
+
+    /**
+     * English is the default fallback language.
+     */
+    private Locale _fallbackLocale = new Locale("en");
+
+    /**
+     * The active locales.
+     */
+    private Map<String, Locale> _locales = new HashMap<String, Locale>();
+
+    /**
+     * Is I18N enabled.
+     */
+    private boolean _enabled;
+
+    public Locale getLocale() {
+        return MgnlContext.getAggregationState().getLocale();
+    }
+
+    /**
+     * Setter for locale.
+     */
+    public void setLocale(Locale locale) {
+        MgnlContext.getAggregationState().setLocale(locale);
+    }
+
+    public Locale getFallbackLocale() {
+        return _fallbackLocale;
+    }
+
+    public void setFallbackLocale(Locale fallbackLocale) {
+        _fallbackLocale = fallbackLocale;
+    }
+
+    //CHECKSTYLE:OFF
+    // method names have to be implements as they are.
+    /**
+     * Do nothing with the uri.
+     */
+    public String toI18NURI(String uri) {
+        return uri;
+    }
+
+    /**
+     * Do nothing with the uri.
+     */
+    public String toRawURI(String i18nUri) {
+        return i18nUri;
+    }
+    //CHECKSTYLE:ON
 
     /**
      * Determines the locale from the current uri.
      * e.g. /content/de.html
      * @return locale from the uri.
      */
-    @Override
     public Locale determineLocale() {
         final String i18nUri = MgnlContext.getAggregationState().getCurrentURI();
         Locale locale = getFallbackLocale();
@@ -44,5 +100,49 @@ public class HandleI18nContentSupport extends DefaultI18nContentSupport {
             locale = getFallbackLocale();
         }
         return locale;
+    }
+
+    /**
+     * Checks if the Locale is supported, added in mgnl config.
+     */
+    protected boolean isLocaleSupported(Locale locale) {
+        return locale != null && _locales.containsKey(locale.toString());
+    }
+
+    /**
+     * Gets the normal node data.
+     */
+    public NodeData getNodeData(Content node, String name, Locale locale) throws RepositoryException {
+        // return the node data
+        return node.getNodeData(name);
+    }
+
+    /**
+     * Gets the normal node data.
+     */
+    public NodeData getNodeData(Content node, String name) {
+        // return the node data
+        return node.getNodeData(name);
+    }
+
+    public boolean isEnabled() {
+        return _enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        _enabled = enabled;
+    }
+
+    public Collection getLocales() {
+        return _locales.values();
+    }
+
+    /**
+     * Adds a locale.
+     */
+    public void addLocale(LocaleDefinition ld) {
+        if (ld.isEnabled()) {
+            _locales.put(ld.getId(), ld.getLocale());
+        }
     }
 }
