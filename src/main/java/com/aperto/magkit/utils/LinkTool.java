@@ -62,6 +62,9 @@ public final class LinkTool {
                 String path = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
                 if (StringUtils.isBlank(path) && !StringUtils.isBlank(alternativeRepository)) {
                     path = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
+                    if (!StringUtils.isBlank(path)) {
+                        path = "/" + alternativeRepository + path;   
+                    }
                 }
                 newLink = StringUtils.defaultString(path, link);
             } catch (NullPointerException e) {

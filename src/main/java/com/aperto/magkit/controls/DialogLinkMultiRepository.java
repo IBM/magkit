@@ -33,8 +33,8 @@ public class DialogLinkMultiRepository extends DialogUUIDLink {
 
         // settings for the 2nd button
         String extension = getConfigValue("extension");
-        String label = getMessage("dialog.link.internal.2nd");
-        getButton(1).setLabel(label);
+        getButton().setLabel(getMessage("dialog.link.internal.2nd"));
+        getButton(1).setLabel(getMessage("dialog.link.internal"));
         getButton(1).setSaveInfo(false);
         String repository = getConfigValue("secondRepository", "data");
         String tree = getConfigValue("tree", repository);
