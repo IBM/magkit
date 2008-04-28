@@ -113,26 +113,30 @@ public class ImageTag extends BaseContentTag {
             imageData = (ImageData) request.getAttribute(_imageDataName);
         }
 
-        if (imageData != null) {
-            writeToJsp(out, imageData, request.getContextPath());
-            returnValue = super.doEndTag();
-        } else {
+        if (imageData == null) {
             Content contentNode = getFirstMatchingNode();
             if (contentNode != null) {
                 NodeData imageNodeData = contentNode.getNodeData(nodeDataName);
                 if (imageNodeData.isExist()) {
                     imageData = new ImageData(imageNodeData, retrieveAltText(contentNode));
-                    if (!StringUtils.isBlank(_htmlAttributes.get("width")) && !StringUtils.isBlank(_htmlAttributes.get("height"))) {
-                        imageData.setHeight(_htmlAttributes.get("height"));
-                        imageData.setWidth(_htmlAttributes.get("width"));
-                    }
-                    writeToJsp(out, imageData, request.getContextPath());                    
-                    returnValue = super.doEndTag();
                 }
             }
         }
 
+        if (imageData != null) {
+            checkMeasures(imageData);
+            writeToJsp(out, imageData, request.getContextPath());
+            returnValue = super.doEndTag();
+        }
+
         return returnValue;
+    }
+
+    private void checkMeasures(ImageData imageData) {
+        if (!StringUtils.isBlank(_htmlAttributes.get("width")) && !StringUtils.isBlank(_htmlAttributes.get("height"))) {
+            imageData.setHeight(_htmlAttributes.get("height"));
+            imageData.setWidth(_htmlAttributes.get("width"));
+        }
     }
 
     private void writeToJsp(JspWriter out, ImageData imageData, String contextPath) {
