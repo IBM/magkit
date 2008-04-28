@@ -29,6 +29,7 @@ public class ConvertLinkTag extends TagSupport {
 
     private String _nodeDataName;
     private String _linkValue;
+    private String _altRepo = null;
     private boolean _addContextPath = true;
     private boolean _addExtension = true;
 
@@ -50,6 +51,11 @@ public class ConvertLinkTag extends TagSupport {
     @TagAttribute
     public void setAddExtension(String addExtension) {
         _addExtension = Boolean.getBoolean(addExtension);
+    }
+
+    @TagAttribute
+    public void setAltRepo(String altRepo) {
+        _altRepo = altRepo;
     }
 
     /**
@@ -82,7 +88,7 @@ public class ConvertLinkTag extends TagSupport {
         if (!StringUtils.isBlank(_linkValue)) {
             try {
                 if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
-                    String link = LinkTool.convertLink(_linkValue, _addExtension);
+                    String link = LinkTool.convertLink(_linkValue, _addExtension, _altRepo);
                     if (_addContextPath) {
                         out.write(request.getContextPath());
                     }
@@ -98,5 +104,17 @@ public class ConvertLinkTag extends TagSupport {
         }
 
         return super.doEndTag();
+    }
+
+    /**
+     * @see javax.servlet.jsp.tagext.TagSupport#release()
+     */
+    public void release() {
+        _addContextPath = true;
+        _addExtension = true;
+        _altRepo = null;
+        _linkValue = null;
+        _nodeDataName = null;
+        super.release();
     }
 }

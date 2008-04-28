@@ -37,17 +37,32 @@ public final class LinkTool {
     /**
      * Returns an absolute path link nevertheless if u give it a uuidLink or normal link with optional added .html.
      *
-     * @param link    the link or uuid, in case of uuid it converts it to a absolute link
+     * @param link the link or uuid, in case of uuid it converts it to a absolute link
      * @param addExtension if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
      * @return the absolute link with optional .html
      */
     public static String convertLink(String link, boolean addExtension) {
+        return convertLink(link, addExtension, null);
+    }
+
+    /**
+     * Returns a handle nevertheless if you give it a uuidLink or normal link with optional added .html.
+     *
+     * @param link the link or uuid, in case of uuid it converts it to a absolute link
+     * @param addExtension if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
+     * @param alternativeRepository which were checked, too.
+     * @return the handle with optional .html
+     */
+    public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
         String newLink = "";
 
         if (StringUtils.isNotEmpty(link)) {
             try {
                 // convert to uuid or just give the passed link back (for externals or controlType:link)
                 String path = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
+                if (StringUtils.isBlank(path) && !StringUtils.isBlank(alternativeRepository)) {
+                    path = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
+                }
                 newLink = StringUtils.defaultString(path, link);
             } catch (NullPointerException e) {
                 // should only occur in unit tests if the mgnlContext is not present
