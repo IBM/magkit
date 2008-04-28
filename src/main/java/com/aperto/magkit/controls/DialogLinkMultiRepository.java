@@ -3,6 +3,7 @@ package com.aperto.magkit.controls;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.gui.control.Button;
 import info.magnolia.cms.gui.dialog.DialogLink;
+import info.magnolia.cms.gui.dialog.DialogUUIDLink;
 import org.apache.log4j.Logger;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author frank.sommer (08.02.2008)
  */
-public class DialogLinkMultiRepository extends DialogLink {
+public class DialogLinkMultiRepository extends DialogUUIDLink {
     private static final Logger LOGGER = Logger.getLogger(DialogLinkMultiRepository.class);
 
     /**
