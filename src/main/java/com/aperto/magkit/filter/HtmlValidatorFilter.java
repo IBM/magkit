@@ -7,12 +7,10 @@ import com.aperto.webkit.utils.IoTools;
 import com.aperto.webkit.utils.StringTools;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConstants;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.methods.MultipartPostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.httpclient.util.EncodingUtil;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.*;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.log4j.Logger;
 import javax.servlet.FilterChain;
@@ -47,7 +45,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static boolean c_validatorEnabled = false;
     static {
         try {
-            c_validatorEnabled = BooleanUtils.toBoolean(ResourceBundle.getBundle("nektar").getString(PROPERTY_VALIDATOR_ACTIVE));
+            c_validatorEnabled = BooleanUtils.toBoolean(ResourceBundle.getBundle("environment").getString(PROPERTY_VALIDATOR_ACTIVE));
         } catch (MissingResourceException e) {
             // ignore, validation is disabled (default seting)
         }
@@ -82,7 +80,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         } finally {
             IoTools.closeQuietly(in);
         }
-//        c_validatorEnabled = BooleanUtils.toBoolean(ResourceBundle.getBundle("nektar").getString(PROPERTY_VALIDATOR_ACTIVE));
     }
 
     /**
@@ -209,12 +206,14 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         boolean isValid = true;
         String validationResult = null;
         HttpClient httpClient = new HttpClient();
-        MultipartPostMethod w3cValidatorCheck = new MultipartPostMethod(getW3cValidatorCheckUrl());
+        PostMethod w3cValidatorCheck = new PostMethod(getW3cValidatorCheckUrl());
         PartSource bufferSource = new BufferSource(uri, html, "UTF-8");
+
         FilePart uploadedFile = new FilePart("uploaded_file", bufferSource, "text/html; charset=UTF-8", "UTF-8");
-        w3cValidatorCheck.addPart(uploadedFile);
         StringPart showSource = new StringPart("ss", "1");
-        w3cValidatorCheck.addPart(showSource);
+        Part[] parts = { showSource, uploadedFile }; 
+        w3cValidatorCheck.setRequestEntity(new MultipartRequestEntity(parts, w3cValidatorCheck.getParams()));
+
         int responseCode = httpClient.executeMethod(w3cValidatorCheck);
         if (responseCode != 200) {
             LOGGER.warn(getW3cValidatorCheckUrl() + " responded with " + responseCode + "\n" + getHtml(w3cValidatorCheck));
@@ -240,8 +239,8 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             sb.append("    </head>\n");
             sb.append("    <body>\n");
             sb.append("        <ul>\n");
-            for (Iterator i = errors.iterator(); i.hasNext(); ) {
-                String error = (String) i.next();
+            for (Object errorObject : errors) {
+                String error = (String) errorObject;
                 sb.append("            <li>").append(JspUtils.htmlEncode(error)).append("</li>\n");
             }
             sb.append("        </ul>\n");
@@ -254,17 +253,18 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     private String getHtml(HttpMethodBase httpMethod) throws IoRuntimeException {
         InputStream in = null;
+        String html = "";
         try {
             in = httpMethod.getResponseBodyAsStream();
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             IoTools.copy(in, buffer);
-            String html = HttpConstants.getContentString(buffer.toByteArray(), httpMethod.getResponseCharSet());
-            return html;
+            html = EncodingUtil.getString(buffer.toByteArray(), httpMethod.getResponseCharSet());
         } catch (IOException e) {
             throw new IoRuntimeException(e);
         } finally {
             IoTools.closeQuietly(in);
         }
+        return html;        
     }
 
     private String injectWarningLayer(String html, String validationResultUrl) {
@@ -280,7 +280,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         while (i > 0 && (html.charAt(i - 1) == ' ' || html.charAt(i - 1) == '\t')) {
             --i;
         }
-        Map replacements = new HashMap();
+        Map<String, Object> replacements = new HashMap<String, Object>();
         replacements.put("validatorWarningCssUri", getValidatorWarningCssUri());
         replacements.put("validationResultUrl", validationResultUrl);
         String warningLayer = StringTools.replacePlaceHolders(_warningLayerTemplate, replacements);
@@ -360,93 +360,97 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
      * @author Michael Tamm
      */
     private static class HttpServletResponseWrapper implements HttpServletResponse {
-        private final HttpServletResponse _realRepsonse;
+        private final HttpServletResponse _realResponse;
         private BufferServletOutputStream _out = null;
         private BufferPrintWriter _writer = null;
         private String _contentType = null;
 
         public HttpServletResponseWrapper(HttpServletResponse response) {
-            _realRepsonse = response;
+            _realResponse = response;
         }
 
         public void addCookie(Cookie cookie) {
-            _realRepsonse.addCookie(cookie);
+            _realResponse.addCookie(cookie);
         }
 
         public boolean containsHeader(String name) {
-            return _realRepsonse.containsHeader(name);
+            return _realResponse.containsHeader(name);
         }
 
         // CHECKSTYLE:OFF
         public String encodeURL(String url) {
-            return _realRepsonse.encodeURL(url);
+            return _realResponse.encodeURL(url);
         }
         // CHECKSTYLE:ON
 
         // CHECKSTYLE:OFF
         public String encodeRedirectURL(String url) {
-            return _realRepsonse.encodeRedirectURL(url);
+            return _realResponse.encodeRedirectURL(url);
         }
         // CHECKSTYLE:ON
 
         public String encodeUrl(String url) {
-            return _realRepsonse.encodeUrl(url);
+            return _realResponse.encodeURL(url);
         }
 
         public String encodeRedirectUrl(String url) {
-            return _realRepsonse.encodeRedirectUrl(url);
+            return _realResponse.encodeRedirectURL(url);
         }
 
         public void sendError(int sc, String msg) throws IOException {
-            _realRepsonse.sendError(sc, msg);
+            _realResponse.sendError(sc, msg);
         }
 
         public void sendError(int sc) throws IOException {
-            _realRepsonse.sendError(sc);
+            _realResponse.sendError(sc);
         }
 
         public void sendRedirect(String location) throws IOException {
-            _realRepsonse.sendRedirect(location);
+            _realResponse.sendRedirect(location);
         }
 
         public void setDateHeader(String name, long date) {
-            _realRepsonse.setDateHeader(name, date);
+            _realResponse.setDateHeader(name, date);
         }
 
         public void addDateHeader(String name, long date) {
-            _realRepsonse.addDateHeader(name, date);
+            _realResponse.addDateHeader(name, date);
         }
 
         public void setHeader(String name, String value) {
-            _realRepsonse.setHeader(name, value);
+            _realResponse.setHeader(name, value);
         }
 
         public void addHeader(String name, String value) {
-            _realRepsonse.addHeader(name, value);
+            _realResponse.addHeader(name, value);
         }
 
         public void setIntHeader(String name, int value) {
-            _realRepsonse.setIntHeader(name, value);
+            _realResponse.setIntHeader(name, value);
         }
 
         public void addIntHeader(String name, int value) {
-            _realRepsonse.addIntHeader(name, value);
+            _realResponse.addIntHeader(name, value);
         }
 
         public void setStatus(int sc) {
-            _realRepsonse.setStatus(sc);
+            _realResponse.setStatus(sc);
         }
 
         public void setStatus(int sc, String sm) {
-            _realRepsonse.setStatus(sc, sm);
+            try {
+                _realResponse.sendError(sc, sm);
+            } catch (IOException e) {
+                LOGGER.info("Can not send error message.", e);
+            }
         }
 
         public void setCharacterEncoding(String charset) {
-            _realRepsonse.setCharacterEncoding(charset);
+            _realResponse.setCharacterEncoding(charset);
         }
 
         public String getCharacterEncoding() {
-            return _realRepsonse.getCharacterEncoding();
+            return _realResponse.getCharacterEncoding();
         }
 
         public ServletOutputStream getOutputStream() throws IOException {
@@ -475,7 +479,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
         public void setContentType(String type) {
             _contentType = type;
-            _realRepsonse.setContentType(type);
+            _realResponse.setContentType(type);
         }
 
         /**
@@ -487,35 +491,35 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         }
 
         public void setBufferSize(int size) {
-            _realRepsonse.setBufferSize(size);
+            _realResponse.setBufferSize(size);
         }
 
         public int getBufferSize() {
-            return _realRepsonse.getBufferSize();
+            return _realResponse.getBufferSize();
         }
 
         public void flushBuffer() throws IOException {
-            _realRepsonse.flushBuffer();
+            _realResponse.flushBuffer();
         }
 
         public void resetBuffer() {
-            _realRepsonse.resetBuffer();
+            _realResponse.resetBuffer();
         }
 
         public boolean isCommitted() {
-            return _realRepsonse.isCommitted();
+            return _realResponse.isCommitted();
         }
 
         public void reset() {
-            _realRepsonse.reset();
+            _realResponse.reset();
         }
 
         public void setLocale(Locale loc) {
-            _realRepsonse.setLocale(loc);
+            _realResponse.setLocale(loc);
         }
 
         public Locale getLocale() {
-            return _realRepsonse.getLocale();
+            return _realResponse.getLocale();
         }
 
         /**
@@ -541,12 +545,12 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             if (_out != null) {
                 byte[] bytes = _out.getBytes();
                 LOGGER.debug("setContentLength(" + bytes.length + ")");
-                _realRepsonse.setContentLength(bytes.length);
-                OutputStream out = _realRepsonse.getOutputStream();
+                _realResponse.setContentLength(bytes.length);
+                OutputStream out = _realResponse.getOutputStream();
                 out.write(bytes);
             } else if (_writer != null) {
                 String text = _writer.getBuffer();
-                PrintWriter writer = _realRepsonse.getWriter();
+                PrintWriter writer = _realResponse.getWriter();
                 writer.print(text);
             }
         }
@@ -568,11 +572,11 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                     }
                 }
                 LOGGER.debug("setContentLength(" + bytes.length + ")");
-                _realRepsonse.setContentLength(bytes.length);
-                OutputStream out = _realRepsonse.getOutputStream();
+                _realResponse.setContentLength(bytes.length);
+                OutputStream out = _realResponse.getOutputStream();
                 out.write(bytes);
             } else {
-                PrintWriter writer = _realRepsonse.getWriter();
+                PrintWriter writer = _realResponse.getWriter();
                 writer.print(html);
             }
         }
