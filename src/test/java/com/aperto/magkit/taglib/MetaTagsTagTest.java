@@ -7,9 +7,11 @@ import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
 import org.apache.commons.lang.StringUtils;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.matchers.StringContains;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -17,46 +19,24 @@ import org.springframework.mock.web.MockServletConfig;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
-import static org.junit.matchers.StringContains.*;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * Test the breadcrumb.
  * @author frank.sommer (17.04.2008)
  */
-public class BreadCrumbTagTest extends MagKitTagTest {
+public class MetaTagsTagTest extends MagKitTagTest {
 
-    private BreadCrumbTag _tag;
+    private MetaTagsTag _tag;
 
     @Test
-    public void testDefaultBreadCrumb() throws JspException {
+    public void testDefaultMetaTags() throws JspException {
         PageContext pageContext = runLifeCycle(_tag);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
-        assertThat(output, containsString("<ol>"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
-    }
-
-    @Test
-    public void testWithDelimiter() throws JspException {
-        _tag.setListStyle(false);
-        _tag.setListType(" - ");
-        PageContext pageContext = runLifeCycle(_tag);
-        JspWriter jspWriter = pageContext.getOut();
-        String output = jspWriter.toString();
-        assertThat(output, not(containsString("<ol>")));
-        assertThat(StringUtils.countMatches(output, " - "), is(2));
-    }
-
-    @Test
-    public void testOtherListType() throws JspException {
-        _tag.setListType("ul class=\"test\"");
-        PageContext pageContext = runLifeCycle(_tag);
-        JspWriter jspWriter = pageContext.getOut();
-        String output = jspWriter.toString();
-        assertThat(output, not(containsString("<ol>")));
-        assertThat(output, containsString("<ul class=\"test\">"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
+        Assert.assertThat(output, StringContains.containsString("<meta name=\"author\" content=\"aperto\" />"));
+        Assert.assertThat(output, StringContains.containsString("<meta name=\"description\" content=\"toll\" />"));
+        Assert.assertThat(output, StringContains.containsString("<meta name=\"publisher\" content=\"aperto\" />"));
+        Assert.assertThat(StringUtils.countMatches(output, "<meta"), CoreMatchers.is(3));
     }
 
     @Override
@@ -66,14 +46,11 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         request.setSession(httpSession);
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        MockContent rootContent = new MockContent("content", ItemType.CONTENT);
-
         MockContent parentContent = new MockContent("parent", ItemType.CONTENT);
-        parentContent.addNodeData(new MockNodeData("title", "layer 1"));
-        parentContent.setParent(rootContent);
+        parentContent.addNodeData(new MockNodeData("meta-author", "aperto"));
 
         MockContent mockContent = new MockContent("page1", ItemType.CONTENT);
-        mockContent.addNodeData(new MockNodeData("title", "layer 2"));
+        mockContent.addNodeData(new MockNodeData("meta-description", "toll"));
         mockContent.setParent(parentContent);
 
         MockContent mockContent2 = new MockContent("page2", ItemType.CONTENT);
@@ -87,6 +64,6 @@ public class BreadCrumbTagTest extends MagKitTagTest {
 
     @Before
     public void initTag() throws Exception {
-        _tag = new BreadCrumbTag();
+        _tag = new MetaTagsTag();
     }
 }

@@ -71,10 +71,6 @@
                     <artifactId>magnolia-module-cache</artifactId>
                     <groupId>info.magnolia</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>magnolia-module-mail</artifactId>
-                    <groupId>info.magnolia</groupId>
-                </exclusion>
             </exclusions>
         </dependency>
         <!-- DMS module -->
