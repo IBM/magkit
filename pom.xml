@@ -77,6 +77,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- DMS module -->
+        <dependency>
+            <groupId>info.magnolia</groupId>
+            <artifactId>magnolia-module-dms</artifactId>
+            <version>1.2.3</version>
+        </dependency>
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
