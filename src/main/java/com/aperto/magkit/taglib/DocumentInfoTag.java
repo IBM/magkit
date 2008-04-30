@@ -70,10 +70,10 @@ public class DocumentInfoTag extends TagSupport {
                 documentInfo.setFileSize((doc.getFileSize() / divisor));
                 request.setAttribute("documentInfo", documentInfo);
             } else {
-                LOGGER.error("NodeData is not a uuid to a dms-document");
+                LOGGER.info("NodeData is not a uuid to a dms-document");
             }
         } else {
-            LOGGER.error("NodeData is not valid");
+            LOGGER.info("NodeData is not valid");
         }
         return super.doEndTag();
     }

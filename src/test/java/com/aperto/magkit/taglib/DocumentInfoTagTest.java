@@ -24,11 +24,11 @@ import javax.servlet.jsp.PageContext;
  * @author diana.racho (29.04.2008)
  */
 public class DocumentInfoTagTest extends MagKitTagTest {
-    private final String FILE_NAME = "testimage";
-    private final String FILE_EXTENSION = "jpg";
-    private final long FILE_SIZE_KB = 1024l;
-    private final long FILE_SIZE_BYTE = 1048576l;
-    private final long FILE_SIZE_MB = 1l;
+    private static final String FILE_NAME = "testimage";
+    private static final String FILE_EXTENSION = "jpg";
+    private static final long FILE_SIZE_KB = 1024L;
+    private static final long FILE_SIZE_BYTE = 1048576L;
+    private static final long FILE_SIZE_MB = 1L;
     private DocumentInfoTag _documentInfoTag;
 
     @Test

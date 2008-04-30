@@ -16,31 +16,31 @@ public class DocumentInfo {
         return _fileSize;
     }
 
-    public void setFileSize(long _fileSize) {
-        this._fileSize = _fileSize;
+    public void setFileSize(long fileSize) {
+        _fileSize = fileSize;
     }
 
     public String getFileExtension() {
         return _fileExtension;
     }
 
-    public void setFileExtension(String _fileExtension) {
-        this._fileExtension = _fileExtension;
+    public void setFileExtension(String fileExtension) {
+        _fileExtension = fileExtension;
     }
 
     public Calendar getFileModificationDate() {
         return _fileModificationDate;
     }
 
-    public void setFileModificationDate(Calendar _fileModificationDate) {
-        this._fileModificationDate = _fileModificationDate;
+    public void setFileModificationDate(Calendar fileModificationDate) {
+        _fileModificationDate = fileModificationDate;
     }
 
     public String getFileName() {
         return _fileName;
     }
 
-    public void setFileName(String _fileName) {
-        this._fileName = _fileName;
+    public void setFileName(String fileName) {
+        _fileName = fileName;
     }
 }
