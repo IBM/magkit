@@ -43,6 +43,10 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "enabled", "true")
     });
 
+    private final Task _addBypassFor404 = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[] {
+        new AddFilterBypassTask("/server/filters/bypasses", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit/404.jsp"),
+    });
+
     /**
      * Whithin the default constructor the DeltaBuilder is updated with all nessesary Tasks for an update to module version 1.5 (for Magnolia 3.5.x).
      * <ul>
