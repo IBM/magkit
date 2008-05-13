@@ -9,14 +9,21 @@ import java.util.List;
  * @author frank.sommer (09.05.2008)
  */
 public class NavigationItem extends Item {
-    private List<Item> _subItems = null;
+    private List<NavigationItem> _subItems = null;
 
-    public List<Item> getSubItems() {
+    public List<NavigationItem> getSubItems() {
         return _subItems;
     }
 
-    public void setSubItems(List<Item> subItems) {
+    public void setSubItems(List<NavigationItem> subItems) {
         _subItems = subItems;
+    }
+
+    /**
+     * Constructor.
+     */
+    public NavigationItem() {
+        super();
     }
 
     /**
@@ -29,7 +36,7 @@ public class NavigationItem extends Item {
     /**
      * Constructor.
      */
-    public NavigationItem(String key, String value, List<Item> subItems) {
+    public NavigationItem(String key, String value, List<NavigationItem> subItems) {
         super(key, value);
         _subItems = subItems;
     }

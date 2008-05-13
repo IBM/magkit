@@ -14,6 +14,13 @@ public class Item implements Comparable {
     public static final String KEY_SORTING_DELIMITER = "#";
 
     /**
+     * Constructor.
+     */
+    public Item() {
+        super();
+    }
+
+    /**
      * Constructor with key and value.
      * @param key Key of pair.
      * @param value Value of pair.
