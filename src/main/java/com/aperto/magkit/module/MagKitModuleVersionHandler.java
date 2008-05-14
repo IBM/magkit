@@ -47,16 +47,20 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", "config", "/server/filters/bypasses/404", new AddFilterBypassTask("/server/filters/bypasses", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit/404.jsp")),
     });
 
-    /**
-     * Whithin the default constructor the DeltaBuilder is updated with all nessesary Tasks for an update to module version 1.5 (for Magnolia 3.5.x).
-     * <ul>
-     *      <li>remove deprecated filter property 'priority'</li>
-     *      <li>move acegi filter to correct position </li>
-     * </ul>
-     */
+    private final Task _add404Config = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[] {
+        new CreateNodeTask("Config node", "Create config node.", "config", "/modules/magkit", "config", ItemType.CONTENT.getSystemName()),
+        new CreateNodeTask("404 node", "Create config node for 404.", "config", "/modules/magkit/config", "404", ItemType.CONTENT.getSystemName()),
+        new SetPropertyTask(ContentRepository.CONFIG, "/modules/magkit/config/404", "handle", "/content/de.html"),
+    });
+
+    private final Task _check404Config = new ArrayDelegateTask("Bypass config", "Add the config for the 404 redirect.", new Task[] {
+        new NodeExistsDelegateTask("Check 404 config", "Check 404 config in magkit.", "config", "/server/filters/bypasses/404", _add404Config),
+    });
+
     public MagKitModuleVersionHandler() {
         DeltaBuilder builder100 = DeltaBuilder.update("1.0.0", "Upgrading to Magkit 1.0.0");
         builder100.addTask(_addBypassFor404);
+        builder100.addTask(_check404Config);
         register(builder100);
     }
 
@@ -68,6 +72,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_setAdminInterfaceExportClassTask);
         tasks.add(_setI18nContentSupportTask);
         tasks.add(_addBypassFor404);
+        tasks.add(_add404Config);
         return tasks;
     }
 }
