@@ -57,6 +57,9 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new NodeExistsDelegateTask("Check 404 config", "Check 404 config in magkit.", "config", "/server/filters/bypasses/404", _add404Config),
     });
 
+    /**
+     * Constructor for adding update builder.
+     */
     public MagKitModuleVersionHandler() {
         DeltaBuilder builder100 = DeltaBuilder.update("1.0.0", "Upgrading to Magkit 1.0.0");
         builder100.addTask(_addBypassFor404);
