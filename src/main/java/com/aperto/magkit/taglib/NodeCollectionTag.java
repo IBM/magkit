@@ -10,8 +10,8 @@ import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 import javax.jcr.RepositoryException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
+import javax.servlet.jsp.JspTagException;
+import javax.servlet.jsp.jstl.core.LoopTagSupport;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -21,10 +21,9 @@ import java.util.Iterator;
  * @author frank.sommer (15.05.2008)
  */
 @Tag(name = "nodeCollIterator", bodyContent = BodyContent.JSP)
-public class NodeCollectionTag  extends TagSupport {
+public class NodeCollectionTag extends LoopTagSupport {
     private static final Logger LOGGER = Logger.getLogger(NodeCollectionTag.class);
     private String _contentNodeName;
-    private String _var = "nodeValue";
     private Iterator _nodeIterator;
 
     public String getContentNodeName() {
@@ -40,19 +39,22 @@ public class NodeCollectionTag  extends TagSupport {
     }
 
     /**
-     * Setter for <code>var</code>.
-     * Default is nodeValue.
+     * Variable name of the current object in request.
      */
     @TagAttribute
-    public void setVar(String var) {
-        _var = var;
+    public void setVar(String string) {
+        super.setVar(string);
     }
 
     /**
-     * @see javax.servlet.jsp.tagext.Tag#doStartTag()
+     * Name of the var status object.
      */
-    public int doStartTag() {
-        int returnValue = SKIP_BODY;
+    @TagAttribute
+    public void setVarStatus(String string) {
+        super.setVarStatus(string);
+    }
+
+    protected void prepare() throws JspTagException {
         Content content = Resource.getLocalContentNode();
         try {
             if (content != null && !StringUtils.isBlank(_contentNodeName) && content.hasContent(_contentNodeName)) {
@@ -60,22 +62,27 @@ public class NodeCollectionTag  extends TagSupport {
                 Collection nodeDataCollection = collContent.getNodeDataCollection();
                 nodeDataCollection = ContentUtils.orderNodeDataCollection(nodeDataCollection);
                 _nodeIterator = nodeDataCollection.iterator();
-                returnValue = doIteration() ? EVAL_BODY_INCLUDE : SKIP_BODY;
             }
         } catch (RepositoryException e){
             LOGGER.info("Contentnode could not retrieved.");
         }
-
-        return returnValue;
     }
 
-    private boolean doIteration() {
-        boolean status = false;
-        if (_nodeIterator.hasNext()) {
-            NodeData nd = (NodeData) _nodeIterator.next();
-            pageContext.setAttribute(_var, nd.getString(), PageContext.REQUEST_SCOPE);
-            status = true;
-        }
-        return status;
+    protected boolean hasNext() throws JspTagException {
+        return _nodeIterator.hasNext();
+    }
+
+    protected Object next() throws JspTagException {
+        return ((NodeData) _nodeIterator.next()).getString();
+    }
+
+    /**
+     * Release tag.
+     */
+    @Override
+    public void release() {
+        super.release();
+        _contentNodeName = "";
+        _nodeIterator = null;
     }
 }
