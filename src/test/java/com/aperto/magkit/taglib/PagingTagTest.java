@@ -46,7 +46,7 @@ public class PagingTagTest extends MagKitTagTest {
         assertNotNull("JspWriter is null", jspWriter);
         String output = jspWriter.toString();
         assertNotNull("output is null", output);
-        assertTrue("Output does not contain expected String '1</strong>'", output.contains("1</strong>"));
+        assertTrue("Output does not contain expected String '1</strong>'", output.contains("<li class=\"aktiv\">1</li>"));
         assertTrue("Output does not contain expected String '2</a>'", output.contains("2</a>"));
         assertFalse("Output does not contain expected String '.pid-1.'", output.contains(".pid-1."));
         assertTrue("\"" + output + "\" does not contain expected String 'old.selector.pid-2.'", output.contains("old.selector.pid-2."));
