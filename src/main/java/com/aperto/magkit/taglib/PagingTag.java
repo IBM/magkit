@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -17,11 +18,23 @@ import java.util.ResourceBundle;
 
 /**
  * Draws a paging div container.
+ * Looks in the property files for naming the links, link titles and selector.
+ * (common.paging.prefix, common.paging.prefixTitle, common.paging.selector,
+ * common.paging.prevPageTitle, common.paging.prevPage, common.paging.nextPageTitle, common.paging.nextPage) 
+ *
  * @author frank.sommer (15.11.2007)
  */
 @Tag(name = "paging", bodyContent = BodyContent.JSP)
 public class PagingTag extends TagSupport {
     private static final Logger LOGGER = Logger.getLogger(PagingTag.class);
+
+    private String _prefix = "Seite";
+    private String _prefixTitle = "zur Seite ";
+    private String _selector = " ";
+    private String _prevPageTitle = "zur vorherigen Seite";
+    private String _prevPage = "zurück";
+    private String _nextPageTitle = "zur nächsten Seite";
+    private String _nextPage = "weiter";
 
     private int _pages;
     private int _actPage;
@@ -38,42 +51,48 @@ public class PagingTag extends TagSupport {
 
     /**
      * Produce the paging.
+     *
      * @return jsp output
      * @throws JspException
      */
     public int doEndTag() throws JspException {
         JspWriter out = pageContext.getOut();
         String completeHandle = getHandleFromActivePage();
-        String prefix = "Seite ";
-        String selector = "|";
-        String aureal = "Sie sind auf Seite: ";
-        try {
-            prefix = ResourceBundle.getBundle("language").getString("common.paging.prefix");
-            selector = ResourceBundle.getBundle("language").getString("common.paging.selector");
-            aureal = ResourceBundle.getBundle("language").getString("common.paging.aureal");
-        } catch (MissingResourceException mre) {
-            LOGGER.info("Can not find resource key. Using default value.");
-        }
+        init();
+
         try {
             if (_pages > 1) {
-                out.print("<div class=\"paging\">\n<div>");
-                out.print("<h3>" + prefix + "</h3>");
-                out.print("<p class=\"nav-index\">");
+                out.print("<div class=\"pager\">\n<ul>");
+
+                if (_actPage > 1) {
+                    out.print("<li class=\"previous\">");
+                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage - 1) + ".html\" title=\"" + _prevPageTitle + "\">");
+                    out.print(_prevPage + "</a></li>");
+                }
+
+                out.print("<li><strong>" + _prefix + "</strong></li>");
                 for (int i = 0; i < _pages; i++) {
                     int page = i + 1;
+
                     if (page == _actPage) {
-                        out.print("<strong><span class=\"aural\">" + aureal + "</span> " + page + "</strong>");
+                        out.print("<li class=\"aktiv\">" + page + "</li>");
                     } else {
-                        out.print("<a href=\"" + completeHandle + ".pid-" + page + ".html\" title=\"Seite " + page + "\" >");
-                        out.print(page);
-                        out.print("</a>");
+                        out.print("<li><a href=\"" + completeHandle + ".pid-" + page + ".html\" title=\"" + _prefixTitle + page + "\" >");
+                        out.print(page + "</a></li>");
                     }
-                    if (page < _pages) {
-                        out.print(" " + selector + " ");
+                    if (page < _pages && StringUtils.isNotBlank(_selector)) {
+                        out.print(" " + _selector + " ");
+                    } else {
+                        out.print(" ");
                     }
                 }
-                out.print("</p>");
-                out.print("</div>\n</div>");
+
+                if (_actPage < _pages) {
+                    out.print("<li class=\"next\">");
+                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage + 1) + ".html\" title=\"" + _nextPageTitle + "\">");
+                    out.print(_nextPage + "</a></li>");
+                }
+                out.print("</ul>\n</div>");
             }
         } catch (IOException e) {
             throw new NestableRuntimeException(e);
@@ -95,5 +114,19 @@ public class PagingTag extends TagSupport {
             }
         }
         return handle;
+    }
+
+    private void init() {
+        try {
+            _prefix = ResourceBundle.getBundle("language").getString("common.paging.prefix");
+            _prefixTitle = ResourceBundle.getBundle("language").getString("common.paging.prefixTitle");
+            _selector = ResourceBundle.getBundle("language").getString("common.paging.selector");
+            _prevPageTitle = ResourceBundle.getBundle("language").getString("common.paging.prevPageTitle");
+            _prevPage = ResourceBundle.getBundle("language").getString("common.paging.prevPage");
+            _nextPageTitle = ResourceBundle.getBundle("language").getString("common.paging.nextPageTitle");
+            _nextPage = ResourceBundle.getBundle("language").getString("common.paging.nextPage");
+        } catch (MissingResourceException mre) {
+            LOGGER.info("Can not find resource key. Using default value.");
+        }
     }
 }
