@@ -140,13 +140,13 @@ public class ExportTask extends MatchingTask {
         URL url;
         String[] elements;
         try {
-            url = new URL("http", _targetHost, _targetPort, getWebapp() + "/debug/get_node_children.jsp?currentNode=" + currentSite + getLogin());
+            url = new URL("http", _targetHost, _targetPort, getWebapp() + "/docroot/magkit/get_node_children.jsp?currentNode=" + currentSite + getLogin());
             info("access: " + url.toExternalForm());
             HttpClient httpClient = new HttpClient();
             GetMethod getMethod = new GetMethod(url.toString());
             int statusCode = httpClient.executeMethod(getMethod);
             if (statusCode != HttpStatus.SC_OK) {
-                throw new BuildException("Unable to call debug suite properly. Return code was: " + statusCode);
+                throw new BuildException("Unable to call magkit suite properly. Return code was: " + statusCode);
             }
             String body = getMethod.getResponseBodyAsString();
             body = body.trim();
