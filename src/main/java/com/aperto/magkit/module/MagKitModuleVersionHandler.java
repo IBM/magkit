@@ -5,6 +5,7 @@ import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
+import info.magnolia.module.model.Version;
 import info.magnolia.module.delta.*;
 import info.magnolia.setup.AddFilterBypassTask;
 import java.util.ArrayList;
@@ -58,13 +59,19 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     });
 
     /**
+     * this is used to bootstrap the new module-specific templates, dialogs ... .
+     * bootstraps everything from "mgnl-bootstrap" folder.
+     */
+    private final Task _bootstrapModuleConfigTask = new ModuleBootstrapTask();
+
+    /**
      * Constructor for adding update builder.
      */
     public MagKitModuleVersionHandler() {
-        DeltaBuilder builder100 = DeltaBuilder.update("1.0.0", "Upgrading to Magkit 1.0.0");
-        builder100.addTask(_addBypassFor404);
-        builder100.addTask(_check404Config);
-        register(builder100);
+        DeltaBuilder builder001 = DeltaBuilder.update("0.0.1", "Upgrading to Magkit 0.0.1");
+        builder001.addTask(_addBypassFor404);
+        builder001.addTask(_check404Config);
+        register(builder001);
     }
 
     protected List getExtraInstallTasks(InstallContext installContext) {
@@ -77,5 +84,12 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_addBypassFor404);
         tasks.add(_add404Config);
         return tasks;
+    }
+    
+    @Override
+    protected List getDefaultUpdateTasks(Version forVersion) {
+        List updateTasks = super.getDefaultUpdateTasks(forVersion);
+        updateTasks.add(_bootstrapModuleConfigTask);
+        return updateTasks;
     }
 }
