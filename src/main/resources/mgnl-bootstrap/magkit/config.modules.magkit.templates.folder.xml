@@ -23,10 +23,10 @@
     <sv:value>true</sv:value>
   </sv:property>
   <sv:property sv:name="path" sv:type="String">
-    <sv:value>/templates/magkit-module/pages/folder.jsp</sv:value>
+    <sv:value>/docroot/magkit/folder.jsp</sv:value>
   </sv:property>
   <sv:property sv:name="title" sv:type="String">
-    <sv:value>Aperto : Folder</sv:value>
+    <sv:value>Aperto: Folder</sv:value>
   </sv:property>
   <sv:node sv:name="MetaData">
     <sv:property sv:name="jcr:primaryType" sv:type="Name">
