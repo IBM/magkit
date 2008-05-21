@@ -45,7 +45,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     });
 
     private final Task _addBypassFor404 = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[] {
-        new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", "config", "/server/filters/bypasses/404", new AddFilterBypassTask("/server/filters/bypasses", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit/404.jsp")),
+        new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", "config", "/server/filters/bypasses/404", new AddFilterBypassTask("/server/filters/bypasses", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")),
     });
 
     private final Task _add404Config = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[] {
@@ -68,7 +68,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
      * Constructor for adding update builder.
      */
     public MagKitModuleVersionHandler() {
-        DeltaBuilder builder001 = DeltaBuilder.update("0.0.1", "Upgrading to Magkit 0.0.1");
+        DeltaBuilder builder001 = DeltaBuilder.update("0.0.4", "Upgrading to Magkit 0.0.4");
         builder001.addTask(_addBypassFor404);
         builder001.addTask(_check404Config);
         register(builder001);
