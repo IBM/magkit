@@ -171,7 +171,7 @@ public class RepositoryExportTask extends MatchingTask {
         URL url;
         String[] elements;
         try {
-            url = new URL("http", _targetHost, _targetPort, getWebapp() + "/debug/get_node_children.jsp?currentNode=" + currentSite + getLogin());
+            url = new URL("http", _targetHost, _targetPort, getWebapp() + "/docroot/magkit/get_node_children.jsp?currentNode=" + currentSite + getLogin());
             info("access: " + url.toExternalForm());
             HttpClient httpClient = new HttpClient();
             GetMethod getMethod = new GetMethod(url.toString());
