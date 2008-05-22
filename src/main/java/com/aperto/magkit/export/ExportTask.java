@@ -1,19 +1,19 @@
 package com.aperto.magkit.export;
 
-import com.aperto.webkit.utils.StringTools;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.taskdefs.MatchingTask;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import com.aperto.webkit.utils.StringTools;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import org.apache.log4j.Logger;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.MatchingTask;
 
 /**
  * This is an Ant task that exports every node beyond the root node into an extra xml file.
@@ -112,7 +112,6 @@ public class ExportTask extends MatchingTask {
         info("try to read the repository structure to export xml.");
         info("_rootNode: " + _rootNode);
         info("_outputPath: " + _outputPath);
-
         recursiveGetSite(_rootNode);
     }
 
@@ -181,10 +180,9 @@ public class ExportTask extends MatchingTask {
                     if (statusCode != HttpStatus.SC_OK) {
                         throw new BuildException("Unable to call debug suite properly. Return code was: " + statusCode);
                     }
-
                     File file = new File(_outputPath);
                     file = new File(file, exportSite + ".xml");
-                    info("writing file: " + file.getPath());
+                    info("writing file: " + file.getAbsolutePath());
                     writeToFile(getMethod, file);
                 } catch (IOException e) {
                     throw new BuildException(e);
@@ -201,7 +199,6 @@ public class ExportTask extends MatchingTask {
         try {
             source = getMethod.getResponseBodyAsStream();
             out = new FileOutputStream(file);
-
             byte[] buffer = new byte[10000];
             int count;
             while ((count = source.read(buffer, 0, buffer.length)) != -1) {
@@ -210,8 +207,8 @@ public class ExportTask extends MatchingTask {
         } catch (IOException e) {
             LOGGER.error("Exception while copying files: " + e.getMessage(), e);
         } finally {
-            IOUtils.closeQuietly(source);
-            IOUtils.closeQuietly(out);
+            closeQuietly(source);
+            closeQuietly(out);
         }
     }
 

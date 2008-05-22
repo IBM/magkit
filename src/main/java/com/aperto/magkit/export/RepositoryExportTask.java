@@ -134,7 +134,7 @@ public class RepositoryExportTask extends MatchingTask {
                 }
                 File file = new File(_outputPath);
                 file = new File(file, _repository + "." + element + ".xml");
-                info("writing file: " + file.getPath());
+                info("writing file: " + file.getAbsolutePath());
                 writeToFile(getMethod, file);
             } catch (MalformedURLException e) {
                 throw new BuildException("Failed to export site properly. Exception message: " + e.getMessage());
@@ -171,7 +171,7 @@ public class RepositoryExportTask extends MatchingTask {
         URL url;
         String[] elements;
         try {
-            url = new URL("http", _targetHost, _targetPort, getWebapp() + "/docroot/magkit/get_node_children.jsp?currentNode=" + currentSite + getLogin());
+            url = new URL("http", _targetHost, _targetPort, getWebapp() + "/magkit/get_node_children.jsp?currentNode=" + currentSite + getLogin());
             info("access: " + url.toExternalForm());
             HttpClient httpClient = new HttpClient();
             GetMethod getMethod = new GetMethod(url.toString());
