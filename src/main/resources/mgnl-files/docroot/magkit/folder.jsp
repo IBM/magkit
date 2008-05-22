@@ -6,7 +6,7 @@
 --%><%@ page pageEncoding="ISO-8859-1"
          contentType="text/html; charset=UTF-8"
          session="false"
-%><%@ include file="begin.jspf" %><%
+%><%@ include file="/WEB-INF/jspf/magkit/begin.jspf" %><%
     ServerConfiguration configuration = ServerConfiguration.getInstance();
     if (!configuration.isAdmin() || Resource.showPreview()) {
         Content actpage = Resource.getActivePage();
@@ -37,4 +37,4 @@
 </p>
 </body>
 </html>
-<%@ include file="end.jspf" %>
+<%@ include file="/WEB-INF/jspf/magkit/end.jspf" %>

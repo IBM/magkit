@@ -7,7 +7,7 @@
                  info.magnolia.cms.core.ItemType,
                  info.magnolia.context.MgnlContext,
                  java.util.Iterator"
-%><%@include file="begin.jspf"%><%
+%><%@include file="/WEB-INF/jspf/begin.jspf"%><%
     String currentNode = request.getParameter("currentNode");
     LOGGER.info("currentNode: " + currentNode);
     Content content = null;
@@ -54,4 +54,4 @@
         }
     }
 %>
-<%@ include file="end.jspf" %>
+<%@ include file="/WEB-INF/jspf/end.jspf" %>
