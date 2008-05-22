@@ -1,5 +1,4 @@
-<%@
-    page pageEncoding="Windows-1252"
+<%@ page pageEncoding="Windows-1252"
          contentType="text/html; charset=UTF-8"
          session="false"
          import="com.aperto.webkit.utils.StringTools,
@@ -8,9 +7,7 @@
                  info.magnolia.cms.core.ItemType,
                  info.magnolia.context.MgnlContext,
                  java.util.Iterator"
-%><%@
-    include file="/WEB-INF/jspf/begin.jspf"
-%><%
+%><%@include file="begin.jspf"%><%
     String currentNode = request.getParameter("currentNode");
     LOGGER.info("currentNode: " + currentNode);
     Content content = null;
@@ -29,7 +26,7 @@
             nodePath.append(s);
         }
         if ("/".equals(nodePath.toString())) {
-            content = hm.getRoot();   
+            content = hm.getRoot();
         } else {
             content = hm.getContent( nodePath.toString());
         }
@@ -56,6 +53,5 @@
             }
         }
     }
-%><%@
-    include file="/WEB-INF/jspf/end.jspf"
 %>
+<%@ include file="end.jspf" %>

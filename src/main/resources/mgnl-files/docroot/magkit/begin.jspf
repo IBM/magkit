@@ -1,0 +1,13 @@
+<%!
+    private static org.apache.log4j.Logger LOGGER = null;
+%><%
+    request.setCharacterEncoding("UTF-8");
+
+    // Init static LOGGER, if this is the first request to the jsp ...
+    if (LOGGER == null) {
+        LOGGER = com.aperto.webkit.jsp.TomcatTools.getLogger(pageContext, this);
+    }
+
+    // This try-block is closed in end.jspf ...
+    try {
+%>
