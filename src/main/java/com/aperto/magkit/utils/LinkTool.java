@@ -7,6 +7,7 @@ import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.LinkUtil;
 import info.magnolia.context.MgnlContext;
+import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import javax.jcr.PropertyType;
@@ -65,9 +66,11 @@ public final class LinkTool {
                     content = ContentUtil.getContentByUUID(alternativeRepository, link);
                     if (content != null) {
                         path = "/" + alternativeRepository + content.getHandle();
-                        if ("dms".equalsIgnoreCase(alternativeRepository)) {
-                            // dms servlet makes filename and extension by itself 
-                            withExtension = false;
+                        // in dms the file name is additional nessecary
+                        if ("dms".equalsIgnoreCase(alternativeRepository) && withExtension) {
+                            Document doc = new Document(content);
+                            path += "/" + doc.getFileName();
+                            extension = doc.getFileExtension();
                         }
                     }
                 } else {
