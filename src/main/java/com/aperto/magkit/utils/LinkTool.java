@@ -7,7 +7,6 @@ import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.LinkUtil;
 import info.magnolia.context.MgnlContext;
-import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import javax.jcr.PropertyType;
@@ -56,6 +55,7 @@ public final class LinkTool {
      */
     public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
         String newLink = "";
+        boolean withExtension = addExtension;
         String extension = LinkUtil.DEFAULT_EXTENSION;
         if (StringUtils.isNotEmpty(link)) {
             try {
@@ -66,8 +66,8 @@ public final class LinkTool {
                     if (content != null) {
                         path = "/" + alternativeRepository + content.getHandle();
                         if ("dms".equalsIgnoreCase(alternativeRepository)) {
-                            Document doc = new Document(content);
-                            extension = doc.getFileExtension();
+                            // dms servlet makes filename and extension by itself 
+                            withExtension = false;
                         }
                     }
                 } else {
@@ -79,7 +79,7 @@ public final class LinkTool {
                 newLink = link;
             }
         }
-        if (addExtension && !newLink.toLowerCase(ENGLISH).endsWith(".html") && !newLink.toLowerCase(ENGLISH).endsWith(".htm")) {
+        if (withExtension && !newLink.toLowerCase(ENGLISH).endsWith(".html") && !newLink.toLowerCase(ENGLISH).endsWith(".htm")) {
             newLink += "." + extension;
         }
 
