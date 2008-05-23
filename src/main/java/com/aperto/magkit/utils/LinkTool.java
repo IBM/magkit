@@ -4,9 +4,10 @@ import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.link.LinkHelper;
+import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.LinkUtil;
 import info.magnolia.context.MgnlContext;
+import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import javax.jcr.PropertyType;
@@ -55,16 +56,22 @@ public final class LinkTool {
      */
     public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
         String newLink = "";
-
+        String extension = LinkUtil.DEFAULT_EXTENSION;
         if (StringUtils.isNotEmpty(link)) {
             try {
-                // convert to uuid or just give the passed link back (for externals or controlType:link)
-                String path = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
-                if (StringUtils.isBlank(path) && !StringUtils.isBlank(alternativeRepository)) {
-                    path = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
-                    if (!StringUtils.isBlank(path)) {
-                        path = "/" + alternativeRepository + path;   
+                String path = null;
+                Content content = ContentUtil.getContentByUUID(ContentRepository.WEBSITE, link);
+                if (content == null && !StringUtils.isBlank(alternativeRepository)) {
+                    content = ContentUtil.getContentByUUID(alternativeRepository, link);
+                    if (content != null) {
+                        path = "/" + alternativeRepository + content.getHandle();
+                        if ("dms".equalsIgnoreCase(alternativeRepository)) {
+                            Document doc = new Document(content);
+                            extension = doc.getFileExtension();
+                        }
                     }
+                } else {
+                    path = content.getHandle();
                 }
                 newLink = StringUtils.defaultString(path, link);
             } catch (NullPointerException e) {
@@ -73,7 +80,7 @@ public final class LinkTool {
             }
         }
         if (addExtension && !newLink.toLowerCase(ENGLISH).endsWith(".html") && !newLink.toLowerCase(ENGLISH).endsWith(".htm")) {
-            newLink += "." + LinkUtil.DEFAULT_EXTENSION;
+            newLink += "." + extension;
         }
 
         return newLink;
