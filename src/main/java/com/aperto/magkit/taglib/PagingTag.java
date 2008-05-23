@@ -38,6 +38,7 @@ public class PagingTag extends TagSupport {
 
     private int _pages;
     private int _actPage;
+    private boolean _addQueryString = false;
 
     @TagAttribute(required = true)
     public void setPages(int pages) {
@@ -49,6 +50,11 @@ public class PagingTag extends TagSupport {
         _actPage = actPage;
     }
 
+    @TagAttribute
+    public void setAddQueryString(String addQueryString) {
+        _addQueryString = Boolean.valueOf(addQueryString);
+    }
+
     /**
      * Produce the paging.
      *
@@ -58,15 +64,19 @@ public class PagingTag extends TagSupport {
     public int doEndTag() throws JspException {
         JspWriter out = pageContext.getOut();
         String completeHandle = getHandleFromActivePage();
+        String queryString = "";
         init();
-
+        if (_addQueryString) {
+            HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+            queryString = "?" + request.getQueryString();
+        }
         try {
             if (_pages > 1) {
                 out.print("<div class=\"pager\">\n<ul>");
 
                 if (_actPage > 1) {
                     out.print("<li class=\"previous\">");
-                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage - 1) + ".html\" title=\"" + _prevPageTitle + "\">");
+                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage - 1) + ".html" + queryString + "\" title=\"" + _prevPageTitle + "\">");
                     out.print(_prevPage + "</a></li>");
                 }
 
@@ -77,7 +87,7 @@ public class PagingTag extends TagSupport {
                     if (page == _actPage) {
                         out.print("<li class=\"aktiv\">" + page + "</li>");
                     } else {
-                        out.print("<li><a href=\"" + completeHandle + ".pid-" + page + ".html\" title=\"" + _prefixTitle + page + "\" >");
+                        out.print("<li><a href=\"" + completeHandle + ".pid-" + page + ".html" + queryString + "\" title=\"" + _prefixTitle + page + "\" >");
                         out.print(page + "</a></li>");
                     }
                     if (page < _pages && StringUtils.isNotBlank(_selector)) {
@@ -89,7 +99,7 @@ public class PagingTag extends TagSupport {
 
                 if (_actPage < _pages) {
                     out.print("<li class=\"next\">");
-                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage + 1) + ".html\" title=\"" + _nextPageTitle + "\">");
+                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage + 1) + ".html" + queryString + "\" title=\"" + _nextPageTitle + "\">");
                     out.print(_nextPage + "</a></li>");
                 }
                 out.print("</ul>\n</div>");
