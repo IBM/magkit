@@ -68,7 +68,7 @@ public class PagingTag extends TagSupport {
         init();
         if (_addQueryString) {
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-            queryString = "?" + request.getQueryString();
+            queryString = "?" + request.getQueryString().replaceAll("&", "&amp;");
         }
         try {
             if (_pages > 1) {
