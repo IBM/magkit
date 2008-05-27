@@ -3,6 +3,8 @@ package com.aperto.magkit.utils;
 import info.magnolia.cms.beans.runtime.FileProperties;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
+import info.magnolia.cms.util.NodeDataUtil;
+import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.StringUtils;
 import javax.jcr.RepositoryException;
 
@@ -103,6 +105,26 @@ public class ImageData {
         } catch (RepositoryException e) {
             LOGGER.warn("Can not access repository.", e);
         }
+    }
+
+    /**
+     * Constructor.
+     * @param document from dms
+     */
+    public ImageData(Document document) {
+        _handle = document.getPath() + document.getFileName() + "." + document.getFileExtension();
+        Content content = document.getNode();
+        try {
+            if (content.hasNodeData("document")) {
+                NodeData nodeData = content.getNodeData("document");
+                _height = nodeData.getAttribute(FileProperties.PROPERTY_HEIGHT);
+                _width = nodeData.getAttribute(FileProperties.PROPERTY_WIDTH);
+            }
+        } catch (RepositoryException re) {
+            LOGGER.info("Can not get document nodedata from dms document.");
+        }
+        _filesize = String.valueOf(document.getFileSize());
+        _alt = NodeDataUtil.getString(content, "subject", document.getFileName());
     }
 
     /**
