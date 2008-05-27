@@ -112,7 +112,7 @@ public class ImageData {
      * @param document from dms
      */
     public ImageData(Document document) {
-        _handle = document.getPath() + document.getFileName() + "." + document.getFileExtension();
+        _handle = document.getPath() + "." + document.getFileExtension();
         Content content = document.getNode();
         try {
             if (content.hasNodeData("document")) {
