@@ -170,10 +170,14 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 LOGGER.debug("Checking " + request.getRequestURL() + " with W3C Validator ...");
             }
             String validationResult = w3cValidate(request.getRequestURI(), html);
+
+            /*
+            //deprecated
             if (validationResult == null) {
                 // the (X)HTML is valid, check additional aperto rules now ...
                 validationResult = apertoValidate(html);
             }
+            */
             // Validation error handling ...
             if (validationResult != null) {
                 LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
