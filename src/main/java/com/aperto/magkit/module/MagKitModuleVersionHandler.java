@@ -45,6 +45,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private final Task _addValidatorFilterBypassTask = new ArrayDelegateTask("Filter", "Add the bypass for validator filter.", new Task[]{
         new AddFilterBypassTask("/server/filters/validator", "isAdmin", info.magnolia.voting.voters.OnAdminVoter.class, ""),
         new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/validator/bypasses/isAdmin", "not", "true"),
+        new AddFilterBypassTask("/server/filters/validator", "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit"),
     });
 
     private final Task _setAdminInterfaceExportClassTask = new SetPropertyTask(ContentRepository.CONFIG, "/modules/adminInterface/pages/export", "class", "com.aperto.magkit.export.ExportPageAlphabetically");
