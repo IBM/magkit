@@ -77,7 +77,7 @@ public class PagingTag extends TagSupport {
 
                 if (_actPage > 1) {
                     out.print("<li class=\"previous\">");
-                    out.print("<a href=\"" + completeHandle + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage - 1) + ".html" + queryString + "\" title=\"" + _prevPageTitle + "\">");
+                    out.print("<a href=\"" + completeHandle + "." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage - 1) + ".html" + queryString + "\" title=\"" + _prevPageTitle + "\">");
                     out.print(_prevPage + "</a></li>");
                 }
 
@@ -88,7 +88,7 @@ public class PagingTag extends TagSupport {
                     if (page == _actPage) {
                         out.print("<li class=\"aktiv\">" + page + "</li>");
                     } else {
-                        out.print("<li><a href=\"" + completeHandle + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + page + ".html" + queryString + "\" title=\"" + _prefixTitle + page + "\" >");
+                        out.print("<li><a href=\"" + completeHandle + "." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + page + ".html" + queryString + "\" title=\"" + _prefixTitle + page + "\" >");
                         out.print(page + "</a></li>");
                     }
                     if (page < _pages && StringUtils.isNotBlank(_selector)) {
@@ -100,7 +100,7 @@ public class PagingTag extends TagSupport {
 
                 if (_actPage < _pages) {
                     out.print("<li class=\"next\">");
-                    out.print("<a href=\"" + completeHandle + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage + 1) + ".html" + queryString + "\" title=\"" + _nextPageTitle + "\">");
+                    out.print("<a href=\"" + completeHandle + "." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage + 1) + ".html" + queryString + "\" title=\"" + _nextPageTitle + "\">");
                     out.print(_nextPage + "</a></li>");
                 }
                 out.print("</ul>\n</div>");
