@@ -4,7 +4,7 @@
     <display-name>magkit</display-name>
     <description>Aperto Magnolia Module</description>
     <versionHandler>com.aperto.magkit.module.MagKitModuleVersionHandler</versionHandler>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <dependencies>
         <dependency>
             <name>adminInterface</name>
