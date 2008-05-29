@@ -15,6 +15,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import java.io.IOException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import com.aperto.magkit.utils.ResourceUtils;
 
 /**
  * Draws a paging div container.
@@ -76,7 +77,7 @@ public class PagingTag extends TagSupport {
 
                 if (_actPage > 1) {
                     out.print("<li class=\"previous\">");
-                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage - 1) + ".html" + queryString + "\" title=\"" + _prevPageTitle + "\">");
+                    out.print("<a href=\"" + completeHandle + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage - 1) + ".html" + queryString + "\" title=\"" + _prevPageTitle + "\">");
                     out.print(_prevPage + "</a></li>");
                 }
 
@@ -87,7 +88,7 @@ public class PagingTag extends TagSupport {
                     if (page == _actPage) {
                         out.print("<li class=\"aktiv\">" + page + "</li>");
                     } else {
-                        out.print("<li><a href=\"" + completeHandle + ".pid-" + page + ".html" + queryString + "\" title=\"" + _prefixTitle + page + "\" >");
+                        out.print("<li><a href=\"" + completeHandle + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + page + ".html" + queryString + "\" title=\"" + _prefixTitle + page + "\" >");
                         out.print(page + "</a></li>");
                     }
                     if (page < _pages && StringUtils.isNotBlank(_selector)) {
@@ -99,7 +100,7 @@ public class PagingTag extends TagSupport {
 
                 if (_actPage < _pages) {
                     out.print("<li class=\"next\">");
-                    out.print("<a href=\"" + completeHandle + ".pid-" + (_actPage + 1) + ".html" + queryString + "\" title=\"" + _nextPageTitle + "\">");
+                    out.print("<a href=\"" + completeHandle + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage + 1) + ".html" + queryString + "\" title=\"" + _nextPageTitle + "\">");
                     out.print(_nextPage + "</a></li>");
                 }
                 out.print("</ul>\n</div>");
@@ -118,7 +119,7 @@ public class PagingTag extends TagSupport {
         if (!StringUtils.isBlank(selector)) {
             String[] strings = StringUtils.split(selector, '.');
             for (String s : strings) {
-                if (!s.startsWith("pid-")) {
+                if (!s.startsWith(ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER)) {
                     handle += "." + s;
                 }
             }
