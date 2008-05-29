@@ -28,8 +28,8 @@ import java.util.ResourceBundle;
 @Tag(name = "metaTags", bodyContent = BodyContent.JSP)
 public class MetaTagsTag extends TagSupport {
     private static final Logger LOGGER = Logger.getLogger(MetaTagsTag.class);
-    private String[] META_PROPERTIES = {"publisher", "company", "copyright", "robots", "page-topics", "siteinfo", "reply-to", "revisit-after", "audience"};
-    private String[] PAGE_PROPERTIES = {"meta-author", "meta-keywords", "meta-description"};
+    private static final String[] META_PROPERTIES = {"publisher", "company", "copyright", "robots", "page-topics", "siteinfo", "reply-to", "revisit-after", "audience"};
+    private static final String[] PAGE_PROPERTIES = {"meta-author", "meta-keywords", "meta-description"};
     private String _veloTemplate = "com/aperto/magkit/velocity/meta.vm";
 
     /**
