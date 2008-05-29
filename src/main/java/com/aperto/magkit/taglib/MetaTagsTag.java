@@ -13,6 +13,7 @@ import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
+import javax.servlet.ServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,9 @@ import java.util.ResourceBundle;
  */
 @Tag(name = "metaTags", bodyContent = BodyContent.JSP)
 public class MetaTagsTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(LinkTargetTag.class);    
+    private static final Logger LOGGER = Logger.getLogger(MetaTagsTag.class);
+    private String[] META_PROPERTIES = {"publisher", "company", "copyright", "robots", "page-topics", "siteinfo", "reply-to", "revisit-after", "audience"};
+    private String[] PAGE_PROPERTIES = {"meta-author", "meta-keywords", "meta-description"};
     private String _veloTemplate = "com/aperto/magkit/velocity/meta.vm";
 
     /**
@@ -58,16 +61,15 @@ public class MetaTagsTag extends TagSupport {
 
     private Map<String, String> retrieveData() {
         Map<String, String> content = new HashMap<String, String>();
+        ServletRequest request = pageContext.getRequest();
+        content.put("language", request.getLocale().getLanguage());
         ResourceBundle resourceBundle = ResourceBundle.getBundle("language");
-        retrieveDataFromResourceBundle(content, resourceBundle, "publisher");
-        retrieveDataFromResourceBundle(content, resourceBundle, "company");
-        retrieveDataFromResourceBundle(content, resourceBundle, "copyright");
-        retrieveDataFromResourceBundle(content, resourceBundle, "robots");
-        retrieveDataFromResourceBundle(content, resourceBundle, "page-topics");
-        
-        retrieveDataFromMagnolia(content, "meta-author");
-        retrieveDataFromMagnolia(content, "meta-keywords");
-        retrieveDataFromMagnolia(content, "meta-description");
+        for (String property : META_PROPERTIES) {
+            retrieveDataFromResourceBundle(content, resourceBundle, property);
+        }
+        for (String property : PAGE_PROPERTIES) {
+            retrieveDataFromMagnolia(content, property);                        
+        }
         return content;
     }
 
