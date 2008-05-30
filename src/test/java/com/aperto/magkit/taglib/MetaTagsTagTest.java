@@ -36,7 +36,7 @@ public class MetaTagsTagTest extends MagKitTagTest {
         Assert.assertThat(output, StringContains.containsString("<meta name=\"author\" content=\"aperto\" />"));
         Assert.assertThat(output, StringContains.containsString("<meta name=\"description\" content=\"toll\" />"));
         Assert.assertThat(output, StringContains.containsString("<meta name=\"publisher\" content=\"aperto\" />"));
-        Assert.assertThat(StringUtils.countMatches(output, "<meta"), CoreMatchers.is(3));
+        Assert.assertThat(StringUtils.countMatches(output, "<meta"), CoreMatchers.is(4));
     }
 
     @Override
