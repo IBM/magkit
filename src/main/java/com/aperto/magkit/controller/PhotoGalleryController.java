@@ -40,7 +40,7 @@ import java.util.List;
  *       <property name="thumbWidth" value="65" />
  *       <property name="cropping" value="true" />
  * </bean>
- * <code>
+ * </code>
  *
  * @author frank.sommer
  */
