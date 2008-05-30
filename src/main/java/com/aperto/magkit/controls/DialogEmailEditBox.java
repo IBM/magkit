@@ -1,14 +1,8 @@
 package com.aperto.magkit.controls;
 
-import org.apache.log4j.Logger;
-import org.apache.commons.lang.StringUtils;
 import com.aperto.webkit.utils.StringTools;
-import info.magnolia.cms.util.AlertUtil;
 import info.magnolia.cms.gui.dialog.DialogEdit;
-import info.magnolia.cms.gui.dialog.DialogControl;
-import info.magnolia.cms.gui.dialog.DialogControlImpl;
-
-import java.util.Iterator;
+import info.magnolia.cms.util.AlertUtil;
 
 /**
  * Dialog control for validating the input as email address.
@@ -17,7 +11,6 @@ import java.util.Iterator;
  *         Date: 08.04.2008
  *         Time: 11:49:01
  */
-
 public class DialogEmailEditBox extends DialogEdit {
 
     /**
@@ -25,29 +18,7 @@ public class DialogEmailEditBox extends DialogEdit {
      */
     @Override
     public boolean validate() {
-        boolean isValid = true;
-
-        // ********************************
-        // * BEGIN: This is just copied from original validate
-        // ********************************
-        if (isRequired()) {
-            if (StringUtils.isEmpty(getValue()) && getValues().size() == 0) {
-                String name = getMessage(getLabel());
-                AlertUtil.setMessage(getMessage("dialog.validation.required", new Object[]{name}));
-                isValid = false;
-            }
-        }
-        for (Object o : getSubs()) {
-            DialogControl sub = (DialogControl) o;
-            if (sub instanceof DialogControlImpl) {
-                if (!((DialogControlImpl) sub).validate()) {
-                    isValid = false;
-                }
-            }
-        }
-        // ********************************
-        // * END: This is just copied from original validate
-        // ********************************
+        boolean isValid = super.validate();
 
         //validate whether the given email is valid
         if (isValid) {

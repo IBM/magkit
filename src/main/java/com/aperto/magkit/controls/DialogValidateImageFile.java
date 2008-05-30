@@ -13,13 +13,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This ControlType uses the ImageInfo class, that helps to get MetaInformation for Images.
  * It is made to validate an especial image that should be uploaded via a mgnl dialog. It validates
  * filesize, height, width and fileextension.
  * <p/>
  * If you use this control, the user wont be able to upload "bad" images.
  *
- * @author rainer.blumenthal
+ * @author rainer.blumenthal, frank.sommer
  *         Date: 02.04.2008
  *         Time: 15:15:17
  */
