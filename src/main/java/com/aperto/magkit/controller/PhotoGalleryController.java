@@ -47,9 +47,11 @@ import java.util.List;
 public class PhotoGalleryController extends AbstractController {
     private static final Logger LOGGER = Logger.getLogger(PhotoGalleryController.class);
     private static final String[] IMAGE_EXTENSIONS = {"png", "jpg", "gif", "bmp", "jpeg"};
+    private static final String DEFAULT_VIEWNAME = "paragraphs/photoGallery";
     private int _thumbWidth = 65;
     private int _thumbHeight = 65;
     private boolean _cropping = true;
+    private String _viewname = DEFAULT_VIEWNAME;
 
     public void setThumbWidth(int thumbWidth) {
         _thumbWidth = thumbWidth;
@@ -61,6 +63,10 @@ public class PhotoGalleryController extends AbstractController {
 
     public void setCropping(boolean cropping) {
         _cropping = cropping;
+    }
+
+    public void setViewname(String viewname) {
+        _viewname = viewname;
     }
 
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -98,7 +104,7 @@ public class PhotoGalleryController extends AbstractController {
             LOGGER.error("Exception while getting gallery information.", e);
         }
 
-        return new ModelAndView("paragraphs/photoGallery", result);
+        return new ModelAndView(_viewname, result);
     }
 
     /**
