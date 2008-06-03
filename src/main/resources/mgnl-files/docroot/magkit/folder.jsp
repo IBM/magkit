@@ -10,7 +10,7 @@
     ServerConfiguration configuration = ServerConfiguration.getInstance();
     if (!configuration.isAdmin() || Resource.showPreview()) {
         Content actpage = Resource.getActivePage();
-        if (actpage != null && actpage.getLevel() > 1) {
+        if (actpage != null && actpage.getLevel() > 0) {
             Content parent = actpage.getParent();
             if (parent != null) {
                 String handle = request.getContextPath();
