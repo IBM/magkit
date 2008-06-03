@@ -1,7 +1,5 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.webkit.jsp.ApertoHtmlValidator;
-import com.aperto.webkit.jsp.JspUtils;
 import com.aperto.webkit.lang.IoRuntimeException;
 import com.aperto.webkit.utils.IoTools;
 import com.aperto.webkit.utils.StringTools;
@@ -12,6 +10,7 @@ import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.*;
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -27,7 +26,7 @@ import java.util.*;
  * Complete class from aperto commons needed. Because elimination of Magnolia MainBar needed to validate HTML
  * and generating HTML is private inside this class.
  *
- * @author Michael Tamm
+ * @author Michael Tamm, frank.sommer
  */
 public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static final Logger LOGGER = Logger.getLogger(HtmlValidatorFilter.class);
@@ -40,7 +39,9 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     public static final String MAGNOLIA_MAIN_BAR_END_PARAM = "magnolia-main-bar-end";
     private static final int MAX_CACHED_RESULTS = 100;
     private static final String PROPERTY_VALIDATOR_ACTIVE = "validator.active";
-
+    private static final String MGNL_MAIN_BAR_BEGIN = "<div class=\"mgnlMainbar";
+    private static final String MGNL_MAIN_BAR_END = "</div>";
+    
     // using old behaviour (no such filter) as default:
     private static boolean c_validatorEnabled = false;
     static {
@@ -51,8 +52,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         }
     }
 
-    private String _mgnlMainBarStart = "<div class=\"mgnlMainbar";
-    private String _mgnlMainBarEnd = "</div>";
     private String _w3cValidatorCheckUrl = "http://validator.aperto.de/w3c-markup-validator/check";
     private String _validatorWarningCssUri = "/css/validator-warning.css";
     private String _warningLayerTemplate;
@@ -148,13 +147,12 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             String html = responseWrapper.getBuffer();
             String mgnlHtml = html;
             // remove mgnlMainBar
-            if (html.contains(getMgnlMainBarStart())) {
-                int mgnlMainBarStartPos = html.indexOf(getMgnlMainBarStart());
-                int mgnlMainBarEndPos = html.indexOf(getMgnlMainBarEnd(), mgnlMainBarStartPos);
-                html = html.substring(0, mgnlMainBarStartPos)
-                        + html.substring(mgnlMainBarEndPos + getMgnlMainBarEnd().length());
+            if (!StringUtils.isBlank(html) && html.contains(MGNL_MAIN_BAR_BEGIN)) {
+                int mgnlMainBarStartPos = html.indexOf(MGNL_MAIN_BAR_BEGIN);
+                int mgnlMainBarEndPos = html.indexOf(MGNL_MAIN_BAR_END, mgnlMainBarStartPos);
+                html = html.substring(0, mgnlMainBarStartPos) + html.substring(mgnlMainBarEndPos + MGNL_MAIN_BAR_END.length());
             }
-            if (html != null) {
+            if (!StringUtils.isBlank(html)) {
                 html = validateHtml(request, html, mgnlHtml);
                 responseWrapper.writeHtml(html);
             }
@@ -171,20 +169,13 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             }
             String validationResult = w3cValidate(request.getRequestURI(), html);
 
-            /*
-            //deprecated
-            if (validationResult == null) {
-                // the (X)HTML is valid, check additional aperto rules now ...
-                validationResult = apertoValidate(html);
-            }
-            */
             // Validation error handling ...
             if (validationResult != null) {
                 LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
                 _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
                 String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
                 // use original html with mgnlMainBar
-                if (mgnlHtml.contains(getMgnlMainBarStart())) {
+                if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
                     html = injectWarningLayer(mgnlHtml, validationResultUrl);
                 } else {
                     html = injectWarningLayer(html, validationResultUrl);
@@ -192,7 +183,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 _resultCounter++;
             } else {
                 // try to put back mgnlMainBar
-                if (mgnlHtml.contains(getMgnlMainBarStart())) {
+                if (mgnlHtml.contains(MGNL_MAIN_BAR_END)) {
                     html = mgnlHtml;
                 }
             }
@@ -226,33 +217,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             isValid = (validationResult.indexOf("class=\"valid\">This Page Is Valid") != -1);
         }
         return (isValid ? null : validationResult);
-    }
-
-    /**
-     * Returns <code>null</code>, if no errors could be found,
-     * otherwise the HTML of a validation result page is returned.
-     */
-    private String apertoValidate(String html) {
-        String validationResult = null;
-        List errors = ApertoHtmlValidator.validate(html);
-        if (errors.size() > 0) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("<html>\n");
-            sb.append("    <head>\n");
-            sb.append("        <title>Validation Results</title>\n");
-            sb.append("    </head>\n");
-            sb.append("    <body>\n");
-            sb.append("        <ul>\n");
-            for (Object errorObject : errors) {
-                String error = (String) errorObject;
-                sb.append("            <li>").append(JspUtils.htmlEncode(error)).append("</li>\n");
-            }
-            sb.append("        </ul>\n");
-            sb.append("    </body>\n");
-            sb.append("</html>\n");
-            validationResult = sb.toString();
-        }
-        return validationResult;
     }
 
     private String getHtml(HttpMethodBase httpMethod) throws IoRuntimeException {
@@ -289,22 +253,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         replacements.put("validationResultUrl", validationResultUrl);
         String warningLayer = StringTools.replacePlaceHolders(_warningLayerTemplate, replacements);
         return html.substring(0, i) + warningLayer + html.substring(i);
-    }
-
-    public String getMgnlMainBarStart() {
-        return _mgnlMainBarStart;
-    }
-
-    public void setMgnlMainBarStart(String mgnlMainBarStart) {
-        _mgnlMainBarStart = mgnlMainBarStart;
-    }
-
-    public String getMgnlMainBarEnd() {
-        return _mgnlMainBarEnd;
-    }
-
-    public void setMgnlMainBarEnd(String mgnlMainBarEnd) {
-        _mgnlMainBarEnd = mgnlMainBarEnd;
     }
 
     public String getW3cValidatorCheckUrl() {
