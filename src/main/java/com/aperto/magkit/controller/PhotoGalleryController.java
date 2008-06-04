@@ -273,7 +273,7 @@ public class PhotoGalleryController extends AbstractController {
         } catch (PathNotFoundException e) {
             LOGGER.info(e.getLocalizedMessage());
         } catch (AccessDeniedException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.info(e.getLocalizedMessage());
         } catch (RepositoryException e) {
             LOGGER.info(e.getLocalizedMessage());
         }
