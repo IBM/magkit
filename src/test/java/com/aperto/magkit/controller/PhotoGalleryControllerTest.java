@@ -56,7 +56,7 @@ public class PhotoGalleryControllerTest {
         File file = _photoGalleryController.scaleImage(ImageIO.read(oriImgStr), 120, 60);
         BufferedImage img = ImageIO.read(file);
         assertThat(img.getWidth(), is(120));
-        assertThat(img.getHeight(), is(58));
+        assertThat(img.getHeight(), is(60));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class PhotoGalleryControllerTest {
         InputStream oriImgStr = PhotoGalleryControllerTest.class.getResourceAsStream("/testimage.jpg");
         File file = _photoGalleryController.scaleImage(ImageIO.read(oriImgStr), 120, 150);
         BufferedImage img = ImageIO.read(file);
-        assertThat(img.getWidth(), is(121));
+        assertThat(img.getWidth(), is(119));
         assertThat(img.getHeight(), is(150));
     }
 }

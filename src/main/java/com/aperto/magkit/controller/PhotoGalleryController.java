@@ -9,6 +9,7 @@ import info.magnolia.cms.link.LinkHelper;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.cms.util.Resource;
+import info.magnolia.cms.security.AccessDeniedException;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.DMSModule;
 import info.magnolia.module.dms.beans.Document;
@@ -18,8 +19,11 @@ import org.apache.commons.lang.ArrayUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import javax.imageio.ImageIO;
+import javax.imageio.IIOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -89,11 +93,13 @@ public class PhotoGalleryController extends AbstractController {
                             Document originalDocument = new Document(content);
                             if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension())) {
                                 Document previewDocument = getPreviewImageDocument(originalDocument, manager);
-                                galleryEntry.setImage(new ImageData(originalDocument));
-                                galleryEntry.setThumbnail(new ImageData(previewDocument));
-                                galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
-                                galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
-                                imageList.add(galleryEntry);
+                                if (previewDocument != null) {
+                                    galleryEntry.setImage(new ImageData(originalDocument));
+                                    galleryEntry.setThumbnail(new ImageData(previewDocument));
+                                    galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
+                                    galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
+                                    imageList.add(galleryEntry);
+                                }
                             }
                         }
                         result.put("imageList", imageList);
@@ -118,7 +124,7 @@ public class PhotoGalleryController extends AbstractController {
     private Document getPreviewImageDocument(Document document, HierarchyManager manager) throws Exception {
         Document previewDocument = getPreviewDocumentForDocument(document, manager);
 
-        if (!previewDocument.getFileName().equals(document.getFileName())) {
+        if (previewDocument != null && !previewDocument.getFileName().equals(document.getFileName())) {
             InputStream oriImgStr = null;
             InputStream newImgStr = null;
             File newImgFile = null;
@@ -134,6 +140,9 @@ public class PhotoGalleryController extends AbstractController {
                 previewDocument.setFileName(document.getFileName());
                 previewDocument.updateMetaData();
                 previewDocument.save();
+            } catch (IIOException iioe) {
+                LOGGER.info("Error reading image: " + document.getName());
+                previewDocument = null;
             } finally {
                 if (oriImgStr != null) {
                     oriImgStr.close();
@@ -173,9 +182,19 @@ public class PhotoGalleryController extends AbstractController {
         int cropHeight = oriHeight;
         if (_cropping) {
             // create the thumbnail as a buffered image
-            cropWidth = thumbHeightRatio > oriHeightRatio ? (int) (oriWidth / thumbHeightRatio) : oriWidth;
+            cropWidth = (int) (oriWidth * thumbWidthRatio / thumbHeightRatio * oriHeightRatio / oriWidthRatio);
+            cropHeight = (int) (oriHeight * thumbHeightRatio / thumbWidthRatio * oriWidthRatio / oriHeightRatio);
+
+            if (cropWidth > oriWidth) {
+                cropWidth = oriWidth;
+                cropHeight = (int) ((double) cropHeight / (double) cropWidth * (double) oriWidth);
+            }
+            if (cropHeight > oriHeight) {
+                cropHeight = oriHeight;
+                cropWidth = (int) ((double) cropWidth / (double) cropHeight * (double) oriHeight);
+            }
+
             int xOffset = Math.max((oriWidth - cropWidth) / 2, 0);
-            cropHeight = thumbWidthRatio > oriWidthRatio ? (int) (oriHeight / thumbWidthRatio) : oriHeight;
             int yOffset = Math.max((oriHeight - cropHeight) / 2, 0);
             newImg = oriImgBuff.getSubimage(xOffset, yOffset, cropWidth, cropHeight);
         } else {
@@ -224,31 +243,39 @@ public class PhotoGalleryController extends AbstractController {
      * @param manager  the dms hierarchy manager
      * @return the preview document for the given original document
      */
-    private Document getPreviewDocumentForDocument(Document document, HierarchyManager manager) throws Exception {
+    private Document getPreviewDocumentForDocument(Document document, HierarchyManager manager) {
         Document previewDocument = null;
-        if (document.getNode().hasNodeData("relation1")) {
-            String path = document.getNode().getNodeData("relation1").getString();
-            Content tmp = manager.getContent(path);
-            if (tmp != null) {
-                previewDocument = new Document(tmp);
-            }
-        }
-
-        String folderPath = PathUtil.getFolder(document.getPath());
-        Content mainFolder = manager.getContent(folderPath);
-        if (mainFolder != null) {
-            Content previewFolder = ContentUtil.getContent(mainFolder, "previewFolder");
-            if (previewFolder == null) {
-                previewFolder = mainFolder.createContent("previewFolder");
-                mainFolder.save();
+        try {
+            if (document.getNode().hasNodeData("relation1")) {
+                String path = document.getNode().getNodeData("relation1").getString();
+                Content tmp = manager.getContent(path);
+                if (tmp != null) {
+                    previewDocument = new Document(tmp);
+                }
             }
 
-            Content previewImage = ContentUtil.getContent(previewFolder, document.getName());
-            if (previewImage == null) {
-                previewImage = previewFolder.createContent(document.getName(), ItemType.CONTENTNODE);
-                previewFolder.save();
+            String folderPath = PathUtil.getFolder(document.getPath());
+            Content mainFolder = manager.getContent(folderPath);
+            if (mainFolder != null) {
+                Content previewFolder = ContentUtil.getContent(mainFolder, "previewFolder");
+                if (previewFolder == null) {
+                    previewFolder = mainFolder.createContent("previewFolder");
+                    mainFolder.save();
+                }
+
+                Content previewImage = ContentUtil.getContent(previewFolder, document.getName());
+                if (previewImage == null) {
+                    previewImage = previewFolder.createContent(document.getName(), ItemType.CONTENTNODE);
+                    previewFolder.save();
+                }
+                previewDocument = new Document(previewImage);
             }
-            previewDocument = new Document(previewImage);
+        } catch (PathNotFoundException e) {
+            LOGGER.info(e.getLocalizedMessage());
+        } catch (AccessDeniedException e) {
+            LOGGER.error(e.getLocalizedMessage());
+        } catch (RepositoryException e) {
+            LOGGER.info(e.getLocalizedMessage());
         }
 
         return previewDocument;
