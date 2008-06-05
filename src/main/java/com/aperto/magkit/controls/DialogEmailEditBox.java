@@ -2,7 +2,6 @@ package com.aperto.magkit.controls;
 
 import com.aperto.webkit.utils.StringTools;
 import info.magnolia.cms.gui.dialog.DialogEdit;
-import info.magnolia.cms.util.AlertUtil;
 
 /**
  * Dialog control for validating the input as email address.
@@ -24,7 +23,7 @@ public class DialogEmailEditBox extends DialogEdit {
         if (isValid) {
             isValid = StringTools.isValidEmailAddress(getValue());
             if (!isValid) {
-                AlertUtil.setMessage("dialog.validation.email.wrongFormat");
+                setValidationMessage("dialog.validation.email.wrongFormat");
             }
         }
 
