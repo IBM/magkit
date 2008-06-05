@@ -30,6 +30,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     private static final String CONTEXT_PATH = "/author";
     private static final String LINK_VALUE_EXT = "http://www.aperto.de/test.html";
     private static final String LINK_VALUE_INT = "/sammeln/infos";
+    private static final String LINK_VALUE_INT_SHORT = "/sammeln";
 
     @Test
     public void testExternalLink() throws JspException {
@@ -54,12 +55,40 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         assertThat(output, endsWith("html"));
     }
 
+    @Test
+    public void testInternalLinkWithSelector() throws JspException {
+        ConvertLinkTag tag = new ConvertLinkTag();
+        tag.setNodeDataName("link2");
+        tag.setSelector("navid-123");
+        PageContext pageContext = runLifeCycle(tag);
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        assertThat(output, containsString(CONTEXT_PATH));
+        assertThat(output, containsString(LINK_VALUE_INT));
+        assertThat(output, endsWith("123.html"));
+    }
+
+    @Test
+    public void testInternalLinkWithSelectorShort() throws JspException {
+        ConvertLinkTag tag = new ConvertLinkTag();
+        tag.setNodeDataName("link3");
+        tag.setSelector("navid-123");
+        PageContext pageContext = runLifeCycle(tag);
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        assertThat(output, containsString(CONTEXT_PATH));
+        assertThat(output, containsString(LINK_VALUE_INT_SHORT));
+        assertThat(output, endsWith("123.html"));
+    }
+
     @Override
     protected PageContext createPageContext() {
         MockContent mockContent = new MockContent("test", ItemType.CONTENT);
         MockNodeData mockNodeData = new MockNodeData("link", LINK_VALUE_EXT);
         mockContent.addNodeData(mockNodeData);
         mockNodeData = new MockNodeData("link2", LINK_VALUE_INT);
+        mockContent.addNodeData(mockNodeData);
+        mockNodeData = new MockNodeData("link3", LINK_VALUE_INT_SHORT);
         mockContent.addNodeData(mockNodeData);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute(LOCAL_CONTENT_OBJ, mockContent);

@@ -27,6 +27,7 @@ import java.io.IOException;
 public class ConvertLinkTag extends TagSupport {
     private static final Logger LOGGER = Logger.getLogger(ConvertLinkTag.class);
 
+    private String _selector;
     private String _nodeDataName;
     private String _linkValue;
     private String _altRepo = null;
@@ -56,6 +57,11 @@ public class ConvertLinkTag extends TagSupport {
     @TagAttribute
     public void setAltRepo(String altRepo) {
         _altRepo = altRepo;
+    }
+
+    @TagAttribute
+    public void setSelector(String selector) {
+        _selector = selector;
     }
 
     /**
@@ -89,6 +95,7 @@ public class ConvertLinkTag extends TagSupport {
             try {
                 if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
                     String link = LinkTool.convertLink(_linkValue, _addExtension, _altRepo);
+                    link = LinkTool.insertSelector(link, _selector);
                     if (_addContextPath) {
                         out.write(request.getContextPath());
                     }
@@ -115,6 +122,7 @@ public class ConvertLinkTag extends TagSupport {
         _altRepo = null;
         _linkValue = null;
         _nodeDataName = null;
+        _selector = "";
         super.release();
     }
 }

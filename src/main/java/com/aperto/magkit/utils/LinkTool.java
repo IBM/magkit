@@ -6,9 +6,11 @@ import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.LinkUtil;
+import info.magnolia.cms.link.LinkHelper;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import javax.jcr.PropertyType;
 import static java.util.Locale.ENGLISH;
@@ -147,6 +149,26 @@ public final class LinkTool {
             LOGGER.info("Given NodeData was null or does not exist.");
         }
         return binaryLink;
+    }
+
+    /**
+     * Inserts a selector in the given link.
+     */
+    public static String insertSelector(String link, String selector) {
+        String newLink = link;
+        if (!StringUtils.isBlank(selector) && !LinkHelper.isExternalLinkOrAnchor(link)) {
+            String[] pathParts = StringUtils.split(link, '/');
+            String lastPart = pathParts[pathParts.length - 1];
+            pathParts = (String[]) ArrayUtils.remove(pathParts, pathParts.length - 1);
+            String[] parts = StringUtils.split(lastPart, '.');
+            String[] newParts = new String[parts.length + 1];
+            newParts[0] = parts[0];
+            newParts[1] = selector;
+            System.arraycopy(parts, 1, newParts, 2, newParts.length - 2);
+            newLink = '/' + StringUtils.join(pathParts, '/') + '/';
+            newLink += StringUtils.join(newParts, '.');
+        }
+        return newLink;
     }
 
     private LinkTool() {
