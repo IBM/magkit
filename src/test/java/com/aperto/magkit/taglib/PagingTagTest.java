@@ -68,7 +68,7 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(output, containsString("<li class=\"aktiv\">1</li>"));
         assertThat(output, containsString("2</a>"));
         assertThat(output, not(containsString(".pid-1.")));
-        assertThat(output, containsString("5</a></li> <li>...</li>"));
+        assertThat(output, containsString("5</a></li><li>...</li>"));
     }
 
     @Test
@@ -82,10 +82,29 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(jspWriter, notNullValue());
         String output = jspWriter.toString();
         assertThat(output, notNullValue());
-        assertThat(output, not(containsString("1</a></li>")));
+        assertThat(output, containsString("1</a></li>"));
+        assertThat(output, not(containsString("2</a></li>")));
         assertThat(output, containsString("<li class=\"aktiv\">5</li>"));
         assertThat(output, containsString("<li>...</li><li><a href=\"/page.old.selector.pid-3.html\" title=\"zur Seite 3\" >3</a></li>"));
-        assertThat(output, containsString("7</a></li> <li>...</li>"));
+        assertThat(output, containsString("7</a></li><li>...</li>"));
+    }
+
+    @Test
+    public void testPaddingLast() {
+        PagingTag tag = new PagingTag();
+        tag.setPages(8);
+        tag.setActPage(8);
+        PageContext pageContext = runLifeCycle(tag);
+        assertThat(pageContext, notNullValue());
+        JspWriter jspWriter = pageContext.getOut();
+        assertThat(jspWriter, notNullValue());
+        String output = jspWriter.toString();
+        assertThat(output, notNullValue());
+        assertThat(output, containsString("1</a></li>"));
+        assertThat(output, not(containsString("2</a></li>")));
+        assertThat(output, containsString("<li class=\"aktiv\">8</li>"));
+        assertThat(output, containsString("<li>...</li><li><a href=\"/page.old.selector.pid-4.html\" title=\"zur Seite 4\" >4</a></li>"));
+        assertThat(output, containsString("1</a></li><li>...</li>"));
     }
 
     @Test
@@ -101,7 +120,8 @@ public class PagingTagTest extends MagKitTagTest {
         String output = jspWriter.toString();
         assertThat(output, notNullValue());
         assertThat(output, containsString(">1</a></li>"));
+        assertThat(output, containsString(">2</a></li>"));
         assertThat(output, containsString("<li class=\"aktiv\">5</li>"));
-        assertThat(output, containsString("10</a></li> <li>...</li>"));
+        assertThat(output, containsString("10</a></li><li>...</li>"));
     }
 }

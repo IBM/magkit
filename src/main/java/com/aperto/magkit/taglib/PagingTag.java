@@ -32,7 +32,6 @@ public class PagingTag extends TagSupport {
     
     private String _prefix = "Seite";
     private String _prefixTitle = "zur Seite ";
-    private String _selector = " ";
     private String _prevPageTitle = "zur vorherigen Seite";
     private String _prevPage = "zurück";
     private String _nextPageTitle = "zur nächsten Seite";
@@ -85,25 +84,21 @@ public class PagingTag extends TagSupport {
                 out.print("<li><strong>" + _prefix + "</strong></li>");
                 int startPage = 1;
                 if (_pages > _linkedPages && _actPage > ((_linkedPages / 2) + 1)) {
+                    out.print(determineLinkedPage(1, completeHandle, queryString));
                     out.print("<li>" + PADDING_SEQUENZ + "</li>");
-                    startPage = _actPage - (_linkedPages / 2);
+                    startPage = Math.min(_actPage - (_linkedPages / 2), _pages - _linkedPages + 1);
                 }
                 int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
                 for (int page = startPage; page <= lastPage; page++) {
                     if (page == _actPage) {
                         out.print("<li class=\"aktiv\">" + page + "</li>");
                     } else {
-                        out.print("<li><a href=\"" + completeHandle + "." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + page + ".html" + queryString + "\" title=\"" + _prefixTitle + page + "\" >");
-                        out.print(page + "</a></li>");
-                    }
-                    if (page < _pages && StringUtils.isNotBlank(_selector)) {
-                        out.print(" " + _selector + " ");
-                    } else {
-                        out.print(" ");
+                        out.print(determineLinkedPage(page, completeHandle, queryString));
                     }
                 }
                 if (lastPage < _pages) {
-                    out.print("<li>" + PADDING_SEQUENZ + "</li>");    
+                    out.print("<li>" + PADDING_SEQUENZ + "</li>");
+                    out.print(determineLinkedPage(_pages, completeHandle, queryString));                    
                 }
                 out.print(determineNext(completeHandle, queryString));
                 out.print("</ul>\n</div>");
@@ -112,6 +107,13 @@ public class PagingTag extends TagSupport {
             throw new NestableRuntimeException(e);
         }
         return super.doEndTag();
+    }
+
+    private String determineLinkedPage(int page, String completeHandle, String queryString) throws IOException {
+        StringBuffer out = new StringBuffer();
+        out.append("<li><a href=\"").append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString).append("\" title=\"").append(_prefixTitle).append(page).append("\" >");
+        out.append(page).append("</a></li>");
+        return out.toString();
     }
 
     private String determineNext(String completeHandle, String queryString) throws IOException {
@@ -154,7 +156,6 @@ public class PagingTag extends TagSupport {
         try {
             _prefix = ResourceBundle.getBundle("language").getString("common.paging.prefix");
             _prefixTitle = ResourceBundle.getBundle("language").getString("common.paging.prefixTitle");
-            _selector = ResourceBundle.getBundle("language").getString("common.paging.selector");
             _prevPageTitle = ResourceBundle.getBundle("language").getString("common.paging.prevPageTitle");
             _prevPage = ResourceBundle.getBundle("language").getString("common.paging.prevPage");
             _nextPageTitle = ResourceBundle.getBundle("language").getString("common.paging.nextPageTitle");
