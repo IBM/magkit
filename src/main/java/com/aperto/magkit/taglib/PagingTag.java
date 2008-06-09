@@ -28,7 +28,8 @@ import com.aperto.magkit.utils.ResourceUtils;
 @Tag(name = "paging", bodyContent = BodyContent.JSP)
 public class PagingTag extends TagSupport {
     private static final Logger LOGGER = Logger.getLogger(PagingTag.class);
-
+    private static final String PADDING_SEQUENZ = "...";
+    
     private String _prefix = "Seite";
     private String _prefixTitle = "zur Seite ";
     private String _selector = " ";
@@ -39,7 +40,13 @@ public class PagingTag extends TagSupport {
 
     private int _pages;
     private int _actPage;
+    private int _linkedPages = 5;
     private boolean _addQueryString = false;
+
+    @TagAttribute
+    public void setLinkedPages(int linkedPages) {
+        _linkedPages = linkedPages;
+    }
 
     @TagAttribute(required = true)
     public void setPages(int pages) {
@@ -74,17 +81,15 @@ public class PagingTag extends TagSupport {
         try {
             if (_pages > 1) {
                 out.print("<div class=\"pager\">\n<ul>");
-
-                if (_actPage > 1) {
-                    out.print("<li class=\"previous\">");
-                    out.print("<a href=\"" + completeHandle + "." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage - 1) + ".html" + queryString + "\" title=\"" + _prevPageTitle + "\">");
-                    out.print(_prevPage + "</a></li>");
-                }
-
+                out.print(determinePrevious(completeHandle, queryString));
                 out.print("<li><strong>" + _prefix + "</strong></li>");
-                for (int i = 0; i < _pages; i++) {
-                    int page = i + 1;
-
+                int startPage = 1;
+                if (_pages > _linkedPages && _actPage > ((_linkedPages / 2) + 1)) {
+                    out.print("<li>" + PADDING_SEQUENZ + "</li>");
+                    startPage = _actPage - (_linkedPages / 2);
+                }
+                int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
+                for (int page = startPage; page <= lastPage; page++) {
                     if (page == _actPage) {
                         out.print("<li class=\"aktiv\">" + page + "</li>");
                     } else {
@@ -97,12 +102,10 @@ public class PagingTag extends TagSupport {
                         out.print(" ");
                     }
                 }
-
-                if (_actPage < _pages) {
-                    out.print("<li class=\"next\">");
-                    out.print("<a href=\"" + completeHandle + "." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER + (_actPage + 1) + ".html" + queryString + "\" title=\"" + _nextPageTitle + "\">");
-                    out.print(_nextPage + "</a></li>");
+                if (lastPage < _pages) {
+                    out.print("<li>" + PADDING_SEQUENZ + "</li>");    
                 }
+                out.print(determineNext(completeHandle, queryString));
                 out.print("</ul>\n</div>");
             }
         } catch (IOException e) {
@@ -111,7 +114,27 @@ public class PagingTag extends TagSupport {
         return super.doEndTag();
     }
 
-    protected String getHandleFromActivePage() {
+    private String determineNext(String completeHandle, String queryString) throws IOException {
+        StringBuffer out = new StringBuffer();
+        if (_actPage < _pages) {
+            out.append("<li class=\"next\">");
+            out.append("<a href=\"").append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage + 1).append(".html").append(queryString).append("\" title=\"").append(_nextPageTitle).append("\">");
+            out.append(_nextPage).append("</a></li>");
+        }
+        return out.toString();
+    }
+
+    private String determinePrevious(String completeHandle, String queryString) throws IOException {
+        StringBuffer out = new StringBuffer();
+        if (_actPage > 1) {
+            out.append("<li class=\"previous\">");
+            out.append("<a href=\"").append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage - 1).append(".html").append(queryString).append("\" title=\"").append(_prevPageTitle).append("\">");
+            out.append(_prevPage).append("</a></li>");
+        }
+        return out.toString();
+    }
+
+    private String getHandleFromActivePage() {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
         String handle = request.getContextPath();
         handle += Resource.getCurrentActivePage().getHandle();
@@ -139,5 +162,17 @@ public class PagingTag extends TagSupport {
         } catch (MissingResourceException mre) {
             LOGGER.info("Can not find resource key. Using default value.");
         }
+    }
+
+    /**
+     * Overriden method.
+     */
+    @Override
+    public void release() {
+        super.release();
+        _actPage = 1;
+        _pages = 1;
+        _linkedPages = 5;
+        _addQueryString = false;
     }
 }

@@ -6,8 +6,10 @@ import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
+import static org.junit.matchers.StringContains.containsString;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -41,14 +43,65 @@ public class PagingTagTest extends MagKitTagTest {
         tag.setPages(2);
         tag.setActPage(1);
         PageContext pageContext = runLifeCycle(tag);
-        assertNotNull("PageContext is null", pageContext);
+        assertThat(pageContext, notNullValue());
         JspWriter jspWriter = pageContext.getOut();
-        assertNotNull("JspWriter is null", jspWriter);
+        assertThat(jspWriter, notNullValue());
         String output = jspWriter.toString();
-        assertNotNull("output is null", output);
-        assertTrue("Output does not contain expected String '1</strong>'", output.contains("<li class=\"aktiv\">1</li>"));
-        assertTrue("Output does not contain expected String '2</a>'", output.contains("2</a>"));
-        assertFalse("Output does not contain expected String '.pid-1.'", output.contains(".pid-1."));
-        assertTrue("\"" + output + "\" does not contain expected String 'old.selector.pid-2.'", output.contains("old.selector.pid-2."));
+        assertThat(output, notNullValue());
+        assertThat(output, containsString("<li class=\"aktiv\">1</li>"));
+        assertThat(output, containsString("2</a>"));
+        assertThat(output, not(containsString(".pid-1.")));
+        assertThat(output, containsString("old.selector.pid-2."));
+    }
+
+    @Test
+    public void testPaddingStart() {
+        PagingTag tag = new PagingTag();
+        tag.setPages(10);
+        tag.setActPage(1);
+        PageContext pageContext = runLifeCycle(tag);
+        assertThat(pageContext, notNullValue());
+        JspWriter jspWriter = pageContext.getOut();
+        assertThat(jspWriter, notNullValue());
+        String output = jspWriter.toString();
+        assertThat(output, notNullValue());
+        assertThat(output, containsString("<li class=\"aktiv\">1</li>"));
+        assertThat(output, containsString("2</a>"));
+        assertThat(output, not(containsString(".pid-1.")));
+        assertThat(output, containsString("5</a></li> <li>...</li>"));
+    }
+
+    @Test
+    public void testPaddingEnd() {
+        PagingTag tag = new PagingTag();
+        tag.setPages(10);
+        tag.setActPage(5);
+        PageContext pageContext = runLifeCycle(tag);
+        assertThat(pageContext, notNullValue());
+        JspWriter jspWriter = pageContext.getOut();
+        assertThat(jspWriter, notNullValue());
+        String output = jspWriter.toString();
+        assertThat(output, notNullValue());
+        assertThat(output, not(containsString("1</a></li>")));
+        assertThat(output, containsString("<li class=\"aktiv\">5</li>"));
+        assertThat(output, containsString("<li>...</li><li><a href=\"/page.old.selector.pid-3.html\" title=\"zur Seite 3\" >3</a></li>"));
+        assertThat(output, containsString("7</a></li> <li>...</li>"));
+    }
+
+    @Test
+    public void testPaddingEndLong() {
+        PagingTag tag = new PagingTag();
+        tag.setPages(20);
+        tag.setActPage(5);
+        tag.setLinkedPages(10);
+        PageContext pageContext = runLifeCycle(tag);
+        assertThat(pageContext, notNullValue());
+        JspWriter jspWriter = pageContext.getOut();
+        assertThat(jspWriter, notNullValue());
+        String output = jspWriter.toString();
+        assertThat(output, notNullValue());
+        assertThat(output, containsString(">1</a></li>"));
+        assertThat(output, containsString("<li class=\"aktiv\">5</li>"));
+        assertThat(output, containsString("10</a></li> <li>...</li>"));
     }
 }
