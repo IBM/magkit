@@ -4,6 +4,9 @@ import com.aperto.webkit.lang.IoRuntimeException;
 import com.aperto.webkit.utils.IoTools;
 import com.aperto.webkit.utils.StringTools;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
+import info.magnolia.cms.util.ContentUtil;
+import info.magnolia.cms.beans.config.ContentRepository;
+import info.magnolia.cms.core.Content;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.util.EncodingUtil;
@@ -19,6 +22,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.jcr.RepositoryException;
 import java.io.*;
 import java.util.*;
 
@@ -53,7 +57,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     }
 
     private String _w3cValidatorCheckUrl = "http://validator.aperto.de/w3c-markup-validator/check";
-    private String _validatorWarningCssUri = "/css/validator-warning.css";
+    private String _validatorWarningCssUri = "/docroot/magkit/css/validator-warning.css";
     private String _warningLayerTemplate;
     private int _resultCounter = 0;
     private String[] _cachedResults = new String[MAX_CACHED_RESULTS];
@@ -62,6 +66,19 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
      * inits the filter.
      */
     public void init(FilterConfig filterConfig) throws ServletException {
+        Content configContent  = ContentUtil.getContent(ContentRepository.CONFIG, "/server/filters/validator/config");
+        if (configContent != null) {
+            try {
+                if (configContent.hasNodeData(VALIDATOR_WARNING_CSS_URI) && !StringTools.isEmpty(configContent.getNodeData(VALIDATOR_WARNING_CSS_URI).getString())) {
+                    setValidatorWarningCssUri(configContent.getNodeData(VALIDATOR_WARNING_CSS_URI).getString());
+                }
+                if (configContent.hasNodeData(W3C_VALIDATOR_CHECK_URL_PARAM_NAME) && !StringTools.isEmpty(configContent.getNodeData(W3C_VALIDATOR_CHECK_URL_PARAM_NAME).getString())) {
+                    setW3cValidatorCheckUrl(configContent.getNodeData(W3C_VALIDATOR_CHECK_URL_PARAM_NAME).getString());
+                }
+            } catch (RepositoryException e) {
+                LOGGER.info("NodeData " + VALIDATOR_WARNING_CSS_URI + " not found.");
+            }
+        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("init(" + filterConfig + ")");
         }
@@ -174,11 +191,12 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
                 _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
                 String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
+                String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
                 // use original html with mgnlMainBar
                 if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
-                    html = injectWarningLayer(mgnlHtml, validationResultUrl);
+                    html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri);
                 } else {
-                    html = injectWarningLayer(html, validationResultUrl);
+                    html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri);
                 }
                 _resultCounter++;
             } else {
@@ -235,7 +253,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         return html;        
     }
 
-    private String injectWarningLayer(String html, String validationResultUrl) {
+    private String injectWarningLayer(String html, String validationResultUrl, String validatorWarningCssUri) {
         String lowerCaseHtml = html.toLowerCase();
         int i = lowerCaseHtml.lastIndexOf("</body");
         if (i == -1) {
@@ -249,7 +267,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             --i;
         }
         Map<String, Object> replacements = new HashMap<String, Object>();
-        replacements.put("validatorWarningCssUri", getValidatorWarningCssUri());
+        replacements.put("validatorWarningCssUri", validatorWarningCssUri);
         replacements.put("validationResultUrl", validationResultUrl);
         String warningLayer = StringTools.replacePlaceHolders(_warningLayerTemplate, replacements);
         return html.substring(0, i) + warningLayer + html.substring(i);
