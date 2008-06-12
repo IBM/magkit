@@ -4,9 +4,6 @@ import com.aperto.webkit.lang.IoRuntimeException;
 import com.aperto.webkit.utils.IoTools;
 import com.aperto.webkit.utils.StringTools;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
-import info.magnolia.cms.util.ContentUtil;
-import info.magnolia.cms.beans.config.ContentRepository;
-import info.magnolia.cms.core.Content;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.util.EncodingUtil;
@@ -22,7 +19,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.jcr.RepositoryException;
 import java.io.*;
 import java.util.*;
 
@@ -66,19 +62,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
      * inits the filter.
      */
     public void init(FilterConfig filterConfig) throws ServletException {
-        Content configContent  = ContentUtil.getContent(ContentRepository.CONFIG, "/server/filters/validator/config");
-        if (configContent != null) {
-            try {
-                if (configContent.hasNodeData(VALIDATOR_WARNING_CSS_URI) && !StringTools.isEmpty(configContent.getNodeData(VALIDATOR_WARNING_CSS_URI).getString())) {
-                    setValidatorWarningCssUri(configContent.getNodeData(VALIDATOR_WARNING_CSS_URI).getString());
-                }
-                if (configContent.hasNodeData(W3C_VALIDATOR_CHECK_URL_PARAM_NAME) && !StringTools.isEmpty(configContent.getNodeData(W3C_VALIDATOR_CHECK_URL_PARAM_NAME).getString())) {
-                    setW3cValidatorCheckUrl(configContent.getNodeData(W3C_VALIDATOR_CHECK_URL_PARAM_NAME).getString());
-                }
-            } catch (RepositoryException e) {
-                LOGGER.info("NodeData " + VALIDATOR_WARNING_CSS_URI + " not found.");
-            }
-        }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("init(" + filterConfig + ")");
         }
@@ -93,6 +76,8 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 IoTools.copy(in, buffer);
                 _warningLayerTemplate = buffer.toString();
             }
+
+
         } finally {
             IoTools.closeQuietly(in);
         }
