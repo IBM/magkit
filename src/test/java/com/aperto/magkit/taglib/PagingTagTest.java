@@ -14,6 +14,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
+
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 
@@ -48,7 +49,7 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(jspWriter, notNullValue());
         String output = jspWriter.toString();
         assertThat(output, notNullValue());
-        assertThat(output, containsString("<li class=\"aktiv\">1</li>"));
+        assertThat(output, containsString("<li><strong>1</strong></li>"));
         assertThat(output, containsString("2</a>"));
         assertThat(output, not(containsString(".pid-1.")));
         assertThat(output, containsString("old.selector.pid-2."));
@@ -65,7 +66,7 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(jspWriter, notNullValue());
         String output = jspWriter.toString();
         assertThat(output, notNullValue());
-        assertThat(output, containsString("<li class=\"aktiv\">1</li>"));
+        assertThat(output, containsString("<li><strong>1</strong></li>"));
         assertThat(output, containsString("2</a>"));
         assertThat(output, not(containsString(".pid-1.")));
         assertThat(output, containsString("5</a></li><li>...</li>"));
@@ -84,7 +85,7 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(output, notNullValue());
         assertThat(output, containsString("1</a></li>"));
         assertThat(output, not(containsString("2</a></li>")));
-        assertThat(output, containsString("<li class=\"aktiv\">5</li>"));
+        assertThat(output, containsString("<li><strong>5</strong></li>"));
         assertThat(output, containsString("<li>...</li><li><a href=\"/page.old.selector.pid-3.html\" title=\"zur Seite 3\" >3</a></li>"));
         assertThat(output, containsString("7</a></li><li>...</li>"));
     }
@@ -102,7 +103,7 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(output, notNullValue());
         assertThat(output, containsString("1</a></li>"));
         assertThat(output, not(containsString("2</a></li>")));
-        assertThat(output, containsString("<li class=\"aktiv\">8</li>"));
+        assertThat(output, containsString("<li><strong>8</strong></li>"));
         assertThat(output, containsString("<li>...</li><li><a href=\"/page.old.selector.pid-4.html\" title=\"zur Seite 4\" >4</a></li>"));
         assertThat(output, containsString("1</a></li><li>...</li>"));
     }
@@ -121,7 +122,8 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(output, notNullValue());
         assertThat(output, containsString(">1</a></li>"));
         assertThat(output, containsString(">2</a></li>"));
-        assertThat(output, containsString("<li class=\"aktiv\">5</li>"));
+        assertThat(output, containsString("<li><strong>5</strong></li>"));
         assertThat(output, containsString("10</a></li><li>...</li>"));
     }
 }
+

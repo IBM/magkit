@@ -91,7 +91,7 @@ public class PagingTag extends TagSupport {
                 int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
                 for (int page = startPage; page <= lastPage; page++) {
                     if (page == _actPage) {
-                        out.print("<li class=\"aktiv\">" + page + "</li>");
+                        out.print("<li><strong>" + page + "</strong></li>");
                     } else {
                         out.print(determineLinkedPage(page, completeHandle, queryString));
                     }
