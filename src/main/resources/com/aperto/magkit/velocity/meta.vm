@@ -24,14 +24,14 @@
 <meta name="page-topic" content="${page-topics}" />
 #end
 #if (${audience})
-<meta name="audience" content="${audience}">
+<meta name="audience" content="${audience}" />
 #end
 #if (${siteinfo})
-<meta name="siteinfo" content="${siteinfo}">
+<meta name="siteinfo" content="${siteinfo}" />
 #end
 #if (${reply-to})
-<meta http-equiv="reply-to" content="${reply-to}">
+<meta http-equiv="reply-to" content="${reply-to}" />
 #end
 #if (${revisit-after})
-<meta name="revisit-after" CONTENT="${revisit-after}">
+<meta name="revisit-after" CONTENT="${revisit-after}" />
 #end
