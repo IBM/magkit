@@ -16,6 +16,7 @@ import info.magnolia.module.dms.beans.Document;
 import info.magnolia.module.dms.util.PathUtil;
 import org.apache.log4j.Logger;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import javax.imageio.ImageIO;
@@ -82,27 +83,29 @@ public class PhotoGalleryController extends AbstractController {
         try {
             if (localContent != null && localContent.hasNodeData("folder")) {
                 String folderPath = LinkHelper.convertUUIDtoHandle(localContent.getNodeData("folder").getString(), dmsRepName);
-                Content folder = manager.getContent(folderPath);
-                if (folder != null) {
-                    Collection images = folder.getChildren(ItemType.CONTENTNODE);
-                    if (images.size() > 0) {
-                        List<GalleryEntry> imageList = new ArrayList<GalleryEntry>();
-                        for (Object imgObj : images) {
-                            GalleryEntry galleryEntry = new GalleryEntry();
-                            Content content = (Content) imgObj;
-                            Document originalDocument = new Document(content);
-                            if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension())) {
-                                Document previewDocument = getPreviewImageDocument(originalDocument, manager);
-                                if (previewDocument != null) {
-                                    galleryEntry.setImage(new ImageData(originalDocument));
-                                    galleryEntry.setThumbnail(new ImageData(previewDocument));
-                                    galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
-                                    galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
-                                    imageList.add(galleryEntry);
+                if (StringUtils.isNotBlank(folderPath)) {
+                    Content folder = manager.getContent(folderPath);
+                    if (folder != null) {
+                        Collection images = folder.getChildren(ItemType.CONTENTNODE);
+                        if (images.size() > 0) {
+                            List<GalleryEntry> imageList = new ArrayList<GalleryEntry>();
+                            for (Object imgObj : images) {
+                                GalleryEntry galleryEntry = new GalleryEntry();
+                                Content content = (Content) imgObj;
+                                Document originalDocument = new Document(content);
+                                if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension())) {
+                                    Document previewDocument = getPreviewImageDocument(originalDocument, manager);
+                                    if (previewDocument != null) {
+                                        galleryEntry.setImage(new ImageData(originalDocument));
+                                        galleryEntry.setThumbnail(new ImageData(previewDocument));
+                                        galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
+                                        galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
+                                        imageList.add(galleryEntry);
+                                    }
                                 }
                             }
+                            result.put("imageList", imageList);
                         }
-                        result.put("imageList", imageList);
                     }
                 }
             }
