@@ -76,34 +76,17 @@ public class PhotoGalleryController extends AbstractController {
 
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> result = new HashMap<String, Object>();
-        String dmsRepName = DMSModule.getInstance().getRepository();
-        HierarchyManager manager = MgnlContext.getHierarchyManager(dmsRepName);
         Content localContent = Resource.getLocalContentNode();
 
         try {
             if (localContent != null && localContent.hasNodeData("folder")) {
-                String folderPath = LinkHelper.convertUUIDtoHandle(localContent.getNodeData("folder").getString(), dmsRepName);
+                String folderPath = LinkHelper.convertUUIDtoHandle(localContent.getNodeData("folder").getString(), DMSModule.getInstance().getRepository());
                 if (StringUtils.isNotBlank(folderPath)) {
-                    Content folder = manager.getContent(folderPath);
+                    Content folder = MgnlContext.getHierarchyManager(DMSModule.getInstance().getRepository()).getContent(folderPath);
                     if (folder != null) {
                         Collection images = folder.getChildren(ItemType.CONTENTNODE);
                         if (images.size() > 0) {
-                            List<GalleryEntry> imageList = new ArrayList<GalleryEntry>();
-                            for (Object imgObj : images) {
-                                GalleryEntry galleryEntry = new GalleryEntry();
-                                Content content = (Content) imgObj;
-                                Document originalDocument = new Document(content);
-                                if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension())) {
-                                    Document previewDocument = getPreviewImageDocument(originalDocument, manager);
-                                    if (previewDocument != null) {
-                                        galleryEntry.setImage(new ImageData(originalDocument));
-                                        galleryEntry.setThumbnail(new ImageData(previewDocument));
-                                        galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
-                                        galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
-                                        imageList.add(galleryEntry);
-                                    }
-                                }
-                            }
+                            List<GalleryEntry> imageList = retrieveImageList(images);
                             result.put("imageList", imageList);
                         }
                     }
@@ -116,6 +99,26 @@ public class PhotoGalleryController extends AbstractController {
         return new ModelAndView(_viewname, result);
     }
 
+    private List<GalleryEntry> retrieveImageList(Collection images) throws Exception {
+        List<GalleryEntry> imageList = new ArrayList<GalleryEntry>();
+        for (Object imgObj : images) {
+            GalleryEntry galleryEntry = new GalleryEntry();
+            Content content = (Content) imgObj;
+            Document originalDocument = new Document(content);
+            if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension())) {
+                Document previewDocument = getPreviewImageDocument(originalDocument);
+                if (previewDocument != null) {
+                    galleryEntry.setImage(new ImageData(originalDocument));
+                    galleryEntry.setThumbnail(new ImageData(previewDocument));
+                    galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
+                    galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
+                    imageList.add(galleryEntry);
+                }
+            }
+        }
+        return imageList;
+    }
+
     /**
      * Create an image file that is a scaled version of the original image and returns
      * the document for that image.
@@ -124,7 +127,8 @@ public class PhotoGalleryController extends AbstractController {
      * @param manager  the HierarchyManager
      * @return the new image file
      */
-    private Document getPreviewImageDocument(Document document, HierarchyManager manager) throws Exception {
+    private Document getPreviewImageDocument(Document document) throws Exception {
+        HierarchyManager manager = MgnlContext.getHierarchyManager(DMSModule.getInstance().getRepository());
         Document previewDocument = getPreviewDocumentForDocument(document, manager);
 
         if (previewDocument != null && !previewDocument.getFileName().equals(document.getFileName())) {
