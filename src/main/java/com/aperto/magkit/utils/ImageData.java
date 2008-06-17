@@ -19,6 +19,7 @@ public class ImageData {
     private String _handle;
     private String _filesize;
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(LinkTool.class);
+    private static final String SUFFIX_RESIZED = "_resized";
 
     /**
      * Constructor with some given data.
@@ -53,13 +54,33 @@ public class ImageData {
      * @param imageKey node data key for image.
      */
     public ImageData(Content content, String imageKey) {
+        initImageData(content, imageKey, false);
+    }
+
+    /**
+     * Constructor.
+     * @param content content with image node data
+     * @param imageKey node data key for image.
+     * @param checkResizer checks a possible resizer node data
+     */
+    public ImageData(Content content, String imageKey, boolean checkResizer) {
+        initImageData(content, imageKey, checkResizer);
+    }
+
+    private void initImageData(Content content, String imageKey, boolean checkResizer) {
         _alt = "";
         _handle = "";
         _height = "";
         _width = "";
         _filesize = "";
         try {
-            if (content.hasNodeData(imageKey)) {
+            if (checkResizer && content.hasNodeData(imageKey + SUFFIX_RESIZED)) {
+                NodeData nodeData = content.getNodeData(imageKey + SUFFIX_RESIZED);
+                if (nodeData != null) {
+                    retrieveDataFromNode(nodeData);
+                }
+            }
+            if (StringUtils.isBlank(_handle) && content.hasNodeData(imageKey)) {
                 NodeData imageNode = content.getNodeData(imageKey);
                 if (imageNode != null) {
                     retrieveDataFromNode(imageNode);
