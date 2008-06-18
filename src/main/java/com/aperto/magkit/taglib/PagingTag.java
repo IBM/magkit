@@ -45,6 +45,7 @@ public class PagingTag extends TagSupport {
     private boolean _addQueryString = false;
     private boolean _showPrefix = true;
     private boolean _showTitle = true;
+    private String _includeHeadline = "";
 
     @TagAttribute
     public void setLinkedPages(int linkedPages) {
@@ -76,6 +77,11 @@ public class PagingTag extends TagSupport {
         _showTitle = Boolean.valueOf(showTitle);
     }
 
+    @TagAttribute
+    public void setIncludeHeadline(String headline) {
+        _includeHeadline = headline;
+    }
+
     /**
      * Produce the paging.
      *
@@ -93,7 +99,11 @@ public class PagingTag extends TagSupport {
         }
         try {
             if (_pages > 1) {
-                out.print("<div class=\"pager\">\n<ul>");
+                out.print("<div class=\"pager\">\n");
+                if (StringUtils.isNotEmpty(_includeHeadline)) {
+                    out.print("<h4>" + _includeHeadline + "</h4>\n");
+                }
+                out.print("<ul>\n");
                 out.print(determinePrevious(completeHandle, queryString));
                 if (_showPrefix) {
                     out.print("<li><strong>" + _prefix + "</strong></li>");
@@ -206,5 +216,6 @@ public class PagingTag extends TagSupport {
         _addQueryString = false;
         _showPrefix = true;
         _showTitle = true;
+        _includeHeadline = "";
     }
 }
