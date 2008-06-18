@@ -69,11 +69,20 @@ public class Item implements Comparable {
 
     /**
      * Implementation for comparing.
+     * Compares by position in the keys or alphabetically by value and key.
      */
     public int compareTo(Object o) {
         int returnValue = 0;
         if (Item.class.equals(o.getClass())) {
-            returnValue = _key.compareTo(((Item) o)._key);
+            Item item = (Item) o;
+            if (getPosition() > -1) {
+                returnValue = _key.compareTo(item._key);
+            } else {
+                returnValue = _value.compareTo(item._value);
+                if (returnValue == 0) {
+                    returnValue = _key.compareTo(item._key);
+                }
+            }
         }
         return returnValue;
     }
