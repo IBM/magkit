@@ -55,7 +55,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     });
 
     private final Task _addBypassFor404 = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[]{
-        new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", "config", "/server/filters/bypasses/404", null, new AddFilterBypassTask("/server/filters", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")),
+        new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", ContentRepository.CONFIG, "/server/filters/bypasses/404", null, new AddFilterBypassTask("/server/filters", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")),
     });
 
     private final Task _add404Config = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[]{
@@ -65,7 +65,16 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     });
 
     private final Task _check404Config = new ArrayDelegateTask("Bypass config", "Add the config for the 404 redirect.", new Task[]{
-        new NodeExistsDelegateTask("Check 404 config", "Check 404 config in magkit.", "config", "/modules/magkit/config/404", _add404Config),
+        new NodeExistsDelegateTask("Check 404 config", "Check 404 config in magkit.", ContentRepository.CONFIG, "/modules/magkit/config/404", _add404Config),
+    });
+
+    private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
+        new CreateNodeTask("captcha", "Create config node.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny", "captcha", ItemType.CONTENTNODE.getSystemName()),
+        new SetPropertyTask(ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", "URI", "/captcha/*"),
+    });
+
+    private final Task _checkCaptchaConfig = new ArrayDelegateTask("Captcha cache", "Add the config for the captcha cache exclusion.", new Task[]{
+        new NodeExistsDelegateTask("Check cache config", "Check cache config.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", null, _addCaptchaConfig),
     });
 
     /**
@@ -78,9 +87,10 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
      * Constructor for adding update builder.
      */
     public MagKitModuleVersionHandler() {
-        DeltaBuilder builder001 = DeltaBuilder.update("0.0.3", "Upgrading to Magkit 0.0.3");
+        DeltaBuilder builder001 = DeltaBuilder.update("0.1.0", "Upgrading to Magkit 0.1.0");
         builder001.addTask(_addBypassFor404);
         builder001.addTask(_check404Config);
+        builder001.addTask(_checkCaptchaConfig);
         register(builder001);
     }
 
@@ -93,6 +103,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_setI18nContentSupportTask);
         tasks.add(_addBypassFor404);
         tasks.add(_add404Config);
+        tasks.add(_addCaptchaConfig);
         return tasks;
     }
 
