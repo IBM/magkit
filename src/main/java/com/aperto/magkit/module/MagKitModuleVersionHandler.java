@@ -87,7 +87,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
      * Constructor for adding update builder.
      */
     public MagKitModuleVersionHandler() {
-        DeltaBuilder builder001 = DeltaBuilder.update("0.1.0", "Upgrading to Magkit 0.1.0");
+        DeltaBuilder builder001 = DeltaBuilder.update("0.1.5", "Upgrading to Magkit 0.1.5");
         builder001.addTask(_addBypassFor404);
         builder001.addTask(_check404Config);
         builder001.addTask(_checkCaptchaConfig);
