@@ -65,7 +65,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     });
 
     private final Task _check404Config = new ArrayDelegateTask("Bypass config", "Add the config for the 404 redirect.", new Task[]{
-        new NodeExistsDelegateTask("Check 404 config", "Check 404 config in magkit.", ContentRepository.CONFIG, "/modules/magkit/config/404", _add404Config),
+        new NodeExistsDelegateTask("Check 404 config", "Check 404 config in magkit.", ContentRepository.CONFIG, "/modules/magkit/config/404", null, _add404Config),
     });
 
     private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
