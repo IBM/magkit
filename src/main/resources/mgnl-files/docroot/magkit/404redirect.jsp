@@ -1,5 +1,4 @@
-<%@ page import="com.aperto.webkit.utils.ExceptionEater,
-        java.util.MissingResourceException,
+<%@ page import="java.util.MissingResourceException,
         java.util.ResourceBundle"
 %><%
     ResourceBundle resourceBundle = ResourceBundle.getBundle("environment");
@@ -8,8 +7,8 @@
             String handle = resourceBundle.getString("errorpage.404." + request.getLocale().getLanguage());
             String contextName = request.getContextPath();
             String newLocn = contextName + handle;
-            response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-            response.setHeader("Location", newLocn);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            pageContext.forward(newLocn);
         } catch (MissingResourceException mre) {
 %>
             404-Seite ist nicht konfiguriert.
