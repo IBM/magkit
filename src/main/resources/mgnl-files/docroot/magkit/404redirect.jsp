@@ -1,14 +1,20 @@
-<%@ page import="info.magnolia.cms.core.Content,
-        info.magnolia.cms.util.ContentUtil,
-        info.magnolia.cms.beans.config.ContentRepository"
+<%@ page import="com.aperto.webkit.utils.ExceptionEater,
+        java.util.MissingResourceException,
+        java.util.ResourceBundle"
 %><%
-    Content content = ContentUtil.getContent(ContentRepository.WEBSITE, "/config/" + request.getLocale().getLanguage() + "centralHandles");
-    if (content != null && content.hasNodeData("404Link")) {
-        String handle = content.getNodeData("404Link").getString();
-        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-        String contextName = request.getContextPath();
-        String newLocn = contextName + handle;
-        response.setHeader("Location", newLocn);
+    ResourceBundle resourceBundle = ResourceBundle.getBundle("environment");
+    if (resourceBundle != null) {
+        try {
+            String handle = resourceBundle.getString("errorpage.404." + request.getLocale().getLanguage());
+            String contextName = request.getContextPath();
+            String newLocn = contextName + handle;
+            response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+            response.setHeader("Location", newLocn);
+        } catch (MissingResourceException mre) {
+%>
+            404-Seite ist nicht konfiguriert.
+<%
+        }
     } else {
 %>
     Die 404-Seite ist nicht konfiguriert.
