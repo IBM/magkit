@@ -1,23 +1,15 @@
 package com.aperto.magkit.module;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.aperto.magkit.filter.HtmlValidatorFilter;
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.ArrayDelegateTask;
-import info.magnolia.module.delta.CreateNodeTask;
-import info.magnolia.module.delta.DeltaBuilder;
-import info.magnolia.module.delta.FilterOrderingTask;
-import info.magnolia.module.delta.ModuleBootstrapTask;
-import info.magnolia.module.delta.NodeExistsDelegateTask;
-import info.magnolia.module.delta.SetPropertyTask;
-import info.magnolia.module.delta.Task;
+import info.magnolia.module.delta.*;
 import info.magnolia.module.model.Version;
 import info.magnolia.setup.AddFilterBypassTask;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The MagKitModuleVersionHandler for the MagKit module.
@@ -57,6 +49,10 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", ContentRepository.CONFIG, "/server/filters/bypasses/404", null, new AddFilterBypassTask("/server/filters", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")),
     });
 
+    private final Task _addBypassForStatus = new ArrayDelegateTask("Bypass", "Add the bypass for status output.", new Task[]{
+        new NodeExistsDelegateTask("Check status bypass", "Check status bypass in server config.", ContentRepository.CONFIG, "/server/filters/bypasses/status", null, new AddFilterBypassTask("/server/filters", "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")),
+    });
+
     private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
         new CreateNodeTask("captcha", "Create config node.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny", "captcha", ItemType.CONTENTNODE.getSystemName()),
         new SetPropertyTask(ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", "URI", "/captcha/*"),
@@ -76,10 +72,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
      * Constructor for adding update builder.
      */
     public MagKitModuleVersionHandler() {
-        DeltaBuilder builder001 = DeltaBuilder.update("0.1.5", "Upgrading to Magkit 0.1.5");
-        builder001.addTask(_addBypassFor404);
-        builder001.addTask(_checkCaptchaConfig);
-        register(builder001);
     }
 
     protected List getExtraInstallTasks(InstallContext installContext) {
@@ -90,6 +82,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_setAdminInterfaceExportClassTask);
         tasks.add(_setI18nContentSupportTask);
         tasks.add(_addBypassFor404);
+        tasks.add(_addBypassForStatus);
         tasks.add(_addCaptchaConfig);
         return tasks;
     }
@@ -98,6 +91,9 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     protected List getDefaultUpdateTasks(Version forVersion) {
         List updateTasks = super.getDefaultUpdateTasks(forVersion);
         updateTasks.add(_bootstrapModuleConfigTask);
+        updateTasks.add(_addBypassFor404);
+        updateTasks.add(_addBypassForStatus);
+        updateTasks.add(_checkCaptchaConfig);
         return updateTasks;
     }
 }
