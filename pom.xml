@@ -1,18 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>magkit-multi</artifactId>
         <groupId>com.aperto.magkit</groupId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <groupId>com.aperto.magkit</groupId>
     <artifactId>magkit</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Aperto Magnolia Kit</name>
     <packaging>jar</packaging>
-    <url>http://www.aperto.com</url>
 
     <dependencies>
         <dependency>
@@ -23,17 +25,14 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.3</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -58,13 +57,13 @@
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-empty-webapp</artifactId>
-            <version>3.5.4</version>
+            <version>${magnolia.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-empty-webapp</artifactId>
-            <version>3.5.4</version>
+            <version>${magnolia.version}</version>
             <type>pom</type>
             <exclusions>
                 <exclusion>
@@ -106,13 +105,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
-            <version>1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -122,6 +119,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <!--  see http://myfaces.apache.org/tobago/tobago-tool/maven-apt-plugin -->
@@ -153,150 +151,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- See http://mojo.codehaus.org/cobertura-maven-plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-idea-plugin -->
-            <plugin>
-                <artifactId>maven-idea-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <downloadSources>false</downloadSources>
-                    <downloadJavadocs>false</downloadJavadocs>
-                    <jdkLevel>1.5</jdkLevel>
-                    <exclude>tomcat/target, tomcat/repositories</exclude>
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-eclipse-plugin -->
-            <plugin>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <additionalProjectnatures>
-                        <projectnature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</projectnature>
-                        <projectnature>com.genuitec.eclipse.springframework.springnature</projectnature>
-                    </additionalProjectnatures>
-                    <additionalBuildcommands>
-                        <buildcommand>com.atlassw.tools.eclipse.checkstyle.CheckstyleBuilder</buildcommand>
-                        <buildcommand>com.genuitec.eclipse.springframework.springbuilder</buildcommand>
-                    </additionalBuildcommands>
-                    <projectnatures>
-                        <java.lang.String>org.springframework.ide.eclipse.core.springnature</java.lang.String>
-                        <java.lang.String>org.eclipse.jdt.core.javanature</java.lang.String>
-                    </projectnatures>
-                    <!-- additionalConfig>
-                       <file>
-                           <name>.checkstyle</name>
-                           <content>
-                               <![CDATA[
-                                   <fileset-config file-format-version="1.2.0" simple-config="true">
-                                       <local-check-config name="aperto" location="/build-tools/src/main/resources/com/aperto/checkstyle-rules.xml" type="project" description="">
-                                           <additional-data name="protect-config-file" value="true" />
-                                       </local-check-config>
-                                       <fileset name="all" enabled="true" check-config-name="aperto" local="true">
-                                           <file-match-pattern match-pattern="." include-pattern="true" />
-                                       </fileset>
-                                       <filter name="NonSrcDirs" enabled="true" />
-                                   </fileset-config>]]>
-                           </content>
-                       </file>
-                   </additionalConfig -->
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-release-plugin/ -->
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagBase>https://subversion.aperto.de/magkit/tags</tagBase>
-                    <preparationGoals>clean install</preparationGoals>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-compiler-plugin -->
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>Windows-1252</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-surefire-plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/Test*.java</include>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                        <include>**/*TestCase.java</include>
-                    </includes>
-                    <systemProperties>
-                        <property>
-                            <name>net.sourceforge.cobertura.datafile</name>
-                            <value>target/cobertura/cobertura.ser</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-checkstyle-plugin -->
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <sourceDirectory>src</sourceDirectory>
-                    <configLocation>com/aperto/checkstyle-rules.xml</configLocation>
-                    <failOnViolation>true</failOnViolation>
-                    <failsOnError>true</failsOnError>
-                    <enableRulesSummary>false</enableRulesSummary>
-                    <consoleOutput>true</consoleOutput>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <linkXRef>false</linkXRef>
-                    <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
-                    <excludes>**/package-info.java</excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- See http://mojo.codehaus.org/findbugs-maven-plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <reportLevel>high</reportLevel>
-                    <excludeFilterFile>com/aperto/findbugs-suppressions.xml</excludeFilterFile>
-                </configuration>
-            </plugin>
-            <!-- See http://clirr.sourceforge.net/clirr-maven/index.html -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>clirr-maven-plugin</artifactId>
-                <version>2.1.1</version>
-                <configuration>
-                    <minSeverity>info</minSeverity>
-                </configuration>
             </plugin>
             <!-- http://cargo.codehaus.org/ -->
             <plugin>
@@ -345,14 +199,8 @@
                 </configuration>
             </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <groupId>com.aperto</groupId>
-                <artifactId>build-tools</artifactId>
-                <version>0.1</version>
-            </extension>
-        </extensions>
     </build>
+
     <profiles>
         <profile>
             <id>author</id>
@@ -400,88 +248,5 @@
     </profiles>
 
     <reporting>
-        <plugins>
-            <!-- See http://mojo.codehaus.org/findbugs-maven-plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <reportLevel>high</reportLevel>
-                    <excludeFilterFile>com/aperto/findbugs-suppressions.xml</excludeFilterFile>
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-javadoc-plugin -->
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-jxr-plugin -->
-            <plugin>
-                <artifactId>maven-jxr-plugin</artifactId>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-surefire-report-plugin -->
-            <plugin>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-            </plugin>
-            <!-- See http://mojo.codehaus.org/cobertura-maven-plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <instrumentation>
-                        <excludes>
-                            <exclude>jsp/**</exclude>
-                        </excludes>
-                    </instrumentation>
-                </configuration>
-            </plugin>
-            <!-- See http://mojo.codehaus.org/taglist-maven-plugin -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <configuration>
-                    <tags>
-                        <tag>TODO</tag>
-                        <tag>CHECKSTYLE</tag>
-                    </tags>
-                </configuration>
-            </plugin>
-            <!-- See http://maven.apache.org/plugins/maven-pmd-plugin -->
-            <plugin>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <linkXref>true</linkXref>
-                    <sourceEncoding>Windows-1252</sourceEncoding>
-                    <targetJdk>1.5</targetJdk>
-                    <includeTests>true</includeTests>
-                    <!-- See http://pmd.sourceforge.net/rules/index.html -->
-                    <rulesets>
-                        <ruleset>rulesets/finalizers.xml</ruleset>
-                        <ruleset>rulesets/basic-jsp.xml</ruleset>
-                        <ruleset>rulesets/unusedcode.xml</ruleset>
-                        <ruleset>rulesets/coupling.xml</ruleset>
-                        <ruleset>rulesets/basic.xml</ruleset>
-                        <ruleset>rulesets/design.xml</ruleset>
-                        <ruleset>rulesets/sunsecure.xml</ruleset>
-                        <ruleset>rulesets/strictexception.xml</ruleset>
-                        <ruleset>rulesets/javabeans.xml</ruleset>
-                        <ruleset>rulesets/typeresolution.xml</ruleset>
-                        <ruleset>rulesets/codesize.xml</ruleset>
-                        <ruleset>rulesets/imports.xml</ruleset>
-                        <ruleset>rulesets/clone.xml</ruleset>
-                        <ruleset>rulesets/braces.xml</ruleset>
-                        <ruleset>rulesets/strings.xml</ruleset>
-                        <!-- ruleset>${multiproject.dir}/src/main/config/pmd-rules.xml</ruleset -->
-                    </rulesets>
-                </configuration>
-            </plugin>
-            <!-- See http://clirr.sourceforge.net/clirr-maven/index.html -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>clirr-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
     </reporting>
 </project>
