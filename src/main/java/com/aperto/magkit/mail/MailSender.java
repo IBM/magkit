@@ -1,9 +1,13 @@
 package com.aperto.magkit.mail;
 
-import org.apache.log4j.Logger;
+import info.magnolia.cms.beans.runtime.Document;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.apache.log4j.Logger;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.Date;
 
 /**
@@ -31,7 +35,7 @@ public class MailSender {
     }
 
     /**
-     * Sends a mail.
+     * Sends a simple mail.
      * @param to mail receiver
      * @param subject mail subject
      * @param mailtext mail text
@@ -56,6 +60,49 @@ public class MailSender {
             String message = "Mail sending failed: " + msg;
             LOGGER.error(message, e);
         }
+        return successful;
+    }
+
+    /**
+     * Sends a mail with attachment.
+     */
+    public boolean sendMail(String to, String subject, String mailtext, String replyTo, Document file) {
+        return sendMail(new String[] {to}, subject, mailtext, replyTo, file);            
+    }
+
+    /**
+     * Sends a mail with attachment.
+     * @param to recipients
+     * @param subject subject
+     * @param mailtext mailtext
+     * @param replyTo reply to
+     * @param file attachment
+     * @return successful
+     */
+    public boolean sendMail(String[] to, String subject, String mailtext, String replyTo, Document file) {
+        boolean successful = false;
+
+        MimeMessage message = _javaMailSender.createMimeMessage();
+        try {
+            // use the true flag to indicate you need a multipart message
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setText(mailtext);
+            helper.setSubject(subject);
+            if (!StringUtils.isBlank(replyTo)) {
+                helper.setReplyTo(replyTo);
+            }
+            if (file != null) {
+                helper.addAttachment(file.getFileNameWithExtension(), file.getFile());
+            }
+            _javaMailSender.send(helper.getMimeMessage());
+            successful = true;
+        } catch (MessagingException e) {
+            LOGGER.info(e.getLocalizedMessage());
+        } catch (Exception e) {
+            LOGGER.error("Mail sending failed.", e);
+        }
+
         return successful;
     }
 
