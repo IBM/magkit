@@ -41,7 +41,7 @@
         <a id="validator-warning-toggle" href="" title="Hide warning" onclick="toggleValidatorWarning(this); return false;">Hide warning</a>
         <a id="validator-warning-close" href="" title="Close warning" onclick="document.getElementById('validator-warning').style.display = 'none'; return false;">Close warning</a>
     </div>
-    <h1>This page is <strong>not</strong> valid (X)HTML!</h1>
+    <h1>This page is <strong>${validationOk}</strong> valid (X)HTML!</h1>
     <p>
         <a href="${validationResultUrl}">Please check the results of the validator.</a>
     </p>

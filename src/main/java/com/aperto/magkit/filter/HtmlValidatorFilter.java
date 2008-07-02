@@ -170,24 +170,26 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 LOGGER.debug("Checking " + request.getRequestURL() + " with W3C Validator ...");
             }
             String validationResult = w3cValidate(request.getRequestURI(), html);
-
+            _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
+            String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
+            String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
             // Validation error handling ...
-            if (validationResult != null) {
+            if (validationResult.indexOf("class=\"valid\">This Page Is Valid") < 0) {
                 LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
-                _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
-                String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
-                String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
                 // use original html with mgnlMainBar
                 if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
-                    html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri);
+                    html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri, "not");
                 } else {
-                    html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri);
+                    html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri, "not");
                 }
                 _resultCounter++;
             } else {
-                // try to put back mgnlMainBar
-                if (mgnlHtml.contains(MGNL_MAIN_BAR_END)) {
-                    html = mgnlHtml;
+                LOGGER.debug("Detected valid (X)HTML, injecting warning layer into HTML response ...");
+                // use original html with mgnlMainBar
+                if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
+                    html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri, "");
+                } else {
+                    html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri, "");
                 }
             }
         } catch (Exception e) {
@@ -201,7 +203,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
      * otherwise the HTML of a validation result page is returned.
      */
     private String w3cValidate(String uri, String html) throws IOException {
-        boolean isValid = true;
         String validationResult = null;
         HttpClient httpClient = new HttpClient();
         PostMethod w3cValidatorCheck = new PostMethod(getW3cValidatorCheckUrl());
@@ -217,9 +218,8 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             LOGGER.warn(getW3cValidatorCheckUrl() + " responded with " + responseCode + "\n" + getHtml(w3cValidatorCheck));
         } else {
             validationResult = getHtml(w3cValidatorCheck);
-            isValid = (validationResult.indexOf("class=\"valid\">This Page Is Valid") != -1);
         }
-        return (isValid ? null : validationResult);
+        return validationResult;
     }
 
     private String getHtml(HttpMethodBase httpMethod) throws IoRuntimeException {
@@ -238,7 +238,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         return html;        
     }
 
-    private String injectWarningLayer(String html, String validationResultUrl, String validatorWarningCssUri) {
+    private String injectWarningLayer(String html, String validationResultUrl, String validatorWarningCssUri, String validationOk) {
         String lowerCaseHtml = html.toLowerCase();
         int i = lowerCaseHtml.lastIndexOf("</body");
         if (i == -1) {
@@ -254,6 +254,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         Map<String, Object> replacements = new HashMap<String, Object>();
         replacements.put("validatorWarningCssUri", validatorWarningCssUri);
         replacements.put("validationResultUrl", validationResultUrl);
+        replacements.put("validationOk", validationOk);
         String warningLayer = StringTools.replacePlaceHolders(_warningLayerTemplate, replacements);
         return html.substring(0, i) + warningLayer + html.substring(i);
     }
