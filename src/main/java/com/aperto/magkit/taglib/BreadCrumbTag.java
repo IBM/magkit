@@ -216,7 +216,7 @@ public class BreadCrumbTag extends TagSupport {
     }
 
     private String getNavTitle(Content page) {
-        String navTitle = page.getNodeData("navTitle").getString();
+        String navTitle = page.getNodeData("navTitle").getString().replaceAll("\\{-\\}", "");
         if (StringTools.isBlank(navTitle)) {
             navTitle = page.getTitle();
             if (StringTools.isBlank(navTitle)) {
