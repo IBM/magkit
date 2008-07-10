@@ -39,28 +39,61 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new AddFilterBypassTask("/server/filters/validator", "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit"),
     });
 
-    private final Task _setAdminInterfaceExportClassTask = new SetPropertyTask(ContentRepository.CONFIG, "/modules/adminInterface/pages/export", "class", "com.aperto.magkit.export.ExportPageAlphabetically");
+    private final Task _setAdminInterfaceExportClassTask = new SetPropertyTask(
+            ContentRepository.CONFIG,
+            "/modules/adminInterface/pages/export",
+            "class",
+            "com.aperto.magkit.export.ExportPageAlphabetically"
+    );
+
     private final Task _setI18nContentSupportTask = new ArrayDelegateTask("Filter", "Set i18n support.", new Task[]{
         new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
         new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "enabled", "true")
     });
 
-    private final Task _addBypassFor404 = new ArrayDelegateTask("Bypass", "Add the bypass for 404 redirect.", new Task[]{
-        new NodeExistsDelegateTask("Check 404 bypass", "Check 404 bypass in server config.", ContentRepository.CONFIG, "/server/filters/bypasses/404", null, new AddFilterBypassTask("/server/filters", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")),
-    });
+    private final Task _checkMultpartFilter = new PropertyValueDelegateTask(
+            "Check multipart filter",
+            "Check multipart filter setting in server config.",
+            ContentRepository.CONFIG,
+            "/server/filters/multipartRequest",
+            "class",
+            "com.aperto.magkit.filter.CosMultipartRequestFilter",
+            true,
+            null,
+            new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/multipartRequest", "class", "com.aperto.magkit.filter.CosMultipartRequestFilter")
+    );
+    
+    private final Task _addBypassFor404 = new NodeExistsDelegateTask(
+            "Check 404 bypass",
+            "Check 404 bypass in server config.",
+            ContentRepository.CONFIG,
+            "/server/filters/bypasses/404",
+            null,
+            new AddFilterBypassTask("/server/filters", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")
+    );
 
-    private final Task _addBypassForStatus = new ArrayDelegateTask("Bypass", "Add the bypass for status output.", new Task[]{
-        new NodeExistsDelegateTask("Check status bypass", "Check status bypass in server config.", ContentRepository.CONFIG, "/server/filters/bypasses/status", null, new AddFilterBypassTask("/server/filters", "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")),
-    });
+    private final Task _addBypassForStatus = new NodeExistsDelegateTask(
+            "Check status bypass",
+            "Check status bypass in server config.",
+            ContentRepository.CONFIG,
+            "/server/filters/bypasses/status",
+            null,
+            new AddFilterBypassTask("/server/filters", "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")
+    );
 
     private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
         new CreateNodeTask("captcha", "Create config node.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny", "captcha", ItemType.CONTENTNODE.getSystemName()),
         new SetPropertyTask(ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", "URI", "/captcha/*"),
     });
 
-    private final Task _checkCaptchaConfig = new ArrayDelegateTask("Captcha cache", "Add the config for the captcha cache exclusion.", new Task[]{
-        new NodeExistsDelegateTask("Check cache config", "Check cache config.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", null, _addCaptchaConfig),
-    });
+    private final Task _checkCaptchaConfig = new NodeExistsDelegateTask(
+            "Check cache config",
+            "Check cache config.",
+            ContentRepository.CONFIG,
+            "/modules/cache/config/URI/deny/captcha",
+            null,
+            _addCaptchaConfig
+    );
 
     /**
      * this is used to bootstrap the new module-specific templates, dialogs ... .
@@ -84,6 +117,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_addBypassFor404);
         tasks.add(_addBypassForStatus);
         tasks.add(_addCaptchaConfig);
+        tasks.add(_checkMultpartFilter);
         return tasks;
     }
 
@@ -94,6 +128,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         updateTasks.add(_addBypassFor404);
         updateTasks.add(_addBypassForStatus);
         updateTasks.add(_checkCaptchaConfig);
+        updateTasks.add(_checkMultpartFilter);
         return updateTasks;
     }
 }
