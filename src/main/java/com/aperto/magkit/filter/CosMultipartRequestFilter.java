@@ -46,6 +46,7 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
         String type = null;
         String type1 = request.getHeader("Content-Type");
         String type2 = request.getContentType();
+        HttpServletRequest newRequest = request;
         if (type1 == null && type2 != null) {
             type = type2;
         } else if (type2 == null && type1 != null) {
@@ -55,9 +56,9 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
         }
         if ((type != null) && type.toLowerCase().startsWith("multipart/form-data")) {
             MultipartForm mpf = parseParameters(request);
-            request = new MultipartRequestWrapper(request, mpf);
+            newRequest = new MultipartRequestWrapper(request, mpf);
         }
-        chain.doFilter(request, response);
+        chain.doFilter(newRequest, response);
     }
 
     /**
@@ -87,17 +88,21 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
                 form.addDocument(name, multi.getFilesystemName(name), multi.getContentType(name), multi.getFile(name));
             }
             request.setAttribute(MultipartForm.REQUEST_ATTRIBUTE_NAME, form);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             LOGGER.info("The maximum file size was exceeded.");
         }
         return form;
     }
 
+    /**
+     * Wrapper class.
+     * @author mgnl
+     */
     static class MultipartRequestWrapper extends HttpServletRequestWrapper {
         private MultipartForm _form;
 
         /**
-         * @param request
+         * Constuctor.
          */
         public MultipartRequestWrapper(HttpServletRequest request, MultipartForm form) {
             super(request);
