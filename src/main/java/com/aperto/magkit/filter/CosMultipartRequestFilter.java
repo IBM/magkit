@@ -32,11 +32,11 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
      * Max file upload size. Default 50 MB.
      */
     private static final int DEFAULT_MAX_FILE_SIZE = 52428800;
-    private static int c_configuredMaxFileSize;
+    private static String c_configuredMaxFileSize;
     private static final String PROPERTY_MAX_FIEL_SIZE = "upload.maxFileSize";
     static {
         try {
-            c_configuredMaxFileSize = Math.abs(NumberUtils.toInt(ResourceBundle.getBundle("environment").getString(PROPERTY_MAX_FIEL_SIZE), DEFAULT_MAX_FILE_SIZE));
+            c_configuredMaxFileSize = ResourceBundle.getBundle("environment").getString(PROPERTY_MAX_FIEL_SIZE);
         } catch (MissingResourceException e) {
             ExceptionEater.eat(e);
         }
@@ -71,7 +71,8 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
         String encoding = StringUtils.defaultString(request.getCharacterEncoding(), "UTF-8");
         DefaultFileRenamePolicy fileRenamePolicy = new DefaultFileRenamePolicy();
         try {
-            MultipartRequest multi = new MultipartRequest(request, Path.getTempDirectoryPath(), c_configuredMaxFileSize, encoding, fileRenamePolicy);
+            int maxValue = Math.abs(NumberUtils.toInt(c_configuredMaxFileSize, DEFAULT_MAX_FILE_SIZE));
+            MultipartRequest multi = new MultipartRequest(request, Path.getTempDirectoryPath(), maxValue, encoding, fileRenamePolicy);
             Enumeration params = multi.getParameterNames();
             while (params.hasMoreElements()) {
                 String name = (String) params.nextElement();
