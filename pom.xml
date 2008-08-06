@@ -212,9 +212,6 @@
                             <filesets>
                                 <fileset>
                                     <directory>${basedir}/tomcat</directory>
-                                    <includes>
-                                        <include>author</include>
-                                    </includes>
                                 </fileset>
                             </filesets>
                         </configuration>
