@@ -1,6 +1,6 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.velocity.VelocityEngine;
+import com.aperto.magkit.velocity.SimpleTextTemplate;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.cms.util.Resource;
@@ -9,16 +9,15 @@ import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import org.springframework.web.servlet.tags.RequestContextAwareTag;
+import org.springframework.web.servlet.support.RequestContext;
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.ServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /**
  *
@@ -26,7 +25,7 @@ import java.util.ResourceBundle;
  * @author frank.sommer (21.04.2008)
  */
 @Tag(name = "metaTags", bodyContent = BodyContent.JSP)
-public class MetaTagsTag extends TagSupport {
+public class MetaTagsTag extends RequestContextAwareTag {
     private static final Logger LOGGER = Logger.getLogger(MetaTagsTag.class);
     private static final String[] META_PROPERTIES = {"publisher", "company", "copyright", "robots", "page-topics", "siteinfo", "reply-to", "revisit-after", "audience"};
     private static final String[] PAGE_PROPERTIES = {"meta-author", "meta-keywords", "meta-description"};
@@ -47,12 +46,12 @@ public class MetaTagsTag extends TagSupport {
     public int doEndTag() throws JspException {
         Map<String, String> content = retrieveData();
         try {
-            VelocityEngine engine = new VelocityEngine(_veloTemplate);
-            String html = engine.applyTemplate(content);
+            SimpleTextTemplate template = new SimpleTextTemplate(_veloTemplate);
+            String html = template.evaluate(content);
             JspWriter writer = pageContext.getOut();
             writer.write(html);
         } catch (IOException ioe) {
-            LOGGER.info("Can not write to jsp.");        
+            LOGGER.info("Can not write to jsp.");
         } catch (Exception e) {
             LOGGER.warn("Can not create html for meta-tags.", e);
         }
@@ -61,11 +60,9 @@ public class MetaTagsTag extends TagSupport {
 
     private Map<String, String> retrieveData() {
         Map<String, String> content = new HashMap<String, String>();
-        ServletRequest request = pageContext.getRequest();
-        content.put("language", request.getLocale().getLanguage());
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("language");
+        content.put("language", pageContext.getRequest().getLocale().getLanguage());
         for (String property : META_PROPERTIES) {
-            retrieveDataFromResourceBundle(content, resourceBundle, property);
+            retrieveDataFromResourceBundle(content, property);
         }
         for (String property : PAGE_PROPERTIES) {
             retrieveDataFromMagnolia(content, property);                        
@@ -87,9 +84,9 @@ public class MetaTagsTag extends TagSupport {
         }
     }
 
-    private void retrieveDataFromResourceBundle(Map<String, String> content, ResourceBundle resourceBundle, String key) {
+    private void retrieveDataFromResourceBundle(Map<String, String> content, String key) {
         try {
-            String value = resourceBundle.getString("meta." + key);
+            String value = getContext().getMessage("meta." + key);
             if (!StringUtils.isBlank(value)) {
                 content.put(key, value);
             }
@@ -104,5 +101,16 @@ public class MetaTagsTag extends TagSupport {
     public void release() {
         super.release();
         _veloTemplate = "com/aperto/magkit/velocity/meta.vm";
+    }
+
+    protected int doStartTagInternal() throws Exception {
+        return EVAL_BODY_INCLUDE;
+    }
+
+    /**
+     * Helper for testing.
+     */
+    protected RequestContext getContext() {
+        return getRequestContext();
     }
 }

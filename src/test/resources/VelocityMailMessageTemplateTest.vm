@@ -1,0 +1,3 @@
+Hello ${who}!
+Best regards,
+${someone}

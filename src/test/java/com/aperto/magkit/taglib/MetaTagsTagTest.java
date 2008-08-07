@@ -16,22 +16,26 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
+import org.springframework.web.servlet.support.RequestContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
+import static org.easymock.classextension.EasyMock.*;
+import java.util.MissingResourceException;
+import java.util.Locale;
 
 /**
  * Test the breadcrumb.
  * @author frank.sommer (17.04.2008)
  */
 public class MetaTagsTagTest extends MagKitTagTest {
-
-    private MetaTagsTag _tag;
+    private MetaTagsTag _metaTagsTag;
+    private PageContext _pageContext;
 
     @Test
     public void testDefaultMetaTags() throws JspException {
-        PageContext pageContext = runLifeCycle(_tag);
-        JspWriter jspWriter = pageContext.getOut();
+        _metaTagsTag.doEndTag();
+        JspWriter jspWriter = _pageContext.getOut();
         String output = jspWriter.toString();
         Assert.assertThat(output, StringContains.containsString("<meta name=\"author\" content=\"aperto\" />"));
         Assert.assertThat(output, StringContains.containsString("<meta name=\"description\" content=\"toll\" />"));
@@ -64,6 +68,17 @@ public class MetaTagsTagTest extends MagKitTagTest {
 
     @Before
     public void initTag() throws Exception {
-        _tag = new MetaTagsTag();
+        _metaTagsTag = new MetaTagsTag() {
+            @Override
+            protected RequestContext getContext() {
+                RequestContext mockContext = createMock(RequestContext.class);
+                expect(mockContext.getMessage("meta.publisher")).andReturn("aperto").times(1);
+                expect(mockContext.getMessage((String) anyObject())).andThrow(new MissingResourceException("", "", ""));
+                replay(mockContext);
+                return mockContext;
+            }
+        };
+        _pageContext = createPageContext();
+        _metaTagsTag.setPageContext(_pageContext);
     }
 }

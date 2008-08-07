@@ -1,0 +1,3 @@
+Hello dynamic ${who}!
+Best regards,
+${someone}
