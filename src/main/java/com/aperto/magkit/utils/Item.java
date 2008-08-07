@@ -50,7 +50,7 @@ public class Item implements Comparable {
         int position = -1;
         int index = _key.indexOf(KEY_SORTING_DELIMITER);
         if (index > 0) {
-            position = NumberUtils.toInt(_key.substring(index), -1);
+            position = NumberUtils.toInt(_key.substring(0, index), -1);
         }
         return position;
     }
