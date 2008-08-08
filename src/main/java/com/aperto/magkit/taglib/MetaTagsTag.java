@@ -9,15 +9,15 @@ import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import org.springframework.web.servlet.tags.RequestContextAwareTag;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.web.servlet.support.RequestContext;
+import org.springframework.web.servlet.tags.RequestContextAwareTag;
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.MissingResourceException;
 
 /**
  *
@@ -90,7 +90,7 @@ public class MetaTagsTag extends RequestContextAwareTag {
             if (!StringUtils.isBlank(value)) {
                 content.put(key, value);
             }
-        } catch (MissingResourceException mre) {
+        } catch (NoSuchMessageException mre) {
             LOGGER.info("No value found for " + key);
         }
     }
