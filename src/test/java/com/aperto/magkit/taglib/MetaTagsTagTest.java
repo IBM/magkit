@@ -7,11 +7,13 @@ import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
 import org.apache.commons.lang.StringUtils;
+import static org.easymock.classextension.EasyMock.*;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.matchers.StringContains;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -20,9 +22,6 @@ import org.springframework.web.servlet.support.RequestContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
-import static org.easymock.classextension.EasyMock.*;
-import java.util.MissingResourceException;
-import java.util.Locale;
 
 /**
  * Test the breadcrumb.
@@ -73,7 +72,7 @@ public class MetaTagsTagTest extends MagKitTagTest {
             protected RequestContext getContext() {
                 RequestContext mockContext = createMock(RequestContext.class);
                 expect(mockContext.getMessage("meta.publisher")).andReturn("aperto").times(1);
-                expect(mockContext.getMessage((String) anyObject())).andThrow(new MissingResourceException("", "", ""));
+                expect(mockContext.getMessage((String) anyObject())).andThrow(new NoSuchMessageException("code"));
                 replay(mockContext);
                 return mockContext;
             }
