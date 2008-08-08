@@ -4,6 +4,7 @@ import com.aperto.magkit.velocity.SimpleTextTemplate;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.cms.util.Resource;
+import info.magnolia.context.MgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
@@ -60,7 +61,7 @@ public class MetaTagsTag extends RequestContextAwareTag {
 
     private Map<String, String> retrieveData() {
         Map<String, String> content = new HashMap<String, String>();
-        content.put("language", pageContext.getRequest().getLocale().getLanguage());
+        content.put("language", MgnlContext.getLocale().getLanguage());
         for (String property : META_PROPERTIES) {
             retrieveDataFromResourceBundle(content, property);
         }

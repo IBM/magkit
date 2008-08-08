@@ -33,5 +33,5 @@
 <meta http-equiv="reply-to" content="${reply-to}" />
 #end
 #if (${revisit-after})
-<meta name="revisit-after" CONTENT="${revisit-after}" />
+<meta name="revisit-after" content="${revisit-after}" />
 #end

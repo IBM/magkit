@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.RequestContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
+import java.util.Locale;
 
 /**
  * Test the breadcrumb.
@@ -61,6 +62,7 @@ public class MetaTagsTagTest extends MagKitTagTest {
         mockContent2.setParent(mockContent);
 
         initMgnlWebContext(request, response, httpSession.getServletContext());
+        MgnlContext.setLocale(new Locale("de"));
         MgnlContext.getAggregationState().setMainContent(mockContent2);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
