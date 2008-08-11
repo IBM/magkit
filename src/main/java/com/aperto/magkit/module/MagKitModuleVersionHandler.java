@@ -20,7 +20,7 @@ import java.util.List;
 public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private final Task _addCmsFilterBypassTask = new ArrayDelegateTask("Filter", "Add bypasses for filter 'cms'", new Task[]{
         new AddFilterBypassTask("/server/filters/cms", "debug", info.magnolia.voting.voters.URIStartsWithVoter.class, "/debug"),
-        new AddFilterBypassTask("/server/filters/cms", "captcha", info.magnolia.voting.voters.URIStartsWithVoter.class, "/captcha"),
+        new AddFilterBypassTask("/server/filters/cms", "captcha", info.magnolia.voting.voters.URIStartsWithVoter.class, "/service/captcha"),
         new AddFilterBypassTask("/server/filters/cms", "core", info.magnolia.voting.voters.URIStartsWithVoter.class, "/core"),
         new AddFilterBypassTask("/server/filters/cms", "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit")
     });
@@ -83,7 +83,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
 
     private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
         new CreateNodeTask("captcha", "Create config node.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny", "captcha", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", "URI", "/captcha/*"),
+        new SetPropertyTask(ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", "URI", "/service/captcha/*"),
     });
 
     private final Task _checkCaptchaConfig = new NodeExistsDelegateTask(
