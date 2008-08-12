@@ -2,9 +2,10 @@ package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.velocity.SimpleTextTemplate;
 import info.magnolia.cms.core.Content;
+import info.magnolia.cms.i18n.I18nContentSupport;
+import info.magnolia.cms.i18n.I18nContentSupportFactory;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.cms.util.Resource;
-import info.magnolia.context.MgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
@@ -61,7 +62,14 @@ public class MetaTagsTag extends RequestContextAwareTag {
 
     private Map<String, String> retrieveData() {
         Map<String, String> content = new HashMap<String, String>();
-        content.put("language", MgnlContext.getLocale().getLanguage());
+        I18nContentSupport i18nSupport = I18nContentSupportFactory.getI18nSupport();
+        String language;
+        if (i18nSupport != null) {
+            language = i18nSupport.getLocale().getLanguage();
+        } else {
+            language = getRequestContext().getLocale().getLanguage();
+        }
+        content.put("language", language);
         for (String property : META_PROPERTIES) {
             retrieveDataFromResourceBundle(content, property);
         }
