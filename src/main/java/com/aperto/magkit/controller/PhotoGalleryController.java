@@ -6,25 +6,26 @@ import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.cms.link.LinkHelper;
+import info.magnolia.cms.security.AccessDeniedException;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.cms.util.Resource;
-import info.magnolia.cms.security.AccessDeniedException;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.DMSModule;
 import info.magnolia.module.dms.beans.Document;
 import info.magnolia.module.dms.util.PathUtil;
-import org.apache.log4j.Logger;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
-import javax.imageio.ImageIO;
 import javax.imageio.IIOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.imageio.ImageIO;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -46,6 +47,7 @@ import java.util.List;
  *       <property name="cropping" value="true" />
  * </bean>
  * </code>
+ * The images are set html escaped in the request variable <em>imageList</em>.
  *
  * @author frank.sommer
  */
@@ -110,8 +112,10 @@ public class PhotoGalleryController extends AbstractController {
                 if (previewDocument != null) {
                     galleryEntry.setImage(new ImageData(originalDocument));
                     galleryEntry.setThumbnail(new ImageData(previewDocument));
-                    galleryEntry.setImageTitle(NodeDataUtil.getString(content, "subject", originalDocument.getFileName()));
-                    galleryEntry.setImageDescription(NodeDataUtil.getString(content, "description"));
+                    String imageTitle = NodeDataUtil.getString(content, "subject", originalDocument.getFileName());
+                    galleryEntry.setImageTitle(StringEscapeUtils.escapeHtml(imageTitle));
+                    String description = NodeDataUtil.getString(content, "description");
+                    galleryEntry.setImageDescription(StringEscapeUtils.escapeHtml(description));
                     imageList.add(galleryEntry);
                 }
             }
