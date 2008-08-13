@@ -18,25 +18,33 @@ import java.util.List;
  *         Date: 03.04.2008
  */
 public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
+    private static final String PATH_FILTER = "/server/filters";
+    private static final String PATH_FILTER_CMS = PATH_FILTER + "/cms";
+    private static final String PATH_FILTER_VALIDATOR = PATH_FILTER + "/validator";
+    private static final String PATH_I18N = "/server/i18n/content";
+    private static final String PATH_FILTER_MULTIPART = PATH_FILTER + "/multipartRequest";
+    private static final String CLASS_MAGKIT_MP_FILTER = "com.aperto.magkit.filter.CosMultipartRequestFilter";
+    private static final String PATH_CACHE_CAPTCHA = "/modules/cache/config/URI/deny/captcha";
+
     private final Task _addCmsFilterBypassTask = new ArrayDelegateTask("Filter", "Add bypasses for filter 'cms'", new Task[]{
-        new AddFilterBypassTask("/server/filters/cms", "debug", info.magnolia.voting.voters.URIStartsWithVoter.class, "/debug"),
-        new AddFilterBypassTask("/server/filters/cms", "captcha", info.magnolia.voting.voters.URIStartsWithVoter.class, "/service/captcha"),
-        new AddFilterBypassTask("/server/filters/cms", "core", info.magnolia.voting.voters.URIStartsWithVoter.class, "/core"),
-        new AddFilterBypassTask("/server/filters/cms", "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit")
+        new AddFilterBypassTask(PATH_FILTER_CMS, "debug", info.magnolia.voting.voters.URIStartsWithVoter.class, "/debug"),
+        new AddFilterBypassTask(PATH_FILTER_CMS, "captcha", info.magnolia.voting.voters.URIStartsWithVoter.class, "/service/captcha"),
+        new AddFilterBypassTask(PATH_FILTER_CMS, "core", info.magnolia.voting.voters.URIStartsWithVoter.class, "/core"),
+        new AddFilterBypassTask(PATH_FILTER_CMS, "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit")
     });
     private final Task _addValidatorFilterTask = new ArrayDelegateTask("Filter", "Add the Validator filter.", new Task[]{
-        new CreateNodeTask("Validator-Filter", "Create Validator filter node", ContentRepository.CONFIG, "/server/filters", "validator", ItemType.CONTENT.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/validator", "class", "com.aperto.magkit.filter.HtmlValidatorFilter"),
-        new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/validator", "enabled", "true"),
-        new CreateNodeTask("Validator-Filter config", "Create config node for validator filter node", ContentRepository.CONFIG, "/server/filters/validator", "config", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/validator/config", HtmlValidatorFilter.W3C_VALIDATOR_CHECK_URL_PARAM_NAME, "http://validator.aperto.de/w3c-markup-validator/check"),
+        new CreateNodeTask("Validator-Filter", "Create Validator filter node", ContentRepository.CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "class", "com.aperto.magkit.filter.HtmlValidatorFilter"),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "enabled", "true"),
+        new CreateNodeTask("Validator-Filter config", "Create config node for validator filter node", ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "config", ItemType.CONTENTNODE.getSystemName()),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR + "/config", HtmlValidatorFilter.W3C_VALIDATOR_CHECK_URL_PARAM_NAME, "http://validator.aperto.de/w3c-markup-validator/check"),
         new FilterOrderingTask("validator", new String[]{"contentType", "uriSecurity"})
     });
 
     private final Task _addValidatorFilterBypassTask = new ArrayDelegateTask("Filter", "Add the bypass for validator filter.", new Task[]{
-        new AddFilterBypassTask("/server/filters/validator", "isAdmin", info.magnolia.voting.voters.OnAdminVoter.class, ""),
-        new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/validator/bypasses/isAdmin", "not", "true"),
-        new AddFilterBypassTask("/server/filters/validator", "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit"),
+        new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "isAdmin", info.magnolia.voting.voters.OnAdminVoter.class, ""),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR + "/bypasses/isAdmin", "not", "true"),
+        new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit"),
     });
 
     private final Task _setAdminInterfaceExportClassTask = new SetPropertyTask(
@@ -47,50 +55,50 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     );
 
     private final Task _setI18nContentSupportTask = new ArrayDelegateTask("Filter", "Set i18n support.", new Task[]{
-        new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
-        new SetPropertyTask(ContentRepository.CONFIG, "/server/i18n/content", "enabled", "true")
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "enabled", "true")
     });
 
     private final Task _checkMultpartFilter = new PropertyValueDelegateTask(
             "Check multipart filter",
             "Check multipart filter setting in server config.",
             ContentRepository.CONFIG,
-            "/server/filters/multipartRequest",
+            PATH_FILTER_MULTIPART,
             "class",
-            "com.aperto.magkit.filter.CosMultipartRequestFilter",
+            CLASS_MAGKIT_MP_FILTER,
             true,
             null,
-            new SetPropertyTask(ContentRepository.CONFIG, "/server/filters/multipartRequest", "class", "com.aperto.magkit.filter.CosMultipartRequestFilter")
+            new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_MULTIPART, "class", CLASS_MAGKIT_MP_FILTER)
     );
     
     private final Task _addBypassFor404 = new NodeExistsDelegateTask(
             "Check 404 bypass",
             "Check 404 bypass in server config.",
             ContentRepository.CONFIG,
-            "/server/filters/bypasses/404",
+            PATH_FILTER + "/bypasses/404",
             null,
-            new AddFilterBypassTask("/server/filters", "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")
+            new AddFilterBypassTask(PATH_FILTER, "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")
     );
 
     private final Task _addBypassForStatus = new NodeExistsDelegateTask(
             "Check status bypass",
             "Check status bypass in server config.",
             ContentRepository.CONFIG,
-            "/server/filters/bypasses/status",
+            PATH_FILTER + "/bypasses/status",
             null,
-            new AddFilterBypassTask("/server/filters", "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")
+            new AddFilterBypassTask(PATH_FILTER, "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")
     );
 
     private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
         new CreateNodeTask("captcha", "Create config node.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny", "captcha", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, "/modules/cache/config/URI/deny/captcha", "URI", "/service/captcha/*"),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA, "URI", "/service/captcha/*"),
     });
 
     private final Task _checkCaptchaConfig = new NodeExistsDelegateTask(
             "Check cache config",
             "Check cache config.",
             ContentRepository.CONFIG,
-            "/modules/cache/config/URI/deny/captcha",
+            PATH_CACHE_CAPTCHA,
             null,
             _addCaptchaConfig
     );
