@@ -24,7 +24,9 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private static final String PATH_I18N = "/server/i18n/content";
     private static final String PATH_FILTER_MULTIPART = PATH_FILTER + "/multipartRequest";
     private static final String CLASS_MAGKIT_MP_FILTER = "com.aperto.magkit.filter.CosMultipartRequestFilter";
-    private static final String PATH_CACHE_CAPTCHA = "/modules/cache/config/URI/deny/captcha";
+    private static final String PATH_CACHE_DENY = "/modules/cache/config/URI/deny";
+    private static final String PATH_CACHE_CAPTCHA = PATH_CACHE_DENY + "/captcha";
+    private static final String PATH_CACHE_DEBUG = PATH_CACHE_DENY + "/debug";
 
     private final Task _addCmsFilterBypassTask = new ArrayDelegateTask("Filter", "Add bypasses for filter 'cms'", new Task[]{
         new AddFilterBypassTask(PATH_FILTER_CMS, "debug", info.magnolia.voting.voters.URIStartsWithVoter.class, "/debug"),
@@ -89,18 +91,20 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
             new AddFilterBypassTask(PATH_FILTER, "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")
     );
 
-    private final Task _addCaptchaConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
-        new CreateNodeTask("captcha", "Create config node.", ContentRepository.CONFIG, "/modules/cache/config/URI/deny", "captcha", ItemType.CONTENTNODE.getSystemName()),
+    private final Task _addCacheConfig = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
+        new CreateNodeTask("captcha", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_DENY, "captcha", ItemType.CONTENTNODE.getSystemName()),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA, "URI", "/service/captcha/*"),
+        new CreateNodeTask("debug", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_DENY, "debug", ItemType.CONTENTNODE.getSystemName()),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG, "URI", "/debug/*"),
     });
 
-    private final Task _checkCaptchaConfig = new NodeExistsDelegateTask(
+    private final Task _checkCacheConfig = new NodeExistsDelegateTask(
             "Check cache config",
             "Check cache config.",
             ContentRepository.CONFIG,
             PATH_CACHE_CAPTCHA,
             null,
-            _addCaptchaConfig
+            _addCacheConfig
     );
 
     /**
@@ -124,7 +128,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_setI18nContentSupportTask);
         tasks.add(_addBypassFor404);
         tasks.add(_addBypassForStatus);
-        tasks.add(_addCaptchaConfig);
+        tasks.add(_addCacheConfig);
         tasks.add(_checkMultpartFilter);
         return tasks;
     }
@@ -135,7 +139,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         updateTasks.add(_bootstrapModuleConfigTask);
         updateTasks.add(_addBypassFor404);
         updateTasks.add(_addBypassForStatus);
-        updateTasks.add(_checkCaptchaConfig);
+        updateTasks.add(_checkCacheConfig);
         updateTasks.add(_checkMultpartFilter);
         return updateTasks;
     }
