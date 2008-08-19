@@ -489,7 +489,7 @@ public class ExportTask extends MatchingTask {
     }
 
     // Main method for testing.
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         ExportTask exportTask = new ExportTask();
         exportTask.setI18n(true);
         exportTask.setTargetPort(8001);
@@ -502,5 +502,5 @@ public class ExportTask extends MatchingTask {
         exportTask.setMgnlUser("superuser");
         exportTask.setMgnlPassword("superuser");
         exportTask.execute(); 
-    }
+    } */
 }
