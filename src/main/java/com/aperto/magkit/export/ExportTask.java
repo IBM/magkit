@@ -48,7 +48,8 @@ public class ExportTask extends MatchingTask {
     private boolean _verbose;
     private String _webapp = "author";
     private boolean _i18n = false;
-    private Map<String, Properties> _properties = new HashMap<String, Properties>(2);
+    private Map<String, SortedProperties> _properties = new HashMap<String, SortedProperties>(2);
+    private boolean _propertiesChanged = false;
 
     /**
      * Enum for switching the export modus.
@@ -165,13 +166,15 @@ public class ExportTask extends MatchingTask {
     }
 
     private void saveProperties() {
-        for (Map.Entry entry : _properties.entrySet()) {
-            Properties prop = (Properties) entry.getValue();
-            try {
-                FileOutputStream stream = new FileOutputStream(_messagePath + "/" + entry.getKey());
-                prop.store(stream, "# Add your custom strings here. the keys can be used inside the dialog definitions. For example use it as a label.");
-            } catch (IOException e) {
-                info("Can not save file: " + entry.getKey());
+        if (_propertiesChanged) {
+            for (Map.Entry entry : _properties.entrySet()) {
+                Properties prop = (Properties) entry.getValue();
+                try {
+                    FileOutputStream stream = new FileOutputStream(_messagePath + "/" + entry.getKey());
+                    prop.store(stream, "# Add your custom strings here. the keys can be used inside the dialog definitions. For example use it as a label.");
+                } catch (IOException e) {
+                    info("Can not save file: " + entry.getKey());
+                }
             }
         }
     }
@@ -185,7 +188,7 @@ public class ExportTask extends MatchingTask {
                 }
             });
             for (File file : files) {
-                Properties prop = new Properties();
+                SortedProperties prop = new SortedProperties();
                 FileInputStream inStream = null;
                 try {
                     inStream = new FileInputStream(file);
@@ -362,6 +365,7 @@ public class ExportTask extends MatchingTask {
         valueElement.addText(i18nKey);
         element.add(valueElement);
         for (Map.Entry entry : _properties.entrySet()) {
+            _propertiesChanged = true;
             ((Properties) entry.getValue()).setProperty(i18nKey, "");
         }
         return element;
@@ -453,16 +457,18 @@ public class ExportTask extends MatchingTask {
     private void checkValue(Element property, String type, String... keyParts) {
         Node valueNode = property.selectSingleNode("sv:value");
         String valueText = valueNode.getText();
-        if (isAlreadyI18nKey(valueText)) {
+        if (isNotAlreadyI18nKey(valueText)) {
+
             String i18nKey = generateI18nKey(type, keyParts);
             valueNode.setText(i18nKey);
             for (Map.Entry entry : _properties.entrySet()) {
+                _propertiesChanged = true;
                 ((Properties) entry.getValue()).setProperty(i18nKey, valueText);
             }
         }
     }
 
-    private boolean isAlreadyI18nKey(String valueText) {
+    private boolean isNotAlreadyI18nKey(String valueText) {
         return !valueText.startsWith(Modus.DIALOG.name().toLowerCase()) &&
                 !valueText.startsWith(Modus.PARAGRAPH.name().toLowerCase()) &&
                 !valueText.startsWith(Modus.TEMPLATE.name().toLowerCase());
@@ -483,7 +489,7 @@ public class ExportTask extends MatchingTask {
     }
 
     // Main method for testing.
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         ExportTask exportTask = new ExportTask();
         exportTask.setI18n(true);
         exportTask.setTargetPort(8001);
@@ -496,5 +502,5 @@ public class ExportTask extends MatchingTask {
         exportTask.setMgnlUser("superuser");
         exportTask.setMgnlPassword("superuser");
         exportTask.execute(); 
-    } */
+    }
 }
