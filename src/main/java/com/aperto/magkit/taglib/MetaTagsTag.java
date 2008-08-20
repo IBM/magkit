@@ -95,8 +95,9 @@ public class MetaTagsTag extends RequestContextAwareTag {
 
     private void retrieveDataFromResourceBundle(Map<String, String> content, String key) {
         try {
-            String value = getContext().getMessage("meta." + key);
-            if (!StringUtils.isBlank(value)) {
+            String messageKey = "meta." + key;
+            String value = getContext().getMessage(messageKey);
+            if (!StringUtils.isBlank(value) && !messageKey.equals(value)) {
                 content.put(key, value);
             }
         } catch (NoSuchMessageException mre) {
