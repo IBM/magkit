@@ -65,7 +65,7 @@ public class DialogValidateImageFile extends DialogFile {
 
         if (isValid) {
             MultipartForm mf = (MultipartForm) getRequest().getAttribute("multipartform");
-            Document doc = mf.getDocument("image");
+            Document doc = mf.getDocument(getName());
 
             // for "Remove Image" in Dialog - still working
             if (doc != null) {
