@@ -56,6 +56,21 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     }
 
     @Test
+    public void testInternalLinkVar() throws JspException {
+        ConvertLinkTag tag = new ConvertLinkTag();
+        tag.setNodeDataName("link2");
+        tag.setVar("link");
+        PageContext pageContext = runLifeCycle(tag);
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        assertThat(output.length(), is(0));
+        String var = (String) pageContext.getRequest().getAttribute("link");
+        assertThat(var, containsString(CONTEXT_PATH));
+        assertThat(var, containsString(LINK_VALUE_INT));
+        assertThat(var, endsWith("html"));
+    }
+
+    @Test
     public void testInternalLinkWithSelector() throws JspException {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link2");

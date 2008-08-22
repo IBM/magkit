@@ -26,7 +26,7 @@ import java.io.IOException;
 @Tag(name = "convertLink", bodyContent = BodyContent.JSP)
 public class ConvertLinkTag extends TagSupport {
     private static final Logger LOGGER = Logger.getLogger(ConvertLinkTag.class);
-
+    private String _var;
     private String _selector;
     private String _nodeDataName;
     private String _linkValue;
@@ -64,16 +64,54 @@ public class ConvertLinkTag extends TagSupport {
         _selector = selector;
     }
 
+    @TagAttribute
+    public void setVar(String var) {
+        _var = var;
+    }
+
     /**
      * Writes the converted link.
      * @return jsp output
      * @throws javax.servlet.jsp.JspException
      */
     public int doEndTag() throws JspException {
-        JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+        StringBuilder builder = new StringBuilder(10);
+        fetchLinkValuefromCms();
 
-        // if nodeData is set, fetch the linkValue from CMS
+        // convert linkValue write in output
+        if (!StringUtils.isBlank(_linkValue)) {
+            try {
+                if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
+                    String link = LinkTool.convertLink(_linkValue, _addExtension, _altRepo);
+                    link = LinkTool.insertSelector(link, _selector);
+                    if (_addContextPath) {
+                        builder.append(request.getContextPath());
+                    }
+                    builder.append(link);
+                } else {
+                    builder.append(_linkValue);
+                }
+                if (StringUtils.isBlank(_var)) {
+                    JspWriter out = pageContext.getOut();
+                    out.write(builder.toString());
+                } else {
+                    request.setAttribute(_var, builder.toString());
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error", e);
+            }
+        } else {
+            LOGGER.info("No parameter is given for ConvertLinkTag.");
+        }
+
+        return super.doEndTag();
+    }
+
+    /**
+     * if nodeData is set, fetch the linkValue from CMS.
+     */
+    private void fetchLinkValuefromCms() {
         if (!StringUtils.isBlank(_nodeDataName)) {
             Content content = Resource.getLocalContentNode();
             if (content == null) {
@@ -93,27 +131,6 @@ public class ConvertLinkTag extends TagSupport {
                 LOGGER.warn("Can not access content node.", re);
             }
         }
-        // convert linkValue write in output
-        if (!StringUtils.isBlank(_linkValue)) {
-            try {
-                if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
-                    String link = LinkTool.convertLink(_linkValue, _addExtension, _altRepo);
-                    link = LinkTool.insertSelector(link, _selector);
-                    if (_addContextPath) {
-                        out.write(request.getContextPath());
-                    }
-                    out.write(link);
-                } else {
-                    out.write(_linkValue);
-                }
-            } catch (IOException e) {
-                LOGGER.error("Error", e);
-            }
-        } else {
-            LOGGER.info("No parameter is given for ConvertLinkTag.");
-        }
-
-        return super.doEndTag();
     }
 
     /**
