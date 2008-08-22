@@ -76,6 +76,9 @@ public class ConvertLinkTag extends TagSupport {
         // if nodeData is set, fetch the linkValue from CMS
         if (!StringUtils.isBlank(_nodeDataName)) {
             Content content = Resource.getLocalContentNode();
+            if (content == null) {
+                content = Resource.getCurrentActivePage();
+            }
             try {
                 if (content.hasNodeData(_nodeDataName)) {
                     NodeData data = content.getNodeData(_nodeDataName);
