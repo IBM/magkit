@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import info.magnolia.cms.i18n.I18nContentSupportFactory;
+
 import com.aperto.magkit.utils.ResourceUtils;
 
 /**
@@ -49,6 +51,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set linked page.
+     *
      * @param linkedPages linked page
      */
     @TagAttribute
@@ -58,6 +61,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set count of pages.
+     *
      * @param pages count of pages
      */
     @TagAttribute(required = true)
@@ -67,6 +71,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set count of active page.
+     *
      * @param actPage count of active page
      */
     @TagAttribute(required = true)
@@ -76,6 +81,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set add query string.
+     *
      * @param addQueryString add query string
      */
     @TagAttribute
@@ -85,6 +91,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set show prefix.
+     *
      * @param showPrefix show prefix
      */
     @TagAttribute
@@ -94,6 +101,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set show title.
+     *
      * @param showTitle show title
      */
     @TagAttribute
@@ -103,6 +111,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * set headline.
+     *
      * @param headline - headline
      */
     @TagAttribute
@@ -165,6 +174,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * returns <li>tag for given page.
+     *
      * @param link - handle for link
      * @param page - count of page
      * @return <li>tag
@@ -184,6 +194,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * returns <li>tag for next button.
+     *
      * @param link - handle for link
      * @return <li>tag
      * @throws IOException
@@ -205,6 +216,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * returns <li>tag for previous button.
+     *
      * @param link - handle for link
      * @return <li>tag
      * @throws IOException
@@ -226,9 +238,10 @@ public class PagingTag extends TagSupport {
 
     /**
      * returns link for given page.
+     *
      * @param completeHandle - handle of active page
-     * @param queryString - query string
-     * @param page - count of page
+     * @param queryString    - query string
+     * @param page           - count of page
      * @return link
      */
     public String getLink(String completeHandle, String queryString, int page) {
@@ -239,6 +252,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * returns handle of active page.
+     *
      * @return handle of active page
      */
     public String getHandleFromActivePage() {
@@ -262,13 +276,17 @@ public class PagingTag extends TagSupport {
      */
     public void init() {
         try {
-            _prefix = ResourceBundle.getBundle("language").getString("common.paging.prefix");
-            _prefixTitle = ResourceBundle.getBundle("language").getString("common.paging.prefixTitle");
-            _prevPageTitle = ResourceBundle.getBundle("language").getString("common.paging.prevPageTitle");
             _prevPage = ResourceBundle.getBundle("language").getString("common.paging.prevPage");
-            _nextPageTitle = ResourceBundle.getBundle("language").getString("common.paging.nextPageTitle");
             _nextPage = ResourceBundle.getBundle("language").getString("common.paging.nextPage");
             _actPageTitle = ResourceBundle.getBundle("language").getString("common.paging.actPageTitle");
+            if (_showPrefix) {
+                _prefix = ResourceBundle.getBundle("language").getString("common.paging.prefix");
+            }
+            if (_showTitle) {
+                _prefixTitle = ResourceBundle.getBundle("language").getString("common.paging.prefixTitle");
+                _prevPageTitle = ResourceBundle.getBundle("language").getString("common.paging.prevPageTitle");
+                _nextPageTitle = ResourceBundle.getBundle("language").getString("common.paging.nextPageTitle");
+            }            
         } catch (MissingResourceException mre) {
             LOGGER.info("Can not find resource key. Using default value.");
         }
