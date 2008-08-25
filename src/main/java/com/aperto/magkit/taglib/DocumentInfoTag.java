@@ -67,7 +67,13 @@ public class DocumentInfoTag extends TagSupport {
                     documentInfo.setFileModificationDate(doc.getModificationDate());
                 }
                 documentInfo.setFileName(doc.getFileName());
-                documentInfo.setFileSize((doc.getFileSize() / divisor));
+                long fileSize = 0;
+                try {
+                    fileSize = doc.getFileSize();
+                } catch (NumberFormatException e) {
+                    LOGGER.info(e.getLocalizedMessage());
+                }
+                documentInfo.setFileSize((fileSize / divisor));                
                 request.setAttribute("documentInfo", documentInfo);
             } else {
                 LOGGER.info("NodeData is not a uuid to a dms-document");
