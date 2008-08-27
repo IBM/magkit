@@ -115,7 +115,7 @@ public class PhotoGalleryController extends AbstractController {
                     String imageTitle = NodeDataUtil.getString(content, "subject", originalDocument.getFileName());
                     galleryEntry.setImageTitle(StringEscapeUtils.escapeHtml(imageTitle));
                     String description = NodeDataUtil.getString(content, "description");
-                    galleryEntry.setImageDescription(StringEscapeUtils.escapeHtml(description));
+                    galleryEntry.setImageDescription(description);
                     imageList.add(galleryEntry);
                 }
             }
