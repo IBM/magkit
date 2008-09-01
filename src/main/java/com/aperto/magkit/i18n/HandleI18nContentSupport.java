@@ -74,7 +74,9 @@ public class HandleI18nContentSupport implements I18nContentSupport {
 
     /**
      * Determines the locale from the current uri.
-     * e.g. /content/de.html
+     * e.g. /content/de.html --> locale de
+     * e.g. /content/de_mandant.html --> locale de
+     * e.g. /content/de_DE/test.html --> locale de_DE
      * @return locale from the uri.
      */
     public Locale determineLocale() {
@@ -86,18 +88,36 @@ public class HandleI18nContentSupport implements I18nContentSupport {
             String[] localeArr = StringUtils.split(part, "_");
             if (localeArr.length == 1) {
                 locale = new Locale(StringUtils.substringBefore(localeArr[0], "."));
+                if (isLocaleSupported(locale)) {
+                    break;
+                }
             } else if (localeArr.length == 2) {
                 locale = new Locale(localeArr[0], StringUtils.substringBefore(localeArr[1], "."));
-            }
-
-            if (isLocaleSupported(locale)) {
-                LOGGER.debug("Supported locale found: " + locale.getLanguage());
-                break;
+                if (isLocaleSupported(locale)) {
+                    break;
+                } else {
+                    locale = new Locale(localeArr[0]);
+                    if (isLocaleSupported(locale)) {
+                        break;
+                    }
+                }
+            } else if (localeArr.length > 2) {
+                locale = new Locale(localeArr[0], localeArr[1]);
+                if (isLocaleSupported(locale)) {
+                    break;
+                }
+            } else {
+                locale = new Locale(localeArr[0]);
+                if (isLocaleSupported(locale)) {
+                    break;
+                }
             }
         }
 
         if (!isLocaleSupported(locale)) {
             locale = getFallbackLocale();
+        } else {
+            LOGGER.debug("Supported locale found: " + locale.getLanguage());            
         }
         return locale;
     }

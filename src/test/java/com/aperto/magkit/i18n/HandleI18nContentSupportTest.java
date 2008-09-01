@@ -47,6 +47,18 @@ public class HandleI18nContentSupportTest extends MagKitTest {
     }
 
     @Test
+    public void testLocalizedHandleSiteWithMandant() {
+        MgnlContext.getAggregationState().setCurrentURI("de_mandant.html");
+        HandleI18nContentSupport contentSupport = (HandleI18nContentSupport) FactoryUtil.newInstance(HandleI18nContentSupport.class);
+        LocaleDefinition definition = new LocaleDefinition();
+        definition.setLocale(new Locale("de"));
+        definition.setEnabled(true);
+        contentSupport.addLocale(definition);
+        Locale locale = contentSupport.determineLocale();
+        assertThat(locale.getLanguage(), is("de"));
+    }
+
+    @Test
     public void testUnlocalizedHandle() {
         MgnlContext.getAggregationState().setCurrentURI("/content/den/testpage.html");        
         HandleI18nContentSupport contentSupport = (HandleI18nContentSupport) FactoryUtil.newInstance(HandleI18nContentSupport.class);
@@ -61,6 +73,18 @@ public class HandleI18nContentSupportTest extends MagKitTest {
     @Test
     public void testLocalizedHandleWithCountry() {
         MgnlContext.getAggregationState().setCurrentURI("/content/de_DE/testpage.html");
+        HandleI18nContentSupport contentSupport = (HandleI18nContentSupport) FactoryUtil.newInstance(HandleI18nContentSupport.class);
+        LocaleDefinition definition = new LocaleDefinition();
+        definition.setLocale(new Locale("de", "DE"));
+        definition.setEnabled(true);
+        contentSupport.addLocale(definition);
+        Locale locale = contentSupport.determineLocale();
+        assertThat(locale.getLanguage(), is("de"));
+    }
+
+    @Test
+    public void testLocalizedHandleWithCountryWithMandant() {
+        MgnlContext.getAggregationState().setCurrentURI("/content/de_DE_mandant/testpage.html");
         HandleI18nContentSupport contentSupport = (HandleI18nContentSupport) FactoryUtil.newInstance(HandleI18nContentSupport.class);
         LocaleDefinition definition = new LocaleDefinition();
         definition.setLocale(new Locale("de", "DE"));
