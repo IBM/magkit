@@ -78,7 +78,8 @@ public final class LinkTool {
                             extension = doc.getFileExtension();
                         }
                     }
-                } else {
+                }
+                if (StringUtils.isNotEmpty(handle)) {
                     path.append(handle);
                 }
                 newLink = StringUtils.defaultString(path.toString(), isUuid(link) ? "" : link);
