@@ -31,6 +31,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     private static final String LINK_VALUE_EXT = "http://www.aperto.de/test.html";
     private static final String LINK_VALUE_INT = "/sammeln/infos";
     private static final String LINK_VALUE_INT_SHORT = "/sammeln";
+    private static final String LINK_VALUE_UUID = "29f35061-bf9f-478c-a4b0-cb9f07a0fc8c";
 
     @Test
     public void testExternalLink() throws JspException {
@@ -41,6 +42,16 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         String output = jspWriter.toString();
         assertThat(output, not(containsString(CONTEXT_PATH)));
         assertThat(output, is(LINK_VALUE_EXT));
+    }
+
+    @Test
+    public void testUuidLink() throws JspException {
+        ConvertLinkTag tag = new ConvertLinkTag();
+        tag.setNodeDataName("link4");
+        PageContext pageContext = runLifeCycle(tag);
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        assertThat(output.length(), is(0));
     }
 
     @Test
@@ -104,6 +115,8 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         mockNodeData = new MockNodeData("link2", LINK_VALUE_INT);
         mockContent.addNodeData(mockNodeData);
         mockNodeData = new MockNodeData("link3", LINK_VALUE_INT_SHORT);
+        mockContent.addNodeData(mockNodeData);
+        mockNodeData = new MockNodeData("link4", LINK_VALUE_UUID);
         mockContent.addNodeData(mockNodeData);
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute(LOCAL_CONTENT_OBJ, mockContent);

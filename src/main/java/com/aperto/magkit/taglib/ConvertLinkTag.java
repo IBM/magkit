@@ -85,7 +85,7 @@ public class ConvertLinkTag extends TagSupport {
                 if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
                     String link = LinkTool.convertLink(_linkValue, _addExtension, _altRepo);
                     link = LinkTool.insertSelector(link, _selector);
-                    if (_addContextPath) {
+                    if (_addContextPath && StringUtils.isNotBlank(link)) {
                         builder.append(request.getContextPath());
                     }
                     builder.append(link);

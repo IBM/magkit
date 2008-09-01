@@ -4,16 +4,18 @@ import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.cms.core.NodeData;
+import info.magnolia.cms.link.LinkHelper;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.LinkUtil;
-import info.magnolia.cms.link.LinkHelper;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.beans.Document;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import javax.jcr.PropertyType;
 import static java.util.Locale.ENGLISH;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper class for links.
@@ -22,6 +24,8 @@ import static java.util.Locale.ENGLISH;
  */
 public final class LinkTool {
     private static final Logger LOGGER = Logger.getLogger(LinkTool.class);
+    private static final String DMS_REPOSITORY = "dms";
+    public static final Pattern UUID_PATTERN = Pattern.compile("^[-a-z0-9]{30,40}$");
 
     /**
      * Returns absolutePath-Link nevertheless if u give it a "uuidLink" or a "link".
@@ -58,37 +62,45 @@ public final class LinkTool {
      */
     public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
         String newLink = "";
-        boolean withExtension = addExtension;
         String extension = LinkUtil.DEFAULT_EXTENSION;
         if (StringUtils.isNotEmpty(link)) {
             try {
-                String path = null;
-                Content content = ContentUtil.getContentByUUID(ContentRepository.WEBSITE, link);
-                if (content == null && !StringUtils.isBlank(alternativeRepository)) {
-                    content = ContentUtil.getContentByUUID(alternativeRepository, link);
-                    if (content != null) {
-                        path = "/" + alternativeRepository + content.getHandle();
+                StringBuilder path = new StringBuilder(10);
+                String handle = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
+                if (handle == null && !StringUtils.isBlank(alternativeRepository)) {
+                    handle = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
+                    if (handle != null) {
+                        path.append('/').append(alternativeRepository).append(handle);
                         // in dms the file name is additional nessecary
-                        if ("dms".equalsIgnoreCase(alternativeRepository) && withExtension) {
-                            Document doc = new Document(content);
-                            path += "/" + doc.getFileName();
+                        if (DMS_REPOSITORY.equalsIgnoreCase(alternativeRepository) && addExtension) {
+                            Document doc = new Document(ContentUtil.getContent(DMS_REPOSITORY, handle));
+                            path.append("/").append(doc.getFileName());
                             extension = doc.getFileExtension();
                         }
                     }
                 } else {
-                    path = content.getHandle();
+                    path.append(handle);
                 }
-                newLink = StringUtils.defaultString(path, link);
+                newLink = StringUtils.defaultString(path.toString(), isUuid(link) ? "" : link);
             } catch (NullPointerException e) {
                 // should only occur in unit tests if the mgnlContext is not present
-                newLink = link;
+                newLink = isUuid(link) ? "" : link;
             }
         }
-        if (withExtension && !newLink.toLowerCase(ENGLISH).endsWith(".html") && !newLink.toLowerCase(ENGLISH).endsWith(".htm")) {
+        if (StringUtils.isNotBlank(newLink) && addExtension && !newLink.toLowerCase(ENGLISH).endsWith(".html") && !newLink.toLowerCase(ENGLISH).endsWith(".htm")) {
             newLink += "." + extension;
         }
 
         return newLink;
+    }
+
+    public static boolean isUuid(String link) {
+        boolean isUuid = false;
+        Matcher matcher = UUID_PATTERN.matcher(link);
+        if (matcher.matches()) {
+            isUuid = true;
+        }
+        return isUuid;
     }
 
     /**
