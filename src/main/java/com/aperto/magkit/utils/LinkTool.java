@@ -65,22 +65,24 @@ public final class LinkTool {
         String extension = LinkUtil.DEFAULT_EXTENSION;
         if (StringUtils.isNotEmpty(link)) {
             try {
-                StringBuilder path = new StringBuilder(10);
+                String path = "";
                 String handle = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
                 if (handle == null && !StringUtils.isBlank(alternativeRepository)) {
                     handle = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
                     if (handle != null) {
-                        path.append('/').append(alternativeRepository).append(handle);
+                        StringBuilder dmsHandle = new StringBuilder(10);
+                        dmsHandle.append('/').append(alternativeRepository).append(handle);
                         // in dms the file name is additional nessecary
                         if (DMS_REPOSITORY.equalsIgnoreCase(alternativeRepository) && addExtension) {
                             Document doc = new Document(ContentUtil.getContent(DMS_REPOSITORY, handle));
-                            path.append("/").append(doc.getFileName());
+                            dmsHandle.append("/").append(doc.getFileName());
                             extension = doc.getFileExtension();
                         }
+                        handle = dmsHandle.toString();
                     }
                 }
                 if (StringUtils.isNotEmpty(handle)) {
-                    path.append(handle);
+                    path = handle;
                 }
                 newLink = determineNewLink(path, link);
             } catch (NullPointerException e) {
@@ -95,8 +97,8 @@ public final class LinkTool {
         return newLink;
     }
 
-    private static String determineNewLink(StringBuilder path, String link) {
-        return StringUtils.isBlank(path.toString()) ? (isUuid(link) ? "" : link) : path.toString();
+    private static String determineNewLink(String path, String link) {
+        return StringUtils.isBlank(path) ? (isUuid(link) ? "" : link) : path;
     }
 
     public static boolean isUuid(String link) {
