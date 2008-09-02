@@ -82,7 +82,7 @@ public final class LinkTool {
                 if (StringUtils.isNotEmpty(handle)) {
                     path.append(handle);
                 }
-                newLink = StringUtils.defaultString(path.toString(), isUuid(link) ? "" : link);
+                newLink = determineNewLink(path, link);
             } catch (NullPointerException e) {
                 // should only occur in unit tests if the mgnlContext is not present
                 newLink = isUuid(link) ? "" : link;
@@ -93,6 +93,10 @@ public final class LinkTool {
         }
 
         return newLink;
+    }
+
+    private static String determineNewLink(StringBuilder path, String link) {
+        return StringUtils.isBlank(path.toString()) ? (isUuid(link) ? "" : link) : path.toString();
     }
 
     public static boolean isUuid(String link) {
