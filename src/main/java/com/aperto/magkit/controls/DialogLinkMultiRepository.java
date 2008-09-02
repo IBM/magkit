@@ -2,9 +2,12 @@ package com.aperto.magkit.controls;
 
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.gui.control.Button;
-import info.magnolia.cms.gui.dialog.DialogLink;
 import info.magnolia.cms.gui.dialog.DialogUUIDLink;
+import info.magnolia.cms.util.RequestFormUtil;
+import info.magnolia.cms.link.LinkHelper;
+import info.magnolia.context.MgnlContext;
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class DialogLinkMultiRepository extends DialogUUIDLink {
     private static final Logger LOGGER = Logger.getLogger(DialogLinkMultiRepository.class);
+    private static final String SECOND_REPOSITORY = "secondRepository";
 
     /**
      *  Dialog init.
@@ -36,9 +40,33 @@ public class DialogLinkMultiRepository extends DialogUUIDLink {
         getButton().setLabel(getMessage("dialog.link.internal.2nd"));
         getButton(1).setLabel(getMessage("dialog.link.internal"));
         getButton(1).setSaveInfo(false);
-        String repository = getConfigValue("secondRepository", "data");
+        String repository = getConfigValue(SECOND_REPOSITORY, "data");
         String tree = getConfigValue("tree", repository);
         String buttonOnClick = getConfigValue("buttonOnClick", "mgnlDialogLinkOpenBrowser('" + getName() + "','" + tree + "','" + extension + "');");
         getButton(1).setOnclick(buttonOnClick);
+    }
+
+    /**
+     * Gets repository path.
+     * @see info.magnolia.cms.gui.dialog.UUIDDialogControl#getRepository()
+     * @return Current repository path.
+     */
+    public String getRepository() {
+        String value = "";
+        String repository = super.getRepository();
+        RequestFormUtil params = new RequestFormUtil(getRequest());
+        if (params.getParameter(getName()) != null) {
+            value = params.getParameter(getName());
+            if (!MgnlContext.getHierarchyManager(repository).isExist(value)) {
+                repository = getConfigValue(SECOND_REPOSITORY, "data");    
+            }
+        } else if (getStorageNode() != null) {
+            value = readValue();
+            if (StringUtils.isBlank(LinkHelper.convertUUIDtoHandle(value, repository))) {
+                repository = getConfigValue(SECOND_REPOSITORY, "data");
+            }
+        }
+
+        return repository;
     }
 }
