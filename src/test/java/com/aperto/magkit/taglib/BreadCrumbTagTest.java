@@ -21,8 +21,8 @@ import static org.junit.matchers.StringContains.*;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
- * Test the breadcrumb.
- * @author frank.sommer (17.04.2008)
+ * Test the breadcrumb tag.
+ * @author frank.sommer (17.04.2008) 
  */
 public class BreadCrumbTagTest extends MagKitTagTest {
 
@@ -34,7 +34,7 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, containsString("<ol>"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(1));
+        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
     }
 
     @Test
@@ -56,7 +56,7 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         String output = jspWriter.toString();
         assertThat(output, not(containsString("<ol>")));
         assertThat(output, containsString("<ul class=\"test\">"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(1));
+        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
     }
 
     @Override

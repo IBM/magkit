@@ -21,7 +21,8 @@ import java.io.IOException;
 
 /**
  * Draws a breadcrumbs with links to parents of a node if set or the current page.
- * Default output is: <code>
+ * Default output is: 
+ * <code>
  * <ol>
  *  <li class="first"><a href="/layer_1.html">layer 1</a></li>
  *  <li><a href="/layer_1/layer_2.html">layer 2</a></li>
@@ -192,11 +193,7 @@ public class BreadCrumbTag extends TagSupport {
                 if (j == _startLevel || firstHidden) {
                     out.append(" class=\"first\"");
                     firstHidden = false;
-                } else {
-					if (j == endLevel) {
-						out.append(" class=\"last\"");
-					}
-				}
+                }
                 out.append(">");
             }
             if (_link && (_lastlink || (j < endLevel))) {
