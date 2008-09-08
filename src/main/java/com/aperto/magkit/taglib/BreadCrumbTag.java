@@ -192,7 +192,11 @@ public class BreadCrumbTag extends TagSupport {
                 if (j == _startLevel || firstHidden) {
                     out.append(" class=\"first\"");
                     firstHidden = false;
-                }
+                } else {
+					if (j == endLevel) {
+						out.append(" class=\"last\"");
+					}
+				}
                 out.append(">");
             }
             if (_link && (_lastlink || (j < endLevel))) {

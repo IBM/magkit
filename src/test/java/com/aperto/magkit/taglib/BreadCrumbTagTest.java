@@ -34,7 +34,7 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, containsString("<ol>"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
+        assertThat(StringUtils.countMatches(output, "<li>"), is(1));
     }
 
     @Test
@@ -56,7 +56,7 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         String output = jspWriter.toString();
         assertThat(output, not(containsString("<ol>")));
         assertThat(output, containsString("<ul class=\"test\">"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
+        assertThat(StringUtils.countMatches(output, "<li>"), is(1));
     }
 
     @Override
