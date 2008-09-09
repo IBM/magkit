@@ -10,7 +10,15 @@ public class DocumentInfo {
     private String _fileExtension;
     private Calendar _fileModificationDate;
     private String _fileName;
+    private String _fileSubject;
 
+    public String getFileSubject() {
+        return _fileSubject;
+    }
+
+    public void setFileSubject(String fileSubject) {
+        _fileSubject = fileSubject;
+    }
 
     public long getFileSize() {
         return _fileSize;

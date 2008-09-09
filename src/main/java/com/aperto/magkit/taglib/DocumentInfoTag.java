@@ -13,6 +13,7 @@ import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 import javax.servlet.ServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
+import javax.jcr.RepositoryException;
 
 /**
  * This Tag saves several information from a dms-document in the request.
@@ -25,6 +26,8 @@ import javax.servlet.jsp.tagext.TagSupport;
 @Tag(name = "documentInfo", bodyContent = BodyContent.JSP)
 public class DocumentInfoTag extends TagSupport {
     private static final Logger LOGGER = Logger.getLogger(DocumentInfoTag.class);
+    private static final String ND_SUBJECT = "subject";
+    private static final String ND_TITLE = "title";
 
     private String _nodeDataName;
     private String _fileSize;
@@ -73,7 +76,8 @@ public class DocumentInfoTag extends TagSupport {
                 } catch (NumberFormatException e) {
                     LOGGER.info(e.getLocalizedMessage());
                 }
-                documentInfo.setFileSize((fileSize / divisor));                
+                documentInfo.setFileSize((fileSize / divisor));
+                determineSubject(doc, documentInfo);
                 request.setAttribute("documentInfo", documentInfo);
             } else {
                 LOGGER.info("NodeData is not a uuid to a dms-document");
@@ -82,6 +86,19 @@ public class DocumentInfoTag extends TagSupport {
             LOGGER.info("NodeData is not valid");
         }
         return super.doEndTag();
+    }
+
+    private void determineSubject(Document doc, DocumentInfo documentInfo) {
+        try {
+            Content content = doc.getNode();
+            if (content.hasNodeData(ND_SUBJECT)) {
+                documentInfo.setFileSubject(content.getNodeData(ND_SUBJECT).getString());
+            } else {
+                documentInfo.setFileSubject(content.getNodeData(ND_TITLE).getString());
+            }
+        } catch (RepositoryException e) {
+            LOGGER.error("Error", e);
+        }
     }
 
     protected Content retrieveContent(String link) {
