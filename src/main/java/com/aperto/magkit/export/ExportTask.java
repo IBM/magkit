@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
@@ -37,6 +38,7 @@ public class ExportTask extends MatchingTask {
     private static final String TYPE_LABEL = "label";
     private static final String TYPE_DESCRIPTION = "description";
     private static final String TYPE_TITLE = "title";
+    private static final String[] FORBIDDEN_NODES = {"MetaData", "columns"};
 
     private String _rootNode;
     private String _outputPath;
@@ -387,8 +389,9 @@ public class ExportTask extends MatchingTask {
             for (Object aList : list) {
                 Element parentNode = (Element) aList;
                 String nodeName = parentNode.attribute("name").getValue();
+                boolean isChildOfColumn = checkColumnAncestor(parentNode);
 
-                if (!parentNode.isRootElement() && !"MetaData".equals(nodeName)) {
+                if (!parentNode.isRootElement() && !ArrayUtils.contains(FORBIDDEN_NODES, nodeName) && !isChildOfColumn) {
                     List properties = parentNode.selectNodes("sv:property");
                     Map<String, Node> sortedProperties = new TreeMap<String, Node>();
                     checkNode(properties, sortedProperties, dialogName, nodeName);
@@ -414,10 +417,21 @@ public class ExportTask extends MatchingTask {
         }
     }
 
+    private boolean checkColumnAncestor(Element parentNode) {
+        boolean hasColumnAncestor = false;
+        Element parent = parentNode.getParent();
+        if (parent != null) {
+            Attribute attribute = parent.attribute("name");
+            if (attribute != null) {
+                hasColumnAncestor = "columns".equals(attribute.getValue()) || checkColumnAncestor(parent);
+            }
+        }
+        return hasColumnAncestor;
+    }
+
     private void checkNode(List properties, Map<String, Node> sortedProperties, String... keyParts) {
         boolean labelFound = false;
         boolean descriptionFound = false;
-        boolean dontSetLabel = false;
         boolean dontSetDescription = false;
 
         for (Object obj : properties) {
@@ -439,9 +453,6 @@ public class ExportTask extends MatchingTask {
                 if (valueNode.getText().equals("tab")) {
                     dontSetDescription = true;
                 }
-            } else if (name.equals("options") || name.equals("columns")) {
-                dontSetLabel = true;
-                dontSetDescription = true;
             }
             // sort nodes after parentNode name
             sortedProperties.put(name, property);
@@ -449,7 +460,7 @@ public class ExportTask extends MatchingTask {
             property.detach();
         }
 
-        if (!dontSetLabel && !labelFound) {
+        if (!labelFound) {
             sortedProperties.put(TYPE_LABEL, createI18nNode(TYPE_LABEL, keyParts));
         }
         if (!dontSetDescription && !descriptionFound) {
@@ -500,10 +511,10 @@ public class ExportTask extends MatchingTask {
         exportTask.setVerbose(true);
         exportTask.setWebapp("intranet");
         exportTask.setRootNode("config.modules.intranet.dialogs");
-        exportTask.setOutputPath("P:\\magkit_multi\\magkit/src/main/resources/mgnl-bootstrap/intranet");
+        exportTask.setOutputPath("P:\\magkit_multi\\magkit/src/main/resources/mgnl-bootstrap");
         exportTask.setMessagePath("P:\\magkit_multi\\magkit/src/main/resources/info/magnolia/module/admininterface");
         exportTask.setMgnlUser("superuser");
         exportTask.setMgnlPassword("superuser");
         exportTask.execute(); 
-    }*/
+    } */
 }
