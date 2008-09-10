@@ -417,7 +417,8 @@ public class ExportTask extends MatchingTask {
     private void checkNode(List properties, Map<String, Node> sortedProperties, String... keyParts) {
         boolean labelFound = false;
         boolean descriptionFound = false;
-        boolean isTab = false;
+        boolean dontSetLabel = false;
+        boolean dontSetDescription = false;
 
         for (Object obj : properties) {
             Element property = (Element) obj;
@@ -436,8 +437,11 @@ public class ExportTask extends MatchingTask {
             } else if (name.equals("controlType")) {
                 Node valueNode = property.selectSingleNode("sv:value");
                 if (valueNode.getText().equals("tab")) {
-                    isTab = true;
+                    dontSetDescription = true;
                 }
+            } else if (name.equals("options") || name.equals("columns")) {
+                dontSetLabel = true;
+                dontSetDescription = true;
             }
             // sort nodes after parentNode name
             sortedProperties.put(name, property);
@@ -445,11 +449,10 @@ public class ExportTask extends MatchingTask {
             property.detach();
         }
 
-        if (!labelFound) {
+        if (!dontSetLabel && !labelFound) {
             sortedProperties.put(TYPE_LABEL, createI18nNode(TYPE_LABEL, keyParts));
-
         }
-        if (!isTab && !descriptionFound) {
+        if (!dontSetDescription && !descriptionFound) {
             sortedProperties.put(TYPE_DESCRIPTION, createI18nNode(TYPE_DESCRIPTION, keyParts));
         }
     }
@@ -489,18 +492,18 @@ public class ExportTask extends MatchingTask {
     }
 
     // Main method for testing.
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         ExportTask exportTask = new ExportTask();
         exportTask.setI18n(true);
         exportTask.setTargetPort(8001);
         exportTask.setTargetHost("localhost");
         exportTask.setVerbose(true);
-        exportTask.setWebapp("bsh-cafe-webapp");
-        exportTask.setRootNode("config.modules.bsh-cafe.paragraphs");
-        exportTask.setOutputPath("P:\\magkit_multi\\magkit/src/main/resources/mgnl-bootstrap");
+        exportTask.setWebapp("intranet");
+        exportTask.setRootNode("config.modules.intranet.dialogs");
+        exportTask.setOutputPath("P:\\magkit_multi\\magkit/src/main/resources/mgnl-bootstrap/intranet");
         exportTask.setMessagePath("P:\\magkit_multi\\magkit/src/main/resources/info/magnolia/module/admininterface");
         exportTask.setMgnlUser("superuser");
         exportTask.setMgnlPassword("superuser");
         exportTask.execute(); 
-    } */
+    }
 }
