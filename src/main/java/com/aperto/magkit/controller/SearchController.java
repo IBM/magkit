@@ -195,7 +195,10 @@ public class SearchController extends SimpleFormController {
         return result.getContent();
     }
 
-    private SearchHit collectSearchHitData(Content content, String query) throws RepositoryException {
+    /**
+     * Override this to fill extra search hit data.
+     */
+    protected SearchHit collectSearchHitData(Content content, String query) throws RepositoryException {
         SearchHit searchHit = new SearchHit();
         searchHit.setTitle(retrieveTitle(content));
         searchHit.setAbstract(getSnippet(query, content));
