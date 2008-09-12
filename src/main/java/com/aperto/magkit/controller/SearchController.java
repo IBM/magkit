@@ -14,8 +14,8 @@ import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.context.MgnlContext;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.ArrayUtils.*;
+import static org.apache.commons.lang.StringUtils.*;
 import org.apache.log4j.Logger;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,6 +49,8 @@ import java.util.regex.PatternSyntaxException;
  *       &lt;!--property name="startLevel" value="3" /--&gt;
  *       &lt;!-- true is default --&gt;
  *       &lt;!--property name="sqlQuery" value="false" /--&gt;
+ *       &lt;!-- &lt;em&gt; is default --&gt;
+ *       &lt;!--property name="highlightTag" value="&lt;em&gt;" /--&gt;
  *   &lt;/bean&gt;
  *   &lt;bean id="searchValidator" class="com.aperto.magkit.controller.SearchValidator"/&gt;
  * </code>
@@ -106,6 +108,15 @@ public class SearchController extends SimpleFormController {
     private String _snippet = "";
     private int _startLevel = 2;
     private boolean _sqlQuery = true;
+    private String _highlightTag = "<em>";
+
+    public String getHighlightTag() {
+        return _highlightTag;
+    }
+
+    public void setHighlightTag(String highlightTag) {
+        _highlightTag = highlightTag;
+    }
 
     public void setSqlQuery(boolean sqlQuery) {
         _sqlQuery = sqlQuery;
@@ -215,13 +226,13 @@ public class SearchController extends SimpleFormController {
 
     private String retrieveTitle(Content content) throws RepositoryException {
         String title = retrieveHeadlineFromContent(content, "headline");
-        if (StringUtils.isEmpty(title)) {
+        if (isEmpty(title)) {
             title = retrieveHeadlineFromContent(content, "headlineText");
         }
-        if (StringUtils.isEmpty(title) && content.hasNodeData("title")) {
+        if (isEmpty(title) && content.hasNodeData("title")) {
             title = content.getTitle();
         }
-        if (StringUtils.isEmpty(title)) {
+        if (isEmpty(title)) {
             title = ResourceBundle.getBundle("language").getString("page.noTitle");
         }
         return title;
@@ -263,21 +274,21 @@ public class SearchController extends SimpleFormController {
         while (!foundSnippet && iterator.hasNext()) {
             NodeData property = (NodeData) iterator.next();
             if (property.getType() != PropertyType.BINARY) {
-                if (ArrayUtils.contains(_snippetNodeNames, property.getName())) {
+                if (contains(_snippetNodeNames, property.getName())) {
                     // strips out html tags using a regexp
                     String resultString = stripHtmlTags(property.getString());
-                    if (StringUtils.isBlank(_defaultSnippet)) {
-                        _defaultSnippet = StringUtils.substring(resultString, 0, Math.min(_numberOfChars, resultString.length()));
+                    if (isBlank(_defaultSnippet)) {
+                        _defaultSnippet = substring(resultString, 0, Math.min(_numberOfChars, resultString.length()));
                     }
-                    String[] searchTerms = StringUtils.split(query);
+                    String[] searchTerms = split(query);
                     for (String searchTerm : searchTerms) {
-                        String lowerTerm = StringUtils.lowerCase(searchTerm);
+                        String lowerTerm = lowerCase(searchTerm);
 
                         // exclude keywords and words with less than 2 chars
-                        if (!ArrayUtils.contains(KEYWORDS, lowerTerm) && lowerTerm.length() > 2) {
+                        if (!contains(KEYWORDS, lowerTerm) && lowerTerm.length() > 2) {
 
                             // first check, avoid using heavy string replaceAll operations if the search term is not there
-                            if (StringUtils.contains(resultString.toLowerCase(Locale.GERMAN), lowerTerm)) {
+                            if (contains(resultString.toLowerCase(Locale.GERMAN), lowerTerm)) {
 
                                 // only get first matching keyword
                                 int pos = resultString.toLowerCase(Locale.GERMAN).indexOf(lowerTerm);
@@ -301,7 +312,7 @@ public class SearchController extends SimpleFormController {
         String returnString = resultString;
         int from = Math.max((pos - _numberOfChars / 2), 0);
         int to = Math.min(from + _numberOfChars, returnString.length());
-        returnString = StringUtils.substring(returnString, from, to).trim();
+        returnString = substring(returnString, from, to).trim();
         if (from > 0) {
             int spacePos = returnString.indexOf(' ');
             if (spacePos > 0) {
@@ -322,6 +333,7 @@ public class SearchController extends SimpleFormController {
     private String markSearchTerms(String resultString, String[] searchTerms) {
         String returnString = resultString;
         StringBuffer stringBuffer = new StringBuffer();
+        String closingTag = determineClosingTag(_highlightTag);
 
         stringBuffer.append("(\\b");
         for (String term : searchTerms) {
@@ -334,7 +346,7 @@ public class SearchController extends SimpleFormController {
 
         try {
             Pattern pattern = Pattern.compile(stringBuffer.toString(), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-            returnString = pattern.matcher(returnString).replaceAll("<em>$1</em>");
+            returnString = pattern.matcher(returnString).replaceAll(_highlightTag + "$1" + closingTag);
         } catch (PatternSyntaxException e) {
             LOGGER.info("Forbidden characters found.");
         }
@@ -342,9 +354,21 @@ public class SearchController extends SimpleFormController {
         return returnString;
     }
 
+    /**
+     * TODO: move to util class e.g. aperto commons.
+     */
+    public static String determineClosingTag(String highlightTag) {
+        String closingTag = highlightTag;
+        if (isNotBlank(highlightTag) && highlightTag.charAt(0) == '<') {
+            Pattern pattern = Pattern.compile("[ >]", Pattern.CASE_INSENSITIVE);
+            closingTag = new StringBuilder(pattern.split(highlightTag)[0]).insert(1, '/').append('>').toString();
+        }
+        return closingTag;
+    }
+
     private String stripHtmlTags(String resultString) {
         Matcher matcher = HTML_TAG_PATTERN.matcher(resultString);
-        return matcher.replaceAll(StringUtils.EMPTY);
+        return matcher.replaceAll(EMPTY);
     }
 
     /**
@@ -355,10 +379,10 @@ public class SearchController extends SimpleFormController {
     protected String generateXPathQuery(Search search) {
         String startPath = retrieveStartPath();
         // strip reserved chars and split
-        String[] tokens = StringUtils.split(StringUtils.lowerCase(StringUtils.replaceChars(search.getQ(), RESERVED_CHARS, null)));
+        String[] tokens = split(lowerCase(replaceChars(search.getQ(), RESERVED_CHARS, null)));
 
         StringBuffer xpath = new StringBuffer(tokens.length * 20);
-        if (StringUtils.isNotEmpty(startPath)) {
+        if (isNotEmpty(startPath)) {
             xpath.append(startPath);
         }
         xpath.append("//*[@jcr:primaryType=\'mgnl:content\']//*[");
@@ -366,7 +390,7 @@ public class SearchController extends SimpleFormController {
         boolean emptyQuery = true;
 
         for (String tkn : tokens) {
-            if (ArrayUtils.contains(KEYWORDS, tkn)) {
+            if (contains(KEYWORDS, tkn)) {
                 joinOperator = tkn;
             } else {
                 if (!emptyQuery) {
@@ -393,7 +417,7 @@ public class SearchController extends SimpleFormController {
     protected String generateSqlQuery(Search search) {
         String startPath = retrieveStartPath();
         // strip reserved chars and split
-        String[] tokens = StringUtils.split(StringUtils.lowerCase(StringUtils.replaceChars(search.getQ(), RESERVED_CHARS, null)));
+        String[] tokens = split(lowerCase(replaceChars(search.getQ(), RESERVED_CHARS, null)));
 
         StringBuffer sql = new StringBuffer(tokens.length * 20);
         sql.append("SELECT * FROM mgnl:contentNode WHERE ");
@@ -401,7 +425,7 @@ public class SearchController extends SimpleFormController {
         boolean emptyQuery = true;
 
         for (String tkn : tokens) {
-            if (ArrayUtils.contains(KEYWORDS, tkn)) {
+            if (contains(KEYWORDS, tkn)) {
                 joinOperator = tkn;
             } else {
                 if (!emptyQuery) {
@@ -415,7 +439,7 @@ public class SearchController extends SimpleFormController {
                 emptyQuery = false;
             }
         }
-        if (!StringUtils.isBlank(startPath)) {
+        if (!isBlank(startPath)) {
             sql.append(" AND jcr:path LIKE '/").append(startPath).append("/%'");
         }
         sql.append(" ORDER BY jcr:score DESC");
@@ -430,7 +454,7 @@ public class SearchController extends SimpleFormController {
             try {
                 Content activePage = Resource.getActivePage();
                 if (activePage != null) {
-                    startPath = StringUtils.strip(activePage.getAncestor(_startLevel).getHandle(), "/");
+                    startPath = strip(activePage.getAncestor(_startLevel).getHandle(), "/");
                 }
             } catch (RepositoryException e) {
                 LOGGER.warn("Could not get ancestor from actual page.");
