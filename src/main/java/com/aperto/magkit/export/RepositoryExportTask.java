@@ -6,6 +6,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 /**
  * This is an Ant task that exports given repository as a set of its top nodes.
@@ -128,6 +131,7 @@ public class RepositoryExportTask extends MatchingTask {
                 info("access: " + url.toExternalForm());
                 HttpClient httpClient = new HttpClient();
                 GetMethod getMethod = new GetMethod(url.toString());
+                getMethod.setRequestHeader("Accept-Encoding", "gzip");
                 int statusCode = httpClient.executeMethod(getMethod);
                 if (statusCode != HttpStatus.SC_OK) {
                     throw new BuildException("Failed to export site properly. Return code was: " + statusCode);
@@ -170,21 +174,34 @@ public class RepositoryExportTask extends MatchingTask {
     private String[] getChildNodes(String currentSite) {
         URL url;
         String[] elements;
+        InputStream stream = null;
         try {
             url = new URL("http", _targetHost, _targetPort, getWebapp() + "/magkit/get_node_children.jsp?currentNode=" + currentSite + getLogin());
             info("access: " + url.toExternalForm());
             HttpClient httpClient = new HttpClient();
             GetMethod getMethod = new GetMethod(url.toString());
+            getMethod.setRequestHeader("Accept-Encoding", "gzip");
             int statusCode = httpClient.executeMethod(getMethod);
             if (statusCode != HttpStatus.SC_OK) {
                 throw new BuildException("Unable to call debug suite properly. Return code was: " + statusCode);
             }
-            String body = getMethod.getResponseBodyAsString();
+             
+            String body = "";
+            String encoding = (getMethod.getResponseHeader("Content-Encoding") != null ?
+                                getMethod.getResponseHeader("Content-Encoding").getValue() : "identity");
+            if (StringUtils.equalsIgnoreCase("gzip", encoding)) {
+                stream = new AutoCloseInputStream(new GZIPInputStream(getMethod.getResponseBodyAsStream()));
+                body = IOUtils.toString(stream);
+            } else {
+                body = getMethod.getResponseBodyAsString();
+            }
             body = body.trim();
             body = StringTools.replaceAll(body, "\n", "");
             elements = body.split(";");
         } catch (IOException e) {
             throw new BuildException(e);
+        } finally {
+            IOUtils.closeQuietly(stream);
         }
         return elements;
     }
@@ -230,7 +247,13 @@ public class RepositoryExportTask extends MatchingTask {
         FileOutputStream out = null;
         InputStream source = null;
         try {
-            source = getMethod.getResponseBodyAsStream();
+            String encoding = (getMethod.getResponseHeader("Content-Encoding") != null ?
+                                getMethod.getResponseHeader("Content-Encoding").getValue() : "identity");
+            if (StringUtils.equalsIgnoreCase("gzip", encoding)) {
+                source = new AutoCloseInputStream(new GZIPInputStream(getMethod.getResponseBodyAsStream()));
+            } else {
+                source = getMethod.getResponseBodyAsStream();
+            }
             out = new FileOutputStream(file);
 
             byte[] buffer = new byte[10000];
