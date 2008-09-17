@@ -95,7 +95,7 @@ public abstract class AbstractMailMessageTemlate implements MailMessageTemplate 
         String subject;
         String text;
         if (firstLineSeparator > -1) {
-            subject = result.substring(0, firstLineSeparator);
+            subject = result.substring(0, firstLineSeparator).trim();
             text = result.substring(firstLineSeparator + 1);
         } else {
             subject = result.toString();
