@@ -1,5 +1,8 @@
 package com.aperto.magkit.taglib;
 
+import com.aperto.magkit.utils.ResourceUtils;
+import info.magnolia.cms.i18n.I18nContentSupport;
+import info.magnolia.cms.i18n.I18nContentSupportFactory;
 import info.magnolia.cms.util.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.NestableRuntimeException;
@@ -7,18 +10,14 @@ import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
-import info.magnolia.cms.i18n.I18nContentSupportFactory;
-
-import com.aperto.magkit.utils.ResourceUtils;
 
 /**
  * Draws a paging div container.
@@ -276,16 +275,24 @@ public class PagingTag extends TagSupport {
      */
     public void init() {
         try {
-            _prevPage = ResourceBundle.getBundle("language").getString("common.paging.prevPage");
-            _nextPage = ResourceBundle.getBundle("language").getString("common.paging.nextPage");
-            _actPageTitle = ResourceBundle.getBundle("language").getString("common.paging.actPageTitle");
+            Locale locale;
+            I18nContentSupport i18nSupport = I18nContentSupportFactory.getI18nSupport();
+            if (i18nSupport != null) {
+                locale = i18nSupport.getLocale();
+            } else {
+                locale = Locale.getDefault();
+            }
+            ResourceBundle resourceBundle = ResourceBundle.getBundle("language", locale);
+            _prevPage = resourceBundle.getString("common.paging.prevPage");
+            _nextPage = resourceBundle.getString("common.paging.nextPage");
+            _actPageTitle = resourceBundle.getString("common.paging.actPageTitle");
             if (_showPrefix) {
-                _prefix = ResourceBundle.getBundle("language").getString("common.paging.prefix");
+                _prefix = resourceBundle.getString("common.paging.prefix");
             }
             if (_showTitle) {
-                _prefixTitle = ResourceBundle.getBundle("language").getString("common.paging.prefixTitle");
-                _prevPageTitle = ResourceBundle.getBundle("language").getString("common.paging.prevPageTitle");
-                _nextPageTitle = ResourceBundle.getBundle("language").getString("common.paging.nextPageTitle");
+                _prefixTitle = resourceBundle.getString("common.paging.prefixTitle");
+                _prevPageTitle = resourceBundle.getString("common.paging.prevPageTitle");
+                _nextPageTitle = resourceBundle.getString("common.paging.nextPageTitle");
             }            
         } catch (MissingResourceException mre) {
             LOGGER.info("Can not find resource key. Using default value.");
