@@ -17,6 +17,7 @@ import org.springframework.mock.web.MockServletConfig;
 
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
+import java.util.Locale;
 
 /**
  * Test of the paging tag.
@@ -35,6 +36,7 @@ public class PagingTagTest extends MagKitTagTest {
         initMgnlWebContext(request, response, httpSession.getServletContext());
         MgnlContext.getAggregationState().setMainContent(mockContent);
         MgnlContext.getAggregationState().setSelector("old.selector.pid-1");
+        MgnlContext.getAggregationState().setLocale(new Locale("de"));
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 
