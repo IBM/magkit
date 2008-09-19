@@ -45,7 +45,7 @@ public class OrderingMultiSelect extends DialogMultiSelect {
                 Iterator it = cnt.getContent(getName()).getNodeDataCollection().iterator();
                 while (it.hasNext()) {
                     NodeData data = (NodeData) it.next();
-                    tmp.put(data.getName(), data.getString());
+                    tmp.put(data.getName(), data.getString().replaceAll("'", "&#039;"));
                 }
                 SortedSet<String> s = new TreeSet<String>(new Comparator<String>() {
 
