@@ -4,6 +4,7 @@ import com.aperto.magkit.utils.ContentUtils;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.Resource;
+import info.magnolia.cms.util.NodeDataStringComparator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
@@ -14,6 +15,7 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.jstl.core.LoopTagSupport;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Tag for iterate a nodecollection (e.g. from checkbox-control).
@@ -25,6 +27,7 @@ public class NodeCollectionTag extends LoopTagSupport {
     private static final Logger LOGGER = Logger.getLogger(NodeCollectionTag.class);
     private String _contentNodeName;
     private Iterator _nodeIterator;
+    private boolean _orderByValue = false;
 
     public String getContentNodeName() {
         return _contentNodeName;
@@ -54,13 +57,25 @@ public class NodeCollectionTag extends LoopTagSupport {
         super.setVarStatus(string);
     }
 
+    /**
+     * Ordering by value. Default is false, that means an ordering by node name.
+     */
+    @TagAttribute
+    public void setOrderByValue(boolean orderByValue) {
+        _orderByValue = orderByValue;
+    }
+
     protected void prepare() throws JspTagException {
         Content content = Resource.getLocalContentNode();
         try {
             if (content != null && !StringUtils.isBlank(_contentNodeName) && content.hasContent(_contentNodeName)) {
                 Content collContent = content.getContent(_contentNodeName);
                 Collection nodeDataCollection = collContent.getNodeDataCollection();
-                nodeDataCollection = ContentUtils.orderNodeDataCollection(nodeDataCollection);
+                if (_orderByValue) {
+                    nodeDataCollection = ContentUtils.orderNodeDataCollectionByValue(nodeDataCollection);
+                } else {
+                    nodeDataCollection = ContentUtils.orderNodeDataCollection(nodeDataCollection);
+                }
                 _nodeIterator = nodeDataCollection.iterator();
             }
         } catch (RepositoryException e){

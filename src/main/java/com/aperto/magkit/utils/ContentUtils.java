@@ -2,9 +2,8 @@ package com.aperto.magkit.utils;
 
 import org.apache.log4j.Logger;
 import info.magnolia.cms.core.NodeData;
-import java.util.Iterator;
-import java.util.Arrays;
-import java.util.Collection;
+import info.magnolia.cms.util.NodeDataStringComparator;
+import java.util.*;
 
 /**
  * Util class for handle magnolia content.
@@ -30,5 +29,11 @@ public final class ContentUtils {
     }
 
     private ContentUtils() {
+    }
+
+    public static Collection orderNodeDataCollectionByValue(Collection collection) {
+        List<NodeData> nodeDataList = (List<NodeData>) collection;
+        Collections.sort(nodeDataList, new NodeDataComparator());
+        return nodeDataList;
     }
 }
