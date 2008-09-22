@@ -4,7 +4,12 @@
     ResourceBundle resourceBundle = ResourceBundle.getBundle("environment");
     if (resourceBundle != null) {
         try {
-            String handle = resourceBundle.getString("errorpage.404." + request.getLocale().getLanguage());
+            String handle = "";
+            try {
+                handle = resourceBundle.getString("errorpage.404." + request.getLocale().getLanguage());
+            } catch (MissingResourceException mre) {
+                handle = resourceBundle.getString("errorpage.404");
+            }
             String contextName = request.getContextPath();
             String newLocn = contextName + handle;
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
