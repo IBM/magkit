@@ -17,6 +17,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
+import javax.jcr.RepositoryException;
 
 /**
  * Test of the image tag.
@@ -35,6 +36,7 @@ public class ImageTagTest extends MagKitTagTest {
         String output = jspWriter.toString();
         assertThat(output, containsString("<img"));
         assertThat(output, containsString("alt=\"Alttext\""));
+        assertThat(output, containsString("width=\"200\""));
     }
 
     @Test
@@ -61,6 +63,20 @@ public class ImageTagTest extends MagKitTagTest {
         assertThat(output, containsString("alt=\"Alttext\""));
     }
 
+    @Test
+    public void testScalingImage() {
+        _tag.setImageDataName("imageData");
+        _tag.setScaling(true);
+        _tag.setScaleAtWidth(150);
+        PageContext pageContext = runLifeCycle(_tag);
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        assertThat(output, containsString("<img"));
+        assertThat(output, containsString("alt=\"Alttext\""));
+        assertThat(output, containsString("width=\"150\""));
+        assertThat(output, containsString("height=\"225\""));
+    }
+
     @Override
     protected PageContext createPageContext() {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -71,6 +87,12 @@ public class ImageTagTest extends MagKitTagTest {
         MockContent nodeContent = new MockContent("content", ItemType.CONTENTNODE);
         nodeContent.addNodeData(new MockNodeData("imageAlt", "Alttext"));
         MockNodeData image = new MockNodeData("image", ImageTagTest.class.getResourceAsStream("/testimage.jpg"));
+        try {
+            image.setAttribute("height", "300");
+            image.setAttribute("width", "200");
+        } catch (RepositoryException e) {
+           //Nothing
+        }
         nodeContent.addNodeData(image);
         mockContent.addContent(nodeContent);
         request.setAttribute("imageData", new ImageData(image, "Alttext"));

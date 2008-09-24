@@ -5,6 +5,7 @@ import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.taglibs.BaseContentTag;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.exception.NestableRuntimeException;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
@@ -27,6 +28,9 @@ public class ImageTag extends BaseContentTag {
     private Map<String, String> _htmlAttributes = new HashMap<String, String>();
     private String _altNodeDataName;
     private String _imageDataName;
+    private boolean _scaling = false;
+    private int _scaleAtHeight = 0;
+    private int _scaleAtWidth = 0;
 
     /**
      * Setter for the request attribute name of an ImageData object.
@@ -101,6 +105,46 @@ public class ImageTag extends BaseContentTag {
     }
 
     /**
+     * Setter for <code>alt</code>.
+     * @param value html attribute.
+     */
+    @TagAttribute
+    public void setAlt(String value) {
+        _htmlAttributes.put("alt", value);
+    }
+
+    /**
+     * Activate the scaling of the image.
+     * Default is false.
+     * @see #_scaleAtHeight
+     * @see #_scaleAtWidth
+     */
+    @TagAttribute
+    public void setScaling(boolean scaling) {
+        _scaling = scaling;
+    }
+
+    /**
+     * If scaling true, the image will be scaled to this width.
+     * For contortion set the width attribute.
+     * @see #_scaling
+     */
+    @TagAttribute
+    public void setScaleAtWidth(int scaleAtWidth) {
+        _scaleAtWidth = scaleAtWidth;
+    }
+
+    /**
+     * If scaling true, the image will be scaled to this height.
+     * For contortion set the height attribute.
+     * @see #_scaling
+     */
+    @TagAttribute
+    public void setScaleAtHeight(int scaleAtHeight) {
+        _scaleAtHeight = scaleAtHeight;
+    }
+
+    /**
      * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
      */
     public int doEndTag() throws JspException {
@@ -165,12 +209,27 @@ public class ImageTag extends BaseContentTag {
                 out.write(contextPath);
                 out.write(imageData.getHandle());
                 out.write("\" ");
+                calculateNewMeasures(attributes);
                 writeAttributes(out, attributes);
                 out.write("/>");
             }
         } catch (IOException e) {
             // should never happen
             throw new NestableRuntimeException(e);
+        }
+    }
+
+    private void calculateNewMeasures(Map<String, String> attributes) {
+        if (_scaling && (_scaleAtHeight > 0 || _scaleAtWidth > 0)) {
+            int width = NumberUtils.toInt(attributes.get("width"));
+            int height = NumberUtils.toInt(attributes.get("height"));
+            if ((_scaleAtWidth > 0) && (width > 0)) {
+                attributes.put("width", Integer.toString(_scaleAtWidth));
+                attributes.put("height", Integer.toString((height * _scaleAtWidth) / width));
+            } else if (height > 0) {
+                attributes.put("width", Integer.toString((width * _scaleAtHeight) / height));
+                attributes.put("height", Integer.toString(_scaleAtHeight));
+            }
         }
     }
 
