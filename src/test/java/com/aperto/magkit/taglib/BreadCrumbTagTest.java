@@ -6,7 +6,7 @@ import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
@@ -34,7 +34,7 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, containsString("<ol>"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
+        assertThat(countMatches(output, "<li>"), is(2));
     }
 
     @Test
@@ -45,7 +45,17 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, not(containsString("<ol>")));
-        assertThat(StringUtils.countMatches(output, " - "), is(2));
+        assertThat(countMatches(output, " - "), is(2));
+    }
+
+    @Test
+    public void testListWithDelimiter() throws JspException {
+        _tag.setSeparator("/");
+        PageContext pageContext = runLifeCycle(_tag);
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        assertThat(output, containsString("<ol>"));
+        assertThat(countMatches(output, "/</a>"), is(2));
     }
 
     @Test
@@ -56,7 +66,7 @@ public class BreadCrumbTagTest extends MagKitTagTest {
         String output = jspWriter.toString();
         assertThat(output, not(containsString("<ol>")));
         assertThat(output, containsString("<ul class=\"test\">"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
+        assertThat(countMatches(output, "<li>"), is(2));
     }
 
     @Override

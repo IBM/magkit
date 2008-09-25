@@ -1,17 +1,16 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.webkit.utils.StringTools;
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.util.Resource;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import static org.apache.commons.lang.StringUtils.*;
 import org.apache.commons.lang.exception.NestableRuntimeException;
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import static org.apache.taglibs.standard.tag.common.core.Util.escapeXml;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -75,13 +74,18 @@ public class BreadCrumbTag extends TagSupport {
     private String _listType = "ol";
 
     /**
+     * Additional separator between the breadcrumb items.
+     */
+    private String _separator;
+
+    /**
      * An optional integer value to specify the number of the first element in the page hirachy to be included into the breadcrumb navigation.
      * Default is 1, the root node in content repository is 0.
      * @param startLevel breadcrumb start level. 
      */
     @TagAttribute
     public void setStartLevel(String startLevel) {
-        _startLevel = NumberUtils.toInt(startLevel, 1);
+        _startLevel = toInt(startLevel, 1);
         if (_startLevel < 1) {
             _startLevel = 1;
         }
@@ -152,6 +156,15 @@ public class BreadCrumbTag extends TagSupport {
     }
 
     /**
+     * An optional value for the separator.
+     * The seperator were rendered in the links.
+     */
+    @TagAttribute
+    public void setSeparator(String separator) {
+        _separator = separator;
+    }
+
+    /**
      * Renders the hirachy path to the actual repository element as ordered list as default. 
      * @see javax.servlet.jsp.tagext.Tag#doStartTag()
      */
@@ -169,7 +182,7 @@ public class BreadCrumbTag extends TagSupport {
             }
             out.print(iterateBreadcrumbContent(endLevel, actpage, request.getContextPath()));
             if (_listStyle) {
-                out.print("</" + StringUtils.split(_listType, ' ')[0] + ">");
+                out.print("</" + split(_listType, ' ')[0] + ">");
             }
         } catch (RepositoryException e) {
             LOGGER.warn("Exception caught: " + e.getMessage(), e);
@@ -179,12 +192,12 @@ public class BreadCrumbTag extends TagSupport {
         return super.doStartTag();
     }
 
-    private StringBuffer iterateBreadcrumbContent(int endLevel, Content breadcrumbContent, String contextPath) throws RepositoryException, IOException {
-        StringBuffer out = new StringBuffer();
+    private StringBuilder iterateBreadcrumbContent(int endLevel, Content breadcrumbContent, String contextPath) throws RepositoryException, IOException {
+        StringBuilder out = new StringBuilder();
         boolean firstHidden = false;
         for (int j = _startLevel; j <= endLevel; j++) {
             Content page = breadcrumbContent.getAncestor(j);
-            if (StringUtils.isNotEmpty(_hideProperty) && page.getNodeData(_hideProperty).getBoolean()) {
+            if (isNotEmpty(_hideProperty) && page.getNodeData(_hideProperty).getBoolean()) {
                 firstHidden = true;
                 continue;
             }
@@ -196,17 +209,7 @@ public class BreadCrumbTag extends TagSupport {
                 }
                 out.append(">");
             }
-            if (_link && (_lastlink || (j < endLevel))) {
-                out.append("<a href=\"");
-                out.append(contextPath);
-                out.append(page.getHandle()).append('.').append(ServerConfiguration.getInstance().getDefaultExtension());
-                out.append("\">");
-            }
-            String navTitle = getNavTitle(page);
-            out.append(navTitle);
-            if (_link && (_lastlink || (j < endLevel))) {
-                out.append("</a>");
-            }
+            out.append(renderHref(page, contextPath, j, endLevel));
             if (_listStyle) {
                 out.append("</li>");
             } else if (j < endLevel) {
@@ -216,15 +219,34 @@ public class BreadCrumbTag extends TagSupport {
         return out;
     }
 
+    private String renderHref(Content page, String contextPath, int j, int endLevel) {
+        StringBuilder out = new StringBuilder();
+        if (_link && (_lastlink || (j < endLevel))) {
+            out.append("<a href=\"");
+            out.append(contextPath);
+            out.append(page.getHandle()).append('.').append(ServerConfiguration.getInstance().getDefaultExtension());
+            out.append("\">");
+        }
+        String navTitle = getNavTitle(page);
+        out.append(navTitle);
+        if (isNotBlank(_separator) && (j < endLevel)) {
+            out.append(_separator);
+        }
+        if (_link && (_lastlink || (j < endLevel))) {
+            out.append("</a>");
+        }
+        return out.toString();
+    }
+
     private String getNavTitle(Content page) {
         String navTitle = page.getNodeData("navTitle").getString().replaceAll("\\{-\\}", "");
-        if (StringTools.isBlank(navTitle)) {
+        if (isBlank(navTitle)) {
             navTitle = page.getTitle();
-            if (StringTools.isBlank(navTitle)) {
+            if (isBlank(navTitle)) {
                 navTitle = page.getName();
             }
         }
-        return StringEscapeUtils.escapeHtml(navTitle);
+        return escapeXml(navTitle);
     }
 
     /**
@@ -238,6 +260,7 @@ public class BreadCrumbTag extends TagSupport {
         _hideProperty = null;
         _listType = null;
         _listStyle = true;
+        _separator = null;
         super.release();
     }
 }
