@@ -107,7 +107,7 @@ public class PhotoGalleryController extends AbstractController {
             GalleryEntry galleryEntry = new GalleryEntry();
             Content content = (Content) imgObj;
             Document originalDocument = new Document(content);
-            if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension())) {
+            if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension().toLowerCase(Locale.ENGLISH))) {
                 Document previewDocument = getPreviewImageDocument(originalDocument);
                 if (previewDocument != null) {
                     galleryEntry.setImage(new ImageData(originalDocument));
