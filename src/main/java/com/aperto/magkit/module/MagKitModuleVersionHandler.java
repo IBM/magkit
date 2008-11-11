@@ -116,10 +116,10 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
 
     private final Task _addCacheConfig36 = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
         new CreateNodeTask("captcha", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_EXCLUDE_36, "captcha", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA_36, "pattern", "/service/captcha/*"),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA_36, "pattern", "/service/captcha/"),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA_36, "class", "info.magnolia.voting.voters.URIStartsWithVoter"),
         new CreateNodeTask("debug", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_EXCLUDE_36, "debug", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG_36, "pattern", "/debug/*"),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG_36, "pattern", "/debug/"),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG_36, "class", "info.magnolia.voting.voters.URIStartsWithVoter"),
     });
 
