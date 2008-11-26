@@ -92,9 +92,18 @@ public class CrossScriptingRequestWrapper extends HttpServletRequestWrapper {
     }
 
     /**
-     * Escape all html tags.
+     * Remove javascript and escape html tags.
      */
     private String escapeHtml(String value) {
-        return StringEscapeUtils.escapeHtml(value);
+        String result = value;
+        if (value != null) {
+            result = result.replaceAll("<[\\p{javaWhitespace}]*script", "");
+            result = result.replaceAll("<[\\p{javaWhitespace}]*/script[\\p{javaWhitespace}]*>", "");
+            result = result.replaceAll("[\\\"\\\'][\\p{javaWhitespace}]*javascript:(.*)[\\\"\\\']", "\"\"");
+            result = result.replaceAll("javascript", "\"javascript\"");
+            result = result.replaceAll("eval\\((.*)\\)", "");
+            result = StringEscapeUtils.escapeHtml(result);
+        }
+        return result;
     }
 }
