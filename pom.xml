@@ -5,13 +5,13 @@
     <parent>
         <artifactId>magkit-multi</artifactId>
         <groupId>com.aperto.magkit</groupId>
-        <version>1.3.3</version>
+        <version>1.3.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.aperto.magkit</groupId>
     <artifactId>magkit</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.4-SNAPSHOT</version>
     <name>Aperto Magnolia Kit</name>
     <packaging>jar</packaging>
 
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>com.aperto.magkit</groupId>
             <artifactId>magkit-test</artifactId>
-            <version>1.3.3</version>
+            <version>1.3.4-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
