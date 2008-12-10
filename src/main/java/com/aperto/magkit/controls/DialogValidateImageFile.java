@@ -96,38 +96,10 @@ public class DialogValidateImageFile extends DialogFile {
         try {
             inputStream = doc.getStream();
             BufferedImage imgBuffer = ImageIO.read(inputStream);
-
-            // get configs from control config in cms
-            String allowedFileExtensions = getConfigValue(CONFIG_ALLOWED_EXTENSIONS, DEFAULT_EXTENSIONS);
-            long maxFilesize = NumberUtils.toInt(getConfigValue(CONFIG_MAX_FILESIZE, DEFAULT_SIZE));
-            int maxHeight = NumberUtils.toInt(getConfigValue(CONFIG_MAX_HEIGHT, DEFAULT_HEIGHT));
-            int maxWidth = NumberUtils.toInt(getConfigValue(CONFIG_MAX_WIDTH, DEFAULT_WIDTH));
-            int minHeight = NumberUtils.toInt(getConfigValue(CONFIG_MIN_HEIGHT, DEFAULT_MIN_HEIGHT));
-            int minWidth = NumberUtils.toInt(getConfigValue(CONFIG_MIN_WIDTH, DEFAULT_MIN_WIDTH));
-            // validate file size
-            if (file.length() > maxFilesize) {
-                _errorMessage = "cms.validator.filesize";
-                LOGGER.debug("The file could not be uploaded - max. " + maxFilesize / 1024 + " KB allowed.");
-                valid = false;
-            }
-            //validate file extensions
-            if (valid && !StringUtils.contains(allowedFileExtensions, fileExtension)) {
-                _errorMessage = "cms.validator.format";
-                LOGGER.debug("Tried to upload wrong filetype, it is not one of the following: " + allowedFileExtensions);
-                valid = false;
-            }
-            //validate maximum image dimension
-            if (valid && (imgBuffer.getHeight() > maxHeight || imgBuffer.getWidth() > maxWidth)) {
-                _errorMessage = "cms.validator.dimension";
-                LOGGER.debug("Image Height is bigger then " + maxHeight + " - cannot save Image.");
-                valid = false;
-            }
-            //validate minimum image dimension
-            if (valid && (imgBuffer.getHeight() < minHeight || imgBuffer.getWidth() < minWidth)) {
-                _errorMessage = "cms.validator.dimension";
-                LOGGER.debug("Image Height is smaller than " + minHeight + " or width is smaller than " + minWidth + "  - cannot save Image.");
-                valid = false;
-            }
+            valid = validateFileSize(file);
+            valid = validateFileExtension(valid, fileExtension);
+            valid = validateMaximumImageDimension(valid, imgBuffer);
+            valid = validateMinimumImageDimension(valid, imgBuffer);
         } catch (IOException ioe) {
             _errorMessage = "cms.validator.unknownFile";
             LOGGER.info("Can not read from inputstream.");
@@ -140,6 +112,49 @@ public class DialogValidateImageFile extends DialogFile {
                     LOGGER.info("Could not close inputstream.");
                 }
             }
+        }
+        return valid;
+    }
+
+    private boolean validateMinimumImageDimension(boolean valid, BufferedImage imgBuffer) {
+        int minHeight = NumberUtils.toInt(getConfigValue(CONFIG_MIN_HEIGHT, DEFAULT_MIN_HEIGHT));
+        int minWidth = NumberUtils.toInt(getConfigValue(CONFIG_MIN_WIDTH, DEFAULT_MIN_WIDTH));
+        if (valid && (imgBuffer.getHeight() < minHeight || imgBuffer.getWidth() < minWidth)) {
+            _errorMessage = "cms.validator.dimension";
+            LOGGER.debug("Image Height is smaller than " + minHeight + " or width is smaller than " + minWidth + "  - cannot save Image.");
+            valid = false;
+        }
+        return valid;
+    }
+
+    private boolean validateMaximumImageDimension(boolean valid, BufferedImage imgBuffer) {
+        int maxHeight = NumberUtils.toInt(getConfigValue(CONFIG_MAX_HEIGHT, DEFAULT_HEIGHT));
+        int maxWidth = NumberUtils.toInt(getConfigValue(CONFIG_MAX_WIDTH, DEFAULT_WIDTH));
+        if (valid && (imgBuffer.getHeight() > maxHeight || imgBuffer.getWidth() > maxWidth)) {
+            _errorMessage = "cms.validator.dimension";
+            LOGGER.debug("Image Height is bigger then " + maxHeight + " - cannot save Image.");
+            valid = false;
+        }
+        return valid;
+    }
+
+    private boolean validateFileExtension(boolean valid, String fileExtension) {
+        String allowedFileExtensions = getConfigValue(CONFIG_ALLOWED_EXTENSIONS, DEFAULT_EXTENSIONS);
+        if (valid && !StringUtils.contains(allowedFileExtensions, fileExtension)) {
+            _errorMessage = "cms.validator.format";
+            LOGGER.debug("Tried to upload wrong filetype, it is not one of the following: " + allowedFileExtensions);
+            valid = false;
+        }
+        return valid;
+    }
+
+    private boolean validateFileSize(File file) {
+        boolean valid = true;
+        long maxFilesize = NumberUtils.toInt(getConfigValue(CONFIG_MAX_FILESIZE, DEFAULT_SIZE));
+        if (file.length() > maxFilesize) {
+            _errorMessage = "cms.validator.filesize";
+            LOGGER.debug("The file could not be uploaded - max. " + maxFilesize / 1024 + " KB allowed.");
+            valid = false;
         }
         return valid;
     }
