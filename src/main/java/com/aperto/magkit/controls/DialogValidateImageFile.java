@@ -42,6 +42,14 @@ public class DialogValidateImageFile extends DialogFile {
      * Cms config attribute for maximum allowed image width.
      */
     private static final String CONFIG_MAX_WIDTH = "maxWidth";
+    /**
+     * Cms config attribute for minimum allowed image height.
+     */
+    private static final String CONFIG_MIN_HEIGHT = "minHeight";
+    /**
+     * Cms config attribute for minimum allowed image width.
+     */
+    private static final String CONFIG_MIN_WIDTH = "minWidth";
 
     // default values
     private static final String DEFAULT_EXTENSIONS = "png,jpg,gif,jpeg";
@@ -49,6 +57,8 @@ public class DialogValidateImageFile extends DialogFile {
     private static final String DEFAULT_SIZE = "524288";
     private static final String DEFAULT_HEIGHT = "600";
     private static final String DEFAULT_WIDTH = "500";
+    private static final String DEFAULT_MIN_HEIGHT = "0";
+    private static final String DEFAULT_MIN_WIDTH = "0";
 
     /**
      * Validates the format, the extension, the size and the dimension.
@@ -92,6 +102,8 @@ public class DialogValidateImageFile extends DialogFile {
             long maxFilesize = NumberUtils.toInt(getConfigValue(CONFIG_MAX_FILESIZE, DEFAULT_SIZE));
             int maxHeight = NumberUtils.toInt(getConfigValue(CONFIG_MAX_HEIGHT, DEFAULT_HEIGHT));
             int maxWidth = NumberUtils.toInt(getConfigValue(CONFIG_MAX_WIDTH, DEFAULT_WIDTH));
+            int minHeight = NumberUtils.toInt(getConfigValue(CONFIG_MIN_HEIGHT, DEFAULT_MIN_HEIGHT));
+            int minWidth = NumberUtils.toInt(getConfigValue(CONFIG_MIN_WIDTH, DEFAULT_MIN_WIDTH));
             // validate file size
             if (file.length() > maxFilesize) {
                 _errorMessage = "cms.validator.filesize";
@@ -104,11 +116,16 @@ public class DialogValidateImageFile extends DialogFile {
                 LOGGER.debug("Tried to upload wrong filetype, it is not one of the following: " + allowedFileExtensions);
                 valid = false;
             }
-            //validate image dimension
-
+            //validate maximum image dimension
             if (valid && (imgBuffer.getHeight() > maxHeight || imgBuffer.getWidth() > maxWidth)) {
                 _errorMessage = "cms.validator.dimension";
                 LOGGER.debug("Image Height is bigger then " + maxHeight + " - cannot save Image.");
+                valid = false;
+            }
+            //validate minimum image dimension
+            if (valid && (imgBuffer.getHeight() < minHeight || imgBuffer.getWidth() < minWidth)) {
+                _errorMessage = "cms.validator.dimension";
+                LOGGER.debug("Image Height is smaller than " + minHeight + " or width is smaller than " + minWidth + "  - cannot save Image.");
                 valid = false;
             }
         } catch (IOException ioe) {
