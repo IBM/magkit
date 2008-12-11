@@ -1,4 +1,4 @@
-package com.aperto.degewo.taglib;
+package com.aperto.magkit.taglib;
 
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
