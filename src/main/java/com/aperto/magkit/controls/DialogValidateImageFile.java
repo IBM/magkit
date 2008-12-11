@@ -119,8 +119,8 @@ public class DialogValidateImageFile extends DialogFile {
     private boolean validateMinimumImageDimension(boolean valid, BufferedImage imgBuffer) {
         int minHeight = NumberUtils.toInt(getConfigValue(CONFIG_MIN_HEIGHT, DEFAULT_MIN_HEIGHT));
         int minWidth = NumberUtils.toInt(getConfigValue(CONFIG_MIN_WIDTH, DEFAULT_MIN_WIDTH));
-        boolean result = true;
-        if (valid && (imgBuffer.getHeight() > minHeight || imgBuffer.getWidth() > minWidth)) {
+        boolean result = valid;
+        if (valid && (imgBuffer.getHeight() < minHeight || imgBuffer.getWidth() < minWidth)) {
             _errorMessage = "cms.validator.dimension";
             LOGGER.debug("Image Height is smaller than " + minHeight + " or width is smaller than " + minWidth + "  - cannot save Image.");
             result = false;
@@ -131,8 +131,8 @@ public class DialogValidateImageFile extends DialogFile {
     private boolean validateMaximumImageDimension(boolean valid, BufferedImage imgBuffer) {
         int maxHeight = NumberUtils.toInt(getConfigValue(CONFIG_MAX_HEIGHT, DEFAULT_HEIGHT));
         int maxWidth = NumberUtils.toInt(getConfigValue(CONFIG_MAX_WIDTH, DEFAULT_WIDTH));
-        boolean result = true;
-        if (valid && (imgBuffer.getHeight() < maxHeight || imgBuffer.getWidth() < maxWidth)) {
+        boolean result = valid;
+        if (valid && (imgBuffer.getHeight() > maxHeight || imgBuffer.getWidth() > maxWidth)) {
             _errorMessage = "cms.validator.dimension";
             LOGGER.debug("Image Height is bigger then " + maxHeight + " - cannot save Image.");
             result = false;
@@ -141,7 +141,7 @@ public class DialogValidateImageFile extends DialogFile {
     }
 
     private boolean validateFileExtension(boolean valid, String fileExtension) {
-        boolean result = true;
+        boolean result = valid;
         String allowedFileExtensions = getConfigValue(CONFIG_ALLOWED_EXTENSIONS, DEFAULT_EXTENSIONS);
         if (valid && !StringUtils.contains(allowedFileExtensions, fileExtension)) {
             _errorMessage = "cms.validator.format";
@@ -154,7 +154,7 @@ public class DialogValidateImageFile extends DialogFile {
     private boolean validateFileSize(File file) {
         boolean result = true;
         long maxFilesize = NumberUtils.toInt(getConfigValue(CONFIG_MAX_FILESIZE, DEFAULT_SIZE));
-        if (file.length() < maxFilesize) {
+        if (file.length() > maxFilesize) {
             _errorMessage = "cms.validator.filesize";
             LOGGER.debug("The file could not be uploaded - max. " + maxFilesize / 1024 + " KB allowed.");
             result = false;
