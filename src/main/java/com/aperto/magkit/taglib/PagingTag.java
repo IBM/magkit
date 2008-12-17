@@ -4,7 +4,7 @@ import com.aperto.magkit.utils.ResourceUtils;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.cms.i18n.I18nContentSupportFactory;
 import info.magnolia.cms.util.Resource;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.*;
 import org.apache.commons.lang.exception.NestableRuntimeException;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
@@ -47,6 +47,7 @@ public class PagingTag extends TagSupport {
     private boolean _showPrefix = true;
     private boolean _showTitle = true;
     private String _includeHeadline = "";
+    private String _activeClass = "";
 
     /**
      * set linked page.
@@ -119,6 +120,15 @@ public class PagingTag extends TagSupport {
     }
 
     /**
+     * Set active class. default is empty.
+     * @param activeClass
+     */
+    @TagAttribute
+    public void setActiveClass(String activeClass) {
+        _activeClass = activeClass;
+    }
+
+    /**
      * Produce the paging.
      *
      * @return jsp output
@@ -136,7 +146,7 @@ public class PagingTag extends TagSupport {
         try {
             if (_pages > 1) {
                 out.print("<div class=\"pager\">\n");
-                if (StringUtils.isNotEmpty(_includeHeadline)) {
+                if (isNotEmpty(_includeHeadline)) {
                     out.print("<h4>" + _includeHeadline + "</h4>\n");
                 }
                 out.print("<ul>\n");
@@ -153,7 +163,11 @@ public class PagingTag extends TagSupport {
                 int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
                 for (int page = startPage; page <= lastPage; page++) {
                     if (page == _actPage) {
-                        out.print("<li><em>" + _actPageTitle + "</em><strong>" + page + "</strong></li>");
+                        out.print("<li");
+                        if (isNotBlank(_activeClass)) {
+                            out.print(" class=\"" + _activeClass + "\"");
+                        }
+                        out.print("><em>" + _actPageTitle + "</em><strong>" + page + "</strong></li>");
                     } else {
                         out.print(determineLinkedPage(getLink(completeHandle, queryString, page), page));
                     }
@@ -259,8 +273,8 @@ public class PagingTag extends TagSupport {
         String handle = request.getContextPath();
         handle += Resource.getCurrentActivePage().getHandle();
         String selector = Resource.getSelector();
-        if (!StringUtils.isBlank(selector)) {
-            String[] strings = StringUtils.split(selector, '.');
+        if (!isBlank(selector)) {
+            String[] strings = split(selector, '.');
             for (String s : strings) {
                 if (!s.startsWith(ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER)) {
                     handle += "." + s;
@@ -312,5 +326,6 @@ public class PagingTag extends TagSupport {
         _showPrefix = true;
         _showTitle = true;
         _includeHeadline = "";
+        _activeClass = "";
     }
 }
