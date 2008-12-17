@@ -46,6 +46,7 @@ public class PagingTag extends TagSupport {
     private boolean _addQueryString = false;
     private boolean _showPrefix = true;
     private boolean _showTitle = true;
+    private boolean _encapsulate = true;
     private String _includeHeadline = "";
     private String _activeClass = "";
 
@@ -110,6 +111,14 @@ public class PagingTag extends TagSupport {
     }
 
     /**
+     * Set encapsulate. If encapsulate the paging list is encapsulated in a div container.
+     */
+    @TagAttribute
+    public void setEncapsulate(String encapsulate) {
+        _encapsulate = Boolean.valueOf(encapsulate);
+    }
+
+    /**
      * set headline.
      *
      * @param headline - headline
@@ -145,44 +154,57 @@ public class PagingTag extends TagSupport {
         }
         try {
             if (_pages > 1) {
-                out.print("<div class=\"pager\">\n");
+                if (_encapsulate) {
+                    out.print("<div class=\"pager\">\n");
+                }
                 if (isNotEmpty(_includeHeadline)) {
                     out.print("<h4>" + _includeHeadline + "</h4>\n");
                 }
-                out.print("<ul>\n");
+                out.print("<ul");
+                if (!_encapsulate) {
+                    out.print(" class=\"pager\"");
+                }
+                out.print(">\n");
                 out.print(determinePrevious(getLink(completeHandle, queryString, _actPage - 1)));
                 if (_showPrefix) {
                     out.print("<li><strong>" + _prefix + "</strong></li>");
                 }
-                int startPage = 1;
-                if (_pages > _linkedPages && _actPage > ((_linkedPages / 2) + 1)) {
-                    out.print(determineLinkedPage(getLink(completeHandle, queryString, 1), 1));
-                    out.print("<li>" + PADDING_SEQUENZ + "</li>");
-                    startPage = Math.min(_actPage - (_linkedPages / 2), _pages - _linkedPages + 1);
-                }
-                int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
-                for (int page = startPage; page <= lastPage; page++) {
-                    if (page == _actPage) {
-                        out.print("<li");
-                        if (isNotBlank(_activeClass)) {
-                            out.print(" class=\"" + _activeClass + "\"");
-                        }
-                        out.print("><em>" + _actPageTitle + "</em><strong>" + page + "</strong></li>");
-                    } else {
-                        out.print(determineLinkedPage(getLink(completeHandle, queryString, page), page));
-                    }
-                }
-                if (lastPage < _pages) {
-                    out.print("<li>" + PADDING_SEQUENZ + "</li>");
-                    out.print(determineLinkedPage(getLink(completeHandle, queryString, _pages), _pages));
-                }
+                printListItems(out, completeHandle, queryString);
                 out.print(determineNext(getLink(completeHandle, queryString, _actPage + 1)));
-                out.print("</ul>\n</div>");
+                out.print("</ul>\n");
+                if (_encapsulate) {
+                    out.print("</div>");
+                }
             }
         } catch (IOException e) {
             throw new NestableRuntimeException(e);
         }
         return super.doEndTag();
+    }
+
+    private void printListItems(JspWriter out, String completeHandle, String queryString) throws IOException {
+        int startPage = 1;
+        if (_pages > _linkedPages && _actPage > ((_linkedPages / 2) + 1)) {
+            out.print(determineLinkedPage(getLink(completeHandle, queryString, 1), 1));
+            out.print("<li>" + PADDING_SEQUENZ + "</li>");
+            startPage = Math.min(_actPage - (_linkedPages / 2), _pages - _linkedPages + 1);
+        }
+        int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
+        for (int page = startPage; page <= lastPage; page++) {
+            if (page == _actPage) {
+                out.print("<li");
+                if (isNotBlank(_activeClass)) {
+                    out.print(" class=\"" + _activeClass + "\"");
+                }
+                out.print("><em>" + _actPageTitle + "</em><strong>" + page + "</strong></li>");
+            } else {
+                out.print(determineLinkedPage(getLink(completeHandle, queryString, page), page));
+            }
+        }
+        if (lastPage < _pages) {
+            out.print("<li>" + PADDING_SEQUENZ + "</li>");
+            out.print(determineLinkedPage(getLink(completeHandle, queryString, _pages), _pages));
+        }
     }
 
     /**
@@ -325,6 +347,7 @@ public class PagingTag extends TagSupport {
         _addQueryString = false;
         _showPrefix = true;
         _showTitle = true;
+        _encapsulate = true;
         _includeHeadline = "";
         _activeClass = "";
     }

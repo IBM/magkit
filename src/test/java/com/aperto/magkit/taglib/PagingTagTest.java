@@ -75,6 +75,25 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
+    public void testWithoutCapsulate() {
+        PagingTag tag = new PagingTag();
+        tag.setPages(5);
+        tag.setActPage(1);
+        tag.setEncapsulate("false");
+        tag.setActiveClass("active");
+        PageContext pageContext = runLifeCycle(tag);
+        assertThat(pageContext, notNullValue());
+        JspWriter jspWriter = pageContext.getOut();
+        assertThat(jspWriter, notNullValue());
+        String output = jspWriter.toString();
+        assertThat(output, notNullValue());
+        assertThat(output, not(containsString("<div>")));
+        assertThat(output, containsString("<li class=\"active\"><em>Sie sind hier : </em><strong>1</strong></li>"));
+        assertThat(output, containsString("2</a>"));
+        assertThat(output, not(containsString(".pid-1.")));
+    }
+
+    @Test
     public void testPaddingEnd() {
         PagingTag tag = new PagingTag();
         tag.setPages(10);
