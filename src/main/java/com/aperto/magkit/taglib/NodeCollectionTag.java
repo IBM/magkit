@@ -4,8 +4,7 @@ import com.aperto.magkit.utils.ContentUtils;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.Resource;
-import info.magnolia.cms.util.NodeDataStringComparator;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
@@ -15,7 +14,6 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.jstl.core.LoopTagSupport;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Collections;
 
 /**
  * Tag for iterate a nodecollection (e.g. from checkbox-control).
@@ -28,15 +26,26 @@ public class NodeCollectionTag extends LoopTagSupport {
     private String _contentNodeName;
     private Iterator _nodeIterator;
     private boolean _orderByValue = false;
+    private boolean _returnNodeData = false;
 
     public String getContentNodeName() {
         return _contentNodeName;
     }
 
     /**
-     * Content node name with the node data collection.
+     * Tag delivers a NodeData.
+     * Default is false. The String value of the NodeData is delivered. 
      */
-    @TagAttribute (required = true)
+    @TagAttribute
+    public void setReturnNodeData(boolean returnNodeData) {
+        _returnNodeData = returnNodeData;
+    }
+
+    /**
+     * Content node name with the node data collection.
+     * If empty iterate over the node datas of the local content node.
+     */
+    @TagAttribute
     public void setContentNodeName(String contentNodeName) {
         _contentNodeName = contentNodeName;
     }
@@ -68,8 +77,11 @@ public class NodeCollectionTag extends LoopTagSupport {
     protected void prepare() throws JspTagException {
         Content content = Resource.getLocalContentNode();
         try {
-            if (content != null && !StringUtils.isBlank(_contentNodeName) && content.hasContent(_contentNodeName)) {
-                Content collContent = content.getContent(_contentNodeName);
+            if (content != null) {
+                Content collContent = content;
+                if (isNotBlank(_contentNodeName) && content.hasContent(_contentNodeName)) {
+                    collContent = content.getContent(_contentNodeName);
+                }
                 Collection nodeDataCollection = collContent.getNodeDataCollection();
                 if (_orderByValue) {
                     nodeDataCollection = ContentUtils.orderNodeDataCollectionByValue(nodeDataCollection);
@@ -88,7 +100,13 @@ public class NodeCollectionTag extends LoopTagSupport {
     }
 
     protected Object next() throws JspTagException {
-        return ((NodeData) _nodeIterator.next()).getString();
+        Object returnObject;
+        if (_returnNodeData) {
+            returnObject = _nodeIterator.next();    
+        } else {
+            returnObject = ((NodeData) _nodeIterator.next()).getString();
+        }
+        return returnObject;
     }
 
     /**
@@ -99,5 +117,7 @@ public class NodeCollectionTag extends LoopTagSupport {
         super.release();
         _contentNodeName = "";
         _nodeIterator = null;
+        _orderByValue = false;
+        _returnNodeData = false;
     }
 }
