@@ -4,6 +4,7 @@ import com.aperto.webkit.utils.ExceptionEater;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import info.magnolia.cms.beans.runtime.MultipartForm;
+import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.cms.core.Path;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
 import org.apache.commons.lang.StringUtils;
@@ -32,6 +33,10 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
      * Max file upload size. Default 50 MB.
      */
     private static final int DEFAULT_MAX_FILE_SIZE = 52428800;
+    /**
+     * Max file upload size on author instance. Default 150 MB.
+     */
+    private static final int DEFAULT_AUHTOR_MAX_FILE_SIZE = 157286400;
     private static String c_configuredMaxFileSize;
     private static final String PROPERTY_MAX_FIEL_SIZE = "upload.maxFileSize";
     static {
@@ -71,7 +76,7 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
         String encoding = StringUtils.defaultString(request.getCharacterEncoding(), "UTF-8");
         DefaultFileRenamePolicy fileRenamePolicy = new DefaultFileRenamePolicy();
         try {
-            int maxValue = Math.abs(NumberUtils.toInt(c_configuredMaxFileSize, DEFAULT_MAX_FILE_SIZE));
+            int maxValue = Math.abs(NumberUtils.toInt(c_configuredMaxFileSize, ServerConfiguration.getInstance().isAdmin() ? DEFAULT_AUHTOR_MAX_FILE_SIZE : DEFAULT_MAX_FILE_SIZE));
             MultipartRequest multi = new MultipartRequest(request, Path.getTempDirectoryPath(), maxValue, encoding, fileRenamePolicy);
             Enumeration params = multi.getParameterNames();
             while (params.hasMoreElements()) {
