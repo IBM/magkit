@@ -121,7 +121,7 @@ public class PagingTag extends TagSupport {
 
     /**
      * Set active class. default is empty.
-     * @param activeClass
+     * @param activeClass - class of active li
      */
     @TagAttribute
     public void setActiveClass(String activeClass) {
