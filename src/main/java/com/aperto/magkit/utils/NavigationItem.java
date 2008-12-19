@@ -14,7 +14,7 @@ public class NavigationItem extends Item {
 
     /**
      * Accessor for the list of subitems. Default is NULL.
-     * @return A java.util.List<NavigationItem> or NULL if not set.
+     * @return A java.util.List&lt;NavigationItem&gt; or NULL if not set.
      */
     public List<NavigationItem> getSubItems() {
         return _subItems;
