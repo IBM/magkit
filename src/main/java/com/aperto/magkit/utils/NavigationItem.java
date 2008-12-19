@@ -50,7 +50,7 @@ public class NavigationItem extends Item {
     }
 
     /**
-     * Flag, if the item should be renderes as selected Item. Default is 'false'.
+     * Flag, if the item should be rendered as selected Item. Default is 'false'.
      * @return True, if marked as selected.
      */
     public boolean isSelected() {
@@ -58,7 +58,7 @@ public class NavigationItem extends Item {
     }
 
     /**
-     * Flag, if the item should be renderes as selected Item. Default is 'false'.
+     * Flag, if the item should be rendered as selected Item. Default is 'false'.
      */
     public void setSelected(boolean selected) {
         _selected = selected;
