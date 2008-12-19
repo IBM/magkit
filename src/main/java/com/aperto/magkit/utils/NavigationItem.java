@@ -4,7 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.List;
 
 /**
- * Extends Item with a a list of sub items.
+ * Extends Item with a list of sub items.
  *
  * @author frank.sommer (09.05.2008)
  */
