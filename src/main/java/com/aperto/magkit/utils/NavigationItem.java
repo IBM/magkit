@@ -12,6 +12,10 @@ public class NavigationItem extends Item {
     private List<NavigationItem> _subItems = null;
     private boolean _selected = false;
 
+    /**
+     * Accessor for the list of subitems. Default is NULL.
+     * @return A java.util.List<NavigationItem> or NULL if not set.
+     */
     public List<NavigationItem> getSubItems() {
         return _subItems;
     }
