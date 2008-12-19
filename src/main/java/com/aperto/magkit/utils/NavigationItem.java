@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class NavigationItem extends Item {
     private List<NavigationItem> _subItems = null;
+    private boolean _selected = false;
 
     public List<NavigationItem> getSubItems() {
         return _subItems;
@@ -47,4 +48,20 @@ public class NavigationItem extends Item {
     public boolean hasSubItems() {
         return !CollectionUtils.isEmpty(_subItems);
     }
+
+    /**
+     * Flag, if the item should be renderes as selected Item. Default is 'false'.
+     * @return True, if marked as selected.
+     */
+    public boolean isSelected() {
+        return _selected;
+    }
+
+    /**
+     * Flag, if the item should be renderes as selected Item. Default is 'false'.
+     */
+    public void setSelected(boolean selected) {
+        _selected = selected;
+    }
+
 }
