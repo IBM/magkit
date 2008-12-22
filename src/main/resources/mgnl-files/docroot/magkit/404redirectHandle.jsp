@@ -23,9 +23,8 @@
             } catch (MissingResourceException mre) {
                 handle = resourceBundle.getString("errorpage.404");
             }
-            String newLocn = contextPath + handle;
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            pageContext.forward(newLocn);
+            pageContext.forward(handle);
         } catch (MissingResourceException mre) {
 %>
     404-Seite ist nicht konfiguriert.
