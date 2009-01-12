@@ -1,7 +1,7 @@
 <%@
     page import="info.magnolia.cms.util.Resource,
                  info.magnolia.cms.core.Content,
-                 info.magnolia.cms.beans.config.ServerConfiguration"
+                 info.magnolia.cms.beans.config.ServerConfiguration, java.util.ResourceBundle"
 %><%--
   Created by frank.sommer (16.04.2008)
 --%><%@ page pageEncoding="ISO-8859-1"
@@ -24,8 +24,14 @@
             }
         }
     }
+    try {
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("language");
+        String hint = resourceBundle.getString("folder.hint");
+        pageContext.setAttribute("hint", hint);
+    } catch (Exception e) {
+
+    }
 %><%@ taglib prefix="cms" uri="cms-taglib"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -35,9 +41,9 @@
 </head>
 <body>
 <div style="height:20px"></div><%-- set custom text in your properties --%>
-<p><fmt:message key="folder.hint" var="folderHint" />
+<p><!-- ${hint} -->
 <c:choose>
-    <c:when test="${not empty folderHint and not fn:contains(folderHint, 'folder.hint')}">${folderHint}</c:when>
+    <c:when test="${not empty hint}">${hint}</c:when>
     <c:otherwise>This is a folder. There is no content to show. <br />
     For excluding from navigation save once the page properties.</c:otherwise>
 </c:choose>
