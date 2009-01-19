@@ -137,7 +137,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 
-    private void initMagnoliaContext(MockHttpServletRequest request, MockHttpServletResponse response, MockHttpSession httpSession, MockContent mockContent) {// init MgnlContext:
+    private void initMagnoliaContext(MockHttpServletRequest request, MockHttpServletResponse response, MockHttpSession httpSession, MockContent mockContent) {
         initMgnlWebContext(request, response, httpSession.getServletContext());
         MgnlContext.getAggregationState().setCurrentContent(mockContent);
     }

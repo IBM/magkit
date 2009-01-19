@@ -1,11 +1,14 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.utils.LinkTool;
+import static info.magnolia.cms.util.Resource.getCurrentActivePage;
+import static info.magnolia.cms.util.Resource.getLocalContentNode;
+import static com.aperto.magkit.utils.LinkTool.insertSelector;
+import static com.aperto.magkit.utils.LinkTool.convertLink;
+import static info.magnolia.cms.link.LinkHelper.isExternalLinkOrAnchor;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.link.LinkHelper;
-import info.magnolia.cms.util.Resource;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
@@ -17,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.ServletResponse;
 import java.io.IOException;
 
 /**
@@ -37,6 +39,7 @@ public class ConvertLinkTag extends TagSupport {
     private String _altRepo = null;
     private boolean _addContextPath = true;
     private boolean _addExtension = true;
+    private Content _contentNode;
 
     @TagAttribute
     public void setNodeDataName(String nodeDataName) {
@@ -105,6 +108,16 @@ public class ConvertLinkTag extends TagSupport {
     }
 
     /**
+     * The magnolia content instance to read the node data from. 
+     * If not given the content node or current active page from the magnolia context will be used.
+     * @param contentNode an instance of info.magnolia.cms.core.Content
+     */
+    @TagAttribute
+    public void setContentNode(Content contentNode) {
+        _contentNode = contentNode;
+    }
+
+    /**
      * Writes the converted link.
      * @return jsp output
      * @throws javax.servlet.jsp.JspException
@@ -115,12 +128,12 @@ public class ConvertLinkTag extends TagSupport {
         fetchLinkValuefromCms();
 
         // convert linkValue write in output
-        if (!StringUtils.isBlank(_linkValue)) {
+        if (isNotBlank(_linkValue)) {
             try {
-                if (!LinkHelper.isExternalLinkOrAnchor(_linkValue)) {
-                    String link = LinkTool.convertLink(_linkValue, _addExtension, _altRepo);
-                    link = LinkTool.insertSelector(link, _selector);
-                    if (_addContextPath && StringUtils.isNotBlank(link)) {
+                if (!isExternalLinkOrAnchor(_linkValue)) {
+                    String link = convertLink(_linkValue, _addExtension, _altRepo);
+                    link = insertSelector(link, _selector);
+                    if (_addContextPath && isNotBlank(link)) {
                         builder.append(request.getContextPath());
                     }
                     builder.append(link);
@@ -128,7 +141,7 @@ public class ConvertLinkTag extends TagSupport {
                     builder.append(_linkValue);
                 }
                 String link = ((HttpServletResponse) pageContext.getResponse()).encodeURL(builder.toString());
-                if (StringUtils.isBlank(_var)) {
+                if (isBlank(_var)) {
                     JspWriter out = pageContext.getOut();
                     out.write(link);
                 } else {
@@ -148,11 +161,8 @@ public class ConvertLinkTag extends TagSupport {
      * if nodeData is set, fetch the linkValue from CMS.
      */
     private void fetchLinkValuefromCms() {
-        if (!StringUtils.isBlank(_nodeDataName)) {
-            Content content = Resource.getLocalContentNode();
-            if (content == null) {
-                content = Resource.getCurrentActivePage();
-            }
+        Content content = getContentNode();
+        if (content != null && isNotBlank(_nodeDataName)) {
             try {
                 if (content.hasNodeData(_nodeDataName)) {
                     NodeData data = content.getNodeData(_nodeDataName);
@@ -166,7 +176,20 @@ public class ConvertLinkTag extends TagSupport {
             } catch (RepositoryException re) {
                 LOGGER.warn("Can not access content node.", re);
             }
+        } else {
+            LOGGER.info("Given content node is null or node data name is not specified. Using given linkValue.");
         }
+    }
+
+    private Content getContentNode() {
+        Content content = _contentNode;
+        if (content == null) {
+            content = getLocalContentNode();
+            if (content == null) {
+                content = getCurrentActivePage();
+            }
+        }
+        return content;
     }
 
     /**
