@@ -1,5 +1,6 @@
 package com.aperto.magkit.taglib;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static info.magnolia.cms.util.Resource.getCurrentActivePage;
 import static info.magnolia.cms.util.Resource.getLocalContentNode;
 import static com.aperto.magkit.utils.LinkTool.insertSelector;
@@ -35,11 +36,11 @@ public class ConvertLinkTag extends TagSupport {
     private String _var;
     private String _selector;
     private String _nodeDataName;
-    private String _linkValue;
+    private String _linkValue = EMPTY;
     private String _altRepo = null;
     private boolean _addContextPath = true;
     private boolean _addExtension = true;
-    private Content _contentNode;
+    private Content _contentNode = null;
 
     @TagAttribute
     public void setNodeDataName(String nodeDataName) {
@@ -48,7 +49,7 @@ public class ConvertLinkTag extends TagSupport {
 
     /**
      * A link to be converted into am URL-encoded magnolia link. This value will only be processed if no name for an NodeData is provided.
-     * Default is NULL.
+     * Default is "".
      * @param linkValue an URL String
      */
     @TagAttribute
@@ -199,9 +200,10 @@ public class ConvertLinkTag extends TagSupport {
         _addContextPath = true;
         _addExtension = true;
         _altRepo = null;
-        _linkValue = null;
+        _linkValue = EMPTY;
         _nodeDataName = null;
-        _selector = "";
+        _selector = EMPTY;
+        _contentNode = null;
         super.release();
     }
 }
