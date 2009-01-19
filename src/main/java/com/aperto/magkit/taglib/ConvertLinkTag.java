@@ -13,14 +13,18 @@ import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
+import javax.servlet.ServletResponse;
 import java.io.IOException;
 
 /**
  * Convert uuid to a link from the given node data (@see LinkTool).
+ * The local content node (active paragraph in context) will be used as content node. If not set the current active page will be used as fallback.
  * If it is an internal link the contextPath will be added.
+ * If the Attribute 'linkValue' is set instead of 'nodeDataName' this value will be processed.
  * @author frank.sommer (07.01.2008)
  */
 @Tag(name = "convertLink", bodyContent = BodyContent.JSP)
@@ -39,31 +43,62 @@ public class ConvertLinkTag extends TagSupport {
         _nodeDataName = nodeDataName;
     }
 
+    /**
+     * A link to be converted into am URL-encoded magnolia link. This value will only be processed if no name for an NodeData is provided.
+     * Default is NULL.
+     * @param linkValue an URL String
+     */
     @TagAttribute
     public void setLinkValue(String linkValue) {
         _linkValue = linkValue;
     }
 
+    /**
+     * A flag whether to add the context path at the beginning of the URL (eg. '/author' or '/publish').
+     * Default is TRUE.
+     * @param addContextPath a String representation of a Boolean value ("true" or "false").
+     */
     @TagAttribute
     public void setAddContextPath(String addContextPath) {
         _addContextPath = Boolean.getBoolean(addContextPath);
     }
 
+    /**
+     * A flag whether to add a file extension at the end of the URL.
+     * If the URL does not end with '.html' or '.htm' a default file extension '.html' will be apended.
+     * If the the URL points to a document is the dms module the propper file extenssion will be read from the documents meta data.
+     * Default is TRUE.
+     * @param addExtension a String representation of a Boolean value ("true" or "false").
+     */
     @TagAttribute
     public void setAddExtension(String addExtension) {
         _addExtension = Boolean.getBoolean(addExtension);
     }
 
+    /**
+     * The system name of the repository where the linked document is stored. Allowed values are "website", "dms" (if module is installed), "data" (if module is installed).
+     * Default is "website".
+     * @param altRepo the repository name ("dms" or "website")
+     */
     @TagAttribute
     public void setAltRepo(String altRepo) {
         _altRepo = altRepo;
     }
 
+    /**
+     * An URL sselector to be added to the end of the URL right before the file extension.
+     * Default is NULL.
+     * @param selector the URL selector
+     */
     @TagAttribute
     public void setSelector(String selector) {
         _selector = selector;
     }
 
+    /**
+     * The name of the page context variable where the resulting URL String will be stored.
+     * @param var the page context variable name
+     */
     @TagAttribute
     public void setVar(String var) {
         _var = var;
@@ -76,7 +111,7 @@ public class ConvertLinkTag extends TagSupport {
      */
     public int doEndTag() throws JspException {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-        StringBuilder builder = new StringBuilder(10);
+        StringBuilder builder = new StringBuilder(64);
         fetchLinkValuefromCms();
 
         // convert linkValue write in output
@@ -92,11 +127,12 @@ public class ConvertLinkTag extends TagSupport {
                 } else {
                     builder.append(_linkValue);
                 }
+                String link = ((HttpServletResponse) pageContext.getResponse()).encodeURL(builder.toString());
                 if (StringUtils.isBlank(_var)) {
                     JspWriter out = pageContext.getOut();
-                    out.write(builder.toString());
+                    out.write(link);
                 } else {
-                    request.setAttribute(_var, builder.toString());
+                    request.setAttribute(_var, link);
                 }
             } catch (IOException e) {
                 LOGGER.error("Error", e);

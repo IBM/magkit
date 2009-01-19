@@ -19,6 +19,7 @@ import org.springframework.mock.web.MockServletConfig;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
 
 /**
  * Test of the convert link tag.
@@ -32,12 +33,14 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     private static final String LINK_VALUE_INT = "/sammeln/infos";
     private static final String LINK_VALUE_INT_SHORT = "/sammeln";
     private static final String LINK_VALUE_UUID = "29f35061-bf9f-478c-a4b0-cb9f07a0fc8c";
+    private static final String LINK_VALUE_UMLAUT = "/Ümläutö";
+    private static final String LINK_VALUE_SPACE = "/das ist ein Link";
 
     @Test
     public void testExternalLink() throws JspException {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link");
-        PageContext pageContext = runLifeCycle(tag);
+        PageContext pageContext = runLifeCycle(tag, "link", LINK_VALUE_EXT);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, not(containsString(CONTEXT_PATH)));
@@ -48,7 +51,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     public void testUuidLink() throws JspException {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link4");
-        PageContext pageContext = runLifeCycle(tag);
+        PageContext pageContext = runLifeCycle(tag, "link4", LINK_VALUE_UUID);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output.length(), is(0));
@@ -58,7 +61,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     public void testInternalLink() throws JspException {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link2");
-        PageContext pageContext = runLifeCycle(tag);
+        PageContext pageContext = runLifeCycle(tag, "link2", LINK_VALUE_INT);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, containsString(CONTEXT_PATH));
@@ -71,7 +74,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link2");
         tag.setVar("link");
-        PageContext pageContext = runLifeCycle(tag);
+        PageContext pageContext = runLifeCycle(tag, "link2", LINK_VALUE_INT);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output.length(), is(0));
@@ -86,7 +89,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link2");
         tag.setSelector("navid-123");
-        PageContext pageContext = runLifeCycle(tag);
+        PageContext pageContext = runLifeCycle(tag, "link2", LINK_VALUE_INT);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, containsString(CONTEXT_PATH));
@@ -99,7 +102,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link3");
         tag.setSelector("navid-123");
-        PageContext pageContext = runLifeCycle(tag);
+        PageContext pageContext = runLifeCycle(tag, "link3", LINK_VALUE_INT_SHORT);
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, containsString(CONTEXT_PATH));
@@ -107,26 +110,50 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         assertThat(output, endsWith("123.html"));
     }
 
-    @Override
-    protected PageContext createPageContext() {
-        MockContent mockContent = new MockContent("test", ItemType.CONTENT);
-        MockNodeData mockNodeData = new MockNodeData("link", LINK_VALUE_EXT);
-        mockContent.addNodeData(mockNodeData);
-        mockNodeData = new MockNodeData("link2", LINK_VALUE_INT);
-        mockContent.addNodeData(mockNodeData);
-        mockNodeData = new MockNodeData("link3", LINK_VALUE_INT_SHORT);
-        mockContent.addNodeData(mockNodeData);
-        mockNodeData = new MockNodeData("link4", LINK_VALUE_UUID);
-        mockContent.addNodeData(mockNodeData);
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(LOCAL_CONTENT_OBJ, mockContent);
+    @Test
+    public void testLinkWithSpaces() {
+        ConvertLinkTag tag = new ConvertLinkTag();
+        tag.setNodeDataName("link");
+        PageContext pageContext = runLifeCycle(tag, "link", "/das ist ein Link");
+        JspWriter jspWriter = pageContext.getOut();
+        String output = jspWriter.toString();
+        // sorry, we cannot test with MockHttpServletResponse since it does not provide a usefull implementation of encodeUrl(String url). 
+
+    }
+
+
+    protected PageContext runLifeCycle(TagSupport tag, String nodeDataName, String nodeDataValue) {
+        PageContext pageContext = createPageContext(nodeDataName, nodeDataValue);
+        runLifeCycle(tag, pageContext);
+        return pageContext;
+    }
+
+    protected PageContext createPageContext(String nodeDataName, String nodeDataValue) {
+        MockContent mockContent = createMockContent(nodeDataName, nodeDataValue);
         MockHttpSession httpSession = new MockHttpSession();
-        request.setSession(httpSession);
-        request.setContextPath(CONTEXT_PATH);
+        MockHttpServletRequest request = createMockRequest(mockContent, httpSession);
         MockHttpServletResponse response = new MockHttpServletResponse();
-        // init MgnlContext:
+        initMagnoliaContext(request, response, httpSession, mockContent);
+        return new MockPageContext(new MockServletConfig(), request, response);
+    }
+
+    private void initMagnoliaContext(MockHttpServletRequest request, MockHttpServletResponse response, MockHttpSession httpSession, MockContent mockContent) {// init MgnlContext:
         initMgnlWebContext(request, response, httpSession.getServletContext());
         MgnlContext.getAggregationState().setCurrentContent(mockContent);
-        return new MockPageContext(new MockServletConfig(), request, response);
+    }
+
+    private MockHttpServletRequest createMockRequest(MockContent mockContent, MockHttpSession httpSession) {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute(LOCAL_CONTENT_OBJ, mockContent);
+        request.setSession(httpSession);
+        request.setContextPath(CONTEXT_PATH);
+        return request;
+    }
+
+    private MockContent createMockContent(String nodeDataName, String nodeDataValue) {
+        MockContent mockContent = new MockContent("test", ItemType.CONTENT);
+        MockNodeData mockNodeData = new MockNodeData(nodeDataName, nodeDataValue);
+        mockContent.addNodeData(mockNodeData);
+        return mockContent;
     }
 }
