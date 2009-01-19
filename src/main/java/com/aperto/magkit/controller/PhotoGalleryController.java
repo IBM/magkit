@@ -128,7 +128,6 @@ public class PhotoGalleryController extends AbstractController {
      * the document for that image.
      *
      * @param document the original document
-     * @param manager  the HierarchyManager
      * @return the new image file
      */
     private Document getPreviewImageDocument(Document document) throws Exception {
