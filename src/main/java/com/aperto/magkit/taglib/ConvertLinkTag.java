@@ -8,6 +8,8 @@ import static com.aperto.magkit.utils.LinkTool.convertLink;
 import static info.magnolia.cms.link.LinkHelper.isExternalLinkOrAnchor;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.codec.EncoderException;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import org.apache.log4j.Logger;
@@ -80,7 +82,8 @@ public class ConvertLinkTag extends TagSupport {
     }
 
     /**
-     * The system name of the repository where the linked document is stored. Allowed values are "website", "dms" (if module is installed), "data" (if module is installed).
+     * The system name of the fallback repository where to get the linked content from if it could not be fount in the default repository ('website').
+     * Allowed values are "website", "dms" (if module is installed), "data" (if module is installed).
      * Default is "website".
      * @param altRepo the repository name ("dms" or "website")
      */
@@ -141,7 +144,7 @@ public class ConvertLinkTag extends TagSupport {
                 } else {
                     builder.append(_linkValue);
                 }
-                String link = ((HttpServletResponse) pageContext.getResponse()).encodeURL(builder.toString());
+                String link = builder.toString();
                 if (isBlank(_var)) {
                     JspWriter out = pageContext.getOut();
                     out.write(link);

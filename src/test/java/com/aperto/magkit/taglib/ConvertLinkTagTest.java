@@ -117,7 +117,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         PageContext pageContext = runLifeCycle(tag, "link", "/das ist ein Link");
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
-        // sorry, we cannot test with MockHttpServletResponse since it does not provide a usefull implementation of encodeUrl(String url). 
+        assertThat(output, containsString(CONTEXT_PATH));
 
     }
 
