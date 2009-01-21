@@ -191,11 +191,20 @@ public final class LinkTool {
         return binaryLink.toString();
     }
 
+    /**
+     * URL encodes the passed String using the code from info.magnolia.module.dms.beans.Document.
+     * @param s the string to be encoded
+     * @return a new URL encoded String or an empty String if the parameter s has been NULL.
+     * @throws UnsupportedEncodingException if encoding fails for encoding 'UTF-8'
+     */
     public static String urlEncode(String s) throws UnsupportedEncodingException {
-        // from magnolia Document class:
-        String name = StringUtils.replaceChars(s, "ÇÈ<>\"'/\\", "________");
-        name = URLEncoder.encode(name, "UTF-8");
-        name = StringUtils.replace(name, "+", "%20");
+        String name = StringUtils.EMPTY;
+        if (s != null) {
+            // from magnolia Document class:
+            name = StringUtils.replaceChars(s, "ÇÈ<>\"'/\\", "________");
+            name = URLEncoder.encode(name, "UTF-8");
+            name = StringUtils.replace(name, "+", "%20");
+        }
         return name;
 //        return URL_ENCODER.encode(s);
     }
