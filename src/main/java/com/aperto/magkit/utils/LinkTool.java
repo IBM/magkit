@@ -11,6 +11,9 @@ import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.codec.EncoderException;
 import org.apache.log4j.Logger;
 import javax.jcr.PropertyType;
 import static java.util.Locale.ENGLISH;
@@ -26,6 +29,8 @@ public final class LinkTool {
     private static final Logger LOGGER = Logger.getLogger(LinkTool.class);
     private static final String DMS_REPOSITORY = "dms";
     public static final Pattern UUID_PATTERN = Pattern.compile("^[-a-z0-9]{30,40}$");
+    private static final char SLASH = '/';
+    private static final URLCodec urlEncoder = new URLCodec("UTF-8");
 
     /**
      * Returns absolutePath-Link nevertheless if u give it a "uuidLink" or a "link".
@@ -54,6 +59,7 @@ public final class LinkTool {
 
     /**
      * Returns a handle nevertheless if you give it a uuidLink or normal link with optional added .html.
+     * For document links to the dms module the encoded file name of the document will be used.
      *
      * @param link the link or uuid, in case of uuid it converts it to a absolute link
      * @param addExtension if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
@@ -61,44 +67,48 @@ public final class LinkTool {
      * @return the handle with optional .html
      */
     public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
-        String newLink = "";
+        String newLink = StringUtils.EMPTY;
         String extension = LinkUtil.DEFAULT_EXTENSION;
-        if (StringUtils.isNotEmpty(link)) {
+        if (isNotEmpty(link)) {
             try {
-                String path = "";
+                String path = StringUtils.EMPTY;
                 String handle = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
                 if (handle == null && !StringUtils.isBlank(alternativeRepository)) {
                     handle = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
                     if (handle != null) {
                         StringBuilder dmsHandle = new StringBuilder(10);
-                        dmsHandle.append('/').append(alternativeRepository).append(handle);
+                        dmsHandle.append(SLASH).append(alternativeRepository).append(handle);
                         // in dms the file name is additional nessecary
                         if (DMS_REPOSITORY.equalsIgnoreCase(alternativeRepository) && addExtension) {
                             Document doc = new Document(ContentUtil.getContent(DMS_REPOSITORY, handle));
-                            dmsHandle.append("/").append(doc.getFileName());
+                            dmsHandle.append(SLASH).append(doc.getEncodedFileName());
                             extension = doc.getFileExtension();
                         }
                         handle = dmsHandle.toString();
                     }
                 }
-                if (StringUtils.isNotEmpty(handle)) {
+                if (isNotEmpty(handle)) {
                     path = handle;
                 }
                 newLink = determineNewLink(path, link);
             } catch (NullPointerException e) {
                 // should only occur in unit tests if the mgnlContext is not present
-                newLink = isUuid(link) ? "" : link;
+                newLink = isUuid(link) ? StringUtils.EMPTY : link;
             }
         }
-        if (StringUtils.isNotBlank(newLink) && addExtension && !newLink.toLowerCase(ENGLISH).endsWith(".html") && !newLink.toLowerCase(ENGLISH).endsWith(".htm")) {
+        if (StringUtils.isNotBlank(newLink) && addExtension && !hasHtmlExtension(newLink)) {
             newLink += "." + extension;
         }
-
         return newLink;
     }
 
+    private static boolean hasHtmlExtension(String link) {
+        String lowerCaseLink = link.toLowerCase(ENGLISH);
+        return lowerCaseLink.endsWith(".html") || lowerCaseLink.endsWith(".htm");
+    }
+
     private static String determineNewLink(String path, String link) {
-        return StringUtils.isBlank(path) ? (isUuid(link) ? "" : link) : path;
+        return StringUtils.isBlank(path) ? (isUuid(link) ? StringUtils.EMPTY : link) : path;
     }
 
     public static boolean isUuid(String link) {
@@ -119,7 +129,7 @@ public final class LinkTool {
     public static boolean checkLink(String link) {
         boolean result;
         HierarchyManager hm = MgnlContext.getHierarchyManager(ContentRepository.WEBSITE);
-        result = StringUtils.isNotEmpty(link) && hm.isExist(link);
+        result = isNotEmpty(link) && hm.isExist(link);
         return result;
     }
 
@@ -149,25 +159,39 @@ public final class LinkTool {
 
     /**
      * Method build the link to a binary file which is given as NodeData and the repository.
+     * The file name will be URL encoded using apache commons URLCodec and charset "UTF-8".
      *
      * @param binaryNode binary NodeData
      * @return link to a binary
+     * @throws RuntimeException if file name could not be url encoded with encoding 'UTF-8'.
      */
     public static String getBinaryLink(NodeData binaryNode, String repository) {
-        String binaryLink = "";
+        StringBuilder binaryLink = new StringBuilder(64);
         if (binaryNode != null && binaryNode.isExist()) {
             if (binaryNode.getType() == PropertyType.BINARY) {
-                binaryLink = binaryNode.getHandle() + '/' + binaryNode.getAttribute("fileName") + '.' + binaryNode.getAttribute("extension");
-                if (!StringUtils.isBlank(repository)) {
-                    binaryLink = "/" + repository + binaryLink;    
+                if (StringUtils.isNotBlank(repository)) {
+                    binaryLink.append(SLASH).append(repository);
+//                    binaryLink = SLASH + repository + binaryLink;
                 }
+                String fileName = binaryNode.getAttribute("fileName");
+                String extension = binaryNode.getAttribute("extension");
+                try {
+                    binaryLink.append(binaryNode.getHandle()).append(SLASH).append(urlEncode(fileName)).append(extension);
+                } catch (EncoderException e) {
+                    throw new RuntimeException("Cannot url encode filename '" + fileName + "' with encoding 'UTF-8'", e);
+                }
+//                binaryLink = binaryNode.getHandle() + SLASH + binaryNode.getAttribute("fileName") + '.' + binaryNode.getAttribute("extension");
             } else {
                 LOGGER.info("Given NodeData is not from type binary: " + binaryNode.getHandle());
             }
         } else {
             LOGGER.info("Given NodeData was null or does not exist.");
         }
-        return binaryLink;
+        return binaryLink.toString();
+    }
+
+    public static String urlEncode(String s) throws EncoderException {
+        return urlEncoder.encode(s);
     }
 
     /**
@@ -175,8 +199,8 @@ public final class LinkTool {
      */
     public static String insertSelector(String link, String selector) {
         String newLink = link;
-        if (!StringUtils.isBlank(selector) && !LinkHelper.isExternalLinkOrAnchor(link)) {
-            String[] pathParts = StringUtils.split(link, '/');
+        if (StringUtils.isNotBlank(selector) && !LinkHelper.isExternalLinkOrAnchor(link)) {
+            String[] pathParts = StringUtils.split(link, SLASH);
             String lastPart = pathParts[pathParts.length - 1];
             pathParts = (String[]) ArrayUtils.remove(pathParts, pathParts.length - 1);
             String[] parts = StringUtils.split(lastPart, '.');
@@ -184,7 +208,7 @@ public final class LinkTool {
             newParts[0] = parts[0];
             newParts[1] = selector;
             System.arraycopy(parts, 1, newParts, 2, newParts.length - 2);
-            newLink = '/' + StringUtils.join(pathParts, '/') + '/';
+            newLink = SLASH + StringUtils.join(pathParts, SLASH) + SLASH;
             newLink += StringUtils.join(newParts, '.');
         }
         return newLink;
