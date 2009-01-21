@@ -30,7 +30,7 @@ public final class LinkTool {
     private static final String DMS_REPOSITORY = "dms";
     public static final Pattern UUID_PATTERN = Pattern.compile("^[-a-z0-9]{30,40}$");
     private static final char SLASH = '/';
-    private static final URLCodec urlEncoder = new URLCodec("UTF-8");
+    private static final URLCodec URL_ENCODER = new URLCodec("UTF-8");
 
     /**
      * Returns absolutePath-Link nevertheless if u give it a "uuidLink" or a "link".
@@ -191,7 +191,7 @@ public final class LinkTool {
     }
 
     public static String urlEncode(String s) throws EncoderException {
-        return urlEncoder.encode(s);
+        return URL_ENCODER.encode(s);
     }
 
     /**
