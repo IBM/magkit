@@ -90,6 +90,8 @@ public class ImageTagTest extends MagKitTagTest {
         try {
             image.setAttribute("height", "300");
             image.setAttribute("width", "200");
+            image.setAttribute("fileName", "testimage");
+            image.setAttribute("extension", "jpg");
         } catch (RepositoryException e) {
            //Nothing
         }
