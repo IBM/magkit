@@ -19,6 +19,8 @@ import javax.jcr.PropertyType;
 import static java.util.Locale.ENGLISH;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Helper class for links.
@@ -162,6 +164,7 @@ public final class LinkTool {
      * The file name will be URL encoded using apache commons URLCodec and charset "UTF-8".
      *
      * @param binaryNode binary NodeData
+     * @param repository the repository name. Should be null or empty for website repository.
      * @return link to a binary
      * @throws RuntimeException if file name could not be url encoded with encoding 'UTF-8'.
      */
@@ -171,16 +174,14 @@ public final class LinkTool {
             if (binaryNode.getType() == PropertyType.BINARY) {
                 if (StringUtils.isNotBlank(repository)) {
                     binaryLink.append(SLASH).append(repository);
-//                    binaryLink = SLASH + repository + binaryLink;
                 }
                 String fileName = binaryNode.getAttribute("fileName");
                 String extension = binaryNode.getAttribute("extension");
                 try {
-                    binaryLink.append(binaryNode.getHandle()).append(SLASH).append(urlEncode(fileName)).append(extension);
-                } catch (EncoderException e) {
+                    binaryLink.append(binaryNode.getHandle()).append(SLASH).append(urlEncode(fileName)).append('.').append(extension);
+                } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException("Cannot url encode filename '" + fileName + "' with encoding 'UTF-8'", e);
                 }
-//                binaryLink = binaryNode.getHandle() + SLASH + binaryNode.getAttribute("fileName") + '.' + binaryNode.getAttribute("extension");
             } else {
                 LOGGER.info("Given NodeData is not from type binary: " + binaryNode.getHandle());
             }
@@ -190,8 +191,13 @@ public final class LinkTool {
         return binaryLink.toString();
     }
 
-    public static String urlEncode(String s) throws EncoderException {
-        return URL_ENCODER.encode(s);
+    public static String urlEncode(String s) throws UnsupportedEncodingException {
+        // from magnolia Document class:
+        String name = StringUtils.replaceChars(s, "ÇÈ<>\"'/\\", "________");
+        name = URLEncoder.encode(name, "UTF-8");
+        name = StringUtils.replace(name, "+", "%20");
+        return name;
+//        return URL_ENCODER.encode(s);
     }
 
     /**
