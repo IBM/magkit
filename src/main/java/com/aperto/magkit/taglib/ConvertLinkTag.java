@@ -5,11 +5,10 @@ import static info.magnolia.cms.util.Resource.getCurrentActivePage;
 import static info.magnolia.cms.util.Resource.getLocalContentNode;
 import static com.aperto.magkit.utils.LinkTool.insertSelector;
 import static com.aperto.magkit.utils.LinkTool.convertLink;
+import static com.aperto.magkit.utils.LinkTool.getBinaryLink;
 import static info.magnolia.cms.link.LinkHelper.isExternalLinkOrAnchor;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.codec.EncoderException;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import org.apache.log4j.Logger;
@@ -19,7 +18,6 @@ import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -28,8 +26,9 @@ import java.io.IOException;
 /**
  * Convert uuid to a link from the given node data (@see LinkTool).
  * The local content node (active paragraph in context) will be used as content node. If not set the current active page will be used as fallback.
- * If it is an internal link the contextPath will be added.
+ * If it is an internal link only the contextPath will be added.
  * If the Attribute 'linkValue' is set instead of 'nodeDataName' this value will be processed.
+ * The file names of linked files (NodeType:BINARY or documents in dms) will be url encoded.
  * @author frank.sommer (07.01.2008)
  */
 @Tag(name = "convertLink", bodyContent = BodyContent.JSP)
@@ -50,7 +49,7 @@ public class ConvertLinkTag extends TagSupport {
     }
 
     /**
-     * A link to be converted into am URL-encoded magnolia link. This value will only be processed if no name for an NodeData is provided.
+     * A link to be converted into a magnolia link. This value will only be processed if no name for an NodeData is provided.
      * Default is "".
      * @param linkValue an URL String
      */
@@ -60,7 +59,7 @@ public class ConvertLinkTag extends TagSupport {
     }
 
     /**
-     * A flag whether to add the context path at the beginning of the URL (eg. '/author' or '/publish').
+     * A flag whether to add the context path at the beginning of the URL (eg. '/projectName' ).
      * Default is TRUE.
      * @param addContextPath a String representation of a Boolean value ("true" or "false").
      */
@@ -71,7 +70,7 @@ public class ConvertLinkTag extends TagSupport {
 
     /**
      * A flag whether to add a file extension at the end of the URL.
-     * If the URL does not end with '.html' or '.htm' a default file extension '.html' will be apended.
+     * If the URL does not end with '.html' or '.htm' the default file extension '.html' will be apended.
      * If the the URL points to a document is the dms module the propper file extenssion will be read from the documents meta data.
      * Default is TRUE.
      * @param addExtension a String representation of a Boolean value ("true" or "false").
@@ -122,7 +121,7 @@ public class ConvertLinkTag extends TagSupport {
     }
 
     /**
-     * Writes the converted link.
+     * Writes the converted url encoded link.
      * @return jsp output
      * @throws javax.servlet.jsp.JspException
      */
@@ -153,11 +152,14 @@ public class ConvertLinkTag extends TagSupport {
                 }
             } catch (IOException e) {
                 LOGGER.error("Error", e);
+            } finally {
+                // Method release() is called only bevore garbage collection this instance and should release long living resources like DB connections.
+                // If we want to set back the tag attributes bevore next invocation of this tag we must do it here or in doStartTag().
+                release();
             }
         } else {
             LOGGER.info("No parameter is given for ConvertLinkTag.");
         }
-
         return super.doEndTag();
     }
 
@@ -170,9 +172,8 @@ public class ConvertLinkTag extends TagSupport {
             try {
                 if (content.hasNodeData(_nodeDataName)) {
                     NodeData data = content.getNodeData(_nodeDataName);
-                    int linkType = data.getType();
-                    if (linkType == PropertyType.BINARY) {
-                        _linkValue = data.getHandle() + '/' + data.getAttribute("fileName") + '.' + data.getAttribute("extension");
+                    if (PropertyType.BINARY == data.getType()) {
+                        _linkValue = getBinaryLink(data);
                     } else {
                         _linkValue = data.getString();
                     }
