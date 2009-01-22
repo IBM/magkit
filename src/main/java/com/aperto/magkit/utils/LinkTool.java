@@ -97,7 +97,7 @@ public final class LinkTool {
                 // should only occur in unit tests if the mgnlContext is not present
                 newLink = isUuid(link) ? StringUtils.EMPTY : link;
             } catch (UnsupportedEncodingException e) {
-               throw new RuntimeException("Could not URL encode filename with encoding UTF-8", e);
+                throw new RuntimeException("Could not URL encode filename with encoding UTF-8", e);
             }
         }
         if (StringUtils.isNotBlank(newLink) && addExtension && !hasHtmlExtension(newLink)) {
