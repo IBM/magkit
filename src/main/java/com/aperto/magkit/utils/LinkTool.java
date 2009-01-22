@@ -78,12 +78,12 @@ public final class LinkTool {
                 if (handle == null && !StringUtils.isBlank(alternativeRepository)) {
                     handle = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
                     if (handle != null) {
-                        StringBuilder dmsHandle = new StringBuilder(10);
+                        StringBuilder dmsHandle = new StringBuilder(32);
                         dmsHandle.append(SLASH).append(alternativeRepository).append(handle);
                         // in dms the file name is additional nessecary
                         if (DMS_REPOSITORY.equalsIgnoreCase(alternativeRepository) && addExtension) {
                             Document doc = new Document(ContentUtil.getContent(DMS_REPOSITORY, handle));
-                            dmsHandle.append(SLASH).append(doc.getEncodedFileName());
+                            dmsHandle.append(SLASH).append(urlEncode(doc.getFileName()));
                             extension = doc.getFileExtension();
                         }
                         handle = dmsHandle.toString();
@@ -96,6 +96,8 @@ public final class LinkTool {
             } catch (NullPointerException e) {
                 // should only occur in unit tests if the mgnlContext is not present
                 newLink = isUuid(link) ? StringUtils.EMPTY : link;
+            } catch (UnsupportedEncodingException e) {
+               throw new RuntimeException("Could not URL encode filename with encoding UTF-8", e);
             }
         }
         if (StringUtils.isNotBlank(newLink) && addExtension && !hasHtmlExtension(newLink)) {
@@ -143,7 +145,7 @@ public final class LinkTool {
      */
     public static String getUrl(Content content) {
         String url = content.getHandle();
-        if (!url.endsWith(".html") && !url.endsWith(".htm")) {
+        if (!hasHtmlExtension(url)) {
             url += "." + LinkUtil.DEFAULT_EXTENSION;
         }
         return url;
@@ -206,7 +208,6 @@ public final class LinkTool {
             name = StringUtils.replace(name, "+", "%20");
         }
         return name;
-//        return URL_ENCODER.encode(s);
     }
 
     /**
