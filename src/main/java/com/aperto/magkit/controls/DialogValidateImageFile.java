@@ -37,19 +37,19 @@ public class DialogValidateImageFile extends DialogFile {
     /**
      * Cms config attribute for maximum allowed image height.
      */
-    private static final String CONFIG_MAX_HEIGHT = "maxHeight";
+    public static final String CONFIG_MAX_HEIGHT = "maxHeight";
     /**
      * Cms config attribute for maximum allowed image width.
      */
-    private static final String CONFIG_MAX_WIDTH = "maxWidth";
+    public static final String CONFIG_MAX_WIDTH = "maxWidth";
     /**
      * Cms config attribute for minimum allowed image height.
      */
-    private static final String CONFIG_MIN_HEIGHT = "minHeight";
+    public static final String CONFIG_MIN_HEIGHT = "minHeight";
     /**
      * Cms config attribute for minimum allowed image width.
      */
-    private static final String CONFIG_MIN_WIDTH = "minWidth";
+    public static final String CONFIG_MIN_WIDTH = "minWidth";
 
     // default values
     private static final String DEFAULT_EXTENSIONS = "png,jpg,gif,jpeg";
