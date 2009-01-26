@@ -89,7 +89,7 @@ public class DialogValidateImageFile extends DialogFile {
         return isValid;
     }
 
-    private boolean validateImageFile(Document doc, String fileExtension) {
+    protected boolean validateImageFile(Document doc, String fileExtension) {
         boolean valid = true;
         File file = doc.getFile();
         InputStream inputStream = null;
@@ -116,7 +116,7 @@ public class DialogValidateImageFile extends DialogFile {
         return valid;
     }
 
-    private boolean validateMinimumImageDimension(boolean valid, BufferedImage imgBuffer) {
+    protected boolean validateMinimumImageDimension(boolean valid, BufferedImage imgBuffer) {
         int minHeight = NumberUtils.toInt(getConfigValue(CONFIG_MIN_HEIGHT, DEFAULT_MIN_HEIGHT));
         int minWidth = NumberUtils.toInt(getConfigValue(CONFIG_MIN_WIDTH, DEFAULT_MIN_WIDTH));
         boolean result = valid;
@@ -128,7 +128,7 @@ public class DialogValidateImageFile extends DialogFile {
         return result;
     }
 
-    private boolean validateMaximumImageDimension(boolean valid, BufferedImage imgBuffer) {
+    protected boolean validateMaximumImageDimension(boolean valid, BufferedImage imgBuffer) {
         int maxHeight = NumberUtils.toInt(getConfigValue(CONFIG_MAX_HEIGHT, DEFAULT_HEIGHT));
         int maxWidth = NumberUtils.toInt(getConfigValue(CONFIG_MAX_WIDTH, DEFAULT_WIDTH));
         boolean result = valid;
@@ -140,7 +140,7 @@ public class DialogValidateImageFile extends DialogFile {
         return result;
     }
 
-    private boolean validateFileExtension(boolean valid, String fileExtension) {
+    protected boolean validateFileExtension(boolean valid, String fileExtension) {
         boolean result = valid;
         String allowedFileExtensions = getConfigValue(CONFIG_ALLOWED_EXTENSIONS, DEFAULT_EXTENSIONS);
         if (valid && !StringUtils.contains(allowedFileExtensions, fileExtension)) {
@@ -151,7 +151,7 @@ public class DialogValidateImageFile extends DialogFile {
         return result;
     }
 
-    private boolean validateFileSize(File file) {
+    protected boolean validateFileSize(File file) {
         boolean result = true;
         long maxFilesize = NumberUtils.toInt(getConfigValue(CONFIG_MAX_FILESIZE, DEFAULT_SIZE));
         if (file.length() > maxFilesize) {
@@ -160,5 +160,13 @@ public class DialogValidateImageFile extends DialogFile {
             result = false;
         }
         return result;
+    }
+	
+    public String getErrorMessage() {
+        return _errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        _errorMessage = errorMessage;
     }
 }
