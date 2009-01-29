@@ -9,6 +9,7 @@ import com.aperto.magkit.newsletter.mvc.controller.NewsletterCommandController;
  */
 public class SubscribeCommand implements NewsletterCommand {
     private String _email;
+    private String _displayName;
 
     public void accept(NewsletterCommandController controller) throws Exception {
         controller.execute(this);
@@ -20,5 +21,13 @@ public class SubscribeCommand implements NewsletterCommand {
 
     public void setEmail(String email) {
         _email = email;
+    }
+
+    public String getDisplayName() {
+        return _displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        _displayName = displayName;
     }
 }

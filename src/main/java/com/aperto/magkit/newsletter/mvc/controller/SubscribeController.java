@@ -27,25 +27,32 @@ public class SubscribeController extends SimpleFormController implements Newslet
     protected ModelAndView onSubmit(Object command, BindException errors){
         String view;
         try {
-            // May be a bit overdone: Type resolution with a visitor.
+            // May be a bit overdone for two commands: Type resolution with a visitor.
             ((NewsletterCommand) command).accept(this);
             view = getSuccessView();
         } catch (RemoteException e) {
-            errors.reject("form.system.error", "form.system.error");
+            errors.reject("newsletter.system.error", "newsletter.system.error");
             view = getFormView();
-        } catch (Exception e) {
-            errors.reject("form.system.error", "form.system.error");
+        } catch (IllegalArgumentException e) {
+            errors.reject("newsletter.email.invalid", "newsletter.email.invalid");
+            view = getFormView();
+        } catch (IllegalStateException e) {
+            errors.reject("newsletter.system.error", "newsletter.system.error");
+            view = getFormView();
+            LOGGER.error("Api key or list id invalid while executing subscriber action:", e);
+        } catch (Throwable e) {
+            errors.reject("newsletter.system.error", "newsletter.system.error");
             view = getFormView();
             LOGGER.error("Unexpected Error while executing subscriber action:", e);
         }
         return new ModelAndView(view, errors.getModel());
     }
 
-    public void execute(SubscribeCommand command) throws RemoteException {
-        _subscriberService.subscribe(command.getEmail(), "");
+    public void execute(SubscribeCommand command) throws RemoteException, IllegalArgumentException, IllegalStateException {
+        _subscriberService.subscribe(command.getEmail(), command.getDisplayName());
     }
 
-    public void execute(UnsubscribeCommand command) throws RemoteException {
+    public void execute(UnsubscribeCommand command) throws RemoteException, IllegalArgumentException, IllegalStateException {
         _subscriberService.unsubscribe(command.getEmail());
     }
 
