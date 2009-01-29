@@ -8,8 +8,8 @@ import com.aperto.magkit.newsletter.mvc.commands.UnsubscribeCommand;
 import com.aperto.freshview.campaignmonitor.Subscriber;
 
 /**
- *
- * User: wolf.bubenik
+ * Well, a collection of testcases for the SubscribeController.
+ * @author wolf.bubenik
  * Date: 29.01.2009
  */
 public class SubscribeControllerTest {

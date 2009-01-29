@@ -36,7 +36,7 @@ public class SubscribeController extends SimpleFormController implements Newslet
         } catch (Exception e) {
             errors.reject("form.system.error", "form.system.error");
             view = getFormView();
-            LOGGER.error(e);
+            LOGGER.error("Unexpected Error while executing subscriber action:", e);
         }
         return new ModelAndView(view, errors.getModel());
     }
