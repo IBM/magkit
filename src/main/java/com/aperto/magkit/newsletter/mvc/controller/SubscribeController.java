@@ -14,6 +14,8 @@ import java.rmi.RemoteException;
 /**
  * This controller is designed to be called as template resource of a magnolia paragraph.
  * It handles subscribe and unsubscribe commands and dispatches to the approriate form or success views.
+ * For propper form handling usind spring for each command a seperate controller spring bean must be declared
+ * where individual values for the command class, name and viewnames are configured.
  * @author wolf.bubenik
  * Date: 29.01.2009
  */
