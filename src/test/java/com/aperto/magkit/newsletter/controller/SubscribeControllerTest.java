@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 import com.aperto.magkit.newsletter.mvc.controller.SubscribeController;
 import com.aperto.magkit.newsletter.mvc.commands.SubscribeCommand;
 import com.aperto.magkit.newsletter.mvc.commands.UnsubscribeCommand;
-import com.aperto.freshview.campaignmonitor.Subscriber;
+import com.aperto.freshview.campaignmonitor.SubscriberService;
 
 /**
  * Well, a collection of testcases for the SubscribeController.
@@ -17,7 +17,7 @@ public class SubscribeControllerTest {
     @Test
     public void testCommandResolution() throws Exception {
         SubscribeController sc = new SubscribeController();
-        Subscriber subscriber = mock(Subscriber.class);
+        SubscriberService subscriber = mock(SubscriberService.class);
 
         sc.setSubscriberService(subscriber);
         SubscribeCommand subCommand = new SubscribeCommand();

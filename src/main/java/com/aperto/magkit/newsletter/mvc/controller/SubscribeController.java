@@ -4,12 +4,12 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.validation.BindException;
 import org.apache.log4j.Logger;
-import com.aperto.freshview.campaignmonitor.Subscriber;
+import com.aperto.freshview.campaignmonitor.SubscriberService;
 import com.aperto.magkit.newsletter.mvc.commands.NewsletterCommand;
 import com.aperto.magkit.newsletter.mvc.commands.SubscribeCommand;
 import com.aperto.magkit.newsletter.mvc.commands.UnsubscribeCommand;
 
-import java.rmi.RemoteException;
+import java.io.IOException;
 
 /**
  * This controller is designed to be called as template resource of a magnolia paragraph.
@@ -23,7 +23,7 @@ public class SubscribeController extends SimpleFormController implements Newslet
 
     private static final Logger LOGGER = Logger.getLogger(SubscribeController.class);
 
-    private Subscriber _subscriberService;
+    private SubscriberService _subscriberService;
 
     @Override
     protected ModelAndView onSubmit(Object command, BindException errors){
@@ -32,12 +32,14 @@ public class SubscribeController extends SimpleFormController implements Newslet
             // May be a bit overdone for two commands: Type resolution with a visitor.
             ((NewsletterCommand) command).accept(this);
             view = getSuccessView();
-        } catch (RemoteException e) {
+        } catch (IOException e) {
             errors.reject("newsletter.system.error", "newsletter.system.error");
             view = getFormView();
+            LOGGER.error("Unexpected Error while executing subscriber action:", e);
         } catch (IllegalArgumentException e) {
             errors.reject("newsletter.email.invalid", "newsletter.email.invalid");
             view = getFormView();
+            LOGGER.warn("Unexpected Error while executing subscriber action:", e);
         } catch (IllegalStateException e) {
             errors.reject("newsletter.system.error", "newsletter.system.error");
             view = getFormView();
@@ -50,15 +52,15 @@ public class SubscribeController extends SimpleFormController implements Newslet
         return new ModelAndView(view, errors.getModel());
     }
 
-    public void execute(SubscribeCommand command) throws RemoteException, IllegalArgumentException, IllegalStateException {
+    public void execute(SubscribeCommand command) throws IOException, IllegalArgumentException, IllegalStateException {
         _subscriberService.subscribe(command.getEmail(), command.getDisplayName());
     }
 
-    public void execute(UnsubscribeCommand command) throws RemoteException, IllegalArgumentException, IllegalStateException {
+    public void execute(UnsubscribeCommand command) throws IOException, IllegalArgumentException, IllegalStateException {
         _subscriberService.unsubscribe(command.getEmail());
     }
 
-    public void setSubscriberService(Subscriber subscriberService) {
+    public void setSubscriberService(SubscriberService subscriberService) {
         _subscriberService = subscriberService;
     }
 }
