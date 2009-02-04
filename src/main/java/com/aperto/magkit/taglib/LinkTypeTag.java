@@ -13,7 +13,6 @@ import javax.servlet.ServletRequest;
 import javax.jcr.RepositoryException;
 
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.Resource;
 import info.magnolia.cms.link.LinkHelper;
 
@@ -33,10 +32,16 @@ public class LinkTypeTag extends TagSupport {
 
     private String _nodeDataName;
     private String _var;
+    private String _linkValue;
 
-    @TagAttribute(required = true)
+    @TagAttribute
     public void setNodeDataName(String nodeDataName) {
         _nodeDataName = nodeDataName;
+    }
+
+    @TagAttribute
+    public void setLinkValue(String linkValue) {
+        _linkValue = linkValue;
     }
 
     public String getNodeDataName() {
@@ -64,15 +69,18 @@ public class LinkTypeTag extends TagSupport {
         ServletRequest request = pageContext.getRequest();
 
         // if nodeData is set, fetch the linkValue from CMS
-        if (!StringUtils.isBlank(_nodeDataName)) {
+        if (StringUtils.isNotBlank(_nodeDataName)) {
             Content content = getLocalContent();
             try {
                 if (content.hasNodeData(_nodeDataName)) {
-                    NodeData data = content.getNodeData(_nodeDataName);
-                    path = data.getString();
+                    path = content.getNodeData(_nodeDataName).getString();
                 }
             } catch (RepositoryException re) {
                 LOGGER.warn("Can not access content node.", re);
+            }
+        } else {
+            if (StringUtils.isNotBlank(_linkValue)) {
+                path = _linkValue;
             }
         }
 
