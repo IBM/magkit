@@ -1,6 +1,10 @@
 package com.aperto.magkit.export;
 
-import java.util.*;
+import static java.util.Collections.sort;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * Extends the Properties by sorting.
@@ -8,16 +12,15 @@ import java.util.*;
  * @author frank.sommer (19.08.2008)
  */
 public class SortedProperties extends Properties {
-    // CHECKSTYLE:OFF
+
     @Override
-    public synchronized Enumeration keys() {
+    public Enumeration keys() {
         Enumeration keysEnum = super.keys();
-        Vector keyList = new Vector();
+        List keyList = new Vector();
         while (keysEnum.hasMoreElements()) {
             keyList.add(keysEnum.nextElement());
         }
-        Collections.sort(keyList);
-        return keyList.elements();
+        sort(keyList);
+        return ((Vector) keyList).elements();
     }
-    // CHECKSTYLE:ON
 }
