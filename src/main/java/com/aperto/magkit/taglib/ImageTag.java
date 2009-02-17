@@ -1,21 +1,22 @@
 package com.aperto.magkit.taglib;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+
 import com.aperto.magkit.utils.ImageData;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.taglibs.BaseContentTag;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.exception.NestableRuntimeException;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.myfaces.tobago.apt.annotation.BodyContent;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Modified @see ImgTag from magnolia.
@@ -26,6 +27,7 @@ import java.util.Map;
 public class ImageTag extends BaseContentTag {
 
     private Map<String, String> _htmlAttributes = new HashMap<String, String>();
+    private String _nodeDataName;
     private String _altNodeDataName;
     private String _imageDataName;
     private boolean _scaling = false;
@@ -34,6 +36,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for the request attribute name of an ImageData object.
+     *
      * @param imageDataName Name of the request attribute.
      */
     @TagAttribute
@@ -43,15 +46,18 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>nodeDataName</code>.
-     * @param nDataName The nodeDataName to set.
+     *
+     * @param nodeDataName The nodeDataName to set.
      */
     @TagAttribute
-    public void setNodeDataName(String nDataName) {
-        nodeDataName = nDataName;
+    public void setNodeDataName(String nodeDataName) {
+        _nodeDataName = nodeDataName;
+        super.setNodeDataName(nodeDataName);
     }
 
     /**
      * Setter for <code>_altNodeDataName</code>.
+     *
      * @param altNodeDataName The _altNodeDataName to set.
      */
     @TagAttribute
@@ -61,6 +67,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>height</code>.
+     *
      * @param value html attribute.
      */
     @TagAttribute
@@ -70,6 +77,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>width</code>.
+     *
      * @param value html attribute.
      */
     @TagAttribute
@@ -79,6 +87,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>class</code>.
+     *
      * @param value html attribute.
      */
     @TagAttribute
@@ -88,6 +97,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>style</code>.
+     *
      * @param value html attribute.
      */
     @TagAttribute
@@ -97,6 +107,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>id</code>.
+     *
      * @param value html attribute.
      */
     @TagAttribute
@@ -106,6 +117,7 @@ public class ImageTag extends BaseContentTag {
 
     /**
      * Setter for <code>alt</code>.
+     *
      * @param value html attribute.
      */
     @TagAttribute
@@ -116,6 +128,7 @@ public class ImageTag extends BaseContentTag {
     /**
      * Activate the scaling of the image.
      * Default is false.
+     *
      * @see #_scaleAtHeight
      * @see #_scaleAtWidth
      */
@@ -127,6 +140,7 @@ public class ImageTag extends BaseContentTag {
     /**
      * If scaling true, the image will be scaled to this width.
      * For contortion set the width attribute.
+     *
      * @see #_scaling
      */
     @TagAttribute
@@ -137,6 +151,7 @@ public class ImageTag extends BaseContentTag {
     /**
      * If scaling true, the image will be scaled to this height.
      * For contortion set the height attribute.
+     *
      * @see #_scaling
      */
     @TagAttribute
@@ -160,7 +175,7 @@ public class ImageTag extends BaseContentTag {
         if (imageData == null) {
             Content contentNode = getFirstMatchingNode();
             if (contentNode != null) {
-                NodeData imageNodeData = contentNode.getNodeData(nodeDataName);
+                NodeData imageNodeData = contentNode.getNodeData(getNodeDataName());
                 if (imageNodeData.isExist()) {
                     imageData = new ImageData(imageNodeData, retrieveAltText(contentNode));
                 }
@@ -236,7 +251,7 @@ public class ImageTag extends BaseContentTag {
     private String retrieveAltText(Content contentNode) {
         String altNodeDataNameDef = _altNodeDataName;
         if (StringUtils.isEmpty(altNodeDataNameDef)) {
-            altNodeDataNameDef = nodeDataName + "Alt";
+            altNodeDataNameDef = getNodeDataName() + "Alt";
         }
         return contentNode.getNodeData(altNodeDataNameDef).getString();
     }
@@ -258,5 +273,9 @@ public class ImageTag extends BaseContentTag {
         super.release();
         _altNodeDataName = null;
         _htmlAttributes.clear();
+    }
+
+    protected String getNodeDataName() {
+        return _nodeDataName;
     }
 }
