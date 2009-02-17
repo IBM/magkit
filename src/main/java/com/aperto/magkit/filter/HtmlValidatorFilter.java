@@ -1,17 +1,18 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.webkit.lang.IoRuntimeException;
-import com.aperto.webkit.utils.IoTools;
-import com.aperto.webkit.utils.StringTools;
-import info.magnolia.cms.filters.AbstractMgnlFilter;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.util.EncodingUtil;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.*;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -19,18 +20,34 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
+
+import com.aperto.webkit.lang.IoRuntimeException;
+import com.aperto.webkit.utils.IoTools;
+import com.aperto.webkit.utils.StringTools;
+import info.magnolia.cms.filters.AbstractMgnlFilter;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.PartSource;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.httpclient.util.EncodingUtil;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 /**
  * Complete class from aperto commons needed. Because elimination of Magnolia MainBar needed to validate HTML
  * and generating HTML is private inside this class.
  *
  * @author Michael Tamm, frank.sommer
+ * @deprecated Instead of this filter a validating browser plugin can be used.
  */
 public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static final Logger LOGGER = Logger.getLogger(HtmlValidatorFilter.class);
-    
+
     public static final String W3C_VALIDATOR_CHECK_URL_PARAM_NAME = "w3c-validator-check-url";
     public static final String VALIDATOR_WARNING_CSS_URI = "validator-warning-css-uri";
     private static final String VALIDATION_RESULT_URL_PREFIX = "/html-validator-result-";
@@ -41,9 +58,10 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static final String PROPERTY_VALIDATOR_ACTIVE = "validator.active";
     private static final String MGNL_MAIN_BAR_BEGIN = "<div class=\"mgnlMainbar";
     private static final String MGNL_MAIN_BAR_END = "</div>";
-    
+
     // using old behaviour (no such filter) as default:
     private static boolean c_validatorEnabled = false;
+
     static {
         try {
             c_validatorEnabled = BooleanUtils.toBoolean(ResourceBundle.getBundle("environment").getString(PROPERTY_VALIDATOR_ACTIVE));
@@ -91,7 +109,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     }
 
     /**
-     * Only filters for valid html if not magnolia admin pages (starting with a .) or aperto debug suite. 
+     * Only filters for valid html if not magnolia admin pages (starting with a .) or aperto debug suite.
      */
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (c_validatorEnabled) {
@@ -109,6 +127,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             chain.doFilter(request, response);
         }
     }
+
     private void filter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String url = request.getRequestURL().toString();
         int i = url.indexOf(VALIDATION_RESULT_URL_PREFIX);
@@ -210,7 +229,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
         FilePart uploadedFile = new FilePart("uploaded_file", bufferSource, "text/html; charset=UTF-8", "UTF-8");
         StringPart showSource = new StringPart("ss", "1");
-        Part[] parts = { showSource, uploadedFile }; 
+        Part[] parts = {showSource, uploadedFile};
         w3cValidatorCheck.setRequestEntity(new MultipartRequestEntity(parts, w3cValidatorCheck.getParams()));
 
         int responseCode = httpClient.executeMethod(w3cValidatorCheck);
@@ -235,7 +254,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         } finally {
             IoTools.closeQuietly(in);
         }
-        return html;        
+        return html;
     }
 
     private String injectWarningLayer(String html, String validationResultUrl, String validatorWarningCssUri, String validationOk) {
@@ -340,6 +359,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         // CHECKSTYLE:ON
 
         // CHECKSTYLE:OFF
+
         public String encodeRedirectURL(String url) {
             return _realResponse.encodeRedirectURL(url);
         }
