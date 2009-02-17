@@ -1,22 +1,21 @@
 package com.aperto.magkit.taglib;
 
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.commons.lang.StringUtils;
-
-import javax.servlet.jsp.tagext.TagSupport;
+import java.io.IOException;
+import javax.jcr.RepositoryException;
+import javax.servlet.ServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.ServletRequest;
-import javax.jcr.RepositoryException;
+import javax.servlet.jsp.tagext.TagSupport;
 
+import com.aperto.magkit.utils.LinkTool;
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.util.Resource;
 import info.magnolia.cms.link.LinkHelper;
-
-import java.io.IOException;
+import info.magnolia.cms.util.Resource;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.myfaces.tobago.apt.annotation.BodyContent;
+import org.apache.myfaces.tobago.apt.annotation.Tag;
+import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 
 /**
  * Created by IntelliJ IDEA.
@@ -124,6 +123,6 @@ public class LinkTypeTag extends TagSupport {
     }
 
     protected String getDmsPath(String path) {
-        return LinkHelper.convertUUIDtoHandle(path, "dms");
+        return LinkTool.convertUUIDtoHandle(path, "dms");
     }
 }

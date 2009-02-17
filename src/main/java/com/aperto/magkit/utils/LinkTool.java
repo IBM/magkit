@@ -1,5 +1,12 @@
 package com.aperto.magkit.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import static java.util.Locale.ENGLISH;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.jcr.PropertyType;
+
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
@@ -9,18 +16,11 @@ import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.cms.util.LinkUtil;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.beans.Document;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.codec.EncoderException;
 import org.apache.log4j.Logger;
-import javax.jcr.PropertyType;
-import static java.util.Locale.ENGLISH;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Helper class for links.
@@ -51,7 +51,7 @@ public final class LinkTool {
     /**
      * Returns an absolute path link nevertheless if u give it a uuidLink or normal link with optional added .html.
      *
-     * @param link the link or uuid, in case of uuid it converts it to a absolute link
+     * @param link         the link or uuid, in case of uuid it converts it to a absolute link
      * @param addExtension if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
      * @return the absolute link with optional .html
      */
@@ -63,8 +63,8 @@ public final class LinkTool {
      * Returns a handle nevertheless if you give it a uuidLink or normal link with optional added .html.
      * For document links to the dms module the encoded file name of the document will be used.
      *
-     * @param link the link or uuid, in case of uuid it converts it to a absolute link
-     * @param addExtension if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
+     * @param link                  the link or uuid, in case of uuid it converts it to a absolute link
+     * @param addExtension          if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
      * @param alternativeRepository which were checked, too.
      * @return the handle with optional .html
      */
@@ -74,9 +74,9 @@ public final class LinkTool {
         if (isNotEmpty(link)) {
             try {
                 String path = StringUtils.EMPTY;
-                String handle = LinkHelper.convertUUIDtoHandle(link, ContentRepository.WEBSITE);
+                String handle = convertUUIDtoHandle(link, ContentRepository.WEBSITE);
                 if (handle == null && !StringUtils.isBlank(alternativeRepository)) {
-                    handle = LinkHelper.convertUUIDtoHandle(link, alternativeRepository);
+                    handle = convertUUIDtoHandle(link, alternativeRepository);
                     if (handle != null) {
                         StringBuilder dmsHandle = new StringBuilder(32);
                         dmsHandle.append(SLASH).append(alternativeRepository).append(handle);
@@ -104,6 +104,20 @@ public final class LinkTool {
             newLink += "." + extension;
         }
         return newLink;
+    }
+
+    /**
+     * Api compatibility method for magnolia 4.0 api change.
+     * {@link LinkHelper#convertUUIDtoHandle} throws new info.magnolia.link.LinkException class.
+     */
+    public static String convertUUIDtoHandle(final String link, final String repository) {
+        String handle = null;
+        try {
+            handle = LinkHelper.convertUUIDtoHandle(link, repository);
+        } catch (Exception e) {
+            LOGGER.warn(e.getMessage(), e);
+        }
+        return handle;
     }
 
     private static boolean hasHtmlExtension(String link) {
@@ -195,6 +209,7 @@ public final class LinkTool {
 
     /**
      * URL encodes the passed String using the code from info.magnolia.module.dms.beans.Document.
+     *
      * @param s the string to be encoded
      * @return a new URL encoded String or an empty String if the parameter s has been NULL.
      * @throws UnsupportedEncodingException if encoding fails for encoding 'UTF-8'
