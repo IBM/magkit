@@ -236,20 +236,28 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <classifier>magnolia-4</classifier>
-                            <dependency>
-                                <groupId>info.magnolia</groupId>
-                                <artifactId>magnolia-empty-webapp</artifactId>
-                                <version>4.0-rc4</version>
-                                <type>pom</type>
-                            </dependency>
-                            <dependency>
-                                <groupId>info.magnolia</groupId>
-                                <artifactId>magnolia-module-dms</artifactId>
-                                <version>1.3-rc2</version>
-                            </dependency>
-                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>create-magnolia-4-jar</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>magnolia-4</classifier>
+                                    <dependency>
+                                        <groupId>info.magnolia</groupId>
+                                        <artifactId>magnolia-empty-webapp</artifactId>
+                                        <version>4.0-rc4</version>
+                                        <type>pom</type>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>info.magnolia</groupId>
+                                        <artifactId>magnolia-module-dms</artifactId>
+                                        <version>1.3-rc2</version>
+                                    </dependency>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
