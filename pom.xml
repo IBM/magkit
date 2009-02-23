@@ -57,7 +57,10 @@
             <artifactId>tobago-tool-annotation</artifactId>
             <version>1.0.11</version>
         </dependency>
-        <!-- Magnolia dependencies -->
+
+        <!-- Magnolia dependencies.
+             Following dependencies belong to Magnolia CMS and are meant not to be transitive.
+             A project that must specify its own dependecies especially its own versions of dependencies. -->
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-empty-webapp</artifactId>
@@ -69,6 +72,7 @@
             <artifactId>magnolia-empty-webapp</artifactId>
             <version>${magnolia.version}</version>
             <type>pom</type>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>magnolia-module-cache</artifactId>
@@ -81,7 +85,9 @@
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-dms</artifactId>
             <version>1.2.3</version>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
@@ -249,11 +255,13 @@
                                         <artifactId>magnolia-empty-webapp</artifactId>
                                         <version>4.0-rc4</version>
                                         <type>pom</type>
+                                        <scope>provided</scope>
                                     </dependency>
                                     <dependency>
                                         <groupId>info.magnolia</groupId>
                                         <artifactId>magnolia-module-dms</artifactId>
                                         <version>1.3-rc2</version>
+                                        <scope>provided</scope>
                                     </dependency>
                                 </configuration>
                             </execution>
