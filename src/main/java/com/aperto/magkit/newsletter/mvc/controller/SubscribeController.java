@@ -14,8 +14,8 @@ import java.io.IOException;
 /**
  * This controller is designed to be called as template resource of a magnolia paragraph.
  * It handles subscribe and unsubscribe commands and dispatches to the approriate form or success views.
- * For propper form handling usind spring for each command a seperate controller spring bean must be declared
- * where individual values for the command class, name and viewnames are configured.
+ * For propper form handling usind spring a seperate controller bean must be declared for each command
+ * with individual values for the command class, name and viewnames.
  * @author wolf.bubenik
  * Date: 29.01.2009
  */
@@ -39,7 +39,7 @@ public class SubscribeController extends SimpleFormController implements Newslet
         } catch (IllegalArgumentException e) {
             errors.reject("newsletter.email.invalid", "newsletter.email.invalid");
             view = getFormView();
-            LOGGER.warn("Unexpected Error while executing subscriber action:", e);
+            LOGGER.warn("Validation error. Invalid input for email.", e);
         } catch (IllegalStateException e) {
             errors.reject("newsletter.system.error", "newsletter.system.error");
             view = getFormView();

@@ -3,7 +3,7 @@ package com.aperto.magkit.newsletter.mvc.commands;
 import com.aperto.magkit.newsletter.mvc.controller.NewsletterCommandController;
 
 /**
- * The form backing object for newsletter subscriptions. Implements ExecutorVisitor.
+ * The form backing object for newsletter subscriptions. Implements NewsletterCommand.
  * @author wolf.bubenik
  * Date: 29.01.2009
  */
