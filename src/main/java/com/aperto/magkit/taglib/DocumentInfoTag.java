@@ -79,6 +79,9 @@ public class DocumentInfoTag extends TagSupport {
                 documentInfo.setFileSize((fileSize / divisor));
                 determineSubject(doc, documentInfo);
                 request.setAttribute("documentInfo", documentInfo);
+                // make result accessible for freemarker templates:
+                // TODO: replace this hack with a scope attribute
+                pageContext.setAttribute("documentInfo", documentInfo);
             } else {
                 LOGGER.info("NodeData is not a uuid to a dms-document");
             }
