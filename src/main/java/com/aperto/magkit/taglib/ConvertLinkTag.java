@@ -127,40 +127,46 @@ public class ConvertLinkTag extends TagSupport {
      */
     public int doEndTag() throws JspException {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-        StringBuilder builder = new StringBuilder(64);
         fetchLinkValuefromCms();
 
         // convert linkValue write in output
         if (isNotBlank(_linkValue)) {
             try {
-                if (!isExternalLinkOrAnchor(_linkValue)) {
-                    String link = convertLink(_linkValue, _addExtension, _altRepo);
-                    link = insertSelector(link, _selector);
-                    if (_addContextPath && isNotBlank(link)) {
-                        builder.append(request.getContextPath());
-                    }
-                    builder.append(link);
-                } else {
-                    builder.append(_linkValue);
-                }
-                String link = builder.toString();
+                String link = getLink(request);
                 if (isBlank(_var)) {
                     JspWriter out = pageContext.getOut();
                     out.write(link);
                 } else {
                     request.setAttribute(_var, link);
+                    // Wolf: Put it into pageContext to. Otherwise it is not accessible from within freemarker templates.
+                    pageContext.setAttribute(_var, link);
                 }
             } catch (IOException e) {
                 LOGGER.error("Error", e);
             } finally {
                 // Method release() is called only bevore garbage collection this instance and should release long living resources like DB connections.
-                // If we want to set back the tag attributes bevore next invocation of this tag we must do it here or in doStartTag().
+                // If we want to set back the tag attributes bevore next invocation of this tag we must do it here or in doEndTag().
                 release();
             }
         } else {
             LOGGER.info("No parameter is given for ConvertLinkTag.");
         }
         return super.doEndTag();
+    }
+
+    private String getLink(HttpServletRequest request) {
+        StringBuilder builder = new StringBuilder(64);
+        if (!isExternalLinkOrAnchor(_linkValue)) {
+            String link = convertLink(_linkValue, _addExtension, _altRepo);
+            link = insertSelector(link, _selector);
+            if (_addContextPath && isNotBlank(link)) {
+                builder.append(request.getContextPath());
+            }
+            builder.append(link);
+        } else {
+            builder.append(_linkValue);
+        }
+        return builder.toString();
     }
 
     /**
