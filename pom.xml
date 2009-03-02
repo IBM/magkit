@@ -186,6 +186,7 @@
                             <verbose>false</verbose>
                             <includes>
                                 <include>com/aperto/magkit/taglib/**/*.java</include>
+			  <include>com/aperto/magkit/paging/**/*.java</include>
                             </includes>
                             <force>true</force>
                         </configuration>
