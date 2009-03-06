@@ -1,5 +1,24 @@
 package com.aperto.magkit.controller;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.imageio.IIOException;
+import javax.imageio.ImageIO;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.aperto.magkit.beans.GalleryEntry;
 import com.aperto.magkit.utils.ImageData;
 import info.magnolia.cms.core.Content;
@@ -13,27 +32,14 @@ import info.magnolia.cms.util.Resource;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.dms.DMSModule;
 import info.magnolia.module.dms.beans.Document;
-import info.magnolia.module.dms.util.PathUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.substringBeforeLast;
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
-import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.List;
 
 /**
  * Spring controller of the photo gallery.
@@ -42,9 +48,9 @@ import java.util.List;
  * Cropping is per default on, but you can switch it off. Then the thumbnail has the same ratio like original image.
  * <code>
  * <bean id="photoGalleryController" class="com.aperto.magcit.mvc.controller.PhotoGalleryController">
- *       <property name="thumbHeight" value="65" />
- *       <property name="thumbWidth" value="65" />
- *       <property name="cropping" value="true" />
+ * <property name="thumbHeight" value="65" />
+ * <property name="thumbWidth" value="65" />
+ * <property name="cropping" value="true" />
  * </bean>
  * </code>
  * The images are set html escaped in the request variable <em>imageList</em>.
@@ -79,7 +85,6 @@ public class PhotoGalleryController extends AbstractController {
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> result = new HashMap<String, Object>();
         Content localContent = Resource.getLocalContentNode();
-
         try {
             if (localContent != null && localContent.hasNodeData("folder")) {
                 String folderPath = LinkHelper.convertUUIDtoHandle(localContent.getNodeData("folder").getString(), DMSModule.getInstance().getRepository());
@@ -97,7 +102,6 @@ public class PhotoGalleryController extends AbstractController {
         } catch (Exception e) {
             LOGGER.error("Exception while getting gallery information.", e);
         }
-
         return new ModelAndView(_viewname, result);
     }
 
@@ -133,7 +137,6 @@ public class PhotoGalleryController extends AbstractController {
     private Document getPreviewImageDocument(Document document) throws Exception {
         HierarchyManager manager = MgnlContext.getHierarchyManager(DMSModule.getInstance().getRepository());
         Document previewDocument = getPreviewDocumentForDocument(document, manager);
-
         if (previewDocument != null && !previewDocument.getFileName().equals(document.getFileName())) {
             InputStream oriImgStr = null;
             InputStream newImgStr = null;
@@ -142,7 +145,6 @@ public class PhotoGalleryController extends AbstractController {
                 // get the original image, as a buffered image
                 oriImgStr = document.getFileStream();
                 BufferedImage oriImgBuff = ImageIO.read(oriImgStr);
-
                 // create the new image file
                 newImgFile = scaleImage(oriImgBuff, _thumbWidth, _thumbHeight);
                 newImgStr = new FileInputStream(newImgFile);
@@ -165,7 +167,6 @@ public class PhotoGalleryController extends AbstractController {
                 }
             }
         }
-
         return previewDocument;
     }
 
@@ -186,7 +187,6 @@ public class PhotoGalleryController extends AbstractController {
         double oriHeightRatio = oriHeight > oriWidth ? (double) oriHeight / (double) oriWidth : 1d;
         double thumbWidthRatio = width > height ? (double) width / (double) height : 1d;
         double thumbHeightRatio = height > width ? (double) height / (double) width : 1d;
-
         Image newImg;
         int cropWidth = oriWidth;
         int cropHeight = oriHeight;
@@ -194,7 +194,6 @@ public class PhotoGalleryController extends AbstractController {
             // create the thumbnail as a buffered image
             cropWidth = (int) (oriWidth * thumbWidthRatio / thumbHeightRatio * oriHeightRatio / oriWidthRatio);
             cropHeight = (int) (oriHeight * thumbHeightRatio / thumbWidthRatio * oriWidthRatio / oriHeightRatio);
-
             if (cropWidth > oriWidth) {
                 cropWidth = oriWidth;
                 cropHeight = (int) ((double) cropHeight / (double) cropWidth * (double) oriWidth);
@@ -203,12 +202,11 @@ public class PhotoGalleryController extends AbstractController {
                 cropHeight = oriHeight;
                 cropWidth = (int) ((double) cropWidth / (double) cropHeight * (double) oriHeight);
             }
-
             int xOffset = Math.max((oriWidth - cropWidth) / 2, 0);
             int yOffset = Math.max((oriHeight - cropHeight) / 2, 0);
             newImg = oriImgBuff.getSubimage(xOffset, yOffset, cropWidth, cropHeight);
         } else {
-            newImg = oriImgBuff;    
+            newImg = oriImgBuff;
         }
         // get scale factor for the new image
         double scaleFactor = scaleFactor(oriWidth, oriHeight, width, height);
@@ -222,7 +220,6 @@ public class PhotoGalleryController extends AbstractController {
         g.dispose();
         // create the new image file in the temporary dir
         File newImgFile = File.createTempFile("tmp-img", "png");
-
         ImageIO.write(newImgBuff, "png", newImgFile);
         // return the file
         return newImgFile;
@@ -237,7 +234,6 @@ public class PhotoGalleryController extends AbstractController {
      */
     private double scaleFactor(int width, int height, int maxWidth, int maxHeight) {
         double scaleFactor;
-
         // create two scale factors, and see which is smaller
         double scaleFactorWidth = (double) maxWidth / (double) width;
         double scaleFactorHeight = (double) maxHeight / (double) height;
@@ -263,8 +259,7 @@ public class PhotoGalleryController extends AbstractController {
                     previewDocument = new Document(tmp);
                 }
             }
-
-            String folderPath = PathUtil.getFolder(document.getPath());
+            String folderPath = getFolder(document.getPath());
             Content mainFolder = manager.getContent(folderPath);
             if (mainFolder != null) {
                 Content previewFolder = ContentUtil.getContent(mainFolder, "previewFolder");
@@ -272,7 +267,6 @@ public class PhotoGalleryController extends AbstractController {
                     previewFolder = mainFolder.createContent("previewFolder");
                     mainFolder.save();
                 }
-
                 Content previewImage = ContentUtil.getContent(previewFolder, document.getName());
                 if (previewImage == null) {
                     previewImage = previewFolder.createContent(document.getName(), ItemType.CONTENTNODE);
@@ -287,7 +281,17 @@ public class PhotoGalleryController extends AbstractController {
         } catch (RepositoryException e) {
             LOGGER.info(e.getLocalizedMessage());
         }
-
         return previewDocument;
+    }
+
+    /**
+     * Returns the last folder within the given path parameter.
+     * <p/>
+     * Implementation was copied from info.magnolia.module.dms.util.PathUtil class wich was moved to
+     * info.magnolia.cms.util package in the final release of magnolia-module-dms version 1.3.
+     */
+    protected String getFolder(String path) {
+        String res = substringBeforeLast(path, "/");
+        return isEmpty(res) ? "/" : res;
     }
 }
