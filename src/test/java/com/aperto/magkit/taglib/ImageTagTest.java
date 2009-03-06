@@ -1,5 +1,10 @@
 package com.aperto.magkit.taglib;
 
+import javax.jcr.RepositoryException;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+
 import com.aperto.magkit.MagKitTagTest;
 import com.aperto.magkit.utils.ImageData;
 import com.mockrunner.mock.web.MockPageContext;
@@ -15,9 +20,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.jcr.RepositoryException;
 
 /**
  * Test of the image tag.
@@ -29,7 +31,7 @@ public class ImageTagTest extends MagKitTagTest {
     private ImageTag _tag;
 
     @Test
-    public void testDefaultBehaviour() {
+    public void testDefaultBehaviour() throws JspException {
         _tag.setNodeDataName("image");
         PageContext pageContext = runLifeCycle(_tag);
         JspWriter jspWriter = pageContext.getOut();
@@ -40,7 +42,7 @@ public class ImageTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testManualMeasures() {
+    public void testManualMeasures() throws JspException {
         _tag.setNodeDataName("image");
         _tag.setHeight("50em");
         _tag.setWidth("20em");
@@ -54,7 +56,7 @@ public class ImageTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testImageDataUsage() {
+    public void testImageDataUsage() throws JspException {
         _tag.setImageDataName("imageData");
         PageContext pageContext = runLifeCycle(_tag);
         JspWriter jspWriter = pageContext.getOut();
@@ -64,7 +66,7 @@ public class ImageTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testScalingImage() {
+    public void testScalingImage() throws JspException {
         _tag.setImageDataName("imageData");
         _tag.setScaling(true);
         _tag.setScaleAtWidth(150);
@@ -93,7 +95,7 @@ public class ImageTagTest extends MagKitTagTest {
             image.setAttribute("fileName", "testimage");
             image.setAttribute("extension", "jpg");
         } catch (RepositoryException e) {
-           //Nothing
+            //Nothing
         }
         nodeContent.addNodeData(image);
         mockContent.addContent(nodeContent);

@@ -1,24 +1,27 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.utils.Item;
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.util.Resource;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import java.io.IOException;
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
-import java.io.IOException;
+
+import com.aperto.magkit.utils.Item;
+import info.magnolia.cms.core.Content;
+import info.magnolia.cms.util.Resource;
+import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import org.apache.log4j.Logger;
+import org.apache.myfaces.tobago.apt.annotation.BodyContent;
+import org.apache.myfaces.tobago.apt.annotation.Tag;
+import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 
 /**
  * Create a html list from a formatted string.
  * E.g. <br/>
  * Input: List1|item1;item2;item3 <br/>
  * Output: <code><h4>List1</h4><ul><li>item1</li>...</ul></code>
+ *
  * @author frank.sommer (16.01.2008)
  */
 @Tag(name = "createList", bodyContent = BodyContent.JSP)
@@ -64,14 +67,14 @@ public class CreateListTag extends TagSupport {
 
     /**
      * Writes the created list.
+     *
      * @return jsp output
      * @throws javax.servlet.jsp.JspException
      */
     public int doEndTag() throws JspException {
         JspWriter out = pageContext.getOut();
-
         // if nodeData is set, fetch the linkValue from CMS
-        if (!StringUtils.isBlank(_nodeDataName)) {
+        if (!isBlank(_nodeDataName)) {
             Content content = Resource.getLocalContentNode();
             try {
                 if (content.hasNodeData(_nodeDataName)) {
@@ -82,18 +85,18 @@ public class CreateListTag extends TagSupport {
             }
         }
         // write list
-        if (!StringUtils.isBlank(_listValue)) {
+        if (!isBlank(_listValue)) {
             Item[] items = determineItems(_listValue);
             try {
                 for (Item item : items) {
                     String key = item.getKey();
-                    if (!StringUtils.isBlank(key)) {
+                    if (!isBlank(key)) {
                         StringBuffer sb = new StringBuffer();
                         sb.append("<").append(_hlTag).append(">").append(key).append("</").append(_hlTag).append(">");
                         out.write(sb.toString());
                     }
                     String value = item.getValue();
-                    if (!StringUtils.isBlank(value)) {
+                    if (!isBlank(value)) {
                         String[] listItems = StringUtils.split(value, ';');
                         out.write("<" + _listTag + ">");
                         for (String listItem : listItems) {
@@ -110,7 +113,6 @@ public class CreateListTag extends TagSupport {
         } else {
             LOGGER.info("No parameter is given for ConvertLinkTag.");
         }
-
         return super.doEndTag();
     }
 

@@ -1,5 +1,9 @@
 package com.aperto.magkit.taglib;
 
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+
 import com.aperto.magkit.MagKitTagTest;
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
@@ -14,9 +18,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
 
 /**
  * Test of the create list tag.
@@ -65,7 +66,6 @@ public class CreateListTagTest extends MagKitTagTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         // init MgnlContext:
         initMgnlWebContext(request, response, httpSession.getServletContext());
-
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 }

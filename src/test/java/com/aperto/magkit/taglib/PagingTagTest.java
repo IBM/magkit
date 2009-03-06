@@ -1,5 +1,10 @@
 package com.aperto.magkit.taglib;
 
+import java.util.Locale;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+
 import com.aperto.magkit.MagKitTagTest;
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
@@ -15,10 +20,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
 
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import java.util.Locale;
-
 /**
  * Test of the paging tag.
  *
@@ -31,7 +32,6 @@ public class PagingTagTest extends MagKitTagTest {
         MockHttpSession httpSession = new MockHttpSession();
         request.setSession(httpSession);
         MockHttpServletResponse response = new MockHttpServletResponse();
-
         MockContent mockContent = new MockContent("page", ItemType.CONTENT);
         initMgnlWebContext(request, response, httpSession.getServletContext());
         MgnlContext.getAggregationState().setMainContent(mockContent);
@@ -41,7 +41,7 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testTag() {
+    public void testTag() throws JspException {
         PagingTag tag = new PagingTag();
         tag.setPages(2);
         tag.setActPage(1);
@@ -58,7 +58,7 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testPaddingStart() {
+    public void testPaddingStart() throws JspException {
         PagingTag tag = new PagingTag();
         tag.setPages(10);
         tag.setActPage(1);
@@ -75,7 +75,7 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testWithoutCapsulate() {
+    public void testWithoutCapsulate() throws JspException {
         PagingTag tag = new PagingTag();
         tag.setPages(5);
         tag.setActPage(1);
@@ -94,7 +94,7 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testPaddingEnd() {
+    public void testPaddingEnd() throws JspException {
         PagingTag tag = new PagingTag();
         tag.setPages(10);
         tag.setActPage(5);
@@ -112,7 +112,7 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testPaddingLast() {
+    public void testPaddingLast() throws JspException {
         PagingTag tag = new PagingTag();
         tag.setPages(8);
         tag.setActPage(8);
@@ -130,7 +130,7 @@ public class PagingTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testPaddingEndLong() {
+    public void testPaddingEndLong() throws JspException {
         PagingTag tag = new PagingTag();
         tag.setPages(20);
         tag.setActPage(5);
@@ -147,4 +147,3 @@ public class PagingTagTest extends MagKitTagTest {
         assertThat(output, containsString("10</a></li><li>...</li>"));
     }
 }
-

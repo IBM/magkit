@@ -1,5 +1,10 @@
 package com.aperto.magkit.taglib;
 
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
+
 import com.aperto.magkit.MagKitTagTest;
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
@@ -16,10 +21,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.TagSupport;
 
 /**
  * Test of the convert link tag.
@@ -33,8 +34,6 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     private static final String LINK_VALUE_INT = "/sammeln/infos";
     private static final String LINK_VALUE_INT_SHORT = "/sammeln";
     private static final String LINK_VALUE_UUID = "29f35061-bf9f-478c-a4b0-cb9f07a0fc8c";
-    private static final String LINK_VALUE_UMLAUT = "/Ümläutö";
-    private static final String LINK_VALUE_SPACE = "/das ist ein Link";
 
     @Test
     public void testExternalLink() throws JspException {
@@ -111,7 +110,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     }
 
     @Test
-    public void testLinkWithSpaces() {
+    public void testLinkWithSpaces() throws JspException {
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link");
         PageContext pageContext = runLifeCycle(tag, "link", "/das ist ein Link");
@@ -122,7 +121,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     }
 
 
-    protected PageContext runLifeCycle(TagSupport tag, String nodeDataName, String nodeDataValue) {
+    protected PageContext runLifeCycle(TagSupport tag, String nodeDataName, String nodeDataValue) throws JspException {
         PageContext pageContext = createPageContext(nodeDataName, nodeDataValue);
         runLifeCycle(tag, pageContext);
         return pageContext;
