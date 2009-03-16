@@ -13,7 +13,6 @@ import info.magnolia.module.delta.CreateNodeTask;
 import info.magnolia.module.delta.FilterOrderingTask;
 import info.magnolia.module.delta.ModuleBootstrapTask;
 import info.magnolia.module.delta.NodeExistsDelegateTask;
-import info.magnolia.module.delta.PropertyValueDelegateTask;
 import info.magnolia.module.delta.SetPropertyTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
@@ -30,8 +29,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private static final String PATH_FILTER_CMS = PATH_FILTER + "/cms";
     private static final String PATH_FILTER_VALIDATOR = PATH_FILTER + "/validator";
     private static final String PATH_I18N = "/server/i18n/content";
-    private static final String PATH_FILTER_MULTIPART = PATH_FILTER + "/multipartRequest";
-    private static final String CLASS_MAGKIT_MP_FILTER = "com.aperto.magkit.filter.CosMultipartRequestFilter";
     private static final String PATH_CACHE_DENY_35 = "/modules/cache/config/URI/deny";
     private static final String PATH_CACHE_EXCLUDE_36 = "/modules/cache/config/configurations/default/cachePolicy/voters/urls/excludes";
     private static final String PATH_CACHE_CAPTCHA_35 = PATH_CACHE_DENY_35 + "/captcha";
@@ -63,18 +60,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "enabled", "true")
     });
-
-    private final Task _checkMultpartFilter = new PropertyValueDelegateTask(
-        "Check multipart filter",
-        "Check multipart filter setting in server config.",
-        ContentRepository.CONFIG,
-        PATH_FILTER_MULTIPART,
-        "class",
-        CLASS_MAGKIT_MP_FILTER,
-        true,
-        null,
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_MULTIPART, "class", CLASS_MAGKIT_MP_FILTER)
-    );
 
     private final Task _addBypassFor404 = new NodeExistsDelegateTask(
         "Check 404 bypass",
@@ -165,7 +150,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_addBypassForStatus);
         tasks.add(_addBypassForDebugSuite);
         tasks.add(_checkCacheVersion);
-        tasks.add(_checkMultpartFilter);
         return tasks;
     }
 
@@ -177,7 +161,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         updateTasks.add(_addBypassForStatus);
         updateTasks.add(_addBypassForDebugSuite);
         updateTasks.add(_checkCacheVersion);
-        updateTasks.add(_checkMultpartFilter);
         return updateTasks;
     }
 }

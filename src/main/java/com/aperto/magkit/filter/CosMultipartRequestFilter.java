@@ -1,25 +1,26 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.webkit.utils.ExceptionEater;
-import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
-import info.magnolia.cms.beans.runtime.MultipartForm;
-import info.magnolia.cms.beans.config.ServerConfiguration;
-import info.magnolia.cms.core.Path;
-import info.magnolia.cms.filters.AbstractMgnlFilter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+
+import com.aperto.webkit.utils.ExceptionEater;
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import info.magnolia.cms.beans.config.ServerConfiguration;
+import info.magnolia.cms.beans.runtime.MultipartForm;
+import info.magnolia.cms.core.Path;
+import info.magnolia.cms.filters.AbstractMgnlFilter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 
 /**
  * Fixed implementation of the multipart request filter.
@@ -33,15 +34,17 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
      * Max file upload size. Default 50 MB.
      */
     private static final int DEFAULT_MAX_FILE_SIZE = 52428800;
+
     /**
      * Max file upload size on author instance. Default 150 MB.
      */
     private static final int DEFAULT_AUHTOR_MAX_FILE_SIZE = 157286400;
+    private static final String PROPERTY_MAX_FILE_SIZE = "upload.maxFileSize";
+
     private static String c_configuredMaxFileSize;
-    private static final String PROPERTY_MAX_FIEL_SIZE = "upload.maxFileSize";
     static {
         try {
-            c_configuredMaxFileSize = ResourceBundle.getBundle("environment").getString(PROPERTY_MAX_FIEL_SIZE);
+            c_configuredMaxFileSize = ResourceBundle.getBundle("environment").getString(PROPERTY_MAX_FILE_SIZE);
         } catch (MissingResourceException e) {
             ExceptionEater.eat(e);
         }
@@ -102,6 +105,7 @@ public class CosMultipartRequestFilter extends AbstractMgnlFilter {
 
     /**
      * Wrapper class.
+     *
      * @author mgnl
      */
     static class MultipartRequestWrapper extends HttpServletRequestWrapper {
