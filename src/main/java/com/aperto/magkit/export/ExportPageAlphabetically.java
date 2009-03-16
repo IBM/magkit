@@ -1,5 +1,18 @@
 package com.aperto.magkit.export;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.jcr.Session;
+import javax.jcr.Workspace;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.aperto.webkit.utils.ExceptionEater;
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.HierarchyManager;
@@ -9,18 +22,13 @@ import info.magnolia.cms.security.Permission;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.admininterface.pages.ExportPage;
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import javax.jcr.Session;
-import javax.jcr.Workspace;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
 
 /**
  * Extends {@link ExportPage} so that the export xml will use alphabetic
@@ -28,6 +36,8 @@ import java.util.*;
  * elements will be ordered by their sv:name attribute.
  *
  * @author reik.schatz
+ * @deprecated Do not use this class anymore. It causes big memory problems and will be removed without substitution by
+ *             the next version of magkit.
  */
 public class ExportPageAlphabetically extends ExportPage {
 
@@ -51,7 +61,6 @@ public class ExportPageAlphabetically extends ExportPage {
         HierarchyManager hr = MgnlContext.getHierarchyManager(getMgnlRepository());
         Workspace ws = hr.getWorkspace();
         Session session = ws.getSession();
-
         if (getExt().equalsIgnoreCase(DataTransporter.ZIP)) {
             getResponse().setContentType(MIME_APPLICATION_ZIP);
         } else if (getExt().equalsIgnoreCase(DataTransporter.GZ)) {
@@ -60,14 +69,12 @@ public class ExportPageAlphabetically extends ExportPage {
             getResponse().setContentType(MIME_TEXT_XML);
             getResponse().setCharacterEncoding("UTF-8");
         }
-
         String pathName = StringUtils.replace(getMgnlPath(), "/", ".");
         if (".".equals(pathName)) {
             pathName = StringUtils.EMPTY;
         }
         getResponse().setHeader("content-disposition", "attachment; filename=" + getMgnlRepository() + pathName + getExt());
         ByteArrayOutputStream memoryOutputStream = new ByteArrayOutputStream();
-
         XMLWriter w = null;
         try {
             DataTransporter.executeExport(memoryOutputStream, isMgnlKeepVersions(), isMgnlFormat(), session, getMgnlPath(), getMgnlRepository(), getExt());
@@ -84,7 +91,7 @@ public class ExportPageAlphabetically extends ExportPage {
             getResponse().setHeader("content-disposition", "inline");
             throw e;
         } finally {
-            if (w != null) {                
+            if (w != null) {
                 w.close();
             }
         }
@@ -98,14 +105,12 @@ public class ExportPageAlphabetically extends ExportPage {
         } catch (DocumentException e) {
             ExceptionEater.eat(e);
         } catch (UnsupportedEncodingException e) {
-            ExceptionEater.eat(e);            
+            ExceptionEater.eat(e);
         }
-
         if (document != null) {
             List list = document.selectNodes("//sv:node[@sv:name]");
             for (Object aList : list) {
                 Element parentNode = (Element) aList;
-
                 List properties = parentNode.selectNodes("sv:property");
                 Map<String, Node> sortedProperties = new TreeMap<String, Node>();
                 for (Object property1 : properties) {
@@ -117,14 +122,12 @@ public class ExportPageAlphabetically extends ExportPage {
                     // detach original parentNode from parent
                     property.detach();
                 }
-
                 List<Node> remainingNodes = new ArrayList<Node>();
                 for (Object o : parentNode.elements()) {
                     Node child = (Node) o;
                     remainingNodes.add(child);
                     child.detach();
                 }
-
                 // re-attach sorted properties first
                 for (Map.Entry<String, Node> entry : sortedProperties.entrySet()) {
                     parentNode.add(entry.getValue());

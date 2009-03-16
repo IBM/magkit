@@ -59,13 +59,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit"),
     });
 
-    private final Task _setAdminInterfaceExportClassTask = new SetPropertyTask(
-        ContentRepository.CONFIG,
-        "/modules/adminInterface/pages/export",
-        "class",
-        "com.aperto.magkit.export.ExportPageAlphabetically"
-    );
-
     private final Task _setI18nContentSupportTask = new ArrayDelegateTask("Filter", "Set i18n support.", new Task[]{
         new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "enabled", "true")
@@ -167,7 +160,6 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         tasks.add(_addCmsFilterBypassTask);
         tasks.add(_addValidatorFilterTask);
         tasks.add(_addValidatorFilterBypassTask);
-        tasks.add(_setAdminInterfaceExportClassTask);
         tasks.add(_setI18nContentSupportTask);
         tasks.add(_addBypassFor404);
         tasks.add(_addBypassForStatus);
