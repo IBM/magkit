@@ -1,10 +1,18 @@
 package com.aperto.magkit.mail;
 
+import java.io.InputStream;
+import static java.lang.System.currentTimeMillis;
+import java.util.Map;
+import java.util.Properties;
+import javax.jcr.RepositoryException;
+
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.context.MgnlContext;
 import org.apache.commons.collections.ExtendedProperties;
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang.StringUtils.indexOfAny;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.VelocityEngine;
@@ -12,16 +20,11 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.Resource;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.apache.velocity.runtime.resource.loader.ResourceLoader;
-import javax.jcr.RepositoryException;
-import java.io.InputStream;
-import static java.lang.System.currentTimeMillis;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * This class generates {@link org.springframework.mail.SimpleMailMessage}s by evaluating a velocity template stored
  * within the magnolia content repository.
- * It is an implementation of the {@link com.aperto.bsh.cafe.email.MailMessageTemplate} interface.
+ * It is an implementation of the {@link MailMessageTemplate} interface.
  * <p/>
  * The first line of the velocity template will be interpreted as mail subject, the remaining lines as text.
  * <p/>
@@ -44,7 +47,6 @@ public class MagnoliaContentVelocityMailMessageTemplate extends AbstractMailMess
         properties.setProperty("magnolia.resource.loader.class", MagnoliaContentResourceLoader.class.getName());
         _velocityEngine.init(properties);
     }
-
     //  ---------------------------------------------------------------------
     //  Configuration
     //  ---------------------------------------------------------------------
@@ -55,7 +57,6 @@ public class MagnoliaContentVelocityMailMessageTemplate extends AbstractMailMess
     public void setRepositoryId(final String repositoryId) {
         _repositoryId = repositoryId;
     }
-
     //  ---------------------------------------------------------------------
     //  Inheritence interface implementation
     //  ---------------------------------------------------------------------
@@ -86,7 +87,6 @@ public class MagnoliaContentVelocityMailMessageTemplate extends AbstractMailMess
         }
         return _velocityEngine.getTemplate(templateName, getTemplateEncoding());
     }
-
     //  ---------------------------------------------------------------------
     //  Helper
     //  ---------------------------------------------------------------------

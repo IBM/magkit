@@ -1,11 +1,12 @@
 package com.aperto.magkit.mail;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.springframework.mail.SimpleMailMessage;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.springframework.mail.SimpleMailMessage;
 
 /**
  * This class generates {@link SimpleMailMessage}s by evaluating a velocity template stored within the class path.
@@ -30,6 +31,7 @@ public abstract class AbstractMailMessageTemlate implements MailMessageTemplate 
 
     private String _templateEncoding = "UTF-8";
 
+    private SimpleMailMessage _messagePrototype;
     //  ---------------------------------------------------------------------
     //  Configuration
     //  ---------------------------------------------------------------------
@@ -76,6 +78,14 @@ public abstract class AbstractMailMessageTemlate implements MailMessageTemplate 
         _templateEncoding = templateEncoding;
     }
 
+    /**
+     * Creates a new SimpleMailMessage from this existing instance on template evaluation.
+     *
+     * @see #evaluate(java.util.Map)
+     */
+    public void setMessagePrototype(final SimpleMailMessage messagePrototype) {
+        _messagePrototype = messagePrototype;
+    }
     //  ---------------------------------------------------------------------
     //  Interface implementation
     //  ---------------------------------------------------------------------
@@ -99,14 +109,18 @@ public abstract class AbstractMailMessageTemlate implements MailMessageTemplate 
             text = result.substring(firstLineSeparator + 1);
         } else {
             subject = result.toString();
-            text = ""; 
+            text = "";
         }
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        SimpleMailMessage mailMessage;
+        if (_messagePrototype != null) {
+            mailMessage = new SimpleMailMessage(_messagePrototype);
+        } else {
+            mailMessage = new SimpleMailMessage();
+        }
         mailMessage.setText(text);
         mailMessage.setSubject(subject);
         return mailMessage;
     }
-
     //  ---------------------------------------------------------------------
     //  Inheritence interface
     //  ---------------------------------------------------------------------
@@ -132,7 +146,6 @@ public abstract class AbstractMailMessageTemlate implements MailMessageTemplate 
     }
 
     protected abstract Template getTemplate(final Map<String, ? extends Object> parameters) throws Exception;
-
     //  ---------------------------------------------------------------------
     //  Helper
     //  ---------------------------------------------------------------------

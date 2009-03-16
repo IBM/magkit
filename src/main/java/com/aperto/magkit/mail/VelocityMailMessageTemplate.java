@@ -1,12 +1,15 @@
 package com.aperto.magkit.mail;
 
-import static org.apache.commons.lang.StringUtils.*;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.apache.commons.lang.StringUtils.indexOfAny;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.mail.SimpleMailMessage;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * This class generates {@link SimpleMailMessage}s by evaluating a velocity template stored within the class path.
@@ -32,7 +35,6 @@ public class VelocityMailMessageTemplate extends AbstractMailMessageTemlate {
         properties.setProperty("loader.resource.loader.class", ClasspathResourceLoader.class.getName());
         _velocityEngine.init(properties);
     }
-
     //  ---------------------------------------------------------------------
     //  Configuration
     //  ---------------------------------------------------------------------
@@ -43,7 +45,6 @@ public class VelocityMailMessageTemplate extends AbstractMailMessageTemlate {
     public void setTemplateFileExtension(final String templateFileExtension) {
         _templateFileExtension = templateFileExtension;
     }
-
     //  ---------------------------------------------------------------------
     //  Inheritence interface implementation
     //  ---------------------------------------------------------------------

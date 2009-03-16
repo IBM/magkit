@@ -107,7 +107,20 @@ public class VelocityMailMessageTemplateTest {
     @Test
     public void emptyMessage() throws Exception {
         Map<String, String> parameters = new HashMap<String, String>();
-        SimpleMailMessage message = createTemplate().evaluate(parameters);
+        createEmptyTemplate().evaluate(parameters);
+    }
+
+    @Test
+    public void messagePrototype() throws Exception {
+        Map<String, String> parameters = new HashMap<String, String>();
+        VelocityMailMessageTemplate template = createTemplate();
+        SimpleMailMessage messagePrototype = new SimpleMailMessage();
+        messagePrototype.setFrom("testFrom@aperto.de");
+        messagePrototype.setTo("testTo@aperto.de");
+        template.setMessagePrototype(messagePrototype);
+        SimpleMailMessage message = template.evaluate(parameters);
+        assertEquals("testFrom@aperto.de", message.getFrom());
+        assertEquals("testTo@aperto.de", message.getTo()[0]);
     }
 
     //  ---------------------------------------------------------------------
