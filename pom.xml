@@ -99,13 +99,26 @@
             <version>4.01</version>
         </dependency>
 
-        <!-- Spring e.g. for mail -->
+        <!-- Spring Framework -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
             <version>2.0.6</version>
         </dependency>
-        <!-- testing -->
+
+        <!-- Java Extensions -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+
+        <!-- Test Scope Dependencies -->
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
