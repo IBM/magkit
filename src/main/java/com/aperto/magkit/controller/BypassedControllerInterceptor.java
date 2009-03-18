@@ -10,7 +10,7 @@ import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.context.MgnlContext;
 import static info.magnolia.voting.voters.DontDispatchOnForwardAttributeVoter.DONT_DISPATCH_ON_FORWARD_ATTRIBUTE;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -25,7 +25,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * @author Norman Wiechmann (Aperto AG)
  */
 public class BypassedControllerInterceptor extends HandlerInterceptorAdapter {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BypassedControllerInterceptor.class);
+    private static final Logger LOGGER = Logger.getLogger(BypassedControllerInterceptor.class);
     private static final String DEFAULT_REPOSITORY = ContentRepository.WEBSITE;
 
     /**
