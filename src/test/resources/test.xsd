@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.studierenimosten.de/extranet/vz/1.2/"
+            targetNamespace="http://www.studierenimosten.de/extranet/vz/1.2/"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="1.2">
+
+    <xsd:element name="unis">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="uni_ref" maxOccurs="unbounded" type="uni_refType"/>
+                <xsd:element name="recommendationsWeek" type="recommendationsWeekType"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="uni">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="id" type="stringType"/>
+                <xsd:element name="lastModification" type="xsd:dateTime"/>
+                <xsd:element name="name" type="stringType"/>
+                <xsd:element name="typeOfSchool" type="schoolType"/>
+                <xsd:element name="zip" type="zipType"/>
+                <xsd:element name="city" type="stringType"/>
+                <xsd:element name="federalState" type="federalStateType"/>
+                <xsd:element name="claim" type="stringType"/>
+                <xsd:element name="description" type="stringTypeVeryLong"/>
+                <xsd:element name="logo" type="imageType"/>
+                <xsd:element name="smallLogo" type="imageType"/>
+                <xsd:element name="image" type="imageType"/>
+                <xsd:element name="homepage" type="linkType"/>
+                <xsd:element name="service" type="linkType"/>
+                <xsd:element name="campusTeasers" type="teasersType"/>
+                <xsd:element name="cityTeasers" type="teasersType"/>
+                <xsd:element name="video" type="videoType"/>
+                <xsd:element name="uniMap" type="imageType"/>
+                <xsd:element name="recommendations" type="recommendationsType"/>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="teasersType">
+        <xsd:sequence>
+            <xsd:element name="teaser" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="headline" type="stringTypeShort"/>
+                        <xsd:element name="text" type="stringTypeLong"/>
+                        <xsd:element name="image" type="imageType" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="link" type="linkType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="imageType">
+        <xsd:sequence>
+            <xsd:element name="href" type="xsd:anyURI"/>
+            <xsd:element name="width" type="xsd:nonNegativeInteger"/>
+            <xsd:element name="height" type="xsd:nonNegativeInteger"/>
+            <xsd:element name="lastModification" type="xsd:dateTime"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="videoType">
+        <xsd:sequence>
+            <xsd:element name="videoTitle" type="stringType"/>
+            <xsd:element name="videoDescription" type="stringTypeLong"/>
+            <xsd:element name="videoLink" type="xsd:anyURI"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="recommendationsType">
+        <xsd:sequence>
+            <xsd:element name="recommendation" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="subjectId" type="xsd:normalizedString"/>
+                        <xsd:element name="course" type="stringType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="recommendationsWeekType">
+        <xsd:sequence>
+            <xsd:element name="recommendationWeek" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="subjectId" type="xsd:normalizedString"/>
+                        <xsd:element name="uni" type="stringType"/>
+                        <xsd:element name="course" type="stringType"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="uni_refType">
+        <xsd:sequence>
+            <xsd:element name="uni_ref_uri" type="xsd:anyURI"/>
+            <xsd:element name="uni_ref_id" type="stringType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="zipType">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:pattern value="[0-9]{5,5}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="linkType">
+        <xsd:sequence>
+            <xsd:element name="title" type="stringType"/>
+            <xsd:element name="href" type="xsd:anyURI"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="stringTypeShort">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:maxLength value='50'/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="stringType">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:maxLength value='255'/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="stringTypeLong">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:maxLength value='200'/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="stringTypeVeryLong">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:maxLength value='600'/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="schoolType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Universität"/>
+            <xsd:enumeration value="Kunsthochschule"/>
+            <xsd:enumeration value="Fachhochschule"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="federalStateType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Baden-Württemberg"/>
+            <xsd:enumeration value="Bayern"/>
+            <xsd:enumeration value="Berlin"/>
+            <xsd:enumeration value="Brandenburg"/>
+            <xsd:enumeration value="Bremen"/>
+            <xsd:enumeration value="Hamburg"/>
+            <xsd:enumeration value="Hessen"/>
+            <xsd:enumeration value="Mecklenburg-Vorpommern"/>
+            <xsd:enumeration value="Niedersachsen"/>
+            <xsd:enumeration value="Nordrhein-Westfalen"/>
+            <xsd:enumeration value="Rheinland-Pfalz"/>
+            <xsd:enumeration value="Saarland"/>
+            <xsd:enumeration value="Sachsen"/>
+            <xsd:enumeration value="Sachsen-Anhalt"/>
+            <xsd:enumeration value="Schleswig-Holstein"/>
+            <xsd:enumeration value="Thüringen"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>
