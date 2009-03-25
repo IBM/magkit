@@ -12,6 +12,8 @@ import info.magnolia.module.delta.Task;
  */
 public class StandardTasks {
 
+    private static final String PATH_URI_MAPPING = "/modules/adminInterface/virtualURIMapping";
+
     /**
      * Creates an menu for the given module with templates, paragraphs and dialogs links.
      */
@@ -34,6 +36,26 @@ public class StandardTasks {
                 withProperty("icon", "/.resources/icons/16/dot.gif"),
                 withProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')"),
                 withProperty("label", "menu.config.dialogs")));
+    }
+
+    /**
+     * Maps {@code /robots.txt} to {@code /docroot/moduleName-module/robots.txt}.
+     */
+    public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
+        return createConfigNode("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", PATH_URI_MAPPING, "robots",
+            withProperty("class", "info.magnolia.cms.beans.config.DefaultVirtualURIMapping"),
+            withProperty("fromURI", "/robots.txt"),
+            withProperty("toURI", "forward:/docroot/" + moduleName + "-module/robots.txt"));
+    }
+
+    /**
+     * Maps {@code /favicon.ico} to {@code /docroot/moduleName-module/favicon.ico}.
+     */
+    public static Task virtualUriMappingOfFavicon(final String moduleName) {
+        return createConfigNode("Virtual UriMapping", "Add virtual URI mapping for favicon.", PATH_URI_MAPPING, "favicon",
+            withProperty("class", "info.magnolia.cms.beans.config.DefaultVirtualURIMapping"),
+            withProperty("fromURI", "/favicon.ico"),
+            withProperty("toURI", "forward:/docroot/" + moduleName + "-module/favicon.ico"));
     }
 
     protected StandardTasks() {
