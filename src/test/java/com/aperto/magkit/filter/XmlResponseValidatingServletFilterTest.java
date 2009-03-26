@@ -5,6 +5,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.mockrunner.mock.web.MockHttpServletRequest;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -46,44 +48,47 @@ public class XmlResponseValidatingServletFilterTest {
         _filter = new XmlResponseValidatingServletFilter();
         _filter.setSchemaPath("/test.xsd");
         _response = new MockHttpServletResponse();
+        _response.setContentType("text/xml");
         _responseWrapper = new XmlResponseValidatingServletFilter.ResponseWrapper(_response);
     }
 
     @Test
-    public void validateInvalidXml() throws IOException {
+    public void validateInvalidXml() throws IOException, ServletException {
         _responseWrapper.getWriter().write(INVALID_XML);
+        _filter.initFilterBean();
         assertFalse(_filter.validate(_responseWrapper) == null);
     }
 
     @Test
-    public void validateValidUnisXml() throws IOException {
+    public void validateValidUnisXml() throws IOException, ServletException {
         _responseWrapper.getWriter().write(VALID_UNIS_XML);
+        _filter.initFilterBean();
         assertTrue(_filter.validate(_responseWrapper) == null);
     }
 
     @Test
     public void filterInvalidXml() throws IOException, ServletException {
         _filter.setAppendValidationInfo(false);
-        _filter.doFilterInternal(new MockHttpServletRequest(), _response, new TestFilterChain(INVALID_XML));
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(INVALID_XML));
         assertThat(_response.getContentAsString(), equalTo(INVALID_XML));
     }
 
     @Test(expected = RuntimeException.class)
     public void failOnFilterInvalidXml() throws IOException, ServletException {
         _filter.setFailOnInvalidXml(true);
-        _filter.doFilterInternal(new MockHttpServletRequest(), new MockHttpServletResponse(), new TestFilterChain(INVALID_XML));
+        initAndStartFilter(_filter, new MockHttpServletRequest(), new MockHttpServletResponse(), new TestFilterChain(INVALID_XML));
     }
 
     @Test
     public void filterValidXml() throws IOException, ServletException {
         _filter.setAppendValidationInfo(false);
-        _filter.doFilterInternal(new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
         assertThat(_response.getContentAsString(), equalTo(VALID_UNIS_XML));
     }
 
     @Test
     public void filterInvalidXmlWithValidationInfo() throws IOException, ServletException {
-        _filter.doFilterInternal(new MockHttpServletRequest(), _response, new TestFilterChain(INVALID_XML));
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(INVALID_XML));
         assertTrue(_response.getContentAsString().startsWith(INVALID_XML));
         assertTrue(_response.getContentAsString().length() > INVALID_XML.length());
         assertTrue(_response.getContentAsString().substring(INVALID_XML.length()).contains("valid:false"));
@@ -91,16 +96,41 @@ public class XmlResponseValidatingServletFilterTest {
 
     @Test
     public void filterValidXmlWithValidationInfo() throws IOException, ServletException {
-        _filter.doFilterInternal(new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
         assertTrue(_response.getContentAsString().startsWith(VALID_UNIS_XML));
         assertTrue(_response.getContentAsString().length() > VALID_UNIS_XML.length());
         assertTrue(_response.getContentAsString().substring(VALID_UNIS_XML.length()).contains("valid:true"));
     }
 
+    @Test(expected = RuntimeException.class)
+    public void failOnMissingContentType() throws IOException, ServletException {
+        _response.setContentType(null);
+        _filter.setFailOnInvalidXml(true);
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void failOnInvalidContentType() throws IOException, ServletException {
+        _response.setContentType("text/html");
+        _filter.setFailOnInvalidXml(true);
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+    }
+
+    @Test
+    public void doNotfailOnInvalidContentType() throws IOException, ServletException {
+        _response.setContentType("text/html");
+        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+    }
+
+    protected static void initAndStartFilter(XmlResponseValidatingServletFilter filter, HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        filter.initFilterBean();
+        filter.doFilterInternal(request, response, filterChain);
+    }
+
     /**
      * {@link javax.servlet.FilterChain} implementation that writes the string given the contructor to the response.
      */
-    private static class TestFilterChain implements FilterChain {
+    protected static class TestFilterChain implements FilterChain {
 
         private String _content;
 

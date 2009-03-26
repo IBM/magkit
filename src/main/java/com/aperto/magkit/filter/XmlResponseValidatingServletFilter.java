@@ -1,6 +1,5 @@
 package com.aperto.magkit.filter;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,10 +39,15 @@ import org.xml.sax.SAXException;
 public class XmlResponseValidatingServletFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = Logger.getLogger(XmlResponseValidatingServletFilter.class);
-    private Schema _schema;
+    private boolean _enabled = true;
     private boolean _failOnInvalidXml = false;
     private boolean _appendValidationInfo = true;
     private String _schemaPath;
+    private Schema _schema;
+
+    public void setEnabled(final boolean enabled) {
+        _enabled = enabled;
+    }
 
     public void setFailOnInvalidXml(final Boolean failOnInvalidXml) {
         _failOnInvalidXml = failOnInvalidXml != null ? failOnInvalidXml : false;
@@ -57,24 +61,59 @@ public class XmlResponseValidatingServletFilter extends OncePerRequestFilter {
         _schemaPath = schemaPath;
     }
 
+    public void setSchema(final Schema schema) {
+        _schema = schema;
+    }
+
+    @Override
+    protected void initFilterBean() throws ServletException {
+        super.initFilterBean();
+        if (_schema == null) {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            InputStream stream = XmlResponseValidatingServletFilter.class.getResourceAsStream(_schemaPath);
+            Source schemaFile = new StreamSource(stream);
+            try {
+                _schema = factory.newSchema(schemaFile);
+            } catch (SAXException e) {
+                throw new ServletException(e.getMessage(), e);
+            }
+        }
+    }
+
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        if (_enabled) {
+            doXmlValidatingFilter(request, response, filterChain);
+        } else {
+            filterChain.doFilter(request, response);
+        }
+    }
+
+    protected void doXmlValidatingFilter(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws IOException, ServletException {
         ResponseWrapper responseWrapper = new ResponseWrapper(response);
         filterChain.doFilter(request, responseWrapper);
-        String validationMessage = validate(responseWrapper);
-        if (validationMessage == null || !_failOnInvalidXml) {
-            PrintWriter writer = response.getWriter();
-            writer.write(responseWrapper.getBuffer());
-            if (_appendValidationInfo) {
-                writer.write("<!-- ");
-                writer.write("valid:" + (validationMessage == null));
+        String requestUri = request.getRequestURI();
+        String contentType = responseWrapper.getContentType();
+        boolean hasCorrectContentType = "text/xml".equals(contentType);
+        if (hasCorrectContentType || !_failOnInvalidXml) {
+            if (!hasCorrectContentType) {
+                LOGGER.warn("Invalid content type. contentType:" + contentType + ", requestUrl:" + requestUri);
+            }
+            String validationMessage = validate(responseWrapper);
+            if (validationMessage == null || !_failOnInvalidXml) {
                 if (validationMessage != null) {
-                    writer.write(" error:" + validationMessage);
+                    LOGGER.warn("Invalid XML response. message:" + validationMessage + ", requestUrl:" + requestUri);
                 }
-                writer.write(" --> ");
+                PrintWriter writer = response.getWriter();
+                writer.write(responseWrapper.getBuffer());
+                if (_appendValidationInfo) {
+                    appendValidationInfo(writer, validationMessage);
+                }
+            } else {
+                throw new RuntimeException("Invalid XML response. message:" + validationMessage + ", requestUrl:" + requestUri);
             }
         } else {
-            throw new RuntimeException("Invalid XML.");
+            throw new RuntimeException("Invalid content type. contentType:" + contentType + ", requestUrl:" + requestUri);
         }
     }
 
@@ -82,47 +121,43 @@ public class XmlResponseValidatingServletFilter extends OncePerRequestFilter {
      * Returns {@code null} if the response is valid, otherwise a message that describes the error.
      */
     String validate(final ResponseWrapper responseWrapper) throws IOException {
-        String message;
+        String message = null;
         try {
             String buffer = responseWrapper.getBuffer();
             Reader reader = new StringReader(buffer);
             Source source = new StreamSource(reader);
-            getSchemaValidator().validate(source);
-            message = null;
+            Validator validator = _schema.newValidator();
+            validator.validate(source);
         } catch (SAXException e) {
             message = e.getMessage();
-            LOGGER.error("Invalid XML response.", e);
         }
         return message;
     }
 
-    private synchronized Validator getSchemaValidator() throws SAXException {
-        if (_schema == null) {
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            InputStream stream = XmlResponseValidatingServletFilter.class.getResourceAsStream(_schemaPath);
-            Source schemaFile = new StreamSource(stream);
-            _schema = factory.newSchema(schemaFile);
+    protected void appendValidationInfo(final PrintWriter writer, final String validationMessage) {
+        writer.write("<!-- ");
+        writer.write("valid:" + (validationMessage == null));
+        if (validationMessage != null) {
+            writer.write(" error:" + validationMessage);
         }
-        return _schema.newValidator();
+        writer.write(" --> ");
     }
 
     /**
      * Wrapper for an {@link HttpServletResponse} that provides a buffering of the response content.
      */
-    public static class ResponseWrapper extends HttpServletResponseWrapper {
+    protected static class ResponseWrapper extends HttpServletResponseWrapper {
 
         private StringWriter _writer;
-        private ByteArrayOutputStream _outputStream;
 
         ResponseWrapper(final HttpServletResponse servletResponse) {
             super(servletResponse);
             _writer = new StringWriter();
-            _outputStream = new ByteArrayOutputStream();
         }
 
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
-            return new BufferedServletOutputStream(_outputStream);
+            throw new UnsupportedOperationException("Only writer is supported.");
         }
 
         @Override
@@ -131,7 +166,6 @@ public class XmlResponseValidatingServletFilter extends OncePerRequestFilter {
         }
 
         public String getBuffer() {
-            // TODO _outputStream.toString();
             return _writer.getBuffer().toString();
         }
     }
@@ -139,7 +173,7 @@ public class XmlResponseValidatingServletFilter extends OncePerRequestFilter {
     /**
      * Just to make a simple {@link java.io.OutputStream} a {@link ServletOutputStream}.
      */
-    public static class BufferedServletOutputStream extends ServletOutputStream {
+    protected static class BufferedServletOutputStream extends ServletOutputStream {
 
         private OutputStream _outputStream;
 
