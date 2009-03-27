@@ -22,7 +22,7 @@ import org.springframework.web.filter.GenericFilterBean;
  * Add following code to your web.xml:
  * {@code <filter>
  * <filter-name>forwardAndIncludeLoggingFilter</filter-name>
- * <filter-class>com.aperto.magkit.filter.ForwardAndIncludeLoggingFilter</filter-class>
+ * <filter-class>com.aperto.magkit.filter.PageFragmentLoggingFilter</filter-class>
  * </filter>
  * <filter-mapping>
  * <filter-name>forwardAndIncludeLoggingFilter</filter-name>
@@ -33,6 +33,7 @@ import org.springframework.web.filter.GenericFilterBean;
  *
  * @author Norman Wiechmann, Aperto AG
  * @since 2009-03-26
+ * @deprecated Use com.aperto.webkit.debug.PageFragmentLoggingFilter of aperto commons instead.
  */
 public class PageFragmentLoggingFilter extends GenericFilterBean {
     private static final Logger LOGGER = Logger.getLogger(PageFragmentLoggingFilter.class);
