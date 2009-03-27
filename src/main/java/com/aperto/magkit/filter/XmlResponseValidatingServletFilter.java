@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
  * TODO: Currently only the usage of response writer and not stream is supported.
  *
  * @author Norman Wiechmann (Aperto AG)
+ * @Deprecated Use com.aperto.webkit.jsp.XmlValidatorFilter of aperto commons insteads.
  */
 public class XmlResponseValidatingServletFilter extends OncePerRequestFilter {
 
