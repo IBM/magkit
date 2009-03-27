@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
  * and generating HTML is private inside this class.
  *
  * @author Michael Tamm, frank.sommer
- * @deprecated Instead of this filter a validating browser plugin can be used.
  */
 public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static final Logger LOGGER = Logger.getLogger(HtmlValidatorFilter.class);
