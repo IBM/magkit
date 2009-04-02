@@ -16,6 +16,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Exposes one or more beans defined within the spring application context to the current request.
+ * The function is compareable with {@link org.springframework.web.servlet.view.InternalResourceView#setExposedContextBeanNames(String[] exposedContextBeanNames)}
+ * which comes with spring framework since 2.5.x but can be used without spring enabled request like those used by
+ * magnolia cms.
  *
  * @author Norman Wiechmann, Aperto AG
  * @since 2009-03-17
