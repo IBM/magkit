@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
+/**
+ * ContentHelper.
+ * @author jds
+ */
 public final class ContentHelper {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ContentHelper.class);
     private static final String DATE_PATTERN = "dd.MM.yyyy";
