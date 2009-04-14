@@ -7,6 +7,8 @@ import javax.servlet.jsp.PageContext;
 import com.aperto.magkit.MagKitTagTest;
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
+import info.magnolia.cms.util.Resource;
+import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
 import org.apache.commons.lang.StringUtils;
@@ -59,13 +61,13 @@ public class CreateListTagTest extends MagKitTagTest {
         mockContent.addNodeData(mockNodeData);
         mockNodeData = new MockNodeData("list2", LIST_VALUE_SHORT);
         mockContent.addNodeData(mockNodeData);
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(LOCAL_CONTENT_OBJ, mockContent);
+        MockHttpServletRequest request = new MockHttpServletRequest();       
         MockHttpSession httpSession = new MockHttpSession();
         request.setSession(httpSession);
         MockHttpServletResponse response = new MockHttpServletResponse();
         // init MgnlContext:
         initMgnlWebContext(request, response, httpSession.getServletContext());
+        Resource.setLocalContentNode(mockContent);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 }

@@ -9,6 +9,7 @@ import com.aperto.magkit.MagKitTagTest;
 import com.aperto.magkit.utils.ImageData;
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
+import info.magnolia.cms.util.Resource;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
@@ -104,7 +105,7 @@ public class ImageTagTest extends MagKitTagTest {
         initMgnlWebContext(request, response, httpSession.getServletContext());
         initMgnlWebContext(request, response, httpSession.getServletContext());
         MgnlContext.getAggregationState().setMainContent(mockContent);
-        MgnlContext.setAttribute("contentObj", nodeContent);
+        Resource.setLocalContentNode(nodeContent);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 
