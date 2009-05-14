@@ -23,8 +23,6 @@
         <dependency>
             <groupId>com.aperto.commons</groupId>
             <artifactId>aperto-commons-core</artifactId>
-            <!-- Remove explicit version declaration as soon as the aperto parent pom dependency is fixed -->
-            <version>3.5.4</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
