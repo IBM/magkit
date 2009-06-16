@@ -7,15 +7,18 @@ import javax.jcr.RepositoryException;
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
+import info.magnolia.cms.core.ItemType;
 import static info.magnolia.cms.core.ItemType.CONTENTNODE;
+import static info.magnolia.cms.core.ItemType.FOLDER;
 import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.util.ContentUtil;
+import static info.magnolia.cms.util.ContentUtil.getOrCreateContent;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
 import info.magnolia.module.delta.TaskExecutionException;
 import org.apache.commons.lang.StringUtils;
 import static org.apache.commons.lang.StringUtils.trim;
+import org.apache.log4j.Logger;
 
 /**
  * A 'config' repository task to create tree structures with minimal afford of code.
@@ -24,6 +27,8 @@ import static org.apache.commons.lang.StringUtils.trim;
  * @since 2009-03-17
  */
 public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
+
+    private static final Logger LOGGER = Logger.getLogger(CreateConfigNodeTreeTask.class);
 
     private final String _workspaceName = ContentRepository.CONFIG;
     private final String _parentPath;
@@ -38,12 +43,91 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
     /**
      * Returns a task that creates a content node within the 'config' repository below the given path.
      * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
+     * <p/>
+     * This method is the short cut of {@link #createConfigNode(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])}
+     * with auto generated task name and description.
+     *
+     * @see #withProperty(String, String)
+     * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static CreateConfigNodeTreeTask createConfigNode(final String parentPath, final String nodeName, final Child... children) {
+        String taskName = "Create config node " + nodeName;
+        String taskDescription = "Creates " + parentPath + "/" + nodeName + (children != null ? " and more." : ".");
+        return createConfigNode(taskName, taskDescription, parentPath, nodeName, children);
+    }
+
+    /**
+     * Returns a task that creates a content node within the 'config' repository below the given path.
+     * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
      *
      * @see #withProperty(String, String)
      * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
     public static CreateConfigNodeTreeTask createConfigNode(final String taskName, final String taskDescription, final String parentPath, final String nodeName, final Child... children) {
-        return new CreateConfigNodeTreeTask(taskName, taskDescription, parentPath, new ContentNodeModel(nodeName, children));
+        ContentNodeModel model = new ContentNodeModel(nodeName, true, CONTENTNODE, children);
+        return new CreateConfigNodeTreeTask(taskName, taskDescription, parentPath, model);
+    }
+
+    /**
+     * Returns a task that creates a content folder within the 'config' repository below the given path.
+     * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
+     * <p/>
+     * This method is the short cut of {@link #createConfigFolder(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])}
+     * with auto generated task name and description.
+     *
+     * @see #withProperty(String, String)
+     * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static CreateConfigNodeTreeTask createConfigFolder(final String parentPath, final String nodeName, final Child... children) {
+        String taskName = "Create config folder " + nodeName;
+        String taskDescription = "Creates " + parentPath + "/" + nodeName + (children != null ? " and more." : ".");
+        return createConfigFolder(taskName, taskDescription, parentPath, nodeName, children);
+    }
+
+    /**
+     * Returns a task that creates a content folder within the 'config' repository below the given path.
+     * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
+     *
+     * @see #withProperty(String, String)
+     * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static CreateConfigNodeTreeTask createConfigFolder(final String taskName, final String taskDescription, final String parentPath, final String nodeName, final Child... children) {
+        ContentNodeModel model = new ContentNodeModel(nodeName, true, FOLDER, children);
+        return new CreateConfigNodeTreeTask(taskName, taskDescription, parentPath, model);
+    }
+
+    /**
+     * Returns a task that creates a content node within the 'config' repository below the given path.
+     * The new node may have properties and nodes wich may have themself properties and nodes and so on.
+     * <p/>
+     * This method is the short cut of {@link #goToConfigNode(String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])}
+     * with auto generated task name and description.
+     *
+     * @see #addProperty(String, String)
+     * @see #addNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static CreateConfigNodeTreeTask goToConfigNode(final String path, final Child... children) {
+        String taskName = "Manipulate " + path;
+        String taskDescription = "Manipulate " + path + (children != null ? " and more." : ".");
+        return goToConfigNode(taskName, taskDescription, path, children);
+    }
+
+    /**
+     * Returns a task that creates a content node within the 'config' repository below the given path.
+     * The new node may have properties and nodes wich may have themself properties and nodes and so on.
+     *
+     * @see #addProperty(String, String)
+     * @see #addNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static CreateConfigNodeTreeTask goToConfigNode(final String taskName, final String taskDescription, final String path, final Child... children) {
+        int lastPathSeparator = path.lastIndexOf("/");
+        if (lastPathSeparator == -1) {
+            throw new IllegalArgumentException("Path must contain at least one path separator '/'.");
+        }
+        String parentPath = path.substring(0, lastPathSeparator);
+        String nodeName = path.substring(lastPathSeparator + 1);
+        ContentNodeModel model = new ContentNodeModel(nodeName, false, CONTENTNODE, children);
+        return new CreateConfigNodeTreeTask(taskName, taskDescription, parentPath, model);
     }
 
     /**
@@ -52,6 +136,15 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
      * @see #createConfigNode(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
     public static PropertyModel withProperty(final String name, final String value) {
+        return addProperty(name, value);
+    }
+
+    /**
+     * Returns a property to add to a node declaration.
+     *
+     * @see #createConfigNode(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static PropertyModel addProperty(final String name, final String value) {
         return new PropertyModel(name, value);
     }
 
@@ -62,7 +155,17 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
      * @see #createConfigNode(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
     public static ContentNodeModel withSubNode(final String name, final Child... children) {
-        return new ContentNodeModel(name, children);
+        return addNode(name, children);
+    }
+
+    /**
+     * Returns a sub node to add to a node declaration.
+     * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
+     *
+     * @see #createConfigNode(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
+     */
+    public static ContentNodeModel addNode(final String name, final Child... children) {
+        return new ContentNodeModel(name, true, CONTENTNODE, children);
     }
 
     protected void doExecute(InstallContext installContext) throws RepositoryException, TaskExecutionException {
@@ -79,6 +182,9 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
     }
 
     protected void createProperty(final Content node, final String propertyName, final String newValue) throws RepositoryException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("create property, node handle:" + node.getHandle() + ", property name:" + propertyName + ", value:" + newValue);
+        }
         NodeData property = NodeDataUtil.getOrCreate(node, propertyName);
         String actualValue = property.getString();
         if (!StringUtils.equals(newValue, trim(actualValue))) {
@@ -93,7 +199,12 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
     }
 
     protected void createSubNode(final Content parentNode, final ContentNodeModel model) throws RepositoryException {
-        Content node = ContentUtil.getOrCreateContent(parentNode, model.getName(), CONTENTNODE);
+        String name = model.getName();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("create sub node, parent handle:" + parentNode.getHandle() + ", node name:" + name);
+        }
+        Content node = model.isCreateNode() ?
+            getOrCreateContent(parentNode, name, model.getItemType()) : parentNode.getContent(name);
         createProperties(node, model.getProperties());
         createSubNodes(node, model.getSubNodes());
     }
@@ -108,7 +219,7 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
     /**
      * A data holder containing the data needed to create a property node.
      */
-    public static class PropertyModel implements Child {
+    protected static class PropertyModel implements Child {
         private final String _name;
         private final String _value;
 
@@ -133,9 +244,13 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
         private final String _name;
         private final PropertyModel[] _properties;
         private final ContentNodeModel[] _subNodes;
+        private final boolean _createNode;
+        private final ItemType _itemType;
 
-        protected ContentNodeModel(final String name, final Child... children) {
+        protected ContentNodeModel(final String name, final boolean createNode, final ItemType itemType, final Child... children) {
             _name = name;
+            _createNode = createNode;
+            _itemType = itemType;
             _properties = extractProperties(children);
             _subNodes = extractSubNodes(children);
         }
@@ -162,6 +277,14 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
 
         public String getName() {
             return _name;
+        }
+
+        public boolean isCreateNode() {
+            return _createNode;
+        }
+
+        public ItemType getItemType() {
+            return _itemType;
         }
 
         public PropertyModel[] getProperties() {
