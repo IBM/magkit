@@ -8,8 +8,8 @@ import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.cms.core.ItemType;
+import static info.magnolia.cms.core.ItemType.CONTENT;
 import static info.magnolia.cms.core.ItemType.CONTENTNODE;
-import static info.magnolia.cms.core.ItemType.FOLDER;
 import info.magnolia.cms.core.NodeData;
 import static info.magnolia.cms.util.ContentUtil.getOrCreateContent;
 import info.magnolia.cms.util.NodeDataUtil;
@@ -47,6 +47,7 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
      * This method is the short cut of {@link #createConfigNode(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])}
      * with auto generated task name and description.
      *
+     * @see info.magnolia.cms.core.ItemType#CONTENTNODE
      * @see #withProperty(String, String)
      * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
@@ -60,6 +61,7 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
      * Returns a task that creates a content node within the 'config' repository below the given path.
      * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
      *
+     * @see info.magnolia.cms.core.ItemType#CONTENTNODE
      * @see #withProperty(String, String)
      * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
@@ -69,30 +71,32 @@ public class CreateConfigNodeTreeTask extends AbstractRepositoryTask {
     }
 
     /**
-     * Returns a task that creates a content folder within the 'config' repository below the given path.
+     * Returns a task that creates a content within the 'config' repository below the given path.
      * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
      * <p/>
-     * This method is the short cut of {@link #createConfigFolder(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])}
+     * This method is the short cut of {@link #createConfigContent(String, String, String, String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])}
      * with auto generated task name and description.
      *
+     * @see info.magnolia.cms.core.ItemType#CONTENT
      * @see #withProperty(String, String)
      * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
-    public static CreateConfigNodeTreeTask createConfigFolder(final String parentPath, final String nodeName, final Child... children) {
-        String taskName = "Create config folder " + nodeName;
+    public static CreateConfigNodeTreeTask createConfigContent(final String parentPath, final String nodeName, final Child... children) {
+        String taskName = "Create config content " + nodeName;
         String taskDescription = "Creates " + parentPath + "/" + nodeName + (children != null ? " and more." : ".");
-        return createConfigFolder(taskName, taskDescription, parentPath, nodeName, children);
+        return createConfigContent(taskName, taskDescription, parentPath, nodeName, children);
     }
 
     /**
-     * Returns a task that creates a content folder within the 'config' repository below the given path.
+     * Returns a task that creates a content within the 'config' repository below the given path.
      * The new node may have properties and sub nodes wich may have themself properties and sub nodes and so on.
      *
+     * @see info.magnolia.cms.core.ItemType#CONTENT
      * @see #withProperty(String, String)
      * @see #withSubNode(String, com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.Child[])
      */
-    public static CreateConfigNodeTreeTask createConfigFolder(final String taskName, final String taskDescription, final String parentPath, final String nodeName, final Child... children) {
-        ContentNodeModel model = new ContentNodeModel(nodeName, true, FOLDER, children);
+    public static CreateConfigNodeTreeTask createConfigContent(final String taskName, final String taskDescription, final String parentPath, final String nodeName, final Child... children) {
+        ContentNodeModel model = new ContentNodeModel(nodeName, true, CONTENT, children);
         return new CreateConfigNodeTreeTask(taskName, taskDescription, parentPath, model);
     }
 
