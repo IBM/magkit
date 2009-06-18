@@ -10,6 +10,7 @@ import static info.magnolia.cms.core.ItemType.CONTENTNODE;
 import info.magnolia.cms.core.NodeData;
 import static info.magnolia.cms.util.ContentUtil.createPath;
 import static info.magnolia.cms.util.ContentUtil.getContent;
+import static info.magnolia.cms.util.ContentUtil.getOrCreateContent;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
@@ -37,50 +38,42 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
         _model = model;
     }
 
-    public static Child withProperty(final String name, final String value) {
-        return setProperty(name, value);
-    }
-
     public static Child setProperty(final String name, final String value) {
         return new PropertyModel(name, value);
     }
 
-    public static Child withSubNode(final String path, final Child... children) {
-        return addNode(path, children);
+    /**
+     * Creates new nodes if there are no existing. Different {@link ItemType}s will be ignored.
+     */
+    public static Child createNode(final String path, final Child... children) {
+        return create(path, CONTENTNODE, children);
     }
 
-    public static Child withSubContent(final String path, final Child... children) {
-        return addContent(path, children);
+    /**
+     * Creates new nodes if there are no existing. Different {@link ItemType}s will be ignored.
+     */
+    public static Child createContent(final String path, final Child... children) {
+        return create(path, CONTENT, children);
     }
 
-    public static Child with(final String path, final ItemType itemType, final Child... children) {
-        return add(path, itemType, children);
-    }
-
-    public static Child addNode(final String path, final Child... children) {
-        return new NodeModel(path, NodeModel.Operation.create, CONTENTNODE, children);
-    }
-
-    public static Child addContent(final String path, final Child... children) {
-        return new NodeModel(path, NodeModel.Operation.create, CONTENT, children);
-    }
-
-    public static Child add(final String path, final ItemType itemType, final Child... children) {
+    /**
+     * Creates new nodes if there are no existing. Different {@link ItemType}s will be ignored.
+     */
+    public static Child create(final String path, final ItemType itemType, final Child... children) {
         return new NodeModel(path, NodeModel.Operation.create, itemType, children);
     }
 
-    public static Child replaceNode(final String path, final Child... children) {
-        return new NodeModel(path, NodeModel.Operation.replace, CONTENTNODE, children);
+    /**
+     * Removes an existing node and all it successors. If there is no node at the given path nothing will be changed.
+     */
+    public static Child remove(final String path) {
+        return new NodeModel(path, NodeModel.Operation.remove, null);
     }
 
-    public static Child replaceContent(final String path, final Child... children) {
-        return new NodeModel(path, NodeModel.Operation.replace, CONTENT, children);
-    }
-
-    public static Child replaceNode(final String path, final ItemType itemType, final Child... children) {
-        return new NodeModel(path, NodeModel.Operation.replace, itemType, children);
-    }
-
+    /**
+     * Selects an existing node. The method defines the context for encapsulated operations. It will fail if there
+     * is no node at the given path.
+     */
     public static Child select(final String path, final Child... children) {
         return new NodeModel(path, children);
     }
@@ -145,7 +138,7 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
          *
          */
         public enum Operation {
-            select, create, replace
+            select, create, remove
         }
 
         private final String _path;
@@ -180,23 +173,25 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
                 case create:
                     node = createPath(parentNode, _path, _itemType);
                     break;
-                case replace:
+                case select:
+                    node = selectPath(parentNode, _path);
+                    break;
+                case remove:
                     try {
                         node = selectPath(parentNode, _path);
                         node.delete();
                     } catch (RepositoryException e) {
                         // nothing to delete, path not exists
                     }
-                    node = createPath(parentNode, _path, _itemType);
-                    break;
-                case select:
-                    node = selectPath(parentNode, _path);
+                    node = null;
                     break;
                 default:
                     throw new IllegalStateException("unsupported operation:" + _operation);
             }
-            for (Child child : _children) {
-                child.execute(node);
+            if (_children != null) {
+                for (Child child : _children) {
+                    child.execute(node);
+                }
             }
         }
 

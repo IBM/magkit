@@ -1,7 +1,6 @@
 package com.aperto.magkit.module.delta;
 
-import static com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.addNode;
-import static com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.replaceNode;
+import static com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.createNode;
 import static com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.selectConfig;
 import static com.aperto.magkit.module.delta.CreateConfigNodeTreeTask.setProperty;
 import info.magnolia.module.delta.Task;
@@ -22,19 +21,19 @@ public class StandardTasks {
         return selectConfig("AdminInterface Menu",
             "Create " + moduleDisplayName + " menue items within module adminInterface.",
             "/modules/adminInterface/config/menu",
-            replaceNode(moduleName,
+            createNode(moduleName,
                 setProperty("icon", "/.resources/icons/24/gears.gif"),
                 setProperty("onclick", "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')"),
                 setProperty("label", moduleDisplayName),
-                addNode("templates",
+                createNode("templates",
                     setProperty("icon", "/.resources/icons/16/dot.gif"),
                     setProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates')"),
                     setProperty("label", "menu.config.templates")),
-                addNode("paragraphs",
+                createNode("paragraphs",
                     setProperty("icon", "/.resources/icons/16/dot.gif"),
                     setProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/paragraphs')"),
                     setProperty("label", "menu.config.paragraphs")),
-                addNode("dialogs",
+                createNode("dialogs",
                     setProperty("icon", "/.resources/icons/16/dot.gif"),
                     setProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')"),
                     setProperty("label", "menu.config.dialogs"))));
@@ -45,7 +44,7 @@ public class StandardTasks {
      */
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", PATH_URI_MAPPING,
-            replaceNode("robots",
+            createNode("robots",
                 setProperty("class", "info.magnolia.cms.beans.config.DefaultVirtualURIMapping"),
                 setProperty("fromURI", "/robots.txt"),
                 setProperty("toURI", "forward:/docroot/" + moduleName + "-module/robots.txt")));
@@ -56,7 +55,7 @@ public class StandardTasks {
      */
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", PATH_URI_MAPPING,
-            replaceNode("favicon",
+            createNode("favicon",
                 setProperty("class", "info.magnolia.cms.beans.config.DefaultVirtualURIMapping"),
                 setProperty("fromURI", "/favicon.ico"),
                 setProperty("toURI", "forward:/docroot/" + moduleName + "-module/favicon.ico")));
