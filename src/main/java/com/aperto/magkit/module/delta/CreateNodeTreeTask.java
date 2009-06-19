@@ -9,7 +9,6 @@ import static info.magnolia.cms.core.ItemType.CONTENT;
 import static info.magnolia.cms.core.ItemType.CONTENTNODE;
 import info.magnolia.cms.core.NodeData;
 import static info.magnolia.cms.util.ContentUtil.createPath;
-import static info.magnolia.cms.util.ContentUtil.getContent;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
@@ -17,6 +16,7 @@ import info.magnolia.module.delta.Task;
 import info.magnolia.module.delta.TaskExecutionException;
 import org.apache.commons.lang.StringUtils;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.removeStart;
 import static org.apache.commons.lang.StringUtils.trim;
 import org.apache.log4j.Logger;
 
@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 public class CreateNodeTreeTask extends AbstractRepositoryTask {
 
     private static final Logger LOGGER = Logger.getLogger(CreateNodeTreeTask.class);
+    private static final String PATH_SEPARATOR = "/";
 
     private final String _workspaceName;
     private final Child _model;
@@ -55,7 +56,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
      */
     public static Child setProperty(final String path, final String value) {
         Child model;
-        int lastIndex = path.lastIndexOf("/");
+        int lastIndex = path.lastIndexOf(PATH_SEPARATOR);
         if (lastIndex != -1) {
             String parentPath = path.substring(0, lastIndex);
             String name = path.substring(lastIndex + 1);
@@ -71,7 +72,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
      */
     public static Child removeProperty(final String path) {
         Child model;
-        int lastIndex = path.lastIndexOf("/");
+        int lastIndex = path.lastIndexOf(PATH_SEPARATOR);
         if (lastIndex != -1) {
             String parentPath = path.substring(0, lastIndex);
             String name = path.substring(lastIndex + 1);
@@ -142,8 +143,9 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
     }
 
     /**
-     * Selects an existing node. The method defines the context for encapsulated operations. It will fail if there
-     * is no node at the given path.
+     * Selects an existing node. The method defines the context for encapsulated operations. It will not fail directly
+     * if there is no node at the given path. But subsequent operation which require an existing node, like create a
+     * node or set a property, will fail.
      */
     public static Child select(final String path, final Child... children) {
         return new NodeModel(path, children);
@@ -155,7 +157,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
     protected void doExecute(InstallContext installContext) throws RepositoryException, TaskExecutionException {
         HierarchyManager hm = installContext.getHierarchyManager(_workspaceName);
         Content repositoryRoot = hm.getRoot();
-        _model.execute(repositoryRoot);
+        _model.execute(repositoryRoot, PATH_SEPARATOR);
         repositoryRoot.save();
     }
 
@@ -163,7 +165,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
      * Corporate interface of {@link PropertyModel} and {@link CreateNodeTreeTask.NodeModel}.
      */
     public interface Child {
-        void execute(final Content contextNode) throws RepositoryException;
+        void execute(final Content contextNode, final String contextPath) throws RepositoryException;
     }
 
     /**
@@ -196,18 +198,26 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
             _operation = operation;
         }
 
-        public void execute(final Content contextNode) throws RepositoryException {
+        public void execute(final Content contextNode, final String contextPath) throws RepositoryException {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("execute property model, node:" + contextNode.getHandle() + ", " + toString());
+                LOGGER.debug("context:" + contextPath + ", " + toString());
             }
             switch (_operation) {
                 case remove:
-                    if (contextNode.hasNodeData(_name)) {
+                    if (contextNode != null && contextNode.hasNodeData(_name)) {
                         NodeData property = contextNode.getNodeData(_name);
                         property.delete();
+                    } else {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("nothing to delete, path:" + contextPath + ", " + toString());
+                        }
                     }
                     break;
                 case set:
+                    if (contextNode == null) {
+                        throw new RepositoryException(
+                            "operation failed - path does not exits, context:" + contextPath + ", " + toString());
+                    }
                     NodeData property = NodeDataUtil.getOrCreate(contextNode, _name);
                     String actualValue = property.getString();
                     // update value if not equal
@@ -233,7 +243,6 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
      * A data holder containing the data needed to select or create a repository node.
      */
     protected static final class NodeModel implements Child {
-        private static final String PATH_SEPARATOR = "/";
 
         /**
          * Operations which can be performed with a node.
@@ -242,65 +251,60 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
             select, create, remove
         }
 
-        private final String _path;
+        private final String _relativePath;
         private final Operation _operation;
         private final Child[] _children;
         private final ItemType _itemType;
 
-        private NodeModel(final String path, final Child... children) {
-            this(path, Operation.select, null, children);
+        private NodeModel(final String relativePath, final Child... children) {
+            this(relativePath, Operation.select, null, children);
         }
 
-        private NodeModel(final String path, final Operation operation, final ItemType itemType, final Child... children) {
-            _path = path;
+        private NodeModel(final String relativePath, final Operation operation, final ItemType itemType, final Child... children) {
+            _relativePath = removeStart(relativePath, PATH_SEPARATOR);
             _operation = operation;
             _itemType = itemType;
             _children = children;
         }
 
-        public void execute(final Content contextNode) throws RepositoryException {
+        public void execute(final Content contextNode, final String contextPath) throws RepositoryException {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("execute node model, node:" + contextNode.getHandle() + ", " + toString());
+                LOGGER.debug("context:" + contextPath + ", " + toString());
             }
-            Content parentNode;
-            String relativePath;
-            if (_path.startsWith(PATH_SEPARATOR)) {
-                // absolute path
-                String workspaceName = contextNode.getWorkspace().getName();
-                parentNode = getContent(workspaceName, "/");
-                relativePath = _path.substring(1);
-            } else {
-                parentNode = contextNode;
-                relativePath = _path;
-            }
-            Content node;
+            Content newContextNode;
+            String newContextPath;
             switch (_operation) {
                 case create:
+                    if (contextNode == null) {
+                        throw new RepositoryException(
+                            "operation failed - path does not exits, context:" + contextPath + ", " + toString());
+                    }
                     // create only if not exists
-                    node = createPath(parentNode, relativePath, _itemType);
+                    newContextNode = createPath(contextNode, _relativePath, _itemType);
+                    newContextPath = newContextNode.getHandle();
                     break;
                 case select:
-                    if (isNotBlank(relativePath)) {
-                        node = selectPath(parentNode, relativePath);
-                        if (node == null) {
-                            throw new RepositoryException("path does not exits, parent:" + parentNode.getHandle() + ", path:" + relativePath);
-                        }
+                    if (isNotBlank(_relativePath)) {
+                        newContextNode = selectPath(contextNode, _relativePath);
+                        newContextPath = contextPath + PATH_SEPARATOR + _relativePath;
                     } else {
-                        node = parentNode;
+                        newContextNode = contextNode;
+                        newContextPath = contextPath;
                     }
                     break;
                 case remove:
-                    node = selectPath(parentNode, relativePath);
-                    if (node != null) {
-                        node.delete();
+                    newContextNode = selectPath(contextNode, _relativePath);
+                    newContextPath = contextPath;
+                    if (newContextNode != null) {
+                        newContextNode.delete();
                     }
                     break;
                 default:
                     throw new IllegalStateException("unsupported operation:" + _operation);
             }
-            if (_children != null && node != null) {
+            if (_children != null) {
                 for (Child child : _children) {
-                    child.execute(node);
+                    child.execute(newContextNode, newContextPath);
                 }
             }
         }
@@ -311,7 +315,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
         private Content selectPath(final Content parentNode, final String path) throws RepositoryException {
             Content node = parentNode;
             if (node != null) {
-                for (String pathSegment : path.split("/")) {
+                for (String pathSegment : path.split(PATH_SEPARATOR)) {
                     if (!node.hasContent(pathSegment)) {
                         node = null;
                         break;
@@ -325,7 +329,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
         @Override
         public String toString() {
             return "ContentNodeModel{" +
-                "_path='" + _path + '\'' +
+                "_path='" + _relativePath + '\'' +
                 ", _itemType=" + _itemType +
                 '}';
         }
