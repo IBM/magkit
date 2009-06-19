@@ -15,6 +15,7 @@ import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
 import info.magnolia.module.delta.TaskExecutionException;
 import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.trim;
 import org.apache.log4j.Logger;
 
@@ -71,6 +72,21 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
     }
 
     /**
+     * Removes the property at the given path. The path to the property must exist, otherwise the task will fail.
+     */
+    public static Child removeProperties(final String path, final String... morePaths) {
+        Child[] children = new Child[1 + (morePaths != null ? morePaths.length : 0)];
+        children[0] = removeProperty(path);
+        if (morePaths != null) {
+            int index = 1;
+            for (String morePath : morePaths) {
+                children[index] = removeProperty(morePath);
+            }
+        }
+        return select("", children);
+    }
+
+    /**
      * Creates new nodes if there are no existing. Different {@link ItemType}s will be ignored.
      */
     public static Child createNode(final String path, final Child... children) {
@@ -96,6 +112,22 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
      */
     public static Child remove(final String path) {
         return new NodeModel(path, NodeModel.Operation.remove, null);
+    }
+
+    /**
+     * Batch remove off existing nodes and all it successors.
+     * If there is no node at the given path nothing will be changed.
+     */
+    public static Child remove(final String path, final String... morePaths) {
+        Child[] children = new Child[1 + (morePaths != null ? morePaths.length : 0)];
+        children[0] = remove(path);
+        if (morePaths != null) {
+            int index = 1;
+            for (String morePath : morePaths) {
+                children[index] = remove(morePath);
+            }
+        }
+        return select("", children);
     }
 
     /**
@@ -126,7 +158,7 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
     /**
      * A data holder containing the data needed to create a property node.
      */
-    private static final class PropertyModel implements Child {
+    protected static final class PropertyModel implements Child {
 
         /**
          * Operations which can be performed with a node.
@@ -189,7 +221,7 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
     /**
      * A data holder containing the data needed to select or create a repository node.
      */
-    private static final class NodeModel implements Child {
+    protected static final class NodeModel implements Child {
         private static final String PATH_SEPARATOR = "/";
 
         /**
@@ -237,9 +269,13 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
                     node = createPath(parentNode, relativePath, _itemType);
                     break;
                 case select:
-                    node = selectPath(parentNode, relativePath);
-                    if (node == null) {
-                        throw new RepositoryException("path does not exits, parent:" + parentNode.getHandle() + ", path:" + relativePath);
+                    if (isNotBlank(relativePath)) {
+                        node = selectPath(parentNode, relativePath);
+                        if (node == null) {
+                            throw new RepositoryException("path does not exits, parent:" + parentNode.getHandle() + ", path:" + relativePath);
+                        }
+                    } else {
+                        node = parentNode;
                     }
                     break;
                 case remove:
