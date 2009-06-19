@@ -55,6 +55,22 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
     }
 
     /**
+     * Removes the property at the given path. The path to the property must exist, otherwise the task will fail.
+     */
+    public static Child removeProperty(final String path) {
+        Child model;
+        int lastIndex = path.lastIndexOf("/");
+        if (lastIndex != -1) {
+            String parentPath = path.substring(0, lastIndex);
+            String name = path.substring(lastIndex + 1);
+            model = select(parentPath, remove(name));
+        } else {
+            model = new PropertyModel(path);
+        }
+        return model;
+    }
+
+    /**
      * Creates new nodes if there are no existing. Different {@link ItemType}s will be ignored.
      */
     public static Child createNode(final String path, final Child... children) {
@@ -111,23 +127,53 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
      * A data holder containing the data needed to create a property node.
      */
     private static final class PropertyModel implements Child {
+
+        /**
+         * Operations which can be performed with a node.
+         */
+        public enum Operation {
+            set, remove
+        }
+
         private final String _name;
         private final String _value;
+        private final Operation _operation;
+
+        private PropertyModel(final String name) {
+            this(name, null, Operation.remove);
+        }
 
         private PropertyModel(final String name, final String value) {
+            this(name, value, Operation.set);
+        }
+
+        private PropertyModel(final String name, final String value, final Operation operation) {
             _name = name;
             _value = value;
+            _operation = operation;
         }
 
         public void execute(final Content contextNode) throws RepositoryException {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("execute property model, node:" + contextNode.getHandle() + ", " + toString());
             }
-            NodeData property = NodeDataUtil.getOrCreate(contextNode, _name);
-            String actualValue = property.getString();
-            // update value if not equal
-            if (!StringUtils.equals(_value, trim(actualValue))) {
-                property.setValue(_value);
+            switch (_operation) {
+                case remove:
+                    if (contextNode.hasNodeData(_name)) {
+                        NodeData property = contextNode.getNodeData(_name);
+                        property.delete();
+                    }
+                    break;
+                case set:
+                    NodeData property = NodeDataUtil.getOrCreate(contextNode, _name);
+                    String actualValue = property.getString();
+                    // update value if not equal
+                    if (!StringUtils.equals(_value, trim(actualValue))) {
+                        property.setValue(_value);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("unsupported operation:" + _operation);
             }
         }
 
@@ -147,7 +193,7 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
         private static final String PATH_SEPARATOR = "/";
 
         /**
-         *
+         * Operations which can be performed with a node.
          */
         public enum Operation {
             select, create, remove
@@ -187,34 +233,44 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
             Content node;
             switch (_operation) {
                 case create:
+                    // create only if not exists
                     node = createPath(parentNode, relativePath, _itemType);
                     break;
                 case select:
                     node = selectPath(parentNode, relativePath);
+                    if (node == null) {
+                        throw new RepositoryException("path does not exits, parent:" + parentNode.getHandle() + ", path:" + relativePath);
+                    }
                     break;
                 case remove:
-                    try {
-                        node = selectPath(parentNode, relativePath);
+                    node = selectPath(parentNode, relativePath);
+                    if (node != null) {
                         node.delete();
-                    } catch (RepositoryException e) {
-                        // nothing to delete, path not exists
                     }
-                    node = null;
                     break;
                 default:
                     throw new IllegalStateException("unsupported operation:" + _operation);
             }
-            if (_children != null) {
+            if (_children != null && node != null) {
                 for (Child child : _children) {
                     child.execute(node);
                 }
             }
         }
 
+        /**
+         * Returns the node selected by given path. If path does not exists, returns {@code null}.
+         */
         private Content selectPath(final Content parentNode, final String path) throws RepositoryException {
             Content node = parentNode;
-            for (String pathSegment : path.split("/")) {
-                node = node.getContent(pathSegment);
+            if (node != null) {
+                for (String pathSegment : path.split("/")) {
+                    if (!node.hasContent(pathSegment)) {
+                        node = null;
+                        break;
+                    }
+                    node = node.getContent(pathSegment);
+                }
             }
             return node;
         }
