@@ -10,7 +10,6 @@ import static info.magnolia.cms.core.ItemType.CONTENTNODE;
 import info.magnolia.cms.core.NodeData;
 import static info.magnolia.cms.util.ContentUtil.createPath;
 import static info.magnolia.cms.util.ContentUtil.getContent;
-import static info.magnolia.cms.util.ContentUtil.getOrCreateContent;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
@@ -38,8 +37,21 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
         _model = model;
     }
 
-    public static Child setProperty(final String name, final String value) {
-        return new PropertyModel(name, value);
+    /**
+     * Sets the property at the given path. Creates a new property if it not already exists.
+     * The path to the property must exist, otherwise the task will fail.
+     */
+    public static Child setProperty(final String path, final String value) {
+        Child model;
+        int lastIndex = path.lastIndexOf("/");
+        if (lastIndex != -1) {
+            String parentPath = path.substring(0, lastIndex);
+            String name = path.substring(lastIndex + 1);
+            model = select(parentPath, setProperty(name, value));
+        } else {
+            model = new PropertyModel(path, value);
+        }
+        return model;
     }
 
     /**
@@ -162,23 +174,27 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
                 LOGGER.debug("execute node model, node:" + contextNode.getHandle() + ", " + toString());
             }
             Content parentNode;
+            String relativePath;
             if (_path.startsWith(PATH_SEPARATOR)) {
+                // absolute path
                 String workspaceName = contextNode.getWorkspace().getName();
                 parentNode = getContent(workspaceName, "/");
+                relativePath = _path.substring(1);
             } else {
                 parentNode = contextNode;
+                relativePath = _path;
             }
             Content node;
             switch (_operation) {
                 case create:
-                    node = createPath(parentNode, _path, _itemType);
+                    node = createPath(parentNode, relativePath, _itemType);
                     break;
                 case select:
-                    node = selectPath(parentNode, _path);
+                    node = selectPath(parentNode, relativePath);
                     break;
                 case remove:
                     try {
-                        node = selectPath(parentNode, _path);
+                        node = selectPath(parentNode, relativePath);
                         node.delete();
                     } catch (RepositoryException e) {
                         // nothing to delete, path not exists
