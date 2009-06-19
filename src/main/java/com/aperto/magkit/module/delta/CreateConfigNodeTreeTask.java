@@ -8,7 +8,7 @@ import info.magnolia.cms.beans.config.ContentRepository;
  * @author Norman Wiechmann, Aperto AG
  * @since 2009-03-17
  */
-public class CreateConfigNodeTreeTask extends AbstractCreateNodeTreeTask {
+public class CreateConfigNodeTreeTask extends CreateNodeTreeTask {
 
     protected CreateConfigNodeTreeTask(final String name, final String description, final Child model) {
         super(name, description, ContentRepository.CONFIG, model);

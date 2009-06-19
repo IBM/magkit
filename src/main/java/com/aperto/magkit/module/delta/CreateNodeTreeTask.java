@@ -13,6 +13,7 @@ import static info.magnolia.cms.util.ContentUtil.getContent;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
+import info.magnolia.module.delta.Task;
 import info.magnolia.module.delta.TaskExecutionException;
 import org.apache.commons.lang.StringUtils;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
@@ -25,17 +26,27 @@ import org.apache.log4j.Logger;
  * @author Norman Wiechmann, Aperto AG
  * @since 2009-03-17
  */
-public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
+public class CreateNodeTreeTask extends AbstractRepositoryTask {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractCreateNodeTreeTask.class);
+    private static final Logger LOGGER = Logger.getLogger(CreateNodeTreeTask.class);
 
     private final String _workspaceName;
     private final Child _model;
 
-    protected AbstractCreateNodeTreeTask(final String name, final String description, final String workspaceName, final Child model) {
+    protected CreateNodeTreeTask(final String name, final String description, final String workspaceName, final Child model) {
         super(name, description);
         _workspaceName = workspaceName;
         _model = model;
+    }
+
+    public static Task selectWorkspace(final String workspaceName, final String path, final Child... children) {
+        String taskName = "update configuration below " + path;
+        String taskDescription = "manipulates " + path + (children != null ? " and more." : ".");
+        return new CreateNodeTreeTask(taskName, taskDescription, workspaceName, select(path, children));
+    }
+
+    public static Task selectWorkspace(final String name, final String description, final String workspaceName, final String path, final Child... children) {
+        return new CreateNodeTreeTask(name, description, workspaceName, select(path, children));
     }
 
     /**
@@ -149,7 +160,7 @@ public class AbstractCreateNodeTreeTask extends AbstractRepositoryTask {
     }
 
     /**
-     * Corporate interface of {@link PropertyModel} and {@link com.aperto.magkit.module.delta.AbstractCreateNodeTreeTask.NodeModel}.
+     * Corporate interface of {@link PropertyModel} and {@link CreateNodeTreeTask.NodeModel}.
      */
     public interface Child {
         void execute(final Content contextNode) throws RepositoryException;
