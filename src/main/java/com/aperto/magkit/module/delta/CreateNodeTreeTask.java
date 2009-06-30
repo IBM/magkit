@@ -233,8 +233,9 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
         @Override
         public String toString() {
             return "PropertyModel{" +
-                "name='" + _name + '\'' +
-                ", value='" + _value + '\'' +
+                "_name='" + _name + '\'' +
+                ", _operation=" + _operation +
+                ", _value='" + _value + '\'' +
                 '}';
         }
     }
@@ -329,8 +330,9 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
 
         @Override
         public String toString() {
-            return "ContentNodeModel{" +
-                "_path='" + _relativePath + '\'' +
+            return "NodeModel{" +
+                "_relativePath='" + _relativePath + '\'' +
+                ", _operation=" + _operation +
                 ", _itemType=" + _itemType +
                 '}';
         }
