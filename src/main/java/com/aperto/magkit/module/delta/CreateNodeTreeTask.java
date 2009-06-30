@@ -286,7 +286,8 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
                 case select:
                     if (isNotBlank(_relativePath)) {
                         newContextNode = selectPath(contextNode, _relativePath);
-                        newContextPath = contextPath + PATH_SEPARATOR + _relativePath;
+                        newContextPath = (contextPath.endsWith(PATH_SEPARATOR) ?
+                            contextPath : contextPath + PATH_SEPARATOR) + _relativePath;
                     } else {
                         newContextNode = contextNode;
                         newContextPath = contextPath;
