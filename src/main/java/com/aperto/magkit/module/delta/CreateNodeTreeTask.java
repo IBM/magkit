@@ -15,9 +15,7 @@ import info.magnolia.module.delta.AbstractRepositoryTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.delta.TaskExecutionException;
 import org.apache.commons.lang.StringUtils;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.removeStart;
-import static org.apache.commons.lang.StringUtils.trim;
+import static org.apache.commons.lang.StringUtils.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -56,13 +54,14 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
      */
     public static Child setProperty(final String path, final String value) {
         Child model;
-        int lastIndex = path.lastIndexOf(PATH_SEPARATOR);
+        String normalizedPath = normalizePath(path);
+        int lastIndex = normalizedPath.lastIndexOf(PATH_SEPARATOR);
         if (lastIndex != -1) {
-            String parentPath = path.substring(0, lastIndex);
-            String name = path.substring(lastIndex + 1);
+            String parentPath = normalizedPath.substring(0, lastIndex);
+            String name = normalizedPath.substring(lastIndex + 1);
             model = select(parentPath, setProperty(name, value));
         } else {
-            model = new PropertyModel(path, value);
+            model = new PropertyModel(normalizedPath, value);
         }
         return model;
     }
@@ -72,13 +71,14 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
      */
     public static Child removeProperty(final String path) {
         Child model;
-        int lastIndex = path.lastIndexOf(PATH_SEPARATOR);
+        String normalizedPath = normalizePath(path);
+        int lastIndex = normalizedPath.lastIndexOf(PATH_SEPARATOR);
         if (lastIndex != -1) {
-            String parentPath = path.substring(0, lastIndex);
-            String name = path.substring(lastIndex + 1);
+            String parentPath = normalizedPath.substring(0, lastIndex);
+            String name = normalizedPath.substring(lastIndex + 1);
             model = select(parentPath, remove(name));
         } else {
-            model = new PropertyModel(path);
+            model = new PropertyModel(normalizedPath);
         }
         return model;
     }
@@ -159,6 +159,10 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
         Content repositoryRoot = hm.getRoot();
         _model.execute(repositoryRoot, PATH_SEPARATOR);
         repositoryRoot.save();
+    }
+
+    private static String normalizePath(final String path) {
+        return removeEnd(removeStart(trimToEmpty(path), PATH_SEPARATOR), PATH_SEPARATOR);
     }
 
     /**
@@ -262,7 +266,7 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
         }
 
         private NodeModel(final String relativePath, final Operation operation, final ItemType itemType, final Child... children) {
-            _relativePath = removeStart(relativePath, PATH_SEPARATOR);
+            _relativePath = removeEnd(removeStart(relativePath, PATH_SEPARATOR), PATH_SEPARATOR);
             _operation = operation;
             _itemType = itemType;
             _children = children;
@@ -306,7 +310,9 @@ public class CreateNodeTreeTask extends AbstractRepositoryTask {
             }
             if (_children != null) {
                 for (Child child : _children) {
-                    child.execute(newContextNode, newContextPath);
+                    if (child != null) {
+                        child.execute(newContextNode, newContextPath);
+                    }
                 }
             }
         }
