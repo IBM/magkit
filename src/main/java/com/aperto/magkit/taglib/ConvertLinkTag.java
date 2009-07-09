@@ -65,7 +65,7 @@ public class ConvertLinkTag extends TagSupport {
      */
     @TagAttribute
     public void setAddContextPath(String addContextPath) {
-        _addContextPath = Boolean.getBoolean(addContextPath);
+        _addContextPath = Boolean.valueOf(addContextPath);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ConvertLinkTag extends TagSupport {
      */
     @TagAttribute
     public void setAddExtension(String addExtension) {
-        _addExtension = Boolean.getBoolean(addExtension);
+        _addExtension = Boolean.valueOf(addExtension);
     }
 
     /**
