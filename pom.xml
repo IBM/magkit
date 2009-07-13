@@ -170,6 +170,22 @@
     </dependencies>
 
     <build>
+        <resources>
+            <!-- Filter magkit.xml file within resources directory and keep other files as they are. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/magkit.xml</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/magkit.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <!--
                    see http://myfaces.apache.org/tobago/tobago-tool/maven-apt-plugin
