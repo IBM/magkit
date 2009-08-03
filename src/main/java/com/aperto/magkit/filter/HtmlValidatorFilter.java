@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.net.SocketTimeoutException;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -47,7 +48,7 @@ import org.apache.log4j.Logger;
 public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static final Logger LOGGER = Logger.getLogger(HtmlValidatorFilter.class);
 
-    public static final String W3C_VALIDATOR_CHECK_URL_PARAM_NAME = "w3c-validator-check-url";
+    public static final String W3C_VALIDATOR_CHECK_URL_PARAM_NAME = "w3cValidatorCheckUrl";
     public static final String VALIDATOR_WARNING_CSS_URI = "validator-warning-css-uri";
     private static final String VALIDATION_RESULT_URL_PREFIX = "/html-validator-result-";
     private static final String VALIDATION_RESULT_URL_SUFFIX = ".html";
@@ -57,6 +58,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private static final String PROPERTY_VALIDATOR_ACTIVE = "validator.active";
     private static final String MGNL_MAIN_BAR_BEGIN = "<div class=\"mgnlMainbar";
     private static final String MGNL_MAIN_BAR_END = "</div>";
+    private static final String VALIDATOR_DIV = "<div id=\"html-validator\" />";
 
     // using old behaviour (no such filter) as default:
     private static boolean c_validatorEnabled = false;
@@ -73,6 +75,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private String _validatorWarningCssUri = "/docroot/magkit/css/validator-warning.css";
     private String _warningLayerTemplate;
     private int _resultCounter = 0;
+    private long _timeOut = 15000;
     private String[] _cachedResults = new String[MAX_CACHED_RESULTS];
 
     /**
@@ -188,26 +191,28 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 LOGGER.debug("Checking " + request.getRequestURL() + " with W3C Validator ...");
             }
             String validationResult = w3cValidate(request.getRequestURI(), html);
-            _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
-            String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
-            String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
-            // Validation error handling ...
-            if (validationResult.indexOf("class=\"valid\">This Page Is Valid") < 0) {
-                LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
-                // use original html with mgnlMainBar
-                if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
-                    html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri, "not");
+            if (StringUtils.isNotBlank(validationResult)) {
+                _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
+                String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
+                String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
+                // Validation error handling ...
+                if (validationResult.indexOf("class=\"valid\">This Page Is Valid") < 0) {
+                    LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
+                    // use original html with mgnlMainBar
+                    if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
+                        html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri, "not");
+                    } else {
+                        html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri, "not");
+                    }
+                    _resultCounter++;
                 } else {
-                    html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri, "not");
-                }
-                _resultCounter++;
-            } else {
-                LOGGER.debug("Detected valid (X)HTML, injecting warning layer into HTML response ...");
-                // use original html with mgnlMainBar
-                if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
-                    html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri, "");
-                } else {
-                    html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri, "");
+                    LOGGER.debug("Detected valid (X)HTML, injecting warning layer into HTML response ...");
+                    // use original html with mgnlMainBar
+                    if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
+                        html = injectWarningLayer(mgnlHtml, validationResultUrl, validatorWarningCssUri, "");
+                    } else {
+                        html = injectWarningLayer(html, validationResultUrl, validatorWarningCssUri, "");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -223,6 +228,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private String w3cValidate(String uri, String html) throws IOException {
         String validationResult = null;
         HttpClient httpClient = new HttpClient();
+        httpClient.getHttpConnectionManager().getParams().setSoTimeout((int) _timeOut);
         PostMethod w3cValidatorCheck = new PostMethod(getW3cValidatorCheckUrl());
         PartSource bufferSource = new BufferSource(uri, html, "UTF-8");
 
@@ -231,12 +237,17 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         Part[] parts = {showSource, uploadedFile};
         w3cValidatorCheck.setRequestEntity(new MultipartRequestEntity(parts, w3cValidatorCheck.getParams()));
 
-        int responseCode = httpClient.executeMethod(w3cValidatorCheck);
-        if (responseCode != 200) {
-            LOGGER.warn(getW3cValidatorCheckUrl() + " responded with " + responseCode + "\n" + getHtml(w3cValidatorCheck));
-        } else {
-            validationResult = getHtml(w3cValidatorCheck);
+        try {
+            int responseCode = httpClient.executeMethod(w3cValidatorCheck);
+            if (responseCode != 200) {
+                LOGGER.warn(getW3cValidatorCheckUrl() + " responded with " + responseCode + "\n" + getHtml(w3cValidatorCheck));
+            } else {
+                validationResult = getHtml(w3cValidatorCheck);
+            }
+        } catch (SocketTimeoutException e) {
+            LOGGER.warn("Html validation failed caused time out (" + _timeOut + " milliseconds).", e);
         }
+
         return validationResult;
     }
 
@@ -258,7 +269,12 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     private String injectWarningLayer(String html, String validationResultUrl, String validatorWarningCssUri, String validationOk) {
         String lowerCaseHtml = html.toLowerCase();
-        int i = lowerCaseHtml.lastIndexOf("</body");
+        boolean hasValidatorDiv = true;
+        int i = lowerCaseHtml.lastIndexOf(VALIDATOR_DIV);
+        if (i == -1) {
+            hasValidatorDiv = false;
+            i = lowerCaseHtml.lastIndexOf("</body");
+        }
         if (i == -1) {
             i = lowerCaseHtml.lastIndexOf("</html");
         }
@@ -274,7 +290,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         replacements.put("validationResultUrl", validationResultUrl);
         replacements.put("validationOk", validationOk);
         String warningLayer = StringTools.replacePlaceHolders(_warningLayerTemplate, replacements);
-        return html.substring(0, i) + warningLayer + html.substring(i);
+        return html.substring(0, i) + warningLayer + (hasValidatorDiv ? StringUtils.substringAfter(html.substring(i), VALIDATOR_DIV) : html.substring(i));
     }
 
     public String getW3cValidatorCheckUrl() {
@@ -283,6 +299,19 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     public void setW3cValidatorCheckUrl(String w3cValidatorCheckUrl) {
         _w3cValidatorCheckUrl = w3cValidatorCheckUrl;
+    }
+
+    public long getTimeOut() {
+        return _timeOut;
+    }
+
+    /**
+     * Default value is 15000.
+     *
+     * @param timeOut Timeout in milliseconds
+     */
+    public void setTimeOut(long timeOut) {
+        _timeOut = timeOut;
     }
 
     public String getValidatorWarningCssUri() {
@@ -341,6 +370,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
         public HttpServletResponseWrapper(HttpServletResponse response) {
             _realResponse = response;
+            _contentType = response.getContentType();
         }
 
         public void addCookie(Cookie cookie) {

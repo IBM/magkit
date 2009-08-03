@@ -45,9 +45,9 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         new CreateNodeTask("Validator-Filter", "Create Validator filter node", ContentRepository.CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "class", "com.aperto.magkit.filter.HtmlValidatorFilter"),
         new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "enabled", "true"),
-        new CreateNodeTask("Validator-Filter config", "Create config node for validator filter node", ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "config", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR + "/config", HtmlValidatorFilter.W3C_VALIDATOR_CHECK_URL_PARAM_NAME, "http://validator.aperto.de/w3c-markup-validator/check"),
-        new FilterOrderingTask("validator", new String[]{"contentType", "uriSecurity"})
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, HtmlValidatorFilter.W3C_VALIDATOR_CHECK_URL_PARAM_NAME, "http://validator.aperto.de/w3c-markup-validator/check"),
+        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "timeOut", "15000"),
+        new FilterOrderingTask("validator", new String[]{"contentType", "uriSecurity", "gzip"})
     });
 
     private final Task _addValidatorFilterBypassTask = new ArrayDelegateTask("Filter", "Add the bypass for validator filter.", new Task[]{
