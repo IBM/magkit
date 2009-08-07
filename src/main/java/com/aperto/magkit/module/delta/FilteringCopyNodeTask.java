@@ -24,9 +24,9 @@ public class FilteringCopyNodeTask extends AbstractRepositoryTask {
     private final String _src;
     private final String _dest;
     private final boolean _overwrite;
-    private final XMLFilter _xmlFilter;
+    private final XMLFilter[] _xmlFilter;
 
-    public FilteringCopyNodeTask(String name, String description, String workspaceName, String src, String dest, boolean overwrite, XMLFilter xmlFilter) {
+    public FilteringCopyNodeTask(String name, String description, String workspaceName, String src, String dest, boolean overwrite, XMLFilter... xmlFilter) {
         super(name, description);
         _workspaceName = workspaceName;
         _src = src;

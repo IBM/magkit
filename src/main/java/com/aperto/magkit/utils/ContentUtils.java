@@ -25,7 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.core.Path;
-import org.apache.commons.io.IOUtils;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.apache.commons.lang.StringUtils;
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.substringAfterLast;
@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
 /**
  * Util class for handle magnolia content.
@@ -74,7 +75,7 @@ public final class ContentUtils {
      * <p/>
      * Implementation based on {@link info.magnolia.cms.util.ContentUtil}.
      */
-    public static void copyInSessionFiltered(Content src, String dest, XMLFilter filter) throws RepositoryException {
+    public static void copyInSessionFiltered(Content src, String dest, XMLFilter... filters) throws RepositoryException {
         final String destParentPath = defaultIfEmpty(substringBeforeLast(dest, "/"), "/");
         final String destNodeName = substringAfterLast(dest, "/");
         final Session session = src.getWorkspace().getSession();
@@ -84,9 +85,18 @@ public final class ContentUtils {
             try {
                 ContentHandler handler = getExportContentHandler(outStream);
                 SystemViewExportXmlReaderAdapter adapter = new SystemViewExportXmlReaderAdapter(session, false, false);
-                filter.setParent(adapter);
-                filter.setContentHandler(handler);
-                filter.parse(src.getHandle());
+                if (filters != null && filters.length > 0) {
+                    XMLReader lastFilter = adapter;
+                    for (XMLFilter filter : filters) {
+                        filter.setParent(lastFilter);
+                        lastFilter = filter;
+                    }
+                    lastFilter.setContentHandler(handler);
+                    lastFilter.parse(src.getHandle());
+                } else {
+                    adapter.setContentHandler(handler);
+                    adapter.parse(src.getHandle());
+                }
             } catch (SAXException e) {
                 Exception exception = e.getException();
                 if (exception instanceof RepositoryException) {
@@ -94,26 +104,19 @@ public final class ContentUtils {
                 } else if (exception instanceof IOException) {
                     throw (IOException) exception;
                 } else {
-                    throw new RepositoryException(
-                        "Error serializing system view XML", e);
+                    throw new RepositoryException("Error serializing system view XML", e);
                 }
             }
             outStream.flush();
-            IOUtils.closeQuietly(outStream);
+            closeQuietly(outStream);
             FileInputStream inStream = new FileInputStream(file);
-            session.importXML(
-                destParentPath,
-                inStream,
-                ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
-            IOUtils.closeQuietly(inStream);
+            session.importXML(destParentPath, inStream, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+            closeQuietly(inStream);
             file.delete();
             if (!StringUtils.equals(src.getName(), destNodeName)) {
-                String currentPath;
-                if (destParentPath.equals("/")) {
-                    currentPath = "/" + src.getName();
-                } else {
-                    currentPath = destParentPath + "/" + src.getName();
-                }
+                String currentPath = destParentPath.equals("/") ?
+                    "/" + src.getName()
+                    : destParentPath + "/" + src.getName();
                 session.move(currentPath, dest);
             }
         } catch (IOException e) {
