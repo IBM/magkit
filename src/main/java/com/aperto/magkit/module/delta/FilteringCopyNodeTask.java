@@ -14,7 +14,8 @@ import org.xml.sax.XMLFilter;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 /**
- * TODO: comment.
+ * Copies a node by performing a in session copy operation. Additionally you may specify a {@link XMLFilter} that is
+ * applied to
  *
  * @author Norman Wiechmann (Aperto AG)
  */
@@ -53,7 +54,7 @@ public class FilteringCopyNodeTask extends AbstractRepositoryTask {
     }
 
     /**
-     * TODO: comment.
+     * A {@link XMLFilter} that performs a replacement of content of the sax characters event using a regular expression.
      */
     public static class ReplaceInValueFilter extends XMLFilterImpl {
 
