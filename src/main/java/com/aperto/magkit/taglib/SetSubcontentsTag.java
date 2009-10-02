@@ -51,6 +51,7 @@ public class SetSubcontentsTag extends TagSupport {
 
     /**
      * The key used to store the resulting list in the PageContext.
+     * Required, no default.
      * @param var a String as PageContext key
      */
     @TagAttribute(required = true)
@@ -60,6 +61,7 @@ public class SetSubcontentsTag extends TagSupport {
 
     /**
      * The path to the Content node to extract the childs from.
+     * Default is the current active page.
      * @param parentPath the path to the parent of the desired child nodes
      */
     @TagAttribute()
@@ -90,7 +92,7 @@ public class SetSubcontentsTag extends TagSupport {
 
     /**
      * The name of the repository where to read the parent element from.
-     * One of 'website', 'data', 'dms'.
+     * One of 'website', 'data', 'dms'. Default is 'website'.
      * @param repository a String to select the repository
      */
     @TagAttribute()
@@ -102,7 +104,7 @@ public class SetSubcontentsTag extends TagSupport {
      * Sorting criteria: The name of the sub Content to be used as sorting criteria.
      * If not specified the current Content node will be used.
      * If not existing, the current content element will be added at the end of the list.
-     * Default is NULL.
+     * Default is NULL - the current conten node.
      * @param sortContentNodeName  a String with the name of the content node
      */
     @TagAttribute()
@@ -112,11 +114,11 @@ public class SetSubcontentsTag extends TagSupport {
 
     /**
      * Sorting criteria: The name of the NodeData element of the specified content node to be used for sorting.
-     * If not given the result list will remain in the original order the contents have been added to its parent node.
+     * If not given the result list will not be sorted. It keeps the original order the contents have been added to its parent node.
      * If not existing, the current content element will be added at the end of the list.
      * If the NodeData value is not comparable (does not implement the Interface java.util.Comparable),
      * the current content element will be added at the end of the list.
-     * Default is NULL (not sorting).
+     * Default is NULL (no sorting).
      * @param sortNodeDataName a String with the name of the node data element
      */
     @TagAttribute()
@@ -136,6 +138,7 @@ public class SetSubcontentsTag extends TagSupport {
 
     /**
      * The key used to store the resulting list size in the PageContext.
+     * Default is 'subcontents.size'. 
      * @param varSize a String as PageContext key
      */
     @TagAttribute()
