@@ -1,6 +1,6 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.utils.ResourceUtils;
+import com.aperto.magkit.utils.SelectorUtils;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.cms.i18n.I18nContentSupportFactory;
 import info.magnolia.cms.util.Resource;
@@ -217,7 +217,7 @@ public class PagingTag extends TagSupport {
      */
     public String determineLinkedPage(String link, int page) throws IOException {
         StringBuffer out = new StringBuffer();
-        //out.append("<li><a href=\"").append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
+        //out.append("<li><a href=\"").append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
         out.append("<li><a href=\"").append(link);
         if (_showTitle) {
             out.append("\" title=\"").append(_prefixTitle).append(page);
@@ -238,7 +238,7 @@ public class PagingTag extends TagSupport {
         StringBuffer out = new StringBuffer();
         if (_actPage < _pages) {
             out.append("<li class=\"next\">");
-            //out.append("<a href=\"").append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage + 1).append(".html").append(queryString);
+            //out.append("<a href=\"").append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage + 1).append(".html").append(queryString);
             out.append("<a href=\"").append(link);
             if (_showTitle) {
                 out.append("\" title=\"").append(_nextPageTitle);
@@ -260,7 +260,7 @@ public class PagingTag extends TagSupport {
         StringBuffer out = new StringBuffer();
         if (_actPage > 1) {
             out.append("<li class=\"previous\">");
-            //out.append("<a href=\"").append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage - 1).append(".html").append(queryString);
+            //out.append("<a href=\"").append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage - 1).append(".html").append(queryString);
             out.append("<a href=\"").append(link);
             if (_showTitle) {
                 out.append("\" title=\"").append(_prevPageTitle);
@@ -281,7 +281,7 @@ public class PagingTag extends TagSupport {
      */
     public String getLink(String completeHandle, String queryString, int page) {
         StringBuffer out = new StringBuffer();
-        out.append(completeHandle).append("." + ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
+        out.append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
         return out.toString();
     }
 
@@ -298,7 +298,7 @@ public class PagingTag extends TagSupport {
         if (!isBlank(selector)) {
             String[] strings = split(selector, '.');
             for (String s : strings) {
-                if (!s.startsWith(ResourceUtils.SELECTOR_PAGING_WITH_DELIMITER)) {
+                if (!s.startsWith(SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER)) {
                     handle += "." + s;
                 }
             }

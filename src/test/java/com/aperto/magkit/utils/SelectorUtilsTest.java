@@ -15,19 +15,19 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Test of the resource utils.
- * @see ResourceUtils
+ * @see SelectorUtils
  *
  * @author frank.sommer (11.12.2008)
  */
-public class ResourceUtilsTest extends MagKitTest {
+public class SelectorUtilsTest extends MagKitTest {
     @Test
     public void retrieveValueOfSelector() {
         MgnlContext.getAggregationState().setSelector("aid-6.pid-2.kid-test");
-        String value = ResourceUtils.retrieveValueOfSelector("pid");
+        String value = SelectorUtils.retrieveValueOfSelector("pid");
         assertThat(value, is("2"));
-        value = ResourceUtils.retrieveValueOfSelector("kid");
+        value = SelectorUtils.retrieveValueOfSelector("kid");
         assertThat(value, is("test"));
-        value = ResourceUtils.retrieveValueOfSelector("sid");
+        value = SelectorUtils.retrieveValueOfSelector("sid");
         assertThat(value, is(""));
     }
 

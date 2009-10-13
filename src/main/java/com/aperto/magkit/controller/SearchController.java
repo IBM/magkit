@@ -2,7 +2,7 @@ package com.aperto.magkit.controller;
 
 import com.aperto.magkit.beans.SearchHit;
 import com.aperto.magkit.beans.Search;
-import com.aperto.magkit.utils.ResourceUtils;
+import com.aperto.magkit.utils.SelectorUtils;
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.ItemType;
@@ -168,7 +168,7 @@ public class SearchController extends SimpleFormController {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Executing query " + queryString);
             }
-            int actPage = ResourceUtils.retrieveActivePage();
+            int actPage = SelectorUtils.retrieveActivePage();
             int offset = _entriesPerPage * (actPage - 1);
             search.setActPage(actPage);
             search.setEntriesPerPage(_entriesPerPage);
