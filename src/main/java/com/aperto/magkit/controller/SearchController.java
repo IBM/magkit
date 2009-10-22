@@ -1,7 +1,8 @@
 package com.aperto.magkit.controller;
 
-import com.aperto.magkit.beans.SearchHit;
 import com.aperto.magkit.beans.Search;
+import com.aperto.magkit.beans.SearchHit;
+import com.aperto.magkit.utils.NodeDataPredicate;
 import com.aperto.magkit.utils.SelectorUtils;
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
@@ -9,17 +10,17 @@ import info.magnolia.cms.core.ItemType;
 import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.core.search.Query;
 import info.magnolia.cms.core.search.QueryResult;
-import info.magnolia.cms.util.Resource;
 import info.magnolia.cms.util.ContentUtil;
 import info.magnolia.context.MgnlContext;
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.Predicate;
-import static org.apache.commons.lang.ArrayUtils.*;
+import org.apache.commons.collections15.IteratorUtils;
+import static org.apache.commons.lang.ArrayUtils.contains;
 import static org.apache.commons.lang.StringUtils.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
+
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,32 +68,7 @@ public class SearchController extends SimpleFormController {
      * keywords.
      */
     private static final String[] KEYWORDS = new String[]{"and", "or"};
-    /**
-     * For filtering.
-     */
-    private static final Predicate FILTER_SEARCHABLE_PREDICATE = new Predicate() {
-        public boolean evaluate(Object obj){
-            Content c = (Content) obj;
-            return !excludeFromSearch(c);
-        }
-
-        private boolean excludeFromSearch(Content c){
-            boolean exclude = false;
-            try {
-                if (c.hasNodeData("notSearchable")) {
-                    exclude = c.getNodeData("notSearchable").getBoolean();
-                }
-                Content parent = c.getParent();
-                if (!exclude && parent != null) {
-                    exclude = excludeFromSearch(parent);
-                }
-            } catch (RepositoryException e) {
-                // ignore, happens for root element
-                //LOGGER.warn("Could not get nodeDate or parent of content element", e);
-            }
-            return exclude;
-        }
-    };
+    
     /**
      * Entries for page.
      */
@@ -175,7 +151,7 @@ public class SearchController extends SimpleFormController {
 
             try {
                 Collection searchResults = executeQuery(queryString);
-                List<Content> websiteQueryResult = IteratorUtils.toList(IteratorUtils.filteredIterator((Iterator<Content>) searchResults.iterator(), FILTER_SEARCHABLE_PREDICATE));
+                List<Content> websiteQueryResult = IteratorUtils.toList(IteratorUtils.filteredIterator((Iterator<Content>) searchResults.iterator(), new NodeDataPredicate("notSearchable", true)));
                 List<SearchHit> resultList = new ArrayList<SearchHit>(_entriesPerPage);
                 int numberOfHits = websiteQueryResult.size();
                 if (numberOfHits == 0) {
@@ -288,7 +264,7 @@ public class SearchController extends SimpleFormController {
                         if (!contains(KEYWORDS, lowerTerm) && lowerTerm.length() > 2) {
 
                             // first check, avoid using heavy string replaceAll operations if the search term is not there
-                            if (contains(resultString.toLowerCase(Locale.GERMAN), lowerTerm)) {
+                            if (StringUtils.contains(resultString.toLowerCase(Locale.GERMAN), lowerTerm)) {
 
                                 // only get first matching keyword
                                 int pos = resultString.toLowerCase(Locale.GERMAN).indexOf(lowerTerm);
@@ -452,7 +428,7 @@ public class SearchController extends SimpleFormController {
         // search only in a specific subtree
         if (_startLevel > 0) {
             try {
-                Content activePage = Resource.getActivePage();
+                Content activePage = MgnlContext.getAggregationState().getMainContent();
                 if (activePage != null) {
                     startPath = strip(activePage.getAncestor(_startLevel).getHandle(), "/");
                 }
