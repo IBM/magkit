@@ -227,7 +227,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         String[] patterns = StringUtils.split(_validPattern, '|');
         boolean valid = true;
         for (String pattern : patterns) {
-            valid = validationResult.indexOf(pattern.trim()) < 0;
+            valid = validationResult.indexOf(pattern.trim()) > -1;
             if (!valid) {
                 break;
             }
