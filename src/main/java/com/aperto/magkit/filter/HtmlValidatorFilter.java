@@ -73,6 +73,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     private String _w3cValidatorCheckUrl = "http://validator.aperto.de/w3c-markup-validator/check";
     private String _validatorWarningCssUri = "/docroot/magkit/css/validator-warning.css";
+    private String _validPattern = "[Valid]| class=\"valid\">This document was successfully";
     private String _warningLayerTemplate;
     private int _resultCounter = 0;
     private long _timeOut = 15000;
@@ -196,7 +197,8 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
                 String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
                 // Validation error handling ...
-                if (validationResult.indexOf("[Valid]") < 0 || validationResult.indexOf("class=\"valid\">This document was successfully") < 0) {
+                boolean valid = checkValidationResult(validationResult);
+                if (!valid) {
                     LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
                     // use original html with mgnlMainBar
                     if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
@@ -219,6 +221,18 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             LOGGER.warn("Validation failed: " + e.getMessage(), e);
         }
         return html;
+    }
+
+    private boolean checkValidationResult(String validationResult) {
+        String[] patterns = StringUtils.split(_validPattern, '|');
+        boolean valid = true;
+        for (String pattern : patterns) {
+            valid = validationResult.indexOf(pattern.trim()) < 0;
+            if (!valid) {
+                break;
+            }
+        }
+        return valid;
     }
 
     /**
@@ -320,6 +334,14 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     public void setValidatorWarningCssUri(String validatorWarningCssUri) {
         _validatorWarningCssUri = validatorWarningCssUri;
+    }
+
+    public String getValidPattern() {
+        return _validPattern;
+    }
+
+    public void setValidPattern(String validPattern) {
+        _validPattern = validPattern;
     }
 
     /**
