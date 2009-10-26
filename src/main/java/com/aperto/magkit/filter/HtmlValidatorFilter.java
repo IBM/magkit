@@ -196,7 +196,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
                 String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
                 // Validation error handling ...
-                if (validationResult.indexOf("class=\"valid\">This Page Is Valid") < 0) {
+                if (validationResult.indexOf("[Valid]") < 0 || validationResult.indexOf("class=\"valid\">This document was successfully") < 0) {
                     LOGGER.warn("Detected invalid (X)HTML, injecting warning layer into HTML response ...");
                     // use original html with mgnlMainBar
                     if (mgnlHtml.contains(MGNL_MAIN_BAR_BEGIN)) {
