@@ -74,6 +74,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     private String _w3cValidatorCheckUrl = "http://validator.aperto.de/w3c-markup-validator/check";
     private String _validatorWarningCssUri = "/docroot/magkit/css/validator-warning.css";
     private String _validPattern = "[Valid]| class=\"valid\">This document was successfully";
+    private String _uriDenies = "/debug|/dataModule";
     private String _warningLayerTemplate;
     private int _resultCounter = 0;
     private long _timeOut = 15000;
@@ -118,7 +119,8 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         if (c_validatorEnabled) {
             String requestUri = request.getRequestURI();
             String context = request.getContextPath();
-            if (!(requestUri.startsWith(context + "/.") || requestUri.startsWith(context + "/debug"))) {
+            boolean isAllowedUri = checkUri(requestUri, context);
+            if (!requestUri.startsWith(context + "/.") && isAllowedUri) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("doFilter(" + request + ", " + response + ", " + chain + ")");
                 }
@@ -129,6 +131,18 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         } else {
             chain.doFilter(request, response);
         }
+    }
+
+    private boolean checkUri(String requestUri, String context) {
+        boolean notFound = true;
+        String[] parts = StringUtils.split(_uriDenies, '|');
+        for (String part : parts) {
+            notFound = !requestUri.startsWith(context + part);
+            if (!notFound) {
+                break;
+            }
+        }
+        return notFound;
     }
 
     private void filter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -342,6 +356,14 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     public void setValidPattern(String validPattern) {
         _validPattern = validPattern;
+    }
+
+    public String getUriDenies() {
+        return _uriDenies;
+    }
+
+    public void setUriDenies(String uriDenies) {
+        _uriDenies = uriDenies;
     }
 
     /**
