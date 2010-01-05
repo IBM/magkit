@@ -72,12 +72,6 @@
             <version>${magnolia.version}</version>
             <type>pom</type>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>magnolia-module-cache</artifactId>
-                    <groupId>info.magnolia</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- DMS module -->
         <dependency>
