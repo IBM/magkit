@@ -93,12 +93,12 @@
 
         <!-- Spring Framework -->
         <dependency>
+            <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework</groupId>
         </dependency>
 
         <!-- Java Extensions -->
@@ -230,20 +230,20 @@
                         </zipUrlInstaller>
                         <dependencies>
                             <dependency>
+                                <artifactId>spring-core</artifactId>
                                 <groupId>org.springframework</groupId>
-                                <artifactId>spring</artifactId>
                             </dependency>
                             <dependency>
-                                <groupId>apertoCommons</groupId>
                                 <artifactId>apertoCommons</artifactId>
+                                <groupId>apertoCommons</groupId>
                             </dependency>
                             <dependency>
-                                <groupId>commons-lang</groupId>
                                 <artifactId>commons-lang</artifactId>
+                                <groupId>commons-lang</groupId>
                             </dependency>
                             <dependency>
-                                <groupId>commons-collections</groupId>
                                 <artifactId>commons-collections</artifactId>
+                                <groupId>commons-collections</groupId>
                             </dependency>
                         </dependencies>
                     </container>
