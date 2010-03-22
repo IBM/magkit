@@ -128,6 +128,9 @@ public class DefaultModuleVersionHandlerTest {
         }
     }
 
+    /**
+      * Checkstyle needs an comment here.
+      */
     static class CustomModuleVersionHandler extends DefaultModuleVersionHandler {
 
         private Collection<Delta> _deltas;
@@ -146,6 +149,9 @@ public class DefaultModuleVersionHandlerTest {
         }
     }
 
+    /**
+      * Checkstyle needs an comment here.
+      */
     static class MagnoliaModuleVersionHandler extends info.magnolia.module.DefaultModuleVersionHandler {
 
         MagnoliaModuleVersionHandler() {
