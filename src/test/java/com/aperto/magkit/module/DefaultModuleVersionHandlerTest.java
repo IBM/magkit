@@ -30,8 +30,7 @@ public class DefaultModuleVersionHandlerTest {
     private static final Version VERSION3 = Version.parseVersion(3, 0, 0);
     private static final Version VERSION4 = Version.parseVersion(4, 0, 0);
     private static final Task DUMMY_TASK = new AbstractTask("", "") {
-
-        @Override
+	    
         public void execute(InstallContext installContext) throws TaskExecutionException {
             // do nothing
         }
