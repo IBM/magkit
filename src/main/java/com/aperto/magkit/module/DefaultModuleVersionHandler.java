@@ -29,12 +29,10 @@ public abstract class DefaultModuleVersionHandler implements ModuleVersionHandle
     ///////////////////////////////////////////////////////////////////////////
     //  Interface implementation CustomModuleVersionHandler
 
-    @Override
     public final Version getCurrentlyInstalled(final InstallContext installContext) {
         return _delegate.getCurrentlyInstalled(installContext);
     }
 
-    @Override
     public final List<Delta> getDeltas(final InstallContext installContext, final Version from) {
         List<Delta> deltas;
         if (from == null) {
@@ -56,7 +54,6 @@ public abstract class DefaultModuleVersionHandler implements ModuleVersionHandle
         return deltas;
     }
 
-    @Override
     public final Delta getStartupDelta(final InstallContext installContext) {
         return _delegate.getStartupDelta(installContext);
     }
