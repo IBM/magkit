@@ -133,8 +133,8 @@ public class HandleI18nContentSupport implements I18nContentSupport {
      * Gets the normal node data.
      */
     public NodeData getNodeData(Content node, String name, Locale locale) throws RepositoryException {
-        // return the node data
-        return node.getNodeData(name);
+        // return the node data; ignore local
+        return getNodeData(node, name);
     }
 
     /**
@@ -142,7 +142,8 @@ public class HandleI18nContentSupport implements I18nContentSupport {
      */
     public NodeData getNodeData(Content node, String name) {
         // return the node data
-        return node.getNodeData(name);
+	// node may be null if method is called from cms:isExisting tag !!
+        return node != null ? node.getNodeData(name) : null;
     }
 
     public boolean isEnabled() {
