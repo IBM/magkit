@@ -1,24 +1,27 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
+
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
-import static org.apache.commons.lang.StringUtils.*;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.text.StringContains.containsString;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
+import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
-import static org.junit.matchers.StringContains.*;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * Test the breadcrumb tag.

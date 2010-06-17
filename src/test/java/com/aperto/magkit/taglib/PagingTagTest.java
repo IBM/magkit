@@ -1,24 +1,25 @@
 package com.aperto.magkit.taglib;
 
-import java.util.Locale;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-
 import com.aperto.magkit.MagKitTagTest;
+
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.text.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import static org.junit.matchers.StringContains.containsString;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import java.util.Locale;
 
 /**
  * Test of the paging tag.

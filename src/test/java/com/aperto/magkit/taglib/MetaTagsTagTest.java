@@ -1,24 +1,29 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
+
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.test.mock.MockContent;
 import info.magnolia.test.mock.MockNodeData;
 import org.apache.commons.lang.StringUtils;
-import static org.easymock.classextension.EasyMock.*;
+import static org.easymock.classextension.EasyMock.anyObject;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.replay;
 import org.hamcrest.CoreMatchers;
+import static org.hamcrest.text.StringContains.containsString;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.matchers.StringContains;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.web.servlet.support.RequestContext;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
@@ -37,9 +42,9 @@ public class MetaTagsTagTest extends MagKitTagTest {
         _metaTagsTag.doEndTag();
         JspWriter jspWriter = _pageContext.getOut();
         String output = jspWriter.toString();
-        Assert.assertThat(output, StringContains.containsString("<meta name=\"author\" content=\"aperto\" />"));
-        Assert.assertThat(output, StringContains.containsString("<meta name=\"description\" content=\"toll\" />"));
-        Assert.assertThat(output, StringContains.containsString("<meta name=\"publisher\" content=\"aperto\" />"));
+        Assert.assertThat(output, containsString("<meta name=\"author\" content=\"aperto\" />"));
+        Assert.assertThat(output, containsString("<meta name=\"description\" content=\"toll\" />"));
+        Assert.assertThat(output, containsString("<meta name=\"publisher\" content=\"aperto\" />"));
         Assert.assertThat(StringUtils.countMatches(output, "<meta"), CoreMatchers.is(4));
     }
 
