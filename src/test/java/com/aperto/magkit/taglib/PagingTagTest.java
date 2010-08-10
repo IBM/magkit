@@ -1,11 +1,11 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
+import com.aperto.magkit.mock.MockContent;
 
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
-import info.magnolia.test.mock.MockContent;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.text.StringContains.containsString;

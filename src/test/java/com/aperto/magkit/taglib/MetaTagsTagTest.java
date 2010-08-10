@@ -1,12 +1,12 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
+import com.aperto.magkit.mock.MockContent;
+import com.aperto.magkit.mock.MockNodeData;
 
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
-import info.magnolia.test.mock.MockContent;
-import info.magnolia.test.mock.MockNodeData;
 import org.apache.commons.lang.StringUtils;
 import static org.easymock.classextension.EasyMock.anyObject;
 import static org.easymock.classextension.EasyMock.createMock;
