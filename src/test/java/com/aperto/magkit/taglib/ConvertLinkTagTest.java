@@ -78,7 +78,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output.length(), is(0));
-        String var = (String) pageContext.getRequest().getAttribute("link");
+        String var = (String) pageContext.getAttribute("link");
         assertThat(var, containsString(CONTEXT_PATH));
         assertThat(var, containsString(LINK_VALUE_INT));
         assertThat(var, endsWith("html"));
