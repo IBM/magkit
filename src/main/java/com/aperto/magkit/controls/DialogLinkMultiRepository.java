@@ -1,17 +1,16 @@
 package com.aperto.magkit.controls;
 
-import javax.jcr.RepositoryException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.aperto.magkit.utils.LinkTool;
+import static com.aperto.magkit.utils.LinkTool.convertUUIDtoHandle;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.gui.control.Button;
 import info.magnolia.cms.gui.dialog.DialogUUIDLink;
-import info.magnolia.cms.util.RequestFormUtil;
-import info.magnolia.context.MgnlContext;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import static info.magnolia.context.MgnlContext.getParameter;
+import static org.apache.commons.lang.StringUtils.isBlank;
+
+import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * A link control with two buttons for different repositories.
@@ -19,7 +18,6 @@ import org.apache.log4j.Logger;
  * @author frank.sommer (08.02.2008)
  */
 public class DialogLinkMultiRepository extends DialogUUIDLink {
-    private static final Logger LOGGER = Logger.getLogger(DialogLinkMultiRepository.class);
     private static final String SECOND_REPOSITORY = "secondRepository";
 
     /**
@@ -54,18 +52,16 @@ public class DialogLinkMultiRepository extends DialogUUIDLink {
      * @see info.magnolia.cms.gui.dialog.UUIDDialogControl#getRepository()
      */
     public String getRepository() {
-        String value = "";
         String repository = super.getRepository();
-        RequestFormUtil params = new RequestFormUtil(getRequest());
-        if (params.getParameter(getName()) != null) {
-            value = params.getParameter(getName());
-            if (!MgnlContext.getHierarchyManager(repository).isExist(value)) {
+        if (getParameter(getName()) != null) {
+            String value = getParameter(getName());
+            if (!getHierarchyManager(repository).isExist(value)) {
                 repository = getConfigValue(SECOND_REPOSITORY, "data");
             }
         } else if (getStorageNode() != null) {
-            value = readValue();
-            String handle = LinkTool.convertUUIDtoHandle(value, repository);
-            if (StringUtils.isBlank(handle)) {
+            String value = readValue();
+            String handle = convertUUIDtoHandle(value, repository);
+            if (isBlank(handle)) {
                 repository = getConfigValue(SECOND_REPOSITORY, "data");
             }
         }

@@ -1,12 +1,12 @@
 package com.aperto.magkit.taglib;
 
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.util.Resource;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 @Tag(name = "linkTarget", bodyContent = BodyContent.JSP)
 public class LinkTargetTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(LinkTargetTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkTargetTag.class);
 
     private String _nodeDataName;
 
@@ -40,8 +40,8 @@ public class LinkTargetTag extends TagSupport {
     public int doEndTag() throws JspException {
         JspWriter out = pageContext.getOut();
 
-        if (!StringUtils.isBlank(_nodeDataName)) {
-            Content content = Resource.getLocalContentNode();
+        if (!isBlank(_nodeDataName)) {
+            Content content = getAggregationState().getCurrentContent();
             try {
                 if (content.hasNodeData(_nodeDataName)) {
                     String target = content.getNodeData(_nodeDataName).getString();

@@ -1,20 +1,19 @@
 package com.aperto.magkit.taglib;
 
-import java.io.IOException;
+import com.aperto.magkit.utils.Item;
+import info.magnolia.cms.core.Content;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.split;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
-
-import com.aperto.magkit.utils.Item;
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.util.Resource;
-import org.apache.commons.lang.StringUtils;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import java.io.IOException;
 
 /**
  * Create a html list from a formatted string.
@@ -22,11 +21,12 @@ import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
  * Input: List1|item1;item2;item3 <br/>
  * Output: <code><h4>List1</h4><ul><li>item1</li>...</ul></code>
  *
- * @author frank.sommer (16.01.2008)
+ * @author frank.sommer
+ * @since 16.01.2008
  */
 @Tag(name = "createList", bodyContent = BodyContent.JSP)
 public class CreateListTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(CreateListTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateListTag.class);
 
     private String _nodeDataName;
     private String _listValue;
@@ -75,7 +75,7 @@ public class CreateListTag extends TagSupport {
         JspWriter out = pageContext.getOut();
         // if nodeData is set, fetch the linkValue from CMS
         if (!isBlank(_nodeDataName)) {
-            Content content = Resource.getLocalContentNode();
+            Content content = getAggregationState().getCurrentContent();
             try {
                 if (content.hasNodeData(_nodeDataName)) {
                     _listValue = content.getNodeData(_nodeDataName).getString();
@@ -91,18 +91,14 @@ public class CreateListTag extends TagSupport {
                 for (Item item : items) {
                     String key = item.getKey();
                     if (!isBlank(key)) {
-                        StringBuffer sb = new StringBuffer();
-                        sb.append("<").append(_hlTag).append(">").append(key).append("</").append(_hlTag).append(">");
-                        out.write(sb.toString());
+                        out.write("<" + _hlTag + ">" + key + "</" + _hlTag + ">");
                     }
                     String value = item.getValue();
                     if (!isBlank(value)) {
-                        String[] listItems = StringUtils.split(value, ';');
+                        String[] listItems = split(value, ';');
                         out.write("<" + _listTag + ">");
                         for (String listItem : listItems) {
-                            StringBuffer sb = new StringBuffer();
-                            sb.append("<li>").append(listItem).append("</li>");
-                            out.write(sb.toString());
+                            out.write("<li>" + listItem + "</li>");
                         }
                         out.write("</" + _listTag + ">");
                     }
@@ -118,10 +114,10 @@ public class CreateListTag extends TagSupport {
 
     private Item[] determineItems(String listValue) {
         String newListvalue = listValue.trim();
-        String[] lists = StringUtils.split(newListvalue, '\n');
+        String[] lists = split(newListvalue, '\n');
         Item[] items = new Item[lists.length];
         for (int i = 0; i < lists.length; i++) {
-            String[] fields = StringUtils.split(lists[i], '|');
+            String[] fields = split(lists[i], '|');
             if (fields.length > 0) {
                 if (fields.length == 1) {
                     items[i] = new Item("", fields[0]);

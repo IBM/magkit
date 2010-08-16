@@ -1,45 +1,43 @@
 package com.aperto.magkit.controller;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.aperto.magkit.beans.GalleryEntry;
 import com.aperto.magkit.utils.ImageData;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.cms.link.LinkHelper;
-import info.magnolia.cms.security.AccessDeniedException;
-import info.magnolia.cms.util.ContentUtil;
-import info.magnolia.cms.util.NodeDataUtil;
-import info.magnolia.cms.util.Resource;
-import info.magnolia.context.MgnlContext;
-import info.magnolia.module.dms.DMSModule;
+import static info.magnolia.cms.core.ItemType.CONTENTNODE;
+import static info.magnolia.cms.util.ContentUtil.getContent;
+import static info.magnolia.cms.util.NodeDataUtil.getString;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import static info.magnolia.link.LinkUtil.convertUUIDtoHandle;
+import static info.magnolia.module.dms.DMSModule.getInstance;
 import info.magnolia.module.dms.beans.Document;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.lang.ArrayUtils.contains;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.substringBeforeLast;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+
+import javax.imageio.IIOException;
+import javax.imageio.ImageIO;
+import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import static java.awt.Image.SCALE_AREA_AVERAGING;
+import java.awt.image.BufferedImage;
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
+import java.io.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import java.util.*;
+import java.util.List;
+import static java.util.Locale.ENGLISH;
 
 /**
  * Spring controller of the photo gallery.
@@ -58,7 +56,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
  * @author frank.sommer
  */
 public class PhotoGalleryController extends AbstractController {
-    private static final Logger LOGGER = Logger.getLogger(PhotoGalleryController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhotoGalleryController.class);
     private static final String[] IMAGE_EXTENSIONS = {"png", "jpg", "gif", "bmp", "jpeg"};
     private static final String DEFAULT_VIEWNAME = "paragraphs/photoGallery";
     private int _thumbWidth = 65;
@@ -84,14 +82,14 @@ public class PhotoGalleryController extends AbstractController {
 
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> result = new HashMap<String, Object>();
-        Content localContent = Resource.getLocalContentNode();
+        Content localContent = getAggregationState().getCurrentContent();
         try {
             if (localContent != null && localContent.hasNodeData("folder")) {
-                String folderPath = LinkHelper.convertUUIDtoHandle(localContent.getNodeData("folder").getString(), DMSModule.getInstance().getRepository());
-                if (StringUtils.isNotBlank(folderPath)) {
-                    Content folder = MgnlContext.getHierarchyManager(DMSModule.getInstance().getRepository()).getContent(folderPath);
+                String folderPath = convertUUIDtoHandle(localContent.getNodeData("folder").getString(), getInstance().getRepository());
+                if (isNotBlank(folderPath)) {
+                    Content folder = getHierarchyManager(getInstance().getRepository()).getContent(folderPath);
                     if (folder != null) {
-                        Collection images = folder.getChildren(ItemType.CONTENTNODE);
+                        Collection images = folder.getChildren(CONTENTNODE);
                         if (images.size() > 0) {
                             List<GalleryEntry> imageList = retrieveImageList(images);
                             result.put("imageList", imageList);
@@ -111,14 +109,14 @@ public class PhotoGalleryController extends AbstractController {
             GalleryEntry galleryEntry = new GalleryEntry();
             Content content = (Content) imgObj;
             Document originalDocument = new Document(content);
-            if (ArrayUtils.contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension().toLowerCase(Locale.ENGLISH))) {
+            if (contains(IMAGE_EXTENSIONS, originalDocument.getFileExtension().toLowerCase(ENGLISH))) {
                 Document previewDocument = getPreviewImageDocument(originalDocument);
                 if (previewDocument != null) {
                     galleryEntry.setImage(new ImageData(originalDocument));
                     galleryEntry.setThumbnail(new ImageData(previewDocument));
-                    String imageTitle = NodeDataUtil.getString(content, "subject", originalDocument.getFileName());
-                    galleryEntry.setImageTitle(StringEscapeUtils.escapeHtml(imageTitle));
-                    String description = NodeDataUtil.getString(content, "description");
+                    String imageTitle = getString(content, "subject", originalDocument.getFileName());
+                    galleryEntry.setImageTitle(escapeHtml(imageTitle));
+                    String description = getString(content, "description");
                     galleryEntry.setImageDescription(description);
                     imageList.add(galleryEntry);
                 }
@@ -135,7 +133,7 @@ public class PhotoGalleryController extends AbstractController {
      * @return the new image file
      */
     private Document getPreviewImageDocument(Document document) throws Exception {
-        HierarchyManager manager = MgnlContext.getHierarchyManager(DMSModule.getInstance().getRepository());
+        HierarchyManager manager = getHierarchyManager(getInstance().getRepository());
         Document previewDocument = getPreviewDocumentForDocument(document, manager);
         if (previewDocument != null && !previewDocument.getFileName().equals(document.getFileName())) {
             InputStream oriImgStr = null;
@@ -156,12 +154,8 @@ public class PhotoGalleryController extends AbstractController {
                 LOGGER.info("Error reading image: " + document.getName());
                 previewDocument = null;
             } finally {
-                if (oriImgStr != null) {
-                    oriImgStr.close();
-                }
-                if (newImgStr != null) {
-                    newImgStr.close();
-                }
+                closeQuietly(oriImgStr);
+                closeQuietly(newImgStr);
                 if (newImgFile != null) {
                     newImgFile.delete();
                 }
@@ -202,8 +196,8 @@ public class PhotoGalleryController extends AbstractController {
                 cropHeight = oriHeight;
                 cropWidth = (int) ((double) cropWidth / (double) cropHeight * (double) oriHeight);
             }
-            int xOffset = Math.max((oriWidth - cropWidth) / 2, 0);
-            int yOffset = Math.max((oriHeight - cropHeight) / 2, 0);
+            int xOffset = max((oriWidth - cropWidth) / 2, 0);
+            int yOffset = max((oriHeight - cropHeight) / 2, 0);
             newImg = oriImgBuff.getSubimage(xOffset, yOffset, cropWidth, cropHeight);
         } else {
             newImg = oriImgBuff;
@@ -213,8 +207,8 @@ public class PhotoGalleryController extends AbstractController {
         // get the width and height of the new image
         int newWidth = new Double(cropWidth * scaleFactor).intValue();
         int newHeight = new Double(cropHeight * scaleFactor).intValue();
-        newImg = newImg.getScaledInstance(newWidth, newHeight, Image.SCALE_AREA_AVERAGING);
-        BufferedImage newImgBuff = new BufferedImage(newImg.getWidth(null), newImg.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        newImg = newImg.getScaledInstance(newWidth, newHeight, SCALE_AREA_AVERAGING);
+        BufferedImage newImgBuff = new BufferedImage(newImg.getWidth(null), newImg.getHeight(null), TYPE_INT_RGB);
         Graphics2D g = newImgBuff.createGraphics();
         g.drawImage(newImg, 0, 0, null);
         g.dispose();
@@ -237,7 +231,7 @@ public class PhotoGalleryController extends AbstractController {
         // create two scale factors, and see which is smaller
         double scaleFactorWidth = (double) maxWidth / (double) width;
         double scaleFactorHeight = (double) maxHeight / (double) height;
-        scaleFactor = _cropping ? Math.max(scaleFactorWidth, scaleFactorHeight) : Math.min(scaleFactorWidth, scaleFactorHeight);
+        scaleFactor = _cropping ? max(scaleFactorWidth, scaleFactorHeight) : min(scaleFactorWidth, scaleFactorHeight);
         return scaleFactor;
     }
 
@@ -262,22 +256,18 @@ public class PhotoGalleryController extends AbstractController {
             String folderPath = getFolder(document.getPath());
             Content mainFolder = manager.getContent(folderPath);
             if (mainFolder != null) {
-                Content previewFolder = ContentUtil.getContent(mainFolder, "previewFolder");
+                Content previewFolder = getContent(mainFolder, "previewFolder");
                 if (previewFolder == null) {
                     previewFolder = mainFolder.createContent("previewFolder");
                     mainFolder.save();
                 }
-                Content previewImage = ContentUtil.getContent(previewFolder, document.getName());
+                Content previewImage = getContent(previewFolder, document.getName());
                 if (previewImage == null) {
-                    previewImage = previewFolder.createContent(document.getName(), ItemType.CONTENTNODE);
+                    previewImage = previewFolder.createContent(document.getName(), CONTENTNODE);
                     previewFolder.save();
                 }
                 previewDocument = new Document(previewImage);
             }
-        } catch (PathNotFoundException e) {
-            LOGGER.info(e.getLocalizedMessage());
-        } catch (AccessDeniedException e) {
-            LOGGER.info(e.getLocalizedMessage());
         } catch (RepositoryException e) {
             LOGGER.info(e.getLocalizedMessage());
         }

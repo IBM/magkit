@@ -1,26 +1,24 @@
 package com.aperto.magkit.utils;
 
+import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
+import info.magnolia.cms.core.*;
+import info.magnolia.cms.util.ContentUtil;
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import info.magnolia.link.LinkUtil;
+import static info.magnolia.link.LinkUtil.DEFAULT_EXTENSION;
+import static info.magnolia.link.LinkUtil.isExternalLinkOrAnchor;
+import info.magnolia.module.dms.beans.Document;
+import static org.apache.commons.lang.ArrayUtils.remove;
+import static org.apache.commons.lang.StringUtils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jcr.PropertyType;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import static java.net.URLEncoder.encode;
 import static java.util.Locale.ENGLISH;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.jcr.PropertyType;
-
-import info.magnolia.cms.beans.config.ContentRepository;
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.HierarchyManager;
-import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.link.LinkHelper;
-import info.magnolia.cms.util.ContentUtil;
-import info.magnolia.cms.util.LinkUtil;
-import info.magnolia.context.MgnlContext;
-import info.magnolia.module.dms.beans.Document;
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import org.apache.log4j.Logger;
 
 /**
  * Helper class for links.
@@ -28,11 +26,10 @@ import org.apache.log4j.Logger;
  * @author Rainer Blumenthal (13.02.2007), Frank Sommer (25.10.2007)
  */
 public final class LinkTool {
-    private static final Logger LOGGER = Logger.getLogger(LinkTool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkTool.class);
     private static final String DMS_REPOSITORY = "dms";
     public static final Pattern UUID_PATTERN = Pattern.compile("^[-a-z0-9]{30,40}$");
     private static final char SLASH = '/';
-    private static final URLCodec URL_ENCODER = new URLCodec("UTF-8");
 
     /**
      * Returns absolutePath-Link nevertheless if u give it a "uuidLink" or a "link".
@@ -69,13 +66,13 @@ public final class LinkTool {
      * @return the handle with optional .html
      */
     public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
-        String newLink = StringUtils.EMPTY;
-        String extension = LinkUtil.DEFAULT_EXTENSION;
+        String newLink = EMPTY;
+        String extension = DEFAULT_EXTENSION;
         if (isNotEmpty(link)) {
             try {
-                String path = StringUtils.EMPTY;
-                String handle = convertUUIDtoHandle(link, ContentRepository.WEBSITE);
-                if (handle == null && !StringUtils.isBlank(alternativeRepository)) {
+                String path = EMPTY;
+                String handle = convertUUIDtoHandle(link, WEBSITE);
+                if (handle == null && !isBlank(alternativeRepository)) {
                     handle = convertUUIDtoHandle(link, alternativeRepository);
                     if (handle != null) {
                         StringBuilder dmsHandle = new StringBuilder(32);
@@ -83,7 +80,7 @@ public final class LinkTool {
                         // in dms the file name is additional nessecary
                         if (DMS_REPOSITORY.equalsIgnoreCase(alternativeRepository) && addExtension) {
                             Document doc = new Document(ContentUtil.getContent(DMS_REPOSITORY, handle));
-                            dmsHandle.append(SLASH).append(urlEncode(doc.getFileName()));
+                            dmsHandle.append(SLASH).append(mgnlUrlEncode(doc.getFileName()));
                             extension = doc.getFileExtension();
                         }
                         handle = dmsHandle.toString();
@@ -95,12 +92,12 @@ public final class LinkTool {
                 newLink = determineNewLink(path, link);
             } catch (NullPointerException e) {
                 // should only occur in unit tests if the mgnlContext is not present
-                newLink = isUuid(link) ? StringUtils.EMPTY : link;
+                newLink = isUuid(link) ? EMPTY : link;
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("Could not URL encode filename with encoding UTF-8", e);
             }
         }
-        if (StringUtils.isNotBlank(newLink) && addExtension && !hasHtmlExtension(newLink)) {
+        if (isNotBlank(newLink) && addExtension && !hasHtmlExtension(newLink)) {
             newLink += "." + extension;
         }
         return newLink;
@@ -108,12 +105,12 @@ public final class LinkTool {
 
     /**
      * Api compatibility method for magnolia 4.0 api change.
-     * {@link LinkHelper#convertUUIDtoHandle} throws new info.magnolia.link.LinkException class.
+     * {@link LinkUtil#convertUUIDtoHandle} throws new info.magnolia.link.LinkException class.
      */
     public static String convertUUIDtoHandle(final String link, final String repository) {
         String handle = null;
         try {
-            handle = LinkHelper.convertUUIDtoHandle(link, repository);
+            handle = LinkUtil.convertUUIDtoHandle(link, repository);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
         }
@@ -126,7 +123,7 @@ public final class LinkTool {
     }
 
     private static String determineNewLink(String path, String link) {
-        return StringUtils.isBlank(path) ? (isUuid(link) ? StringUtils.EMPTY : link) : path;
+        return isBlank(path) ? (isUuid(link) ? EMPTY : link) : path;
     }
 
     public static boolean isUuid(String link) {
@@ -146,7 +143,7 @@ public final class LinkTool {
      */
     public static boolean checkLink(String link) {
         boolean result;
-        HierarchyManager hm = MgnlContext.getHierarchyManager(ContentRepository.WEBSITE);
+        HierarchyManager hm = getHierarchyManager(WEBSITE);
         result = isNotEmpty(link) && hm.isExist(link);
         return result;
     }
@@ -160,7 +157,7 @@ public final class LinkTool {
     public static String getUrl(Content content) {
         String url = content.getHandle();
         if (!hasHtmlExtension(url)) {
-            url += "." + LinkUtil.DEFAULT_EXTENSION;
+            url += "." + DEFAULT_EXTENSION;
         }
         return url;
     }
@@ -188,18 +185,18 @@ public final class LinkTool {
         StringBuilder binaryLink = new StringBuilder(64);
         if (binaryNode != null && binaryNode.isExist()) {
             if (binaryNode.getType() == PropertyType.BINARY) {
-                if (StringUtils.isNotBlank(repository)) {
+                if (isNotBlank(repository)) {
                     binaryLink.append(SLASH).append(repository);
                 }
                 String fileName = binaryNode.getAttribute("fileName");
                 String extension = binaryNode.getAttribute("extension");
                 try {
-                    binaryLink.append(binaryNode.getHandle()).append(SLASH).append(urlEncode(fileName)).append('.').append(extension);
+                    binaryLink.append(binaryNode.getHandle()).append(SLASH).append(mgnlUrlEncode(fileName)).append('.').append(extension);
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException("Cannot url encode filename '" + fileName + "' with encoding 'UTF-8'", e);
                 }
             } else {
-                LOGGER.info("Given NodeData is not from type binary: " + binaryNode.getHandle());
+                LOGGER.info("Given NodeData is not from type binary: {}.", binaryNode.getHandle());
             }
         } else {
             LOGGER.info("Given NodeData was null or does not exist.");
@@ -208,19 +205,19 @@ public final class LinkTool {
     }
 
     /**
-     * URL encodes the passed String using the code from info.magnolia.module.dms.beans.Document.
+     * URL encodes the passed String using the code from {@link info.magnolia.module.dms.beans.Document}.
      *
      * @param s the string to be encoded
      * @return a new URL encoded String or an empty String if the parameter s has been NULL.
      * @throws UnsupportedEncodingException if encoding fails for encoding 'UTF-8'
      */
-    public static String urlEncode(String s) throws UnsupportedEncodingException {
-        String name = StringUtils.EMPTY;
+    public static String mgnlUrlEncode(String s) throws UnsupportedEncodingException {
+        String name = EMPTY;
         if (s != null) {
             // from magnolia Document class:
-            name = StringUtils.replaceChars(s, "ÇÈ<>\"'/\\", "________");
-            name = URLEncoder.encode(name, "UTF-8");
-            name = StringUtils.replace(name, "+", "%20");
+            name = replaceChars(s, "ÇÈ<>\"'/\\", "________");
+            name = encode(name, "UTF-8");
+            name = replace(name, "+", "%20");
         }
         return name;
     }
@@ -230,17 +227,17 @@ public final class LinkTool {
      */
     public static String insertSelector(String link, String selector) {
         String newLink = link;
-        if (StringUtils.isNotBlank(selector) && !LinkHelper.isExternalLinkOrAnchor(link)) {
-            String[] pathParts = StringUtils.split(link, SLASH);
+        if (isNotBlank(selector) && !isExternalLinkOrAnchor(link)) {
+            String[] pathParts = split(link, SLASH);
             String lastPart = pathParts[pathParts.length - 1];
-            pathParts = (String[]) ArrayUtils.remove(pathParts, pathParts.length - 1);
-            String[] parts = StringUtils.split(lastPart, '.');
+            pathParts = (String[]) remove(pathParts, pathParts.length - 1);
+            String[] parts = split(lastPart, '.');
             String[] newParts = new String[parts.length + 1];
             newParts[0] = parts[0];
             newParts[1] = selector;
             System.arraycopy(parts, 1, newParts, 2, newParts.length - 2);
-            newLink = SLASH + StringUtils.join(pathParts, SLASH) + SLASH;
-            newLink += StringUtils.join(newParts, '.');
+            newLink = SLASH + join(pathParts, SLASH) + SLASH;
+            newLink += join(newParts, '.');
         }
         return newLink;
     }

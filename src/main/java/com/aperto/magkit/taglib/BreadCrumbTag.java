@@ -2,15 +2,18 @@ package com.aperto.magkit.taglib;
 
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.util.Resource;
-import static org.apache.commons.lang.StringUtils.*;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.split;
 import org.apache.commons.lang.exception.NestableRuntimeException;
 import static org.apache.commons.lang.math.NumberUtils.toInt;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import org.apache.myfaces.tobago.apt.annotation.*;
 import static org.apache.taglibs.standard.tag.common.core.Util.escapeXml;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -31,7 +34,7 @@ import java.io.IOException;
  */
 @Tag(name = "breadcrumb", bodyContent = BodyContent.JSP)
 public class BreadCrumbTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(BreadCrumbTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BreadCrumbTag.class);
 
     /**
      * Breadcrumb start level.
@@ -170,7 +173,7 @@ public class BreadCrumbTag extends TagSupport {
      */
     public int doStartTag() throws JspException {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-        Content actpage = _node != null ? _node : Resource.getCurrentActivePage();
+        Content actpage = _node != null ? _node : getAggregationState().getMainContent();
         try {
             int endLevel = actpage.getLevel();
             if (_excludeCurrent) {
@@ -185,7 +188,7 @@ public class BreadCrumbTag extends TagSupport {
                 out.print("</" + split(_listType, ' ')[0] + ">");
             }
         } catch (RepositoryException e) {
-            LOGGER.warn("Exception caught: " + e.getMessage(), e);
+            LOGGER.warn("Exception caught: {}.", e.getMessage(), e);
         } catch (IOException e) {
             throw new NestableRuntimeException(e);
         }

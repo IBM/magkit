@@ -1,17 +1,14 @@
 package com.aperto.magkit.paging.mvc.tags;
 
+import info.magnolia.cms.util.SelectorUtil;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import org.apache.myfaces.tobago.apt.annotation.*;
 
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
 import java.util.Collections;
 import java.util.List;
-
-import info.magnolia.cms.util.Resource;
 
 /**
  * This tag itterates over a collection of objects and provides status messages to controll the body evaluation of its nested tags.
@@ -19,8 +16,7 @@ import info.magnolia.cms.util.Resource;
  * All HTML content should only be provided as body content of the corresponding nested tags.
  * 
  * @author wolf.bubenik (Aperto AG)
- * Date: 13.01.2009
- * Time: 14:26:36
+ * @since 13.01.2009
  */
 @Tag(name = "pagingIterator", bodyContent = BodyContent.JSP)
 public class PagingIteratorTag extends TagSupport {
@@ -202,7 +198,7 @@ public class PagingIteratorTag extends TagSupport {
      */
     private int getCursorFromUrlSelector() {
         int result = 1;
-        String selector = Resource.getSelector();
+        String selector = SelectorUtil.getSelector();
         if (isNotEmpty(selector)) {
             result = Integer.parseInt(selector);
         }
@@ -381,5 +377,3 @@ public class PagingIteratorTag extends TagSupport {
         return isFirstPages() || isLastPages() || isWindowPage();
     }
 }
-
-

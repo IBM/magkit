@@ -77,7 +77,7 @@
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-dms</artifactId>
-            <version>1.2.3</version>
+            <version>1.2.5</version>
             <scope>provided</scope>
         </dependency>
 

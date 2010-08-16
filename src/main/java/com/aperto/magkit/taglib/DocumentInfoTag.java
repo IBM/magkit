@@ -2,18 +2,17 @@ package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.beans.DocumentInfo;
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.util.ContentUtil;
-import info.magnolia.cms.util.Resource;
+import static info.magnolia.cms.util.ContentUtil.getContentByUUID;
+import static info.magnolia.context.MgnlContext.getAggregationState;
 import info.magnolia.module.dms.beans.Document;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import javax.servlet.ServletRequest;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
-import javax.jcr.RepositoryException;
 
 /**
  * This Tag saves several information from a dms-document in the request.
@@ -21,11 +20,12 @@ import javax.jcr.RepositoryException;
  * Saves a DocumentInfo-Object with the attributes fileSize, fileName, fileExtention and fileModificationDate in request.
  * The default filesizeunit is kb, other can be set with the fileSize attribute ("byte" or "mb").
  *
- * @author diana racho (28.04.2008)
+ * @author diana racho
+ * @since 28.04.2008
  */
 @Tag(name = "documentInfo", bodyContent = BodyContent.JSP)
 public class DocumentInfoTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(DocumentInfoTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentInfoTag.class);
     private static final String ND_SUBJECT = "subject";
     private static final String ND_TITLE = "title";
 
@@ -49,18 +49,17 @@ public class DocumentInfoTag extends TagSupport {
      * @throws javax.servlet.jsp.JspException
      */
     public int doEndTag() throws JspException {
-        ServletRequest request = pageContext.getRequest();
-        String link = Resource.getLocalContentNode().getNodeData(_nodeDataName).getString();
-        if (!StringUtils.isBlank(link)) {
+        String link = getAggregationState().getCurrentContent().getNodeData(_nodeDataName).getString();
+        if (!isBlank(link)) {
             Content node = retrieveContent(link);
             if (node != null) {
                 Document doc = new Document(node);
                 int divisor = 1024;
-                if (!StringUtils.isBlank(_fileSize)) {
-                    if (StringUtils.equals(_fileSize.toLowerCase(), "mb")) {
+                if (!isBlank(_fileSize)) {
+                    if ("mb".equalsIgnoreCase(_fileSize)) {
                         divisor = 1024 * 1024;
                     }
-                    if (StringUtils.equals(_fileSize.toLowerCase(), "byte")) {
+                    if ("byte".equalsIgnoreCase(_fileSize)) {
                         divisor = 1;
                     }
                 }
@@ -78,9 +77,6 @@ public class DocumentInfoTag extends TagSupport {
                 }
                 documentInfo.setFileSize((fileSize / divisor));
                 determineSubject(doc, documentInfo);
-                request.setAttribute("documentInfo", documentInfo);
-                // make result accessible for freemarker templates:
-                // TODO: replace this hack with a scope attribute
                 pageContext.setAttribute("documentInfo", documentInfo);
             } else {
                 LOGGER.info("NodeData is not a uuid to a dms-document");
@@ -105,6 +101,6 @@ public class DocumentInfoTag extends TagSupport {
     }
 
     protected Content retrieveContent(String link) {
-        return ContentUtil.getContentByUUID("dms", link);
+        return getContentByUUID("dms", link);
     }
 }

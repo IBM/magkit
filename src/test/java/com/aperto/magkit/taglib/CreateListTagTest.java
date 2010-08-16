@@ -1,32 +1,27 @@
 package com.aperto.magkit.taglib;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-
 import com.aperto.magkit.MagKitTagTest;
-import com.mockrunner.mock.web.MockPageContext;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.cms.util.Resource;
 import com.aperto.magkit.mock.MockContent;
 import com.aperto.magkit.mock.MockNodeData;
-import org.apache.commons.lang.StringUtils;
+import com.mockrunner.mock.web.MockPageContext;
+import info.magnolia.cms.core.ItemType;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletConfig;
+import org.springframework.mock.web.*;
+
+import javax.servlet.jsp.*;
 
 /**
  * Test of the create list tag.
  *
- * @author frank.sommer (17.01.2008)
+ * @author frank.sommer
+ * @since 17.01.2008
  */
 public class CreateListTagTest extends MagKitTagTest {
-    private static final String LOCAL_CONTENT_OBJ = "contentObj";
     private static final String LIST_VALUE_LONG = "list1|entry1;entry2\nlist2|entry1;entry2";
     private static final String LIST_VALUE_SHORT = "entry1;entry2";
 
@@ -38,7 +33,7 @@ public class CreateListTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, startsWith("<h4>"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(4));
+        assertThat(countMatches(output, "<li>"), is(4));
     }
 
     @Test
@@ -50,7 +45,7 @@ public class CreateListTagTest extends MagKitTagTest {
         JspWriter jspWriter = pageContext.getOut();
         String output = jspWriter.toString();
         assertThat(output, startsWith("<ol>"));
-        assertThat(StringUtils.countMatches(output, "<li>"), is(2));
+        assertThat(countMatches(output, "<li>"), is(2));
     }
 
     @Override
@@ -66,7 +61,7 @@ public class CreateListTagTest extends MagKitTagTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         // init MgnlContext:
         initMgnlWebContext(request, response, httpSession.getServletContext());
-        Resource.setLocalContentNode(mockContent);
+        getAggregationState().setCurrentContent(mockContent);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 }

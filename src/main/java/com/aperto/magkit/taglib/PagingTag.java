@@ -1,23 +1,26 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.utils.SelectorUtils;
+import static com.aperto.magkit.utils.SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER;
+import info.magnolia.cms.core.AggregationState;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.cms.i18n.I18nContentSupportFactory;
-import info.magnolia.cms.util.Resource;
-import static org.apache.commons.lang.StringUtils.*;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.split;
 import org.apache.commons.lang.exception.NestableRuntimeException;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import static java.lang.Math.min;
+import java.util.*;
 
 /**
  * Draws a paging div container.
@@ -25,11 +28,12 @@ import java.util.ResourceBundle;
  * (common.paging.prefix, common.paging.prefixTitle, common.paging.selector,
  * common.paging.prevPageTitle, common.paging.prevPage, common.paging.nextPageTitle, common.paging.nextPage)
  *
- * @author frank.sommer (15.11.2007)
+ * @author frank.sommer
+ * @since 15.11.2007
  */
 @Tag(name = "paging", bodyContent = BodyContent.JSP)
 public class PagingTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(PagingTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PagingTag.class);
     private static final String PADDING_SEQUENZ = "...";
 
     private String _prefix = "Seite";
@@ -187,9 +191,9 @@ public class PagingTag extends TagSupport {
         if (_pages > _linkedPages && _actPage > ((_linkedPages / 2) + 1)) {
             out.print(determineLinkedPage(getLink(completeHandle, queryString, 1), 1));
             out.print("<li>" + PADDING_SEQUENZ + "</li>");
-            startPage = Math.min(_actPage - (_linkedPages / 2), _pages - _linkedPages + 1);
+            startPage = min(_actPage - (_linkedPages / 2), _pages - _linkedPages + 1);
         }
-        int lastPage = Math.min(startPage + _linkedPages - 1, _pages);
+        int lastPage = min(startPage + _linkedPages - 1, _pages);
         for (int page = startPage; page <= lastPage; page++) {
             if (page == _actPage) {
                 out.print("<li");
@@ -216,8 +220,7 @@ public class PagingTag extends TagSupport {
      * @throws IOException
      */
     public String determineLinkedPage(String link, int page) throws IOException {
-        StringBuffer out = new StringBuffer();
-        //out.append("<li><a href=\"").append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
+        StringBuilder out = new StringBuilder();
         out.append("<li><a href=\"").append(link);
         if (_showTitle) {
             out.append("\" title=\"").append(_prefixTitle).append(page);
@@ -235,10 +238,9 @@ public class PagingTag extends TagSupport {
      * @throws IOException
      */
     public String determineNext(String link) throws IOException {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         if (_actPage < _pages) {
             out.append("<li class=\"next\">");
-            //out.append("<a href=\"").append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage + 1).append(".html").append(queryString);
             out.append("<a href=\"").append(link);
             if (_showTitle) {
                 out.append("\" title=\"").append(_nextPageTitle);
@@ -257,10 +259,9 @@ public class PagingTag extends TagSupport {
      * @throws IOException
      */
     public String determinePrevious(String link) throws IOException {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         if (_actPage > 1) {
             out.append("<li class=\"previous\">");
-            //out.append("<a href=\"").append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(_actPage - 1).append(".html").append(queryString);
             out.append("<a href=\"").append(link);
             if (_showTitle) {
                 out.append("\" title=\"").append(_prevPageTitle);
@@ -280,8 +281,8 @@ public class PagingTag extends TagSupport {
      * @return link
      */
     public String getLink(String completeHandle, String queryString, int page) {
-        StringBuffer out = new StringBuffer();
-        out.append(completeHandle).append("." + SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
+        StringBuilder out = new StringBuilder();
+        out.append(completeHandle).append("." + SELECTOR_PAGING_WITH_DELIMITER).append(page).append(".html").append(queryString);
         return out.toString();
     }
 
@@ -293,12 +294,13 @@ public class PagingTag extends TagSupport {
     public String getHandleFromActivePage() {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
         String handle = request.getContextPath();
-        handle += Resource.getCurrentActivePage().getHandle();
-        String selector = Resource.getSelector();
+        AggregationState state = getAggregationState();
+        handle += state.getMainContent().getHandle();
+        String selector = state.getSelector();
         if (!isBlank(selector)) {
             String[] strings = split(selector, '.');
             for (String s : strings) {
-                if (!s.startsWith(SelectorUtils.SELECTOR_PAGING_WITH_DELIMITER)) {
+                if (!s.startsWith(SELECTOR_PAGING_WITH_DELIMITER)) {
                     handle += "." + s;
                 }
             }

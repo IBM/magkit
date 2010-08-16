@@ -1,35 +1,29 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.utils.ImageData;
-
-import com.mockrunner.mock.web.MockPageContext;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.cms.util.Resource;
-import info.magnolia.context.MgnlContext;
 import com.aperto.magkit.mock.MockContent;
 import com.aperto.magkit.mock.MockNodeData;
+import com.aperto.magkit.utils.ImageData;
+import com.mockrunner.mock.web.MockPageContext;
+import static info.magnolia.cms.core.ItemType.CONTENT;
+import static info.magnolia.cms.core.ItemType.CONTENTNODE;
+import static info.magnolia.context.MgnlContext.getAggregationState;
 import static org.hamcrest.text.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletConfig;
+import org.springframework.mock.web.*;
 
 import javax.jcr.RepositoryException;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.*;
 
 /**
  * Test of the image tag.
  *
- * @author frank.sommer (21.04.2008)
+ * @author frank.sommer
+ * @since 21.04.2008
  */
 public class ImageTagTest extends MagKitTagTest {
-
     private ImageTag _tag;
 
     @Test
@@ -86,9 +80,9 @@ public class ImageTagTest extends MagKitTagTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpSession httpSession = new MockHttpSession();
         request.setSession(httpSession);
-        MockContent mockContent = new MockContent("page1", ItemType.CONTENT);
+        MockContent mockContent = new MockContent("page1", CONTENT);
         mockContent.addNodeData(new MockNodeData("title", "layer 2"));
-        MockContent nodeContent = new MockContent("content", ItemType.CONTENTNODE);
+        MockContent nodeContent = new MockContent("content", CONTENTNODE);
         nodeContent.addNodeData(new MockNodeData("imageAlt", "Alttext"));
         MockNodeData image = new MockNodeData("image", ImageTagTest.class.getResourceAsStream("/testimage.jpg"));
         try {
@@ -105,8 +99,8 @@ public class ImageTagTest extends MagKitTagTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         initMgnlWebContext(request, response, httpSession.getServletContext());
         initMgnlWebContext(request, response, httpSession.getServletContext());
-        MgnlContext.getAggregationState().setMainContent(mockContent);
-        Resource.setLocalContentNode(nodeContent);
+        getAggregationState().setMainContent(mockContent);
+        getAggregationState().setCurrentContent(nodeContent);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 

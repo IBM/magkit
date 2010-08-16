@@ -1,21 +1,19 @@
 package com.aperto.magkit.taglib;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static info.magnolia.cms.util.Resource.getCurrentActivePage;
-import static info.magnolia.cms.util.Resource.getLocalContentNode;
-import static com.aperto.magkit.utils.LinkTool.insertSelector;
 import static com.aperto.magkit.utils.LinkTool.convertLink;
 import static com.aperto.magkit.utils.LinkTool.getBinaryLink;
-import static info.magnolia.cms.link.LinkHelper.isExternalLinkOrAnchor;
+import static com.aperto.magkit.utils.LinkTool.insertSelector;
+import info.magnolia.cms.core.*;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static info.magnolia.link.LinkUtil.isExternalLinkOrAnchor;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.NodeData;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import javax.jcr.PropertyType;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
+import static javax.jcr.PropertyType.BINARY;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -33,7 +31,7 @@ import java.io.IOException;
  */
 @Tag(name = "convertLink", bodyContent = BodyContent.JSP)
 public class ConvertLinkTag extends TagSupport {
-    private static final Logger LOGGER = Logger.getLogger(ConvertLinkTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConvertLinkTag.class);
     private String _var;
     private String _selector;
     private String _nodeDataName;
@@ -137,8 +135,6 @@ public class ConvertLinkTag extends TagSupport {
                     JspWriter out = pageContext.getOut();
                     out.write(link);
                 } else {
-                    request.setAttribute(_var, link);
-                    // Wolf: Put it into pageContext to. Otherwise it is not accessible from within freemarker templates.
                     pageContext.setAttribute(_var, link);
                 }
             } catch (IOException e) {
@@ -178,7 +174,7 @@ public class ConvertLinkTag extends TagSupport {
             try {
                 if (content.hasNodeData(_nodeDataName)) {
                     NodeData data = content.getNodeData(_nodeDataName);
-                    if (PropertyType.BINARY == data.getType()) {
+                    if (BINARY == data.getType()) {
                         _linkValue = getBinaryLink(data);
                     } else {
                         _linkValue = data.getString();
@@ -195,9 +191,10 @@ public class ConvertLinkTag extends TagSupport {
     private Content getContentNode() {
         Content content = _contentNode;
         if (content == null) {
-            content = getLocalContentNode();
+            AggregationState state = getAggregationState();
+            content = state.getCurrentContent();
             if (content == null) {
-                content = getCurrentActivePage();
+                content = state.getMainContent();
             }
         }
         return content;

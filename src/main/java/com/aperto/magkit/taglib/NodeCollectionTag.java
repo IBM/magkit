@@ -1,14 +1,15 @@
 package com.aperto.magkit.taglib;
 
-import com.aperto.magkit.utils.ContentUtils;
+import static com.aperto.magkit.utils.ContentUtils.orderNodeDataCollection;
+import static com.aperto.magkit.utils.ContentUtils.orderNodeDataCollectionByValue;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.util.Resource;
+import static info.magnolia.context.MgnlContext.getAggregationState;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.jstl.core.LoopTagSupport;
@@ -22,7 +23,7 @@ import java.util.Iterator;
  */
 @Tag(name = "nodeCollIterator", bodyContent = BodyContent.JSP)
 public class NodeCollectionTag extends LoopTagSupport {
-    private static final Logger LOGGER = Logger.getLogger(NodeCollectionTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodeCollectionTag.class);
     private String _contentNodeName;
     private Iterator _nodeIterator;
     private boolean _orderByValue = false;
@@ -75,7 +76,7 @@ public class NodeCollectionTag extends LoopTagSupport {
     }
 
     protected void prepare() throws JspTagException {
-        Content content = Resource.getLocalContentNode();
+        Content content = getAggregationState().getCurrentContent();
         try {
             if (content != null) {
                 Content collContent = content;
@@ -84,9 +85,9 @@ public class NodeCollectionTag extends LoopTagSupport {
                 }
                 Collection nodeDataCollection = collContent.getNodeDataCollection();
                 if (_orderByValue) {
-                    nodeDataCollection = ContentUtils.orderNodeDataCollectionByValue(nodeDataCollection);
+                    nodeDataCollection = orderNodeDataCollectionByValue(nodeDataCollection);
                 } else {
-                    nodeDataCollection = ContentUtils.orderNodeDataCollection(nodeDataCollection);
+                    nodeDataCollection = orderNodeDataCollection(nodeDataCollection);
                 }
                 _nodeIterator = nodeDataCollection.iterator();
             }

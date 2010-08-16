@@ -33,36 +33,33 @@ package com.aperto.magkit.taglib;
  *
  */
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
+import static com.aperto.magkit.utils.LinkTool.convertLink;
+import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
+import info.magnolia.cms.core.*;
+import static info.magnolia.cms.core.ItemType.CONTENTNODE;
+import info.magnolia.cms.taglibs.util.BaseImageTag;
+import static info.magnolia.cms.util.NodeDataUtil.getOrCreate;
+import info.magnolia.context.MgnlContext;
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import info.magnolia.module.dms.beans.Document;
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.substringAfter;
+import org.apache.myfaces.tobago.apt.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.imageio.ImageIO;
-import javax.jcr.AccessDeniedException;
-import javax.jcr.PathNotFoundException;
+import static javax.jcr.PropertyType.BINARY;
+import static javax.jcr.PropertyType.STRING;
 import javax.jcr.RepositoryException;
-import javax.jcr.PropertyType;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-
-import info.magnolia.module.dms.beans.Document;
-import info.magnolia.cms.beans.config.ContentRepository;
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.HierarchyManager;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.cms.taglibs.util.BaseImageTag;
-import info.magnolia.cms.util.NodeDataUtil;
-import info.magnolia.cms.util.Resource;
-import info.magnolia.context.MgnlContext;
-import org.apache.log4j.Logger;
-import org.apache.myfaces.tobago.apt.annotation.BodyContent;
-import org.apache.commons.lang.StringUtils;
-import org.apache.myfaces.tobago.apt.annotation.Tag;
-import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import static com.aperto.magkit.utils.LinkTool.convertLink;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import static java.io.File.createTempFile;
+import java.util.Calendar;
 
 /**
  * Tag that creates a scaled copy of an image. The maximum width and height of the images can be specified via the
@@ -130,7 +127,7 @@ public class ScaleImageTag extends BaseImageTag {
     /**
      * Logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(ScaleImageTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScaleImageTag.class);
 
     /**
      * Setter for the <code>maxHeight</code> tag attribute.
@@ -190,17 +187,18 @@ public class ScaleImageTag extends BaseImageTag {
         Content imageContentNode;
         JspWriter out = getJspContext().getOut();
         try {
+            AggregationState state = MgnlContext.getAggregationState();
             // set the parent node that contains the original image
-            if ((parentContentNodeName == null) || (parentContentNodeName.equals(""))) {
-                parentContentNode = Resource.getLocalContentNode();
+            if (isBlank(parentContentNodeName)) {
+                parentContentNode = state.getCurrentContent();
             } else {
-                HierarchyManager hm = MgnlContext.getHierarchyManager(ContentRepository.WEBSITE);
+                HierarchyManager hm = getHierarchyManager(WEBSITE);
                 // if this name starts with a '/', then assume it is a node handle
                 // otherwise assume that its is a path relative to the local content node
                 if (parentContentNodeName.startsWith("/")) {
                     parentContentNode = hm.getContent(parentContentNodeName);
                 } else {
-                    String handle = Resource.getLocalContentNode().getHandle();
+                    String handle = state.getCurrentContent().getHandle();
                     parentContentNode = hm.getContent(handle + "/" + parentContentNodeName);
                 }
             }
@@ -208,7 +206,7 @@ public class ScaleImageTag extends BaseImageTag {
             if (parentContentNode.hasContent(_imageContentNodeName)) {
                 imageContentNode = parentContentNode.getContent(_imageContentNodeName);
             } else {
-                imageContentNode = parentContentNode.createContent(_imageContentNodeName, ItemType.CONTENTNODE);
+                imageContentNode = parentContentNode.createContent(_imageContentNodeName, CONTENTNODE);
                 parentContentNode.save();
             }
             // if the node does not have the image data or should be rescaled (i.e., something has c
@@ -217,21 +215,17 @@ public class ScaleImageTag extends BaseImageTag {
                 createImageNodeData(parentContentNode, imageContentNode);
             }
             // write out the handle for the new image and exit
-            StringBuffer handle = new StringBuffer(imageContentNode.getHandle());
+            StringBuilder handle = new StringBuilder(imageContentNode.getHandle());
             handle.append("/");
             handle.append(getFilename());
             handle.append("." + PROPERTIES_EXTENSION_VALUE);
             out.write(handle.toString());
-        } catch (PathNotFoundException e) {
-            LOGGER.error("PathNotFoundException occured in ScaleImage tag: " + e.getMessage(), e);
-        } catch (AccessDeniedException e) {
-            LOGGER.error("AccessDeniedException occured in ScaleImage tag: " + e.getMessage(), e);
         } catch (RepositoryException e) {
-            LOGGER.error("RepositoryException occured in ScaleImage tag: " + e.getMessage(), e);
+            LOGGER.error("RepositoryException occured in ScaleImage tag: {}.", e.getMessage(), e);
         } catch (FileNotFoundException e) {
-            LOGGER.error("FileNotFoundException occured in ScaleImage tag: " + e.getMessage(), e);
+            LOGGER.error("FileNotFoundException occured in ScaleImage tag: {}.", e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.error("IOException occured in ScaleImage tag: " + e.getMessage(), e);
+            LOGGER.error("IOException occured in ScaleImage tag: {}.", e.getMessage(), e);
         }
         cleanUp();
     }
@@ -281,27 +275,29 @@ public class ScaleImageTag extends BaseImageTag {
      * @throws javax.jcr.RepositoryException while creating new nodes
      */
     private void createImageNodeData(Content parentContentNode, Content imageContentNode) throws RepositoryException, IOException {
-        // get the original image, as a buffered image
-        BufferedImage oriImgBuff = null;
         InputStream oriImgStr = null;
-        if (parentContentNode.getNodeData(_parentNodeDataName).getType() == PropertyType.BINARY) {
-            oriImgStr = parentContentNode.getNodeData(_parentNodeDataName).getStream();
-        } else if (parentContentNode.getNodeData(_parentNodeDataName).getType() == PropertyType.STRING) {
-            String dmsLink = StringUtils.substringAfter(convertLink(parentContentNode.getNodeData(_parentNodeDataName).getString(), false, REPOSITORY_DMS), REPOSITORY_DMS);
-            Content dmsContent = MgnlContext.getHierarchyManager(REPOSITORY_DMS).getContent(dmsLink);
-            oriImgStr = new Document(dmsContent).getFileStream();
-        }
-        oriImgBuff = ImageIO.read(oriImgStr);
-        oriImgStr.close();
-        if (oriImgBuff != null) {
-            // create the new image file
-            File newImgFile = scaleImage(oriImgBuff);
-            NodeDataUtil.getOrCreate(imageContentNode, "maxHeight").setValue(_maxHeight);
-            NodeDataUtil.getOrCreate(imageContentNode, "maxWidth").setValue(_maxWidth);
-            createImageNode(newImgFile, imageContentNode);
-            newImgFile.delete();
-        } else {
-            throw new IOException("Can't read image stream.");
+        try {
+            if (parentContentNode.getNodeData(_parentNodeDataName).getType() == BINARY) {
+                oriImgStr = parentContentNode.getNodeData(_parentNodeDataName).getStream();
+            } else if (parentContentNode.getNodeData(_parentNodeDataName).getType() == STRING) {
+                String dmsLink = substringAfter(convertLink(parentContentNode.getNodeData(_parentNodeDataName).getString(), false, REPOSITORY_DMS), REPOSITORY_DMS);
+                Content dmsContent = getHierarchyManager(REPOSITORY_DMS).getContent(dmsLink);
+                oriImgStr = new Document(dmsContent).getFileStream();
+            }
+            // get the original image, as a buffered image
+            BufferedImage oriImgBuff = ImageIO.read(oriImgStr);
+            if (oriImgBuff != null) {
+                // create the new image file
+                File newImgFile = scaleImage(oriImgBuff);
+                getOrCreate(imageContentNode, "maxHeight").setValue(_maxHeight);
+                getOrCreate(imageContentNode, "maxWidth").setValue(_maxWidth);
+                createImageNode(newImgFile, imageContentNode);
+                newImgFile.delete();
+            } else {
+                throw new IOException("Can't read image stream.");
+            }
+        } finally {
+            closeQuietly(oriImgStr);
         }
     }
 
@@ -331,14 +327,14 @@ public class ScaleImageTag extends BaseImageTag {
         g.drawImage(newImg, 0, 0, null);
         g.dispose();
         // create the new image file in the temporary dir
-        File newImgFile = File.createTempFile(TEMP_IMAGE_NAME, PROPERTIES_EXTENSION_VALUE);
+        File newImgFile = createTempFile(TEMP_IMAGE_NAME, PROPERTIES_EXTENSION_VALUE);
         ImageIO.write(newImgBuff, PROPERTIES_EXTENSION_VALUE, newImgFile);
         // return the file
         return newImgFile;
     }
 
-    static int scale(final int oriWidth, final double scaleFactor) {
-        return (int) (oriWidth * scaleFactor);
+    static int scale(final int oriValue, final double scaleFactor) {
+        return (int) (oriValue * scaleFactor);
     }
 
     /**

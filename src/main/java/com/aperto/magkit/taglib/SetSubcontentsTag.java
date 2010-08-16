@@ -1,25 +1,23 @@
 package com.aperto.magkit.taglib;
 
+import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
+import info.magnolia.cms.core.Content;
+import static info.magnolia.cms.core.ItemType.CONTENT;
+import info.magnolia.cms.core.NodeData;
+import static info.magnolia.cms.util.ContentUtil.getContent;
+import static info.magnolia.context.MgnlContext.getAggregationState;
 import static org.apache.commons.collections15.ComparatorUtils.naturalComparator;
 import static org.apache.commons.collections15.ComparatorUtils.reversedComparator;
 import static org.apache.commons.collections15.ComparatorUtils.transformedComparator;
+import org.apache.commons.collections15.Transformer;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import org.apache.myfaces.tobago.apt.annotation.Tag;
 import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
-import org.apache.log4j.Logger;
-import org.apache.commons.collections15.Transformer;
 
-import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.jsp.JspException;
 import javax.jcr.PropertyType;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.tagext.TagSupport;
 import java.util.*;
-
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.util.ContentUtil;
-import info.magnolia.cms.util.Resource;
-import info.magnolia.cms.beans.config.ContentRepository;
 
 /**
  * Retrieves a List of Content Objects that are childs of the specified content
@@ -35,15 +33,13 @@ import info.magnolia.cms.beans.config.ContentRepository;
  */
 @Tag(name = "subcontents")
 public class SetSubcontentsTag extends TagSupport {
-
-    private static final Logger LOGGER = Logger.getLogger(SetSubcontentsTag.class);
-    private static final String ITEM_TYPE_CONTENT = ItemType.CONTENT.getSystemName();
+    private static final String ITEM_TYPE_CONTENT = CONTENT.getSystemName();
 
     private String _var;
     private String _parentPath;
     private String _itemType = ITEM_TYPE_CONTENT;
     private String _namePattern = "*";
-    private String _repository = ContentRepository.WEBSITE;
+    private String _repository = WEBSITE;
     private String _sortContentNodeName;
     private String _sortNodeDataName;
     private boolean _reverseSortingOrder = false;
@@ -185,11 +181,11 @@ public class SetSubcontentsTag extends TagSupport {
     }
 
     private Content getParentContent() {
-        Content parent = null;
+        Content parent;
         if (isNotEmpty(_parentPath)) {
-            parent = ContentUtil.getContent(_repository, _parentPath);
+            parent = getContent(_repository, _parentPath);
         } else {
-            parent = Resource.getCurrentActivePage();
+            parent = getAggregationState().getMainContent();
         }
         return parent;
     }
@@ -202,7 +198,7 @@ public class SetSubcontentsTag extends TagSupport {
         _itemType = ITEM_TYPE_CONTENT;
         _namePattern = "*";
         _parentPath = null;
-        _repository = ContentRepository.WEBSITE;
+        _repository = WEBSITE;
         _sortContentNodeName = null;
         _sortNodeDataName = null;
         _reverseSortingOrder = false;
@@ -286,7 +282,7 @@ public class SetSubcontentsTag extends TagSupport {
         }
                 
         public int compare(Object obj1, Object obj2) {
-            int result = -1;
+            int result;
             if (notComparable(obj1)) {
                 result = 1;
             } else if (notComparable(obj2)) {
