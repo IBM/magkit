@@ -35,8 +35,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
     public void testDocumentInfoTag() throws JspException {
         _documentInfoTag.setNodeDataName("link");
         PageContext pageContext = runLifeCycle(_documentInfoTag);
-        ServletRequest request = pageContext.getRequest();
-        DocumentInfo documentInfo = (DocumentInfo) request.getAttribute("documentInfo");
+        DocumentInfo documentInfo = (DocumentInfo) pageContext.getAttribute("documentInfo");
         assertThat(documentInfo.getFileName(), is(FILE_NAME));
         assertThat(documentInfo.getFileExtension(), is(FILE_EXTENSION));
         assertThat(documentInfo.getFileSize(), is(FILE_SIZE_KB));
@@ -47,8 +46,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
         _documentInfoTag.setNodeDataName("link");
         _documentInfoTag.setFileSize("MB");
         PageContext pageContext = runLifeCycle(_documentInfoTag);
-        ServletRequest request = pageContext.getRequest();
-        DocumentInfo documentInfo = (DocumentInfo) request.getAttribute("documentInfo");
+        DocumentInfo documentInfo = (DocumentInfo) pageContext.getAttribute("documentInfo");
         assertThat(documentInfo.getFileSize(), is(FILE_SIZE_MB));
     }
 
@@ -57,8 +55,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
         _documentInfoTag.setNodeDataName("link");
         _documentInfoTag.setFileSize("kb");
         PageContext pageContext = runLifeCycle(_documentInfoTag);
-        ServletRequest request = pageContext.getRequest();
-        DocumentInfo documentInfo = (DocumentInfo) request.getAttribute("documentInfo");
+        DocumentInfo documentInfo = (DocumentInfo) pageContext.getAttribute("documentInfo");
         assertThat(documentInfo.getFileSize(), is(FILE_SIZE_KB));
     }
 
@@ -67,8 +64,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
         _documentInfoTag.setNodeDataName("link");
         _documentInfoTag.setFileSize("byte");
         PageContext pageContext = runLifeCycle(_documentInfoTag);
-        ServletRequest request = pageContext.getRequest();
-        DocumentInfo documentInfo = (DocumentInfo) request.getAttribute("documentInfo");
+        DocumentInfo documentInfo = (DocumentInfo) pageContext.getAttribute("documentInfo");
         assertThat(documentInfo.getFileSize(), is(FILE_SIZE_BYTE));
     }
 
@@ -76,8 +72,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
     public void testWrongNodedata() throws JspException {
         _documentInfoTag.setNodeDataName("link2");
         PageContext pageContext = runLifeCycle(_documentInfoTag);
-        ServletRequest request = pageContext.getRequest();
-        DocumentInfo documentInfo = (DocumentInfo) request.getAttribute("documentInfo");
+        DocumentInfo documentInfo = (DocumentInfo) pageContext.getAttribute("documentInfo");
         assertThat(documentInfo, nullValue());
     }
 
