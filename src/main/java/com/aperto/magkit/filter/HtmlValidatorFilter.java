@@ -1,43 +1,29 @@
 package com.aperto.magkit.filter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.net.SocketTimeoutException;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.aperto.webkit.lang.IoRuntimeException;
 import com.aperto.webkit.utils.IoTools;
-import com.aperto.webkit.utils.StringTools;
+import static com.aperto.webkit.utils.StringTools.asInt;
+import static com.aperto.webkit.utils.StringTools.replacePlaceHolders;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.apache.commons.httpclient.util.EncodingUtil;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.httpclient.methods.multipart.*;
+import static org.apache.commons.httpclient.util.EncodingUtil.getString;
+import static org.apache.commons.lang.BooleanUtils.toBoolean;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.substringAfter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.*;
+import java.net.SocketTimeoutException;
+import java.util.*;
+import static java.util.ResourceBundle.getBundle;
 
 /**
  * Complete class from aperto commons needed. Because elimination of Magnolia MainBar needed to validate HTML
@@ -46,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author Michael Tamm, frank.sommer
  */
 public class HtmlValidatorFilter extends AbstractMgnlFilter {
-    private static final Logger LOGGER = Logger.getLogger(HtmlValidatorFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlValidatorFilter.class);
 
     public static final String W3C_VALIDATOR_CHECK_URL_PARAM_NAME = "w3cValidatorCheckUrl";
     public static final String VALIDATOR_WARNING_CSS_URI = "validator-warning-css-uri";
@@ -65,7 +51,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     static {
         try {
-            c_validatorEnabled = BooleanUtils.toBoolean(ResourceBundle.getBundle("environment").getString(PROPERTY_VALIDATOR_ACTIVE));
+            c_validatorEnabled = toBoolean(getBundle("environment").getString(PROPERTY_VALIDATOR_ACTIVE));
         } catch (MissingResourceException e) {
             // ignore, validation is disabled (default seting)
         }
@@ -116,7 +102,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
      * Only filters for valid html if not magnolia admin pages (starting with a .) or aperto debug suite.
      */
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (c_validatorEnabled) {
+        if (c_validatorEnabled && isEnabled()) {
             String requestUri = request.getRequestURI();
             String context = request.getContextPath();
             boolean isAllowedUri = checkUri(requestUri, context);
@@ -135,7 +121,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
 
     private boolean checkUri(String requestUri, String context) {
         boolean notFound = true;
-        String[] parts = StringUtils.split(_uriDenies, '|');
+        String[] parts = split(_uriDenies, '|');
         for (String part : parts) {
             notFound = !requestUri.startsWith(context + part);
             if (!notFound) {
@@ -152,7 +138,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             // Extract validation result number ...
             String s = url.substring(i + VALIDATION_RESULT_URL_PREFIX.length());
             s = s.substring(0, s.length() - VALIDATION_RESULT_URL_SUFFIX.length());
-            i = StringTools.asInt(s);
+            i = asInt(s);
             // Display w3c validator result ...
             String html;
             if (i < (_resultCounter - MAX_CACHED_RESULTS)) {
@@ -185,12 +171,12 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             String html = responseWrapper.getBuffer();
             String mgnlHtml = html;
             // remove mgnlMainBar
-            if (!StringUtils.isBlank(html) && html.contains(MGNL_MAIN_BAR_BEGIN)) {
+            if (!isBlank(html) && html.contains(MGNL_MAIN_BAR_BEGIN)) {
                 int mgnlMainBarStartPos = html.indexOf(MGNL_MAIN_BAR_BEGIN);
                 int mgnlMainBarEndPos = html.indexOf(MGNL_MAIN_BAR_END, mgnlMainBarStartPos);
                 html = html.substring(0, mgnlMainBarStartPos) + html.substring(mgnlMainBarEndPos + MGNL_MAIN_BAR_END.length());
             }
-            if (!StringUtils.isBlank(html)) {
+            if (!isBlank(html)) {
                 html = validateHtml(request, html, mgnlHtml);
                 responseWrapper.writeHtml(html);
             }
@@ -206,7 +192,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 LOGGER.debug("Checking " + request.getRequestURL() + " with W3C Validator ...");
             }
             String validationResult = w3cValidate(request.getRequestURI(), html);
-            if (StringUtils.isNotBlank(validationResult)) {
+            if (isNotBlank(validationResult)) {
                 _cachedResults[_resultCounter % MAX_CACHED_RESULTS] = validationResult;
                 String validationResultUrl = request.getContextPath() + VALIDATION_RESULT_URL_PREFIX + _resultCounter + VALIDATION_RESULT_URL_SUFFIX;
                 String validatorWarningCssUri = request.getContextPath() + getValidatorWarningCssUri();
@@ -238,7 +224,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     }
 
     private boolean checkValidationResult(String validationResult) {
-        String[] patterns = StringUtils.split(_validPattern, '|');
+        String[] patterns = split(_validPattern, '|');
         boolean valid = true;
         for (String pattern : patterns) {
             valid = validationResult.indexOf(pattern.trim()) > -1;
@@ -286,7 +272,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             in = httpMethod.getResponseBodyAsStream();
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             IoTools.copy(in, buffer);
-            html = EncodingUtil.getString(buffer.toByteArray(), httpMethod.getResponseCharSet());
+            html = getString(buffer.toByteArray(), httpMethod.getResponseCharSet());
         } catch (IOException e) {
             throw new IoRuntimeException(e);
         } finally {
@@ -317,8 +303,8 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         replacements.put("validatorWarningCssUri", validatorWarningCssUri);
         replacements.put("validationResultUrl", validationResultUrl);
         replacements.put("validationOk", validationOk);
-        String warningLayer = StringTools.replacePlaceHolders(_warningLayerTemplate, replacements);
-        return html.substring(0, i) + warningLayer + (hasValidatorDiv ? StringUtils.substringAfter(html.substring(i), VALIDATOR_DIV) : html.substring(i));
+        String warningLayer = replacePlaceHolders(_warningLayerTemplate, replacements);
+        return html.substring(0, i) + warningLayer + (hasValidatorDiv ? substringAfter(html.substring(i), VALIDATOR_DIV) : html.substring(i));
     }
 
     public String getW3cValidatorCheckUrl() {
