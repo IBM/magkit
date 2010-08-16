@@ -10,7 +10,6 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.*;
 import static org.apache.commons.httpclient.util.EncodingUtil.getString;
-import static org.apache.commons.lang.BooleanUtils.toBoolean;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.split;
@@ -23,7 +22,6 @@ import javax.servlet.http.*;
 import java.io.*;
 import java.net.SocketTimeoutException;
 import java.util.*;
-import static java.util.ResourceBundle.getBundle;
 
 /**
  * Complete class from aperto commons needed. Because elimination of Magnolia MainBar needed to validate HTML
@@ -41,21 +39,9 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
     public static final String MAGNOLIA_MAIN_BAR_START_PARAM = "magnolia-main-bar-start";
     public static final String MAGNOLIA_MAIN_BAR_END_PARAM = "magnolia-main-bar-end";
     private static final int MAX_CACHED_RESULTS = 100;
-    private static final String PROPERTY_VALIDATOR_ACTIVE = "validator.active";
     private static final String MGNL_MAIN_BAR_BEGIN = "<div class=\"mgnlMainbar";
     private static final String MGNL_MAIN_BAR_END = "</div>";
     private static final String VALIDATOR_DIV = "<div id=\"html-validator\" />";
-
-    // using old behaviour (no such filter) as default:
-    private static boolean c_validatorEnabled = false;
-
-    static {
-        try {
-            c_validatorEnabled = toBoolean(getBundle("environment").getString(PROPERTY_VALIDATOR_ACTIVE));
-        } catch (MissingResourceException e) {
-            // ignore, validation is disabled (default seting)
-        }
-    }
 
     private String _w3cValidatorCheckUrl = "http://validator.aperto.de/w3c-markup-validator/check";
     private String _validatorWarningCssUri = "/docroot/magkit/css/validator-warning.css";
@@ -84,8 +70,6 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 IoTools.copy(in, buffer);
                 _warningLayerTemplate = buffer.toString();
             }
-
-
         } finally {
             IoTools.closeQuietly(in);
         }
@@ -102,7 +86,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
      * Only filters for valid html if not magnolia admin pages (starting with a .) or aperto debug suite.
      */
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (c_validatorEnabled && isEnabled()) {
+        if (isEnabled()) {
             String requestUri = request.getRequestURI();
             String context = request.getContextPath();
             boolean isAllowedUri = checkUri(requestUri, context);
