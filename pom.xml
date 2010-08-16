@@ -225,7 +225,7 @@
                         <containerId>tomcat5x</containerId>
                         <type>installed</type>
                         <zipUrlInstaller>
-                            <url>http://www.apache.org/dist/tomcat/tomcat-5/v5.5.25/bin/apache-tomcat-5.5.25.zip</url>
+                            <url>http://www.apache.org/dist/tomcat/tomcat-5/v5.5.30/bin/apache-tomcat-5.5.30.zip</url>
                             <installDir>${java.io.tmpdir}/magkit-tomcat</installDir>
                         </zipUrlInstaller>
                         <dependencies>
