@@ -1,12 +1,12 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
+import com.aperto.magkit.beans.DocumentInfo;
 import com.aperto.magkit.mock.MockContent;
 import com.aperto.magkit.mock.MockNodeData;
-import com.aperto.magkit.beans.DocumentInfo;
 import info.magnolia.cms.beans.runtime.FileProperties;
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.ItemType;
+import static info.magnolia.cms.core.ItemType.CONTENT;
 import info.magnolia.context.MgnlContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,8 +15,8 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.*;
+
 import javax.jcr.RepositoryException;
-import javax.servlet.ServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
@@ -78,7 +78,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
 
     @Override
     protected PageContext createPageContext() {
-        MockContent mockContent = new MockContent("test", ItemType.CONTENT);
+        MockContent mockContent = new MockContent("test", CONTENT);
         MockNodeData mockNodeData = new MockNodeData("link", "http://www.aperto.de/test.html");
         mockContent.addNodeData(mockNodeData);
 
@@ -100,7 +100,7 @@ public class DocumentInfoTagTest extends MagKitTagTest {
         _documentInfoTag = new DocumentInfoTag() {
             @Override
             protected Content retrieveContent(String link) {
-                MockContent mockcontent2 =  new MockContent("document", ItemType.CONTENT);
+                MockContent mockcontent2 =  new MockContent("document", CONTENT);
                 MockNodeData mockNodeData2 = new MockNodeData("document", DocumentInfoTagTest.class.getResourceAsStream("/testimage.jpg"));
                 try {
                     mockNodeData2.setAttribute(FileProperties.PROPERTY_SIZE, Long.toString(FILE_SIZE_BYTE));
