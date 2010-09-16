@@ -7,6 +7,7 @@ import info.magnolia.cms.beans.config.ContentRepository;
  *
  * @author Norman Wiechmann, Aperto AG
  * @since 2009-03-17
+ * @deprecated Use magnolia nodebuilder API and com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory 
  */
 public class CreateConfigNodeTreeTask extends CreateNodeTreeTask {
 

@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
  *
  * @author Norman Wiechmann, Aperto AG
  * @since 2009-03-17
+ * @deprecated Use magnolia nodebuilder API and com.aperto.magkit.nodebuilder.NodeOperationFactory
  */
 public class CreateNodeTreeTask extends AbstractRepositoryTask {
 
