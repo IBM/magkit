@@ -36,6 +36,7 @@ public class PagingTagTest extends MagKitTagTest {
         MockContent mockContent = new MockContent("page", ItemType.CONTENT);
         initMgnlWebContext(request, response, httpSession.getServletContext());
         MgnlContext.getAggregationState().setMainContent(mockContent);
+        MgnlContext.getAggregationState().setCharacterEncoding("UTF-8");
         MgnlContext.getAggregationState().setSelector("old.selector.pid-1");
         MgnlContext.getAggregationState().setLocale(new Locale("de"));
         return new MockPageContext(new MockServletConfig(), request, response);
