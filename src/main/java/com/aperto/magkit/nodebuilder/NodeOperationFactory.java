@@ -132,14 +132,15 @@ public abstract class NodeOperationFactory extends Ops {
         private NodeOperation[] _childrenOps = {};
 
         public void exec(Content context, ErrorHandler errorHandler) {
+            Content transfomed = null;
             try {
-                context = doExec(context, errorHandler);
+                transfomed = doExec(context, errorHandler);
             } catch (RepositoryException e) {
                 errorHandler.handle(e, context);
             }
 
             for (NodeOperation childrenOp : _childrenOps) {
-                childrenOp.exec(context, errorHandler);
+                childrenOp.exec(transfomed, errorHandler);
             }
         }
 
