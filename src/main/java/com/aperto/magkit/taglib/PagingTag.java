@@ -11,6 +11,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.split;
 import org.apache.commons.lang.exception.NestableRuntimeException;
 import org.apache.myfaces.tobago.apt.annotation.*;
+import static org.apache.taglibs.standard.functions.Functions.escapeXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,7 +155,7 @@ public class PagingTag extends TagSupport {
         init();
         if (_addQueryString) {
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-            queryString = "?" + request.getQueryString().replaceAll("&", "&amp;");
+            queryString = "?" + escapeXml(request.getQueryString());
         }
         try {
             if (_pages > 1) {
