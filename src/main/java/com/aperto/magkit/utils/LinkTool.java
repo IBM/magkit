@@ -69,8 +69,8 @@ public final class LinkTool {
         String newLink = EMPTY;
         String extension = DEFAULT_EXTENSION;
         if (isNotEmpty(link)) {
-            try {
-                String path = EMPTY;
+            String path = EMPTY;
+            if (isUuid(link)) {
                 String handle = convertUUIDtoHandle(link, WEBSITE);
                 if (handle == null && !isBlank(alternativeRepository)) {
                     handle = convertUUIDtoHandle(link, alternativeRepository);
@@ -89,13 +89,8 @@ public final class LinkTool {
                 if (isNotEmpty(handle)) {
                     path = handle;
                 }
-                newLink = determineNewLink(path, link);
-            } catch (NullPointerException e) {
-                // should only occur in unit tests if the mgnlContext is not present
-                newLink = isUuid(link) ? EMPTY : link;
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Could not URL encode filename with encoding UTF-8", e);
             }
+            newLink = determineNewLink(path, link);
         }
         if (isNotBlank(newLink) && addExtension && !hasHtmlExtension(newLink)) {
             newLink += "." + extension;
@@ -142,10 +137,8 @@ public final class LinkTool {
      * @return true if the link is present, false if broken
      */
     public static boolean checkLink(String link) {
-        boolean result;
         HierarchyManager hm = getHierarchyManager(WEBSITE);
-        result = isNotEmpty(link) && hm.isExist(link);
-        return result;
+        return isNotEmpty(link) && hm.isExist(link);
     }
 
     /**
@@ -190,11 +183,7 @@ public final class LinkTool {
                 }
                 String fileName = binaryNode.getAttribute("fileName");
                 String extension = binaryNode.getAttribute("extension");
-                try {
-                    binaryLink.append(binaryNode.getHandle()).append(SLASH).append(mgnlUrlEncode(fileName)).append('.').append(extension);
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException("Cannot url encode filename '" + fileName + "' with encoding 'UTF-8'", e);
-                }
+                binaryLink.append(binaryNode.getHandle()).append(SLASH).append(mgnlUrlEncode(fileName)).append('.').append(extension);
             } else {
                 LOGGER.info("Given NodeData is not from type binary: {}.", binaryNode.getHandle());
             }
@@ -211,13 +200,17 @@ public final class LinkTool {
      * @return a new URL encoded String or an empty String if the parameter s has been NULL.
      * @throws UnsupportedEncodingException if encoding fails for encoding 'UTF-8'
      */
-    public static String mgnlUrlEncode(String s) throws UnsupportedEncodingException {
+    public static String mgnlUrlEncode(String s) {
         String name = EMPTY;
-        if (s != null) {
-            // from magnolia Document class:
-            name = replaceChars(s, "ÇÈ<>\"'/\\", "________");
-            name = encode(name, "UTF-8");
-            name = replace(name, "+", "%20");
+        try {
+            if (s != null) {
+                // from magnolia Document class:
+                name = replaceChars(s, "ÇÈ<>\"'/\\", "________");
+                name = encode(name, "UTF-8");
+                name = replace(name, "+", "%20");
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Could not URL encode filename with encoding UTF-8", e);
         }
         return name;
     }

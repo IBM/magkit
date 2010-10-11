@@ -3,8 +3,10 @@ package com.aperto.magkit.taglib;
 import com.aperto.magkit.MagKitTagTest;
 import com.aperto.magkit.mock.MockContent;
 import com.aperto.magkit.mock.MockNodeData;
-
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockHierarchyManager;
 import com.mockrunner.mock.web.MockPageContext;
+import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,14 +15,9 @@ import static org.hamcrest.text.StringContains.containsString;
 import static org.hamcrest.text.StringEndsWith.endsWith;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletConfig;
+import org.springframework.mock.web.*;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.*;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
@@ -49,6 +46,8 @@ public class ConvertLinkTagTest extends MagKitTagTest {
 
     @Test
     public void testUuidLink() throws JspException {
+        cleanContext();
+        mockHierarchyManager(WEBSITE);
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link4");
         PageContext pageContext = runLifeCycle(tag, "link4", LINK_VALUE_UUID);
@@ -120,7 +119,6 @@ public class ConvertLinkTagTest extends MagKitTagTest {
         assertThat(output, containsString(CONTEXT_PATH));
 
     }
-
 
     protected PageContext runLifeCycle(TagSupport tag, String nodeDataName, String nodeDataValue) throws JspException {
         PageContext pageContext = createPageContext(nodeDataName, nodeDataValue);
