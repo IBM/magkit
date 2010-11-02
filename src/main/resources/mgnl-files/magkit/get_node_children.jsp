@@ -5,7 +5,7 @@
                  info.magnolia.cms.core.Content,
                  info.magnolia.cms.core.HierarchyManager,
                  info.magnolia.cms.core.ItemType,
-                 info.magnolia.context.MgnlContext"
+                 info.magnolia.context.MgnlContext, java.util.Collection"
 %><%
     String currentNode = request.getParameter("currentNode");
     Content content = null;
@@ -31,7 +31,9 @@
         out.print(content.getName() + ";");
         boolean hasNodeData = content.getNodeDataCollection().size() > 0;
         if (ItemType.CONTENT.equals(content.getItemType()) && !hasNodeData) {
-            for (Object o : content.getChildren(ItemType.CONTENTNODE)) {
+            Collection<Content> children = content.getChildren(ItemType.CONTENTNODE);
+            children.addAll(content.getChildren(ItemType.CONTENT));
+            for (Object o : children) {
                 Content child = (Content) o;
                 ItemType type = child.getItemType();
                 if (ItemType.CONTENT.equals(type)|| ItemType.CONTENTNODE.equals(type)) {
