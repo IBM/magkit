@@ -1,22 +1,17 @@
 package com.aperto.magkit.module;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.aperto.magkit.filter.HtmlValidatorFilter;
-import info.magnolia.cms.beans.config.ContentRepository;
+import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.ArrayDelegateTask;
-import info.magnolia.module.delta.CreateNodeTask;
-import info.magnolia.module.delta.FilterOrderingTask;
-import info.magnolia.module.delta.ModuleBootstrapTask;
-import info.magnolia.module.delta.NodeExistsDelegateTask;
-import info.magnolia.module.delta.SetPropertyTask;
-import info.magnolia.module.delta.Task;
+import info.magnolia.module.delta.*;
 import info.magnolia.module.model.Version;
 import info.magnolia.setup.AddFilterBypassTask;
+import info.magnolia.voting.voters.OnAdminVoter;
+import info.magnolia.voting.voters.URIStartsWithVoter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The MagKitModuleVersionHandler for the MagKit module.
@@ -37,74 +32,72 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private static final String PATH_CACHE_DEBUG_36 = PATH_CACHE_EXCLUDE_36 + "/debug";
 
     private final Task _addCmsFilterBypassTask = new ArrayDelegateTask("Filter", "Add bypasses for filter 'cms'", new Task[]{
-        new AddFilterBypassTask(PATH_FILTER_CMS, "captcha", info.magnolia.voting.voters.URIStartsWithVoter.class, "/service/captcha"),
-        new AddFilterBypassTask(PATH_FILTER_CMS, "core", info.magnolia.voting.voters.URIStartsWithVoter.class, "/core"),
-        new AddFilterBypassTask(PATH_FILTER_CMS, "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit")
+        new AddFilterBypassTask(PATH_FILTER_CMS, "captcha", URIStartsWithVoter.class, "/service/captcha"),
+        new AddFilterBypassTask(PATH_FILTER_CMS, "core", URIStartsWithVoter.class, "/core"),
+        new AddFilterBypassTask(PATH_FILTER_CMS, "magkit", URIStartsWithVoter.class, "/magkit")
     });
-    private final Task _addValidatorFilterTask = new ArrayDelegateTask("Filter", "Add the Validator filter.", new Task[]{
-        new CreateNodeTask("Validator-Filter", "Create Validator filter node", ContentRepository.CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "class", "com.aperto.magkit.filter.HtmlValidatorFilter"),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "enabled", "true"),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, HtmlValidatorFilter.W3C_VALIDATOR_CHECK_URL_PARAM_NAME, "http://validator.aperto.de/w3c-markup-validator/check"),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR, "timeOut", "15000"),
-        new FilterOrderingTask("validator", new String[]{"contentType", "uriSecurity", "gzip"})
-    });
+    private final Task _addValidatorFilterTask = new ArrayDelegateTask("Filter", "Add the Validator filter.",
+            new CreateNodeTask("Validator-Filter", "Create Validator filter node", CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
+            new SetPropertyTask(CONFIG, PATH_FILTER_VALIDATOR, "class", "com.aperto.magkit.filter.HtmlValidatorFilter"),
+            new SetPropertyTask(CONFIG, PATH_FILTER_VALIDATOR, "enabled", "true"),
+            new SetPropertyTask(CONFIG, PATH_FILTER_VALIDATOR, "w3cValidatorCheckUrl", "http://validator.aperto.de/w3c-markup-validator/check"),
+            new SetPropertyTask(CONFIG, PATH_FILTER_VALIDATOR, "timeOut", "15000"),
+            new FilterOrderingTask("validator", new String[]{"contentType", "uriSecurity", "gzip"}));
 
     private final Task _addValidatorFilterBypassTask = new ArrayDelegateTask("Filter", "Add the bypass for validator filter.", new Task[]{
-        new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "isAdmin", info.magnolia.voting.voters.OnAdminVoter.class, ""),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_FILTER_VALIDATOR + "/bypasses/isAdmin", "not", "true"),
-        new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "magkit", info.magnolia.voting.voters.URIStartsWithVoter.class, "/magkit"),
+        new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "isAdmin", OnAdminVoter.class, ""),
+        new SetPropertyTask(CONFIG, PATH_FILTER_VALIDATOR + "/bypasses/isAdmin", "not", "true"),
+        new AddFilterBypassTask(PATH_FILTER_VALIDATOR, "magkit", URIStartsWithVoter.class, "/magkit"),
     });
 
     private final Task _setI18nContentSupportTask = new ArrayDelegateTask("Filter", "Set i18n support.", new Task[]{
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_I18N, "enabled", "true")
+        new SetPropertyTask(CONFIG, PATH_I18N, "class", "com.aperto.magkit.i18n.HandleI18nContentSupport"),
+        new SetPropertyTask(CONFIG, PATH_I18N, "enabled", "true")
     });
 
     private final Task _addBypassFor404 = new NodeExistsDelegateTask(
         "Check 404 bypass",
         "Check 404 bypass in server config.",
-        ContentRepository.CONFIG,
+        CONFIG,
         PATH_FILTER + "/bypasses/404",
         null,
-        new AddFilterBypassTask(PATH_FILTER, "404", info.magnolia.voting.voters.URIStartsWithVoter.class, "/docroot/magkit")
+        new AddFilterBypassTask(PATH_FILTER, "404", URIStartsWithVoter.class, "/docroot/magkit")
     );
 
     private final Task _addBypassForStatus = new NodeExistsDelegateTask(
         "Check status bypass",
         "Check status bypass in server config.",
-        ContentRepository.CONFIG,
+        CONFIG,
         PATH_FILTER + "/bypasses/status",
         null,
-        new AddFilterBypassTask(PATH_FILTER, "status", info.magnolia.voting.voters.URIStartsWithVoter.class, "/status")
+        new AddFilterBypassTask(PATH_FILTER, "status", URIStartsWithVoter.class, "/status")
     );
 
     private final Task _addBypassForDebugSuite = new NodeExistsDelegateTask(
         "Check debug suite bypass", "Check debug suite bypass in server config.",
-        ContentRepository.CONFIG, PATH_FILTER + "/bypasses/debug", null,
-        new AddFilterBypassTask(PATH_FILTER, "debug", info.magnolia.voting.voters.URIStartsWithVoter.class, "/debug/")
+        CONFIG, PATH_FILTER + "/bypasses/debug", null,
+        new AddFilterBypassTask(PATH_FILTER, "debug", URIStartsWithVoter.class, "/debug/")
     );
 
     private final Task _addCacheConfig35 = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
-        new CreateNodeTask("captcha", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_DENY_35, "captcha", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA_35, "URI", "/service/captcha/*"),
-        new CreateNodeTask("debug", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_DENY_35, "debug", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG_35, "URI", "/debug/*"),
+        new CreateNodeTask("captcha", "Create cache config node.", CONFIG, PATH_CACHE_DENY_35, "captcha", ItemType.CONTENTNODE.getSystemName()),
+        new SetPropertyTask(CONFIG, PATH_CACHE_CAPTCHA_35, "URI", "/service/captcha/*"),
+        new CreateNodeTask("debug", "Create cache config node.", CONFIG, PATH_CACHE_DENY_35, "debug", ItemType.CONTENTNODE.getSystemName()),
+        new SetPropertyTask(CONFIG, PATH_CACHE_DEBUG_35, "URI", "/debug/*"),
     });
 
-    private final Task _addCacheConfig36 = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.", new Task[]{
-        new CreateNodeTask("captcha", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_EXCLUDE_36, "captcha", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA_36, "pattern", "/service/captcha/"),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_CAPTCHA_36, "class", "info.magnolia.voting.voters.URIStartsWithVoter"),
-        new CreateNodeTask("debug", "Create cache config node.", ContentRepository.CONFIG, PATH_CACHE_EXCLUDE_36, "debug", ItemType.CONTENTNODE.getSystemName()),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG_36, "pattern", "/debug/"),
-        new SetPropertyTask(ContentRepository.CONFIG, PATH_CACHE_DEBUG_36, "class", "info.magnolia.voting.voters.URIStartsWithVoter"),
-    });
+    private final Task _addCacheConfig36 = new ArrayDelegateTask("Captcha config", "Add the cache config for captcha.",
+            new CreateNodeTask("captcha", "Create cache config node.", CONFIG, PATH_CACHE_EXCLUDE_36, "captcha", ItemType.CONTENTNODE.getSystemName()),
+            new SetPropertyTask(CONFIG, PATH_CACHE_CAPTCHA_36, "pattern", "/service/captcha/"),
+            new SetPropertyTask(CONFIG, PATH_CACHE_CAPTCHA_36, "class", "info.magnolia.voting.voters.URIStartsWithVoter"),
+            new CreateNodeTask("debug", "Create cache config node.", CONFIG, PATH_CACHE_EXCLUDE_36, "debug", ItemType.CONTENTNODE.getSystemName()),
+            new SetPropertyTask(CONFIG, PATH_CACHE_DEBUG_36, "pattern", "/debug/"),
+            new SetPropertyTask(CONFIG, PATH_CACHE_DEBUG_36, "class", "info.magnolia.voting.voters.URIStartsWithVoter"));
 
     private final Task _checkCacheConfig36 = new NodeExistsDelegateTask(
         "Check cache config",
         "Check cache config.",
-        ContentRepository.CONFIG,
+        CONFIG,
         PATH_CACHE_CAPTCHA_36,
         null,
         _addCacheConfig36
@@ -113,7 +106,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private final Task _checkCacheConfig35 = new NodeExistsDelegateTask(
         "Check cache config",
         "Check cache config.",
-        ContentRepository.CONFIG,
+        CONFIG,
         PATH_CACHE_DENY_35,
         null,
         _addCacheConfig35
@@ -122,7 +115,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private final Task _checkCacheVersion = new NodeExistsDelegateTask(
         "Check cache version",
         "Check cache version.",
-        ContentRepository.CONFIG,
+        CONFIG,
         PATH_CACHE_DENY_35,
         _checkCacheConfig35,
         _checkCacheConfig36
@@ -140,7 +133,7 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     public MagKitModuleVersionHandler() {
     }
 
-    protected List getExtraInstallTasks(InstallContext installContext) {
+    protected List<Task> getExtraInstallTasks(InstallContext installContext) {
         final List<Task> tasks = new ArrayList<Task>();
         tasks.add(_addCmsFilterBypassTask);
         tasks.add(_addValidatorFilterTask);
@@ -154,8 +147,8 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     }
 
     @Override
-    protected List getDefaultUpdateTasks(Version forVersion) {
-        List updateTasks = super.getDefaultUpdateTasks(forVersion);
+    protected List<Task> getDefaultUpdateTasks(Version forVersion) {
+        List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
         updateTasks.add(_bootstrapModuleConfigTask);
         updateTasks.add(_addBypassFor404);
         updateTasks.add(_addBypassForStatus);

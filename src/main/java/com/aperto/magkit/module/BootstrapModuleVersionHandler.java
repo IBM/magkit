@@ -1,22 +1,11 @@
 package com.aperto.magkit.module;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.aperto.magkit.filter.HtmlValidatorFilter;
-import info.magnolia.cms.beans.config.ContentRepository;
-import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.DefaultModuleVersionHandler;
-import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.ArrayDelegateTask;
-import info.magnolia.module.delta.CreateNodeTask;
-import info.magnolia.module.delta.FilterOrderingTask;
 import info.magnolia.module.delta.ModuleBootstrapTask;
-import info.magnolia.module.delta.NodeExistsDelegateTask;
-import info.magnolia.module.delta.SetPropertyTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
-import info.magnolia.setup.AddFilterBypassTask;
+
+import java.util.List;
 
 /**
  * A ModuleVersionHandler which just do the bootstrap on update.
