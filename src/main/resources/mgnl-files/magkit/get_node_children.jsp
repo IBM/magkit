@@ -5,19 +5,15 @@
                  info.magnolia.cms.core.Content,
                  info.magnolia.cms.core.HierarchyManager,
                  info.magnolia.cms.core.ItemType,
-                 info.magnolia.context.MgnlContext,
-                 java.util.Iterator"
-%><%@include file="/WEB-INF/jspf/begin.jspf"%><%
+                 info.magnolia.context.MgnlContext"
+%><%
     String currentNode = request.getParameter("currentNode");
-    LOGGER.info("currentNode: " + currentNode);
     Content content = null;
     if (!StringTools.isBlank(currentNode)) {
         String[] path = currentNode.split("\\.");
-        LOGGER.info("Path: " + path.length);
         String repository = path[0];
-        LOGGER.info("get HierarchyManager: " + repository);
         HierarchyManager hm = MgnlContext.getHierarchyManager(repository);
-        StringBuffer nodePath = new StringBuffer("/");
+        StringBuilder nodePath = new StringBuilder("/");
         for (int i = 1; i < path.length; i++) {
             String s = path[i];
             if (i > 1) {
@@ -28,30 +24,20 @@
         if ("/".equals(nodePath.toString())) {
             content = hm.getRoot();
         } else {
-            content = hm.getContent( nodePath.toString());
+            content = hm.getContent(nodePath.toString());
         }
     }
     if (content != null) {
         out.print(content.getName() + ";");
-        boolean hasNodeData = content.getNodeDataCollection().size() > 0; // deprecated type: ItemType.NT_NODEDATA
-        LOGGER.info("hasNodeData: " + hasNodeData);
+        boolean hasNodeData = content.getNodeDataCollection().size() > 0;
         if (ItemType.CONTENT.equals(content.getItemType()) && !hasNodeData) {
-            LOGGER.info("about to iterate " + content.getChildren(null, "*").size());
-            for (Iterator i = content.getChildren(null, "*").iterator(); i.hasNext();) {
-                Content child = (Content) i.next();
-                if (ItemType.CONTENT.equals(child.getItemType())|| ItemType.CONTENTNODE.equals(child.getItemType())) {
-    //                out.println(child.getName() + " - " + child.getItemType().toString() + ";");
+            for (Object o : content.getChildren(ItemType.CONTENTNODE)) {
+                Content child = (Content) o;
+                ItemType type = child.getItemType();
+                if (ItemType.CONTENT.equals(type)|| ItemType.CONTENTNODE.equals(type)) {
                     out.print(child.getName() + ";");
-                    LOGGER.info("child name: " + child.getName());
                 }
-            }
-        } else {
-            // root - just return list of subnodes
-            for (Object o :content.getChildren()) {
-                LOGGER.info("child name: " + o);
-                out.print(((Content)o).getName() + ";");
             }
         }
     }
 %>
-<%@ include file="/WEB-INF/jspf/end.jspf" %>
