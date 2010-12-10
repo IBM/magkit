@@ -2,23 +2,24 @@ package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
 import com.aperto.magkit.beans.DocumentInfo;
-import com.aperto.magkit.mock.MockContent;
-import com.aperto.magkit.mock.MockNodeData;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.stubNodeData;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.stubTitle;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
 import info.magnolia.cms.beans.runtime.FileProperties;
 import info.magnolia.cms.core.Content;
-import static info.magnolia.cms.core.ItemType.CONTENT;
-import info.magnolia.context.MgnlContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.*;
 
-import javax.jcr.RepositoryException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author diana.racho (29.04.2008)
@@ -78,9 +79,12 @@ public class DocumentInfoTagTest extends MagKitTagTest {
 
     @Override
     protected PageContext createPageContext() {
-        MockContent mockContent = new MockContent("test", CONTENT);
-        MockNodeData mockNodeData = new MockNodeData("link", "http://www.aperto.de/test.html");
-        mockContent.addNodeData(mockNodeData);
+        Content mockContent = mockContent("test",
+            stubNodeData("link", "http://www.aperto.de/test.html"),
+            // mock behaviour of mgnl default content -> NullObject
+            stubNodeData("link2", "")
+        );
+        mockAggregationState(stubCurrentContent(mockContent));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute("contentObj", mockContent);
@@ -89,9 +93,6 @@ public class DocumentInfoTagTest extends MagKitTagTest {
         request.setContextPath("/author");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
-        // init MgnlContext:
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        MgnlContext.getAggregationState().setCurrentContent(mockContent);
         return new MockPageContext(new MockServletContext(), request, response);
     }
 
@@ -100,17 +101,14 @@ public class DocumentInfoTagTest extends MagKitTagTest {
         _documentInfoTag = new DocumentInfoTag() {
             @Override
             protected Content retrieveContent(String link) {
-                MockContent mockcontent2 =  new MockContent("document", CONTENT);
-                MockNodeData mockNodeData2 = new MockNodeData("document", DocumentInfoTagTest.class.getResourceAsStream("/testimage.jpg"));
-                try {
-                    mockNodeData2.setAttribute(FileProperties.PROPERTY_SIZE, Long.toString(FILE_SIZE_BYTE));
-                    mockNodeData2.setAttribute(FileProperties.PROPERTY_FILENAME, "testimage");
-                    mockNodeData2.setAttribute(FileProperties.PROPERTY_EXTENSION, "jpg");
-                } catch (RepositoryException e) {
-                    fail("Can not set attributes.");
-                }
-                mockcontent2.addNodeData(mockNodeData2);
-                return mockcontent2;
+                Map<String, String> fileAttributes = new HashMap<String, String>(5);
+                fileAttributes.put(FileProperties.PROPERTY_SIZE, Long.toString(FILE_SIZE_BYTE));
+                fileAttributes.put(FileProperties.PROPERTY_FILENAME, "testimage");
+                fileAttributes.put(FileProperties.PROPERTY_EXTENSION, "jpg");
+                return mockContent("document",
+                    stubNodeData("document", DocumentInfoTagTest.class.getResourceAsStream("/testimage.jpg"), fileAttributes),
+                    stubTitle("title of document")
+                );
             }
         };
     }

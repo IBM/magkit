@@ -1,19 +1,19 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.mock.MockContent;
-import com.aperto.magkit.mock.MockNodeData;
-import com.mockrunner.mock.web.MockPageContext;
-import info.magnolia.cms.core.ItemType;
-import static info.magnolia.context.MgnlContext.getAggregationState;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.stubNodeData;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
 import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.text.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.springframework.mock.web.*;
 
-import javax.servlet.jsp.*;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
 
 /**
  * Test of the create list tag.
@@ -50,18 +50,14 @@ public class CreateListTagTest extends MagKitTagTest {
 
     @Override
     protected PageContext createPageContext() {
-        MockContent mockContent = new MockContent("test", ItemType.CONTENT);
-        MockNodeData mockNodeData = new MockNodeData("list", LIST_VALUE_LONG);
-        mockContent.addNodeData(mockNodeData);
-        mockNodeData = new MockNodeData("list2", LIST_VALUE_SHORT);
-        mockContent.addNodeData(mockNodeData);
-        MockHttpServletRequest request = new MockHttpServletRequest();       
-        MockHttpSession httpSession = new MockHttpSession();
-        request.setSession(httpSession);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        // init MgnlContext:
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        getAggregationState().setCurrentContent(mockContent);
-        return new MockPageContext(new MockServletConfig(), request, response);
+        mockAggregationState(
+            stubCurrentContent(
+                mockContent("test",
+                    stubNodeData("list", LIST_VALUE_LONG),
+                    stubNodeData("list2", LIST_VALUE_SHORT)
+                )
+            )
+        );
+        return super.createPageContext();
     }
 }

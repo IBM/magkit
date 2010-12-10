@@ -1,23 +1,27 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.mock.MockContent;
-import com.aperto.magkit.mock.MockNodeData;
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockHierarchyManager;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.stubNodeData;
+import static com.aperto.magkit.mockito.ContextMockUtils.*;
 import com.mockrunner.mock.web.MockPageContext;
 import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.context.MgnlContext;
+import info.magnolia.cms.core.Content;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.text.StringContains.containsString;
 import static org.hamcrest.text.StringEndsWith.endsWith;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.springframework.mock.web.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockServletConfig;
 
-import javax.servlet.jsp.*;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**
@@ -127,31 +131,19 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     }
 
     protected PageContext createPageContext(String nodeDataName, String nodeDataValue) {
-        MockContent mockContent = createMockContent(nodeDataName, nodeDataValue);
+        Content mockContent = mockContent("test", stubNodeData(nodeDataName, nodeDataValue));
+        mockAggregationState(stubCurrentContent(mockContent));
         MockHttpSession httpSession = new MockHttpSession();
         MockHttpServletRequest request = createMockRequest(mockContent, httpSession);
         MockHttpServletResponse response = new MockHttpServletResponse();
-        initMagnoliaContext(request, response, httpSession, mockContent);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 
-    private void initMagnoliaContext(MockHttpServletRequest request, MockHttpServletResponse response, MockHttpSession httpSession, MockContent mockContent) {
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        MgnlContext.getAggregationState().setCurrentContent(mockContent);
-    }
-
-    private MockHttpServletRequest createMockRequest(MockContent mockContent, MockHttpSession httpSession) {
+    private MockHttpServletRequest createMockRequest(Content mockContent, MockHttpSession httpSession) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setAttribute(LOCAL_CONTENT_OBJ, mockContent);
         request.setSession(httpSession);
         request.setContextPath(CONTEXT_PATH);
         return request;
-    }
-
-    private MockContent createMockContent(String nodeDataName, String nodeDataValue) {
-        MockContent mockContent = new MockContent("test", ItemType.CONTENT);
-        MockNodeData mockNodeData = new MockNodeData(nodeDataName, nodeDataValue);
-        mockContent.addNodeData(mockNodeData);
-        return mockContent;
     }
 }
