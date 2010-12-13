@@ -6,6 +6,7 @@ import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCu
 import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
 import static com.aperto.magkit.mockito.ContentStubbingOperation.stubNodeData;
 import static com.aperto.magkit.mockito.ContentStubbingOperation.stubTitle;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
 import info.magnolia.cms.beans.runtime.FileProperties;
 import info.magnolia.cms.core.Content;
@@ -31,6 +32,24 @@ public class DocumentInfoTagTest extends MagKitTagTest {
     private static final long FILE_SIZE_BYTE = 1048576L;
     private static final long FILE_SIZE_MB = 1L;
     private DocumentInfoTag _documentInfoTag;
+
+    @Before
+    public void setUp() {
+        cleanContext();
+        _documentInfoTag = new DocumentInfoTag() {
+            @Override
+            protected Content retrieveContent(String link) {
+                Map<String, String> fileAttributes = new HashMap<String, String>(5);
+                fileAttributes.put(FileProperties.PROPERTY_SIZE, Long.toString(FILE_SIZE_BYTE));
+                fileAttributes.put(FileProperties.PROPERTY_FILENAME, "testimage");
+                fileAttributes.put(FileProperties.PROPERTY_EXTENSION, "jpg");
+                return mockContent("document",
+                    stubNodeData("document", DocumentInfoTagTest.class.getResourceAsStream("/testimage.jpg"), fileAttributes),
+                    stubTitle("title of document")
+                );
+            }
+        };
+    }
 
     @Test
     public void testDocumentInfoTag() throws JspException {
@@ -94,22 +113,5 @@ public class DocumentInfoTagTest extends MagKitTagTest {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         return new MockPageContext(new MockServletContext(), request, response);
-    }
-
-    @Before
-    public void getDocumentInfoTag() {
-        _documentInfoTag = new DocumentInfoTag() {
-            @Override
-            protected Content retrieveContent(String link) {
-                Map<String, String> fileAttributes = new HashMap<String, String>(5);
-                fileAttributes.put(FileProperties.PROPERTY_SIZE, Long.toString(FILE_SIZE_BYTE));
-                fileAttributes.put(FileProperties.PROPERTY_FILENAME, "testimage");
-                fileAttributes.put(FileProperties.PROPERTY_EXTENSION, "jpg");
-                return mockContent("document",
-                    stubNodeData("document", DocumentInfoTagTest.class.getResourceAsStream("/testimage.jpg"), fileAttributes),
-                    stubTitle("title of document")
-                );
-            }
-        };
     }
 }
