@@ -10,6 +10,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.split;
 import org.apache.commons.lang.exception.NestableRuntimeException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.myfaces.tobago.apt.annotation.*;
 import static org.apache.taglibs.standard.functions.Functions.escapeXml;
 import org.slf4j.Logger;
@@ -36,18 +37,19 @@ import java.util.*;
 public class PagingTag extends TagSupport {
     private static final Logger LOGGER = LoggerFactory.getLogger(PagingTag.class);
     private static final String PADDING_SEQUENZ = "...";
+    private static final int DEFAULT_LINKED_PAGES = 5;
 
     private String _prefix = "Seite";
     private String _prefixTitle = "zur Seite ";
     private String _prevPageTitle = "zur vorherigen Seite";
-    private String _prevPage = "zurück";
-    private String _nextPageTitle = "zur nächsten Seite";
+    private String _prevPage = "zurï¿½ck";
+    private String _nextPageTitle = "zur nï¿½chsten Seite";
     private String _nextPage = "weiter";
     private String _actPageTitle = "Sie sind hier : ";
 
     private int _pages;
     private int _actPage;
-    private int _linkedPages = 5;
+    private int _linkedPages = DEFAULT_LINKED_PAGES;
     private boolean _addQueryString = false;
     private boolean _showPrefix = true;
     private boolean _showTitle = true;
@@ -149,42 +151,51 @@ public class PagingTag extends TagSupport {
      * @throws JspException
      */
     public int doEndTag() throws JspException {
-        JspWriter out = pageContext.getOut();
-        String completeHandle = getHandleFromActivePage();
-        String queryString = "";
         init();
-        if (_addQueryString) {
-            HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-            queryString = "?" + escapeXml(request.getQueryString());
-        }
         try {
             if (_pages > 1) {
-                if (_encapsulate) {
-                    out.print("<div class=\"pager\">\n");
-                }
-                if (isNotEmpty(_includeHeadline)) {
-                    out.print("<h4>" + _includeHeadline + "</h4>\n");
-                }
-                out.print("<ul");
-                if (!_encapsulate) {
-                    out.print(" class=\"pager\"");
-                }
-                out.print(">\n");
-                out.print(determinePrevious(getLink(completeHandle, queryString, _actPage - 1)));
-                if (_showPrefix) {
-                    out.print("<li><strong>" + _prefix + "</strong></li>");
-                }
-                printListItems(out, completeHandle, queryString);
-                out.print(determineNext(getLink(completeHandle, queryString, _actPage + 1)));
-                out.print("</ul>\n");
-                if (_encapsulate) {
-                    out.print("</div>");
-                }
+                printPaging();
             }
         } catch (IOException e) {
             throw new NestableRuntimeException(e);
         }
         return super.doEndTag();
+    }
+
+    private void printPaging() throws IOException {
+        JspWriter out = pageContext.getOut();
+        String completeHandle = getHandleFromActivePage();
+        String queryString = getQueryString();
+        if (_encapsulate) {
+            out.print("<div class=\"pager\">\n");
+        }
+        if (isNotEmpty(_includeHeadline)) {
+            out.print("<h4>" + _includeHeadline + "</h4>\n");
+        }
+        out.print("<ul");
+        if (!_encapsulate) {
+            out.print(" class=\"pager\"");
+        }
+        out.print(">\n");
+        out.print(determinePrevious(getLink(completeHandle, queryString, _actPage - 1)));
+        if (_showPrefix) {
+            out.print("<li><strong>" + _prefix + "</strong></li>");
+        }
+        printListItems(out, completeHandle, queryString);
+        out.print(determineNext(getLink(completeHandle, queryString, _actPage + 1)));
+        out.print("</ul>\n");
+        if (_encapsulate) {
+            out.print("</div>");
+        }
+    }
+
+    private String getQueryString() {
+        String queryString = StringUtils.EMPTY;
+        if (_addQueryString) {
+            HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+            queryString = "?" + escapeXml(request.getQueryString());
+        }
+        return queryString;
     }
 
     private void printListItems(JspWriter out, String completeHandle, String queryString) throws IOException {
@@ -294,19 +305,21 @@ public class PagingTag extends TagSupport {
      */
     public String getHandleFromActivePage() {
         HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-        String handle = request.getContextPath();
+        StringBuffer handleString = new StringBuffer();
+        handleString.append(request.getContextPath());
         AggregationState state = getAggregationState();
-        handle += state.getMainContent().getHandle();
+        handleString.append(state.getMainContent().getHandle());
         String selector = state.getSelector();
         if (!isBlank(selector)) {
             String[] strings = split(selector, '.');
             for (String s : strings) {
                 if (!s.startsWith(SELECTOR_PAGING_WITH_DELIMITER)) {
-                    handle += "." + s;
+                    handleString.append(".");
+                    handleString.append(s);
                 }
             }
         }
-        return handle;
+        return handleString.toString();
     }
 
     /**
@@ -346,7 +359,7 @@ public class PagingTag extends TagSupport {
         super.release();
         _actPage = 1;
         _pages = 1;
-        _linkedPages = 5;
+        _linkedPages = DEFAULT_LINKED_PAGES;
         _addQueryString = false;
         _showPrefix = true;
         _showTitle = true;
