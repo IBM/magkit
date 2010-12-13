@@ -26,6 +26,9 @@ import org.apache.myfaces.tobago.apt.annotation.TagAttribute;
 @Tag(name = "image", bodyContent = BodyContent.JSP)
 public class ImageTag extends BaseContentTag {
 
+    private static final String ATTR_WIDTH = "width";
+    private static final String ATTR_HEIGHT = "height";
+
     private Map<String, String> _htmlAttributes = new HashMap<String, String>();
     private String _nodeDataName;
     private String _altNodeDataName;
@@ -72,7 +75,7 @@ public class ImageTag extends BaseContentTag {
      */
     @TagAttribute
     public void setHeight(String value) {
-        _htmlAttributes.put("height", value);
+        _htmlAttributes.put(ATTR_HEIGHT, value);
     }
 
     /**
@@ -82,7 +85,7 @@ public class ImageTag extends BaseContentTag {
      */
     @TagAttribute
     public void setWidth(String value) {
-        _htmlAttributes.put("width", value);
+        _htmlAttributes.put(ATTR_WIDTH, value);
     }
 
     /**
@@ -192,17 +195,17 @@ public class ImageTag extends BaseContentTag {
     }
 
     private void checkMeasures(ImageData imageData) {
-        if (!StringUtils.isBlank(_htmlAttributes.get("width")) && !StringUtils.isBlank(_htmlAttributes.get("height"))) {
-            imageData.setHeight(_htmlAttributes.get("height"));
-            imageData.setWidth(_htmlAttributes.get("width"));
+        if (!StringUtils.isBlank(_htmlAttributes.get(ATTR_WIDTH)) && !StringUtils.isBlank(_htmlAttributes.get(ATTR_HEIGHT))) {
+            imageData.setHeight(_htmlAttributes.get(ATTR_HEIGHT));
+            imageData.setWidth(_htmlAttributes.get(ATTR_WIDTH));
         }
     }
 
     private void writeToJsp(JspWriter out, ImageData imageData, String contextPath) {
         // don't modify the original map, remember tag pooling
         Map<String, String> attributes = new HashMap<String, String>(_htmlAttributes);
-        attributes.put("height", imageData.getHeight());
-        attributes.put("width", imageData.getWidth());
+        attributes.put(ATTR_HEIGHT, imageData.getHeight());
+        attributes.put(ATTR_WIDTH, imageData.getWidth());
         try {
             if (StringUtils.lowerCase(imageData.getHandle()).endsWith(".swf")) {
                 // TODO: handle flash movies like aperto
@@ -236,14 +239,14 @@ public class ImageTag extends BaseContentTag {
 
     private void calculateNewMeasures(Map<String, String> attributes) {
         if (_scaling && (_scaleAtHeight > 0 || _scaleAtWidth > 0)) {
-            int width = NumberUtils.toInt(attributes.get("width"));
-            int height = NumberUtils.toInt(attributes.get("height"));
+            int width = NumberUtils.toInt(attributes.get(ATTR_WIDTH));
+            int height = NumberUtils.toInt(attributes.get(ATTR_HEIGHT));
             if ((_scaleAtWidth > 0) && (width > 0)) {
-                attributes.put("width", Integer.toString(_scaleAtWidth));
-                attributes.put("height", Integer.toString((height * _scaleAtWidth) / width));
+                attributes.put(ATTR_WIDTH, Integer.toString(_scaleAtWidth));
+                attributes.put(ATTR_HEIGHT, Integer.toString((height * _scaleAtWidth) / width));
             } else if (height > 0) {
-                attributes.put("width", Integer.toString((width * _scaleAtHeight) / height));
-                attributes.put("height", Integer.toString(_scaleAtHeight));
+                attributes.put(ATTR_WIDTH, Integer.toString((width * _scaleAtHeight) / height));
+                attributes.put(ATTR_HEIGHT, Integer.toString(_scaleAtHeight));
             }
         }
     }
@@ -257,11 +260,10 @@ public class ImageTag extends BaseContentTag {
     }
 
     private void writeAttributes(JspWriter out, Map<String, String> attributes) throws IOException {
-        for (String name : attributes.keySet()) {
-            String value = attributes.get(name);
-            out.write(name);
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            out.write(entry.getKey());
             out.write("=\"");
-            out.write(value);
+            out.write(entry.getValue());
             out.write("\" ");
         }
     }
