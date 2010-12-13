@@ -39,7 +39,7 @@ public class ConvertLinkTagTest extends MagKitTagTest {
     private static final String LINK_VALUE_UUID = "29f35061-bf9f-478c-a4b0-cb9f07a0fc8c";
 
     @Before
-    public void setup() {
+    public void setUp() {
         cleanContext();
     }
 
