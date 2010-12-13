@@ -38,7 +38,10 @@ public class ExportTask extends MatchingTask {
     private static final String TYPE_LABEL = "label";
     private static final String TYPE_DESCRIPTION = "description";
     private static final String TYPE_TITLE = "title";
+    private static final String ATTR_NAME = "name";
     private static final String[] FORBIDDEN_NODES = {"MetaData", "columns"};
+    private static final int DEFAULT_TARGET_PORT = 8888;
+    private static final int DEFAULT_FILE_BYTE_COUNT = 10000;
 
     private String _rootNode;
     private String _outputPath;
@@ -46,7 +49,7 @@ public class ExportTask extends MatchingTask {
     private String _mgnlUser;
     private String _mgnlPassword;
     private String _targetHost = "localhost";
-    private int _targetPort = 8888;
+    private int _targetPort = DEFAULT_TARGET_PORT;
     private boolean _verbose;
     private String _webapp = "author";
     private boolean _i18n = false;
@@ -61,7 +64,7 @@ public class ExportTask extends MatchingTask {
     }
 
     public String getWebapp() {
-        return _webapp.indexOf("/") == 0 ? _webapp : "/" + _webapp;
+        return _webapp.indexOf('/') == 0 ? _webapp : "/" + _webapp;
     }
 
     public void setWebapp(String webapp) {
@@ -157,7 +160,7 @@ public class ExportTask extends MatchingTask {
     /**
      * Starts a recursive export. This method will be called by the Ant runner.
      */
-    public void execute() throws BuildException {
+    public void execute() {
         info("try to read the repository structure to export xml.");
         info("_rootNode: " + _rootNode);
         info("_outputPath: " + _outputPath);
@@ -171,11 +174,13 @@ public class ExportTask extends MatchingTask {
         if (_propertiesChanged) {
             for (Map.Entry entry : _properties.entrySet()) {
                 Properties prop = (Properties) entry.getValue();
+                FileOutputStream stream = null;
                 try {
-                    FileOutputStream stream = new FileOutputStream(_messagePath + "/" + entry.getKey());
+                    stream = new FileOutputStream(_messagePath + "/" + entry.getKey());
                     prop.store(stream, "# Add your custom strings here. the keys can be used inside the dialog definitions. For example use it as a label.");
                 } catch (IOException e) {
                     info("Can not save file: " + entry.getKey());
+                    closeQuietly(stream);
                 }
             }
         }
@@ -184,11 +189,7 @@ public class ExportTask extends MatchingTask {
     private void loadProperties() {
         if (StringUtils.isNotBlank(_messagePath)) {
             File messageDir = new File(_messagePath);
-            File[] files = messageDir.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.startsWith("messages_templating_custom");
-                }
-            });
+            File[] files = messageDir.listFiles(new FileNameFilter());
             for (File file : files) {
                 SortedProperties prop = new SortedProperties();
                 FileInputStream inStream = null;
@@ -201,6 +202,15 @@ public class ExportTask extends MatchingTask {
                     closeQuietly(inStream);
                 }
             }
+        }
+    }
+
+    /**
+     * Filter which checks if file name starts with "messages_templating_custom".
+     */
+    static class FileNameFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            return name.startsWith("messages_templating_custom");
         }
     }
 
@@ -250,7 +260,8 @@ public class ExportTask extends MatchingTask {
         URL url;
         String[] elements = exportSite.split("\\.");
         if (elements.length > 0) {
-            StringBuffer path = new StringBuffer(getWebapp() + "/.magnolia/pages/export.html?mgnlRepository=config&mgnlPath=");
+            StringBuffer path = new StringBuffer(getWebapp());
+            path.append("/.magnolia/pages/export.html?mgnlRepository=config&mgnlPath=");
             String repository = elements[0];
             if (repository != null) {
                 try {
@@ -298,7 +309,7 @@ public class ExportTask extends MatchingTask {
                 XMLWriter writer = new XMLWriter(out, format);
                 writer.write(document);
             } else {
-                byte[] buffer = new byte[10000];
+                byte[] buffer = new byte[DEFAULT_FILE_BYTE_COUNT];
                 int count;
                 while ((count = source.read(buffer, 0, buffer.length)) != -1) {
                     out.write(buffer, 0, count);
@@ -316,13 +327,13 @@ public class ExportTask extends MatchingTask {
 
     private String checkRootElement(Document document) {
         Element root = document.getRootElement();
-        String elementName = root.attribute("name").getValue();
+        String elementName = root.attribute(ATTR_NAME).getValue();
         List list = document.selectNodes("/sv:node/sv:property[@sv:name]");
         boolean labelFound = false;
         boolean descriptionFound = false;
         for (Object obj : list) {
             Element element = (Element) obj;
-            String value = element.attribute("name").getValue();
+            String value = element.attribute(ATTR_NAME).getValue();
             if (value.equals(TYPE_LABEL) || value.equals(TYPE_TITLE)) {
                 labelFound = true;
                 if (getModus().name().toLowerCase().equals(Modus.DIALOG)) {
@@ -388,7 +399,7 @@ public class ExportTask extends MatchingTask {
             List list = document.selectNodes("//sv:node[@sv:name]");
             for (Object aList : list) {
                 Element parentNode = (Element) aList;
-                String nodeName = parentNode.attribute("name").getValue();
+                String nodeName = parentNode.attribute(ATTR_NAME).getValue();
                 boolean isChildOfColumn = checkColumnAncestor(parentNode);
 
                 if (!parentNode.isRootElement() && !ArrayUtils.contains(FORBIDDEN_NODES, nodeName) && !isChildOfColumn) {
@@ -421,7 +432,7 @@ public class ExportTask extends MatchingTask {
         boolean hasColumnAncestor = false;
         Element parent = parentNode.getParent();
         if (parent != null) {
-            Attribute attribute = parent.attribute("name");
+            Attribute attribute = parent.attribute(ATTR_NAME);
             if (attribute != null) {
                 hasColumnAncestor = "columns".equals(attribute.getValue()) || checkColumnAncestor(parent);
             }
@@ -437,7 +448,7 @@ public class ExportTask extends MatchingTask {
         for (Object obj : properties) {
             Element property = (Element) obj;
             // select parentNode name
-            String name = property.attribute("name").getValue();
+            String name = property.attribute(ATTR_NAME).getValue();
             if (name.equals(TYPE_LABEL) || name.equals(TYPE_TITLE)) {
                 labelFound = true;
                 if (getModus().name().toLowerCase().equals(Modus.DIALOG)) {
