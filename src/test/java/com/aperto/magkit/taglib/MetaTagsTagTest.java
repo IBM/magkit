@@ -1,11 +1,21 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
+import com.aperto.magkit.mockito.*;
+import static com.aperto.magkit.mockito.I18nContentSupportStubbingOperation.*;
+import static com.aperto.magkit.mockito.I18nContentSupportMockUtils.mockI18nContentSupport;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.*;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.*;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.*;
+import static com.aperto.magkit.mockito.ContentMockUtils.*;
 import com.aperto.magkit.mock.MockContent;
 import com.aperto.magkit.mock.MockNodeData;
 
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
+import info.magnolia.cms.core.Content;
 import info.magnolia.context.MgnlContext;
 import org.apache.commons.lang.StringUtils;
 import static org.easymock.classextension.EasyMock.anyObject;
@@ -27,6 +37,7 @@ import org.springframework.web.servlet.support.RequestContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
+import javax.jcr.RepositoryException;
 import java.util.Locale;
 
 /**
@@ -48,32 +59,25 @@ public class MetaTagsTagTest extends MagKitTagTest {
         Assert.assertThat(StringUtils.countMatches(output, "<meta"), CoreMatchers.is(4));
     }
 
-    @Override
-    protected PageContext createPageContext() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockHttpSession httpSession = new MockHttpSession();
-        request.setSession(httpSession);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        MockContent parentContent = new MockContent("parent", ItemType.CONTENT);
-        parentContent.addNodeData(new MockNodeData("meta-author", "aperto"));
-
-        MockContent mockContent = new MockContent("page1", ItemType.CONTENT);
-        mockContent.addNodeData(new MockNodeData("meta-description", "toll"));
-        mockContent.setParent(parentContent);
-
-        MockContent mockContent2 = new MockContent("page2", ItemType.CONTENT);
-        mockContent2.addNodeData(new MockNodeData("title", "layer 3"));
-        mockContent2.setParent(mockContent);
-
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        MgnlContext.setLocale(new Locale("de"));
-        MgnlContext.getAggregationState().setMainContent(mockContent2);
-        return new MockPageContext(new MockServletConfig(), request, response);
+    protected void mockMgnlContext() {
+        Content mainContent = mockContent("page2", stubTitle("layer 3"));
+        mockContent("parent",
+            stubNodeData("meta-author", "aperto"),
+            stubChild("page1",
+                stubNodeData("meta-description", "toll"),
+                stubChildren(mainContent)
+            )
+        );
+        mockI18nContentSupport(stubbLocale(Locale.GERMAN));
+        mockAggregationState(
+            stubMainContent(mainContent)
+        );
     }
 
     @Before
-    public void initTag() throws Exception {
+    public void setUp() throws Exception {
+        cleanContext();
+        mockMgnlContext();
         _metaTagsTag = new MetaTagsTag() {
             @Override
             protected RequestContext getContext() {
