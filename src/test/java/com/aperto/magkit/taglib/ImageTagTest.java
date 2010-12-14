@@ -1,21 +1,31 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.mock.MockContent;
-import com.aperto.magkit.mock.MockNodeData;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubMainContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.*;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static com.aperto.magkit.mockito.I18nContentSupportMockUtils.mockI18nContentSupport;
+import static com.aperto.magkit.mockito.I18nContentSupportStubbingOperation.stubbNodeData;
 import com.aperto.magkit.utils.ImageData;
 import com.mockrunner.mock.web.MockPageContext;
-import static info.magnolia.cms.core.ItemType.CONTENT;
-import static info.magnolia.cms.core.ItemType.CONTENTNODE;
-import static info.magnolia.context.MgnlContext.getAggregationState;
+import info.magnolia.cms.core.Content;
 import static org.hamcrest.text.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockServletConfig;
 
-import javax.jcr.RepositoryException;
-import javax.servlet.jsp.*;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test of the image tag.
@@ -25,6 +35,7 @@ import javax.servlet.jsp.*;
  */
 public class ImageTagTest extends MagKitTagTest {
     private ImageTag _tag;
+    private Content _paragraphWithImage;
 
     @Test
     public void testDefaultBehaviour() throws JspException {
@@ -80,32 +91,38 @@ public class ImageTagTest extends MagKitTagTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpSession httpSession = new MockHttpSession();
         request.setSession(httpSession);
-        MockContent mockContent = new MockContent("page1", CONTENT);
-        mockContent.addNodeData(new MockNodeData("title", "layer 2"));
-        MockContent nodeContent = new MockContent("content", CONTENTNODE);
-        nodeContent.addNodeData(new MockNodeData("imageAlt", "Alttext"));
-        MockNodeData image = new MockNodeData("image", ImageTagTest.class.getResourceAsStream("/testimage.jpg"));
-        try {
-            image.setAttribute("height", "300");
-            image.setAttribute("width", "200");
-            image.setAttribute("fileName", "testimage");
-            image.setAttribute("extension", "jpg");
-        } catch (RepositoryException e) {
-            //Nothing
-        }
-        nodeContent.addNodeData(image);
-        mockContent.addContent(nodeContent);
-        request.setAttribute("imageData", new ImageData(image, "Alttext"));
+        request.setAttribute("imageData", getImageData());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        getAggregationState().setMainContent(mockContent);
-        getAggregationState().setCurrentContent(nodeContent);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 
+    private ImageData getImageData() {
+        return new ImageData(_paragraphWithImage.getNodeData("image"), "Alttext");
+    }
+
     @Before
-    public void initTag() throws Exception {
+    public void setUp() throws Exception {
         _tag = new ImageTag();
+        cleanContext();
+        Map<String, String> imageAttributes = new HashMap<String, String>(6);
+        imageAttributes.put("height", "300");
+        imageAttributes.put("width", "200");
+        imageAttributes.put("fileName", "testimage");
+        imageAttributes.put("extension", "jpg");
+        Content pageWithImage = mockContent("page1",
+            stubTitle("layer 2"),
+            stubChildContentNode("content",
+                stubNodeData("imageAlt", "Alttext"),
+                stubNodeData("image", ImageTagTest.class.getResourceAsStream("/testimage.jpg"), imageAttributes)
+            )
+        );
+        _paragraphWithImage = pageWithImage.getContent("content");
+        mockAggregationState(
+            stubCurrentContent(_paragraphWithImage),
+            stubMainContent(pageWithImage)
+        );
+        mockI18nContentSupport(
+            stubbNodeData(_paragraphWithImage, "image", _paragraphWithImage.getNodeData("image"))
+        );
     }
 }
