@@ -3,7 +3,6 @@ package com.aperto.magkit.taglib;
 import com.aperto.magkit.MagKitTagTest;
 import com.aperto.magkit.mock.MockContent;
 import com.aperto.magkit.mock.MockNodeData;
-
 import com.mockrunner.mock.web.MockPageContext;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.context.MgnlContext;
@@ -25,7 +24,8 @@ import javax.servlet.jsp.PageContext;
 
 /**
  * Test the breadcrumb tag.
- * @author frank.sommer (17.04.2008) 
+ *
+ * @author frank.sommer (17.04.2008)
  */
 public class BreadCrumbTagTest extends MagKitTagTest {
 
