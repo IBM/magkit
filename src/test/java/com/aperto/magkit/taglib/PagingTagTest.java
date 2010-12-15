@@ -1,20 +1,18 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.mock.MockContent;
-
-import com.mockrunner.mock.web.MockPageContext;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.context.MgnlContext;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.*;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static com.aperto.magkit.mockito.I18nContentSupportMockUtils.mockI18nContentSupport;
+import static com.aperto.magkit.mockito.I18nContentSupportStubbingOperation.stubbLocale;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.text.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletConfig;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -27,19 +25,16 @@ import java.util.Locale;
  * @author frank.sommer (16.11.2007)
  */
 public class PagingTagTest extends MagKitTagTest {
-    @Override
-    protected PageContext createPageContext() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockHttpSession httpSession = new MockHttpSession();
-        request.setSession(httpSession);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        MockContent mockContent = new MockContent("page", ItemType.CONTENT);
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        MgnlContext.getAggregationState().setMainContent(mockContent);
-        MgnlContext.getAggregationState().setCharacterEncoding("UTF-8");
-        MgnlContext.getAggregationState().setSelector("old.selector.pid-1");
-        MgnlContext.getAggregationState().setLocale(new Locale("de"));
-        return new MockPageContext(new MockServletConfig(), request, response);
+
+    @Before
+    public void setUp() {
+        cleanContext();
+        mockAggregationState(
+            stubMainContent(mockContent("page")),
+            stubCharacterEncoding("UTF-8"),
+            stubSelector("old.selector.pid-1")
+        );
+        mockI18nContentSupport(stubbLocale(Locale.GERMAN));
     }
 
     @Test
