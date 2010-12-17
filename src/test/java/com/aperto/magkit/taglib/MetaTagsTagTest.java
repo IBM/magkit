@@ -1,47 +1,32 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.mockito.*;
-import static com.aperto.magkit.mockito.I18nContentSupportStubbingOperation.*;
-import static com.aperto.magkit.mockito.I18nContentSupportMockUtils.mockI18nContentSupport;
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.*;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.*;
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubMainContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
 import static com.aperto.magkit.mockito.ContentStubbingOperation.*;
-import static com.aperto.magkit.mockito.ContentMockUtils.*;
-import com.aperto.magkit.mock.MockContent;
-import com.aperto.magkit.mock.MockNodeData;
-
-import com.mockrunner.mock.web.MockPageContext;
-import info.magnolia.cms.core.ItemType;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static com.aperto.magkit.mockito.I18nContentSupportMockUtils.mockI18nContentSupport;
+import static com.aperto.magkit.mockito.I18nContentSupportStubbingOperation.stubbLocale;
 import info.magnolia.cms.core.Content;
-import info.magnolia.context.MgnlContext;
 import org.apache.commons.lang.StringUtils;
-import static org.easymock.classextension.EasyMock.anyObject;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.*;
 import org.hamcrest.CoreMatchers;
 import static org.hamcrest.text.StringContains.containsString;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.NoSuchMessageException;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletConfig;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
-import javax.jcr.RepositoryException;
 import java.util.Locale;
 
 /**
  * Test the breadcrumb.
+ *
  * @author frank.sommer (17.04.2008)
  */
 public class MetaTagsTagTest extends MagKitTagTest {
