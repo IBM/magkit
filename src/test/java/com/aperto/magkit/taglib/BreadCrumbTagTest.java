@@ -1,11 +1,16 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import com.aperto.magkit.mock.MockContent;
-import com.aperto.magkit.mock.MockNodeData;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubMainContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.*;
+import com.aperto.magkit.mockito.ContextMockUtils;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static com.aperto.magkit.mockito.ServerConfigurationMockUtils.mockServerConfiguration;
+import static com.aperto.magkit.mockito.ServerConfigurationStubbingoperation.stubbDefaultExtension;
 import com.mockrunner.mock.web.MockPageContext;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.context.MgnlContext;
+import info.magnolia.cms.core.Content;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -74,32 +79,32 @@ public class BreadCrumbTagTest extends MagKitTagTest {
 
     @Override
     protected PageContext createPageContext() {
+        Content main = mockContent("page2", stubTitle("layer 3"), stubNodeData("navTitle", EMPTY));
+        mockContent("content",
+            stubNodeData("navTitle", EMPTY),
+            stubChild("parent",
+                stubNodeData("navTitle", EMPTY),
+                stubTitle("layer 1"),
+                stubChild("page1",
+                    stubNodeData("navTitle", EMPTY),
+                    stubTitle("layer 2"),
+                    stubChildren(main)
+                )
+            )
+        );
+        mockAggregationState(stubMainContent(main));
+        mockServerConfiguration(stubbDefaultExtension("html"));
+
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpSession httpSession = new MockHttpSession();
         request.setSession(httpSession);
         MockHttpServletResponse response = new MockHttpServletResponse();
-
-        MockContent rootContent = new MockContent("content", ItemType.CONTENT);
-
-        MockContent parentContent = new MockContent("parent", ItemType.CONTENT);
-        parentContent.addNodeData(new MockNodeData("title", "layer 1"));
-        parentContent.setParent(rootContent);
-
-        MockContent mockContent = new MockContent("page1", ItemType.CONTENT);
-        mockContent.addNodeData(new MockNodeData("title", "layer 2"));
-        mockContent.setParent(parentContent);
-
-        MockContent mockContent2 = new MockContent("page2", ItemType.CONTENT);
-        mockContent2.addNodeData(new MockNodeData("title", "layer 3"));
-        mockContent2.setParent(mockContent);
-
-        initMgnlWebContext(request, response, httpSession.getServletContext());
-        MgnlContext.getAggregationState().setMainContent(mockContent2);
         return new MockPageContext(new MockServletConfig(), request, response);
     }
 
     @Before
     public void initTag() throws Exception {
         _tag = new BreadCrumbTag();
+        ContextMockUtils.cleanContext();
     }
 }
