@@ -30,8 +30,7 @@ public class HandleI18nContentSupportTest {
 
     @Test
     public void testLocalizedHandleSite() {
-        mockAggregationStateWith("utf-8", "/content/de/testpage.html");
-        MgnlContext.getAggregationState().setCurrentURI("de.html");
+        mockAggregationStateWith("utf-8", "de.html");
         HandleI18nContentSupport contentSupport = createI18nContentSupport(new Locale("de"));
         Locale locale = contentSupport.determineLocale();
         assertThat(locale.getLanguage(), is("de"));
@@ -40,7 +39,6 @@ public class HandleI18nContentSupportTest {
     @Test
     public void testLocalizedHandleSiteWithMandant() {
         mockAggregationStateWith("utf-8", "de_mandant.html");
-        MgnlContext.getAggregationState().setCurrentURI("de_mandant.html");
         HandleI18nContentSupport contentSupport = createI18nContentSupport(new Locale("de"));
         Locale locale = contentSupport.determineLocale();
         assertThat(locale.getLanguage(), is("de"));
