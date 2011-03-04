@@ -12,7 +12,7 @@ import static org.hamcrest.core.Is.is;
  */
 public class SearchControllerTest {
     @Test
-    public void testDeterminClosingTag() {
+    public void testDetermineClosingTag() {
         String s = SearchController.determineClosingTag("<strong class=\"test\">");
         assertThat(s, is("</strong>"));
         s = SearchController.determineClosingTag("<strong>");
