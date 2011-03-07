@@ -18,6 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link XmlResponseValidatingServletFilter}.
@@ -92,32 +93,32 @@ public class XmlResponseValidatingServletFilterTest {
     @Test
     public void filterInvalidXmlWithValidationInfo() throws IOException, ServletException {
         initAndStartFilter(_filter, _request, _response, new TestFilterChain(INVALID_XML));
-        verify(_response.getWriter()).write(matches(INVALID_XML + "<!-- valid: error:[a-zA-Z_0-9]* -->"));
+        verify(_response.getWriter()).write(matches(INVALID_XML));
     }
 
     @Test
     public void filterValidXmlWithValidationInfo() throws IOException, ServletException {
         initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
-        verify(_response.getWriter()).write(matches(INVALID_XML + "<!-- valid: true -->"));
+        verify(_response.getWriter()).write(matches(VALID_UNIS_XML));
     }
 
     @Test(expected = RuntimeException.class)
     public void failOnMissingContentType() throws IOException, ServletException {
-        _response.setContentType(null);
+        when(_response.getContentType()).thenReturn(null);
         _filter.setFailOnInvalidXml(true);
         initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
     }
 
     @Test(expected = RuntimeException.class)
     public void failOnInvalidContentType() throws IOException, ServletException {
-        _response.setContentType("text/html");
+        when(_response.getContentType()).thenReturn("text/html");
         _filter.setFailOnInvalidXml(true);
         initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
     }
 
     @Test
     public void doNotFailOnInvalidContentType() throws IOException, ServletException {
-        _response.setContentType("text/html");
+        when(_response.getContentType()).thenReturn("text/html");
         initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
     }
 
