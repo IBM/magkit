@@ -128,7 +128,7 @@ public class XmlResponseValidatingServletFilterTest {
     }
 
     /**
-     * {@link javax.servlet.FilterChain} implementation that writes the string given the contructor to the response.
+     * {@link javax.servlet.FilterChain} implementation that writes the string given the constructor to the response.
      */
     protected static class TestFilterChain implements FilterChain {
 
