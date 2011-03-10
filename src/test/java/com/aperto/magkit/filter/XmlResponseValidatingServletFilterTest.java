@@ -1,8 +1,5 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.magkit.mockito.servlet.HttpServletRequestStubbingOperation;
-import com.aperto.magkit.mockito.servlet.HttpServletResponseStubbingOperation;
-import com.mockrunner.mock.web.MockHttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,32 +74,32 @@ public class XmlResponseValidatingServletFilterTest {
     @Test
     public void filterInvalidXml() throws IOException, ServletException {
         _filter.setAppendValidationInfo(false);
-        initAndStartFilter(_filter, _request, _response, new TestFilterChain(INVALID_XML));
+        initAndStartFilter(_filter, new TestFilterChain(INVALID_XML));
         verify(_response.getWriter()).write(INVALID_XML);
     }
 
     @Test(expected = RuntimeException.class)
     public void failOnFilterInvalidXml() throws IOException, ServletException {
         _filter.setFailOnInvalidXml(true);
-        initAndStartFilter(_filter, _request, _response, new TestFilterChain(INVALID_XML));
+        initAndStartFilter(_filter, new TestFilterChain(INVALID_XML));
     }
 
     @Test
     public void filterValidXml() throws IOException, ServletException {
         _filter.setAppendValidationInfo(false);
-        initAndStartFilter(_filter, _request, _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new TestFilterChain(VALID_UNIS_XML));
         verify(_response.getWriter()).write(VALID_UNIS_XML);
     }
 
     @Test
     public void filterInvalidXmlWithValidationInfo() throws IOException, ServletException {
-        initAndStartFilter(_filter, _request, _response, new TestFilterChain(INVALID_XML));
+        initAndStartFilter(_filter, new TestFilterChain(INVALID_XML));
         verify(_response.getWriter()).write(matches(INVALID_XML));
     }
 
     @Test
     public void filterValidXmlWithValidationInfo() throws IOException, ServletException {
-        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new TestFilterChain(VALID_UNIS_XML));
         verify(_response.getWriter()).write(matches(VALID_UNIS_XML));
     }
 
@@ -110,25 +107,25 @@ public class XmlResponseValidatingServletFilterTest {
     public void failOnMissingContentType() throws IOException, ServletException {
         when(_response.getContentType()).thenReturn(null);
         _filter.setFailOnInvalidXml(true);
-        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new TestFilterChain(VALID_UNIS_XML));
     }
 
     @Test(expected = RuntimeException.class)
     public void failOnInvalidContentType() throws IOException, ServletException {
         when(_response.getContentType()).thenReturn("text/html");
         _filter.setFailOnInvalidXml(true);
-        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new TestFilterChain(VALID_UNIS_XML));
     }
 
     @Test
     public void doNotFailOnInvalidContentType() throws IOException, ServletException {
         when(_response.getContentType()).thenReturn("text/html");
-        initAndStartFilter(_filter, new MockHttpServletRequest(), _response, new TestFilterChain(VALID_UNIS_XML));
+        initAndStartFilter(_filter, new TestFilterChain(VALID_UNIS_XML));
     }
 
-    protected static void initAndStartFilter(XmlResponseValidatingServletFilter filter, HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    private void initAndStartFilter(XmlResponseValidatingServletFilter filter, FilterChain filterChain) throws IOException, ServletException {
         filter.initFilterBean();
-        filter.doFilterInternal(request, response, filterChain);
+        filter.doFilterInternal(_request, _response, filterChain);
     }
 
     /**
