@@ -1,5 +1,7 @@
 package com.aperto.magkit.filter;
 
+import com.aperto.magkit.mockito.servlet.HttpServletRequestStubbingOperation;
+import com.aperto.magkit.mockito.servlet.HttpServletResponseStubbingOperation;
 import com.mockrunner.mock.web.MockHttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.aperto.magkit.mockito.servlet.HttpServletRequestStubbingOperation.stubContextPath;
+import static com.aperto.magkit.mockito.servlet.HttpServletResponseStubbingOperation.stubContentType;
 import static com.aperto.magkit.mockito.servlet.ServletMockUtils.mockHttpServletRequest;
 import static com.aperto.magkit.mockito.servlet.ServletMockUtils.mockHttpServletResponse;
 import static org.junit.Assert.assertFalse;
@@ -51,8 +55,8 @@ public class XmlResponseValidatingServletFilterTest {
     public void setUp() {
         _filter = new XmlResponseValidatingServletFilter();
         _filter.setSchemaPath("/test.xsd");
-        _request = mockHttpServletRequest("/");
-        _response = mockHttpServletResponse("text/xml");
+        _request = mockHttpServletRequest(stubContextPath("/"));
+        _response = mockHttpServletResponse(stubContentType("text/xml"));
         _responseWrapper = new XmlResponseValidatingServletFilter.ResponseWrapper(_response);
     }
 
