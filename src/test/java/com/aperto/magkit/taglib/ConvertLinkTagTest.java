@@ -1,18 +1,8 @@
 package com.aperto.magkit.taglib;
 
 import com.aperto.magkit.MagKitTagTest;
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
-import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
-import static com.aperto.magkit.mockito.ContentStubbingOperation.stubNodeData;
-import static com.aperto.magkit.mockito.ContextMockUtils.*;
 import com.mockrunner.mock.web.MockPageContext;
-import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
 import info.magnolia.cms.core.Content;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.text.StringContains.containsString;
-import static org.hamcrest.text.StringEndsWith.endsWith;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -24,6 +14,17 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
+import static com.aperto.magkit.mockito.ContentStubbingOperation.stubNodeData;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.text.StringContains.containsString;
+import static org.hamcrest.text.StringEndsWith.endsWith;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test of the convert link tag.
@@ -56,8 +57,6 @@ public class ConvertLinkTagTest extends MagKitTagTest {
 
     @Test
     public void testUuidLink() throws JspException {
-        cleanContext();
-        mockHierarchyManager(WEBSITE);
         ConvertLinkTag tag = new ConvertLinkTag();
         tag.setNodeDataName("link4");
         PageContext pageContext = runLifeCycle(tag, "link4", LINK_VALUE_UUID);
