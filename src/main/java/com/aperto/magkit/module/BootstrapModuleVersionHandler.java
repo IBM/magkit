@@ -1,14 +1,17 @@
 package com.aperto.magkit.module;
 
+import com.aperto.magkit.module.delta.InstallBootstrapTask;
 import info.magnolia.module.DefaultModuleVersionHandler;
+import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.ModuleBootstrapTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A ModuleVersionHandler which just do the bootstrap on update.
+ * A ModuleVersionHandler which just do the bootstrap on update and bootstraps on module install all bootstrap files under "/mgnl-bootstrap/install/moduleName".
  *
  * @author frank.sommer
  * @since 26.10.2010
@@ -32,5 +35,13 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
         List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
         updateTasks.add(_bootstrapModuleConfigTask);
         return updateTasks;
+    }
+
+    @Override
+    protected List getExtraInstallTasks(InstallContext installContext) {
+        List installTasks = new ArrayList();
+        installTasks.addAll(super.getExtraInstallTasks(installContext));
+        installTasks.add(new InstallBootstrapTask());
+        return installTasks;
     }
 }
