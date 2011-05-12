@@ -1,9 +1,8 @@
 package com.aperto.magkit.module;
 
-import com.aperto.magkit.module.delta.InstallBootstrapTask;
+import com.aperto.magkit.module.delta.*;
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.ModuleBootstrapTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
 
@@ -22,7 +21,7 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
      * this is used to bootstrap the new module-specific templates, dialogs ... .
      * bootstraps everything from "mgnl-bootstrap" folder.
      */
-    private final Task _bootstrapModuleConfigTask = new ModuleBootstrapTask();
+    private final Task _bootstrapModuleConfigTask = new ModuleInstanceBootstrapTask();
 
     /**
      * Constructor for adding update builder.
@@ -38,8 +37,8 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
     }
 
     @Override
-    protected List getExtraInstallTasks(InstallContext installContext) {
-        List installTasks = new ArrayList();
+    protected List<Task> getExtraInstallTasks(InstallContext installContext) {
+        List<Task> installTasks = new ArrayList<Task>();
         installTasks.addAll(super.getExtraInstallTasks(installContext));
         installTasks.add(new InstallBootstrapTask());
         return installTasks;
