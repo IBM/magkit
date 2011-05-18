@@ -99,7 +99,7 @@ public abstract class NodeOperationFactory extends Ops {
     public static NodeOperation orderBefore(final String nodeName, final String orderBeforeNodeName) {
         return new AbstractOp() {
             Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                context.orderBefore(nodeName, orderBeforeNodeName);
+                context.getParent().orderBefore(nodeName, orderBeforeNodeName);
                 return context;
             }
         };
