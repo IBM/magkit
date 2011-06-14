@@ -24,6 +24,11 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
     private final Task _bootstrapModuleConfigTask = new ModuleInstanceBootstrapTask();
 
     /**
+     * Registers all unregistered servlets.
+     */
+    private final Task _checkServletRegistrationTask = new CheckModuleServletsTask();
+
+    /**
      * Constructor for adding update builder.
      */
     public BootstrapModuleVersionHandler() {
@@ -33,6 +38,7 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
     protected List<Task> getDefaultUpdateTasks(Version forVersion) {
         List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
         updateTasks.add(_bootstrapModuleConfigTask);
+        updateTasks.add(_checkServletRegistrationTask);
         return updateTasks;
     }
 
