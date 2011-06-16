@@ -32,7 +32,7 @@ public final class ContentUtils {
      * @param collection of NodeDatas
      * @return ordered collection
      */
-    public static List<NodeData> orderNodeDataCollection(Collection<NodeData> collection) {
+    public static Collection<NodeData> orderNodeDataCollection(Collection<NodeData> collection) {
         List<NodeData> nodeDataList = (List<NodeData>) collection;
         NodeDataComparator nodeDataComparator = new NodeDataComparator();
         nodeDataComparator.setCompareByValue(false);
@@ -43,7 +43,7 @@ public final class ContentUtils {
     private ContentUtils() {
     }
 
-    public static List<NodeData> orderNodeDataCollectionByValue(Collection<NodeData> collection) {
+    public static Collection<NodeData> orderNodeDataCollectionByValue(Collection<NodeData> collection) {
         List<NodeData> nodeDataList = (List<NodeData>) collection;
         sort(nodeDataList, new NodeDataComparator());
         return nodeDataList;
