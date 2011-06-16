@@ -5,11 +5,29 @@ import java.util.Comparator;
 
 /**
  * Comparator for a list of NodeDatas.
+ * It is possible to sort by name or value.
+ * Value is default.
  *
  * @author frank.sommer (22.09.2008)
  */
 public class NodeDataComparator implements Comparator<NodeData> {
+    private boolean _compareByValue = true;
+
+    public boolean isCompareByValue() {
+        return _compareByValue;
+    }
+
+    public void setCompareByValue(boolean compareByValue) {
+        _compareByValue = compareByValue;
+    }
+
     public int compare(NodeData o1, NodeData o2) {
-        return o1.getString().compareToIgnoreCase(o2.getString());
+        int compareRes;
+        if (_compareByValue) {
+            compareRes = o1.getString().compareToIgnoreCase(o2.getString());
+        } else {
+            compareRes = o1.getName().compareToIgnoreCase(o2.getName());
+        }
+        return compareRes;
     }
 }

@@ -1,40 +1,24 @@
 package com.aperto.magkit.utils;
 
-import java.io.File;
-import static java.io.File.createTempFile;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import javax.jcr.ImportUUIDBehavior;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import info.magnolia.cms.core.*;
+import org.apache.commons.lang.StringUtils;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.*;
+
+import javax.jcr.*;
+import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.util.*;
 
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.core.Path;
+import static java.io.File.createTempFile;
+import static java.util.Collections.sort;
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import org.apache.commons.lang.StringUtils;
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.substringAfterLast;
 import static org.apache.commons.lang.StringUtils.substringBeforeLast;
-import org.apache.log4j.Logger;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLFilter;
-import org.xml.sax.XMLReader;
 
 /**
  * Util class for handle magnolia content.
@@ -42,30 +26,26 @@ import org.xml.sax.XMLReader;
  * @author frank.sommer (15.05.2008)
  */
 public final class ContentUtils {
-    private static final Logger LOGGER = Logger.getLogger(ContentUtils.class);
-
     /**
      * Orders the given collection of NodeDatas by name.
      *
      * @param collection of NodeDatas
      * @return ordered collection
      */
-    public static Collection orderNodeDataCollection(Collection collection) {
-        Iterator it = collection.iterator();
-        NodeData[] nodes = new NodeData[collection.size()];
-        while (it.hasNext()) {
-            NodeData nd = (NodeData) it.next();
-            nodes[Integer.valueOf(nd.getName())] = nd;
-        }
-        return Arrays.asList(nodes);
+    public static List<NodeData> orderNodeDataCollection(Collection<NodeData> collection) {
+        List<NodeData> nodeDataList = (List<NodeData>) collection;
+        NodeDataComparator nodeDataComparator = new NodeDataComparator();
+        nodeDataComparator.setCompareByValue(false);
+        sort(nodeDataList, nodeDataComparator);
+        return nodeDataList;
     }
 
     private ContentUtils() {
     }
 
-    public static Collection orderNodeDataCollectionByValue(Collection collection) {
+    public static List<NodeData> orderNodeDataCollectionByValue(Collection<NodeData> collection) {
         List<NodeData> nodeDataList = (List<NodeData>) collection;
-        Collections.sort(nodeDataList, new NodeDataComparator());
+        sort(nodeDataList, new NodeDataComparator());
         return nodeDataList;
     }
 
