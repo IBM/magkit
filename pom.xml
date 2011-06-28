@@ -18,6 +18,7 @@
             <groupId>com.aperto.freshview</groupId>
             <artifactId>campaign-monitor-service</artifactId>
             <version>1.0.2</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.aperto.commons</groupId>
