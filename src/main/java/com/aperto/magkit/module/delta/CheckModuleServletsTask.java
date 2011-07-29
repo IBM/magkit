@@ -2,9 +2,15 @@ package com.aperto.magkit.module.delta;
 
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.*;
+import info.magnolia.module.delta.ArrayDelegateTask;
+import info.magnolia.module.delta.RegisterServletTask;
+import info.magnolia.module.delta.TaskExecutionException;
 import info.magnolia.module.model.ModuleDefinition;
 import info.magnolia.module.model.ServletDefinition;
+
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
+import static info.magnolia.nodebuilder.Ops.getNode;
+import static info.magnolia.nodebuilder.Ops.remove;
 
 /**
  * Checks the registration of all module servlets.
@@ -26,9 +32,10 @@ public class CheckModuleServletsTask extends ArrayDelegateTask {
 
         // register servlets
         for (ServletDefinition servletDefinition : moduleDefinition.getServlets()) {
-            if (!hierarchyManager.isExist(DEFAULT_SERVLET_FILTER_PATH + "/" + servletDefinition.getName())) {
-                addTask(new RegisterServletTask(servletDefinition));
+            if (hierarchyManager.isExist(DEFAULT_SERVLET_FILTER_PATH + "/" + servletDefinition.getName())) {
+                addTask(selectServerConfig("Remove Servlet Configuration", "Remove Servlet Configuration", getNode("filters/servlets").then(remove(servletDefinition.getName()))));
             }
+            addTask(new RegisterServletTask(servletDefinition));
         }
 
         super.execute(installContext);
