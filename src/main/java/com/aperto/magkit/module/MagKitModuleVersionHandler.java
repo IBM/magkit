@@ -1,6 +1,8 @@
 package com.aperto.magkit.module;
 
 import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
+
+import com.aperto.webkit.utils.ExceptionEater;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
@@ -13,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -132,7 +135,12 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
      */
     private boolean createApertoTools() {
         boolean returnValue = false;
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("environment");
+        ResourceBundle resourceBundle = null;
+        try {
+            resourceBundle = ResourceBundle.getBundle("environment");
+        } catch (MissingResourceException e) {
+            ExceptionEater.eat(e);
+        }
         if (resourceBundle != null && resourceBundle.containsKey(PROPERTY_KEY)) {
             returnValue = !StringUtils.equalsIgnoreCase(PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, resourceBundle.getString(PROPERTY_KEY));
         }
