@@ -9,9 +9,11 @@ import info.magnolia.module.model.Version;
 import info.magnolia.setup.AddFilterBypassTask;
 import info.magnolia.voting.voters.OnAdminVoter;
 import info.magnolia.voting.voters.URIStartsWithVoter;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * The MagKitModuleVersionHandler for the MagKit module.
@@ -26,6 +28,9 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     private static final String PATH_CACHE_EXCLUDE = "/modules/cache/config/configurations/default/cachePolicy/voters/urls/excludes";
     private static final String PATH_CACHE_CAPTCHA = PATH_CACHE_EXCLUDE + "/captcha";
     private static final String PATH_CACHE_DEBUG = PATH_CACHE_EXCLUDE + "/debug";
+
+    private static final String PROPERTY_KEY = "environment";
+    private static final String PROPERTY_VALUE_PRODUCTION_ENVIRONMENT = "production";
 
     private final Task _addValidatorFilterTask = new ArrayDelegateTask("Filter", "Add the Validator filter.",
             new CreateNodeTask("Validator-Filter", "Create Validator filter node", CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
@@ -86,6 +91,28 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
         _addCacheConfig
     );
 
+    private final Task _bootstrapApertoTools = new BootstrapResourcesTask("Aperto Tools", "Bootstraps the Aperto Tools Menu.") {
+        protected String[] getResourcesToBootstrap(final InstallContext installContext) {
+            String[] returnValue;
+            if (createApertoTools()) {
+                returnValue = new String[] {
+                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.dmsJCR.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.groupsJCR.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.rolesJCR.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.usersJCR.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.dms-jcr.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.usergroups-jcr.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.userroles-jcr.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.users-jcr.xml"
+                };
+            } else {
+                returnValue = new String[]{};
+            }
+            return returnValue;
+        }
+    };
+
     /**
      * this is used to bootstrap the new module-specific templates, dialogs ... .
      * bootstraps everything from "mgnl-bootstrap" folder.
@@ -98,6 +125,28 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
     public MagKitModuleVersionHandler() {
     }
 
+    /**
+     * Returns true if environment property was set and is not 'production' (#MGKT-126).
+     *
+     * @return create aperto tools or not
+     */
+    private boolean createApertoTools() {
+        boolean returnValue = false;
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("environment");
+        if (resourceBundle != null && resourceBundle.containsKey(PROPERTY_KEY)) {
+            returnValue = !StringUtils.equalsIgnoreCase(PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, resourceBundle.getString(PROPERTY_KEY));
+        }
+        return returnValue;
+    }
+
+    @Override
+    protected List<Task> getStartupTasks(InstallContext installContext) {
+        final List<Task> startupTasks = new ArrayList<Task>();
+        startupTasks.add(_bootstrapApertoTools);
+        return startupTasks;
+    }
+
+    @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
         final List<Task> tasks = new ArrayList<Task>();
         tasks.add(_addValidatorFilterTask);
