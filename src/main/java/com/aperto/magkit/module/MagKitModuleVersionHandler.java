@@ -1,7 +1,5 @@
 package com.aperto.magkit.module;
 
-import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
-
 import com.aperto.webkit.utils.ExceptionEater;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.DefaultModuleVersionHandler;
@@ -13,10 +11,9 @@ import info.magnolia.voting.voters.OnAdminVoter;
 import info.magnolia.voting.voters.URIStartsWithVoter;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
+
+import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
 
 /**
  * The MagKitModuleVersionHandler for the MagKit module.
@@ -34,6 +31,8 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
 
     private static final String PROPERTY_KEY = "environment";
     private static final String PROPERTY_VALUE_PRODUCTION_ENVIRONMENT = "production";
+
+    private static final String[] ALLOWED_ENVIRONMENT_VALUES = {"local", "testing", PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, "presentation"};
 
     private final Task _addValidatorFilterTask = new ArrayDelegateTask("Filter", "Add the Validator filter.",
             new CreateNodeTask("Validator-Filter", "Create Validator filter node", CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
@@ -142,9 +141,16 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
             ExceptionEater.eat(e);
         }
         if (resourceBundle != null && resourceBundle.containsKey(PROPERTY_KEY)) {
-            returnValue = !StringUtils.equalsIgnoreCase(PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, resourceBundle.getString(PROPERTY_KEY));
+            String value = resourceBundle.getString(PROPERTY_KEY);
+            if (isAllowedEnvironmentValue(value)) {
+                returnValue = !StringUtils.equals(PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, value);
+            }
         }
         return returnValue;
+    }
+
+    private boolean isAllowedEnvironmentValue(String environmentValue) {
+        return Arrays.asList(ALLOWED_ENVIRONMENT_VALUES).contains(environmentValue);
     }
 
     @Override
