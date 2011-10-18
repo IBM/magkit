@@ -98,7 +98,12 @@ public class MagKitModuleVersionHandler extends DefaultModuleVersionHandler {
             String[] returnValue;
             if (createApertoTools()) {
                 returnValue = new String[] {
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.dms-jcr.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.usergroups-jcr.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.userroles-jcr.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.users-jcr.xml",
                     "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.xml",
+                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.pages.versionPrunePage.xml",
                     "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.dmsJCR.xml",
                     "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.groupsJCR.xml",
                     "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.rolesJCR.xml",
