@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>${this.messages.get("versionPrune.title." + this.repository)}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script type="text/javascript" src="${this.request.contextPath}/.magnolia/pages/javascript.js"></script>
+    <script type="text/javascript" src="${this.request.contextPath}/.magnolia/pages/messages.de.js"></script>
+    <script type="text/javascript" src="${this.request.contextPath}/.resources/admin-js/dialogs/dialogs.js"></script>
+    <link href="${this.request.contextPath}/.resources/admin-css/admin-all.css" type="text/css" rel="stylesheet"/>
+    <script type="text/javascript">
+    function changeRepository() {
+        var form = document.getElementById('main');
+        form.command.value = 'Show';
+        form.path.value = '/';
+        form.versionCount.value = '0';
+        form.submit();
+    }
+    </script>
+</head>
+<body id="mgnl">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <div class="pageframe">
+                    <h3>${this.messages.get("versionPrune.title." + this.repository)}</h3>
+                    <p>${this.messages.get("versionPrune.description")}</p>
+                    <form action="" name="main" id="main">
+                        <input type="hidden" name="command" value="execute"/>
+                        <div class="formelement">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label for="versionCount">${this.messages.get("versionPrune.versions.label")}:</label>
+                                    </td>
+                                    <td class="mgnlDialogEditWithButton" colspan="2">
+                                        <input type="text" name="versionCount" id="versionCount" value="${this.versionCount}" class="mgnlDialogControlEdit" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="formelement">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label for="path">${this.messages.get("versionPrune.path.label")}:</label>
+                                    </td>
+                                    <td class="mgnlDialogEditWithButton" colspan="2">
+                                        <input type="text" name="path" id="path" value="${this.path}" class="mgnlDialogControlEdit" style="width:100%;" />
+                                        <input type="hidden" name="mgnlSaveInfo" value="path,String,0,0,0" />
+                                    </td>
+                                    <td>
+                                        <span onmousedown="mgnlShiftPushButtonDown(this);" onmouseout="mgnlShiftPushButtonOut(this);" onclick="mgnlShiftPushButtonClick(this);mgnlDialogLinkOpenBrowser('path','${this.repository}','');" class="mgnlControlButton">${this.messages.get("versionPrune.internalLink." + this.repository)}...</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="formelement">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label for="repo">${this.messages.get("versionPrune.repo.label")}:</label>
+                                    </td>
+                                    <td colspan="2">
+                                        <select name="repo" id="repo" onchange="changeRepository('main','Show');">
+                                        [#assign keys = this.availableRepositories?keys]
+                                        [#list keys as key]
+                                            <option value="${key}" [#if key == this.repository]selected[/#if]>${this.availableRepositories[key]}</option>
+                                        [/#list]
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="formelement">
+                            <table>
+                                <tr>
+                                    <td colspan="3">
+                                        <input type="submit" value="${this.messages.get('versionPrune.submitPrune.' + this.repository)}" class="mgnlControlButton"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        [#if this.resultMessages?has_content]
+        <tr>
+            <td valign="top">
+                <div class="pageframe">
+                    <label for="resultMessages">Results:</label>
+                    <textarea id="resultMessages" cols="100" rows="25" readonly>${this.resultMessages}</textarea>
+                </div>
+            </td>
+        </tr>
+        [/#if]
+    </table>
+</body>
+</html>
