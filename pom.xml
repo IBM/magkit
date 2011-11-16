@@ -220,56 +220,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- http://cargo.codehaus.org/ -->
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven2-plugin</artifactId>
-                <version>${cargoVersion}</version>
-                <configuration>
-                    <!-- Container configuration -->
-                    <container>
-                        <containerId>tomcat5x</containerId>
-                        <type>installed</type>
-                        <zipUrlInstaller>
-                            <url>http://www.apache.org/dist/tomcat/tomcat-5/v5.5.30/bin/apache-tomcat-5.5.30.zip</url>
-                            <installDir>${java.io.tmpdir}/magkit-tomcat</installDir>
-                        </zipUrlInstaller>
-                        <dependencies>
-                            <dependency>
-                                <artifactId>spring-core</artifactId>
-                                <groupId>org.springframework</groupId>
-                            </dependency>
-                            <dependency>
-                                <artifactId>aperto-commons-core</artifactId>
-                                <groupId>com.aperto.commons</groupId>
-                            </dependency>
-                            <dependency>
-                                <artifactId>commons-lang</artifactId>
-                                <groupId>commons-lang</groupId>
-                            </dependency>
-                            <dependency>
-                                <artifactId>commons-collections</artifactId>
-                                <groupId>commons-collections</groupId>
-                            </dependency>
-                        </dependencies>
-                    </container>
-
-                    <!-- Configuration to use with the container -->
-                    <configuration>
-                        <type>existing</type>
-                        <home>${basedir}/tomcat</home>
-                        <properties>
-                            <cargo.servlet.port>9090</cargo.servlet.port>
-                            <!--
-                                       <cargo.jvmargs>-Dmagnolia.config.home=${basedir}/magnolia-config
-                                       -Xms128M -Xmx800M -XX:MaxPermSize=128M
-                                       -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</cargo.jvmargs>
-                                   -->
-                            <cargo.jvmargs>-Xms128M -Xmx800M -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</cargo.jvmargs>
-                        </properties>
-                    </configuration>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
