@@ -1,6 +1,5 @@
 package com.aperto.magkit.module;
 
-import com.aperto.webkit.utils.ExceptionEater;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.*;
@@ -8,9 +7,9 @@ import info.magnolia.module.model.Version;
 import info.magnolia.setup.AddFilterBypassTask;
 import info.magnolia.voting.voters.OnAdminVoter;
 import info.magnolia.voting.voters.URIStartsWithVoter;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
 
@@ -24,11 +23,6 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
     private static final String PATH_FILTER_VALIDATOR = PATH_FILTER + "/validator";
     private static final String PATH_I18N = "/server/i18n/content";
-
-    private static final String PROPERTY_KEY = "environment";
-    private static final String PROPERTY_VALUE_PRODUCTION_ENVIRONMENT = "production";
-
-    private static final String[] ALLOWED_ENVIRONMENT_VALUES = {"local", "testing", PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, "presentation"};
 
     private final Task _addValidatorFilterTask = new ArrayDelegateTask("Filter", "Add the Validator filter.",
             new CreateNodeTask("Validator-Filter", "Create Validator filter node", CONFIG, PATH_FILTER, "validator", ItemType.CONTENT.getSystemName()),
@@ -66,67 +60,10 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
         new AddFilterBypassTask(PATH_FILTER + "/cms", "spring", URIStartsWithVoter.class, "/service/")
     );
 
-    private final Task _bootstrapApertoTools = new BootstrapResourcesTask("Aperto Tools", "Bootstraps the Aperto Tools Menu.") {
-        protected String[] getResourcesToBootstrap(final InstallContext installContext) {
-            String[] returnValue;
-            if (createApertoTools()) {
-                returnValue = new String[] {
-                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.dms-jcr.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.usergroups-jcr.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.userroles-jcr.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.trees.users-jcr.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.magkit.pages.versionPrunePage.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.dmsJCR.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.groupsJCR.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.rolesJCR.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.usersJCR.xml",
-                    "/mgnl-bootstrap/apertoTools/config.modules.adminInterface.config.menu.aperto-tools.versionPrune.xml"
-                };
-            } else {
-                returnValue = new String[]{};
-            }
-            return returnValue;
-        }
-    };
-
     /**
      * Constructor for adding update builder.
      */
     public MagKitModuleVersionHandler() {
-    }
-
-    /**
-     * Returns true if environment property was set and is not 'production' (#MGKT-126).
-     *
-     * @return create aperto tools or not
-     */
-    private boolean createApertoTools() {
-        boolean returnValue = false;
-        ResourceBundle resourceBundle = null;
-        try {
-            resourceBundle = ResourceBundle.getBundle("environment");
-        } catch (MissingResourceException e) {
-            ExceptionEater.eat(e);
-        }
-        if (resourceBundle != null && resourceBundle.containsKey(PROPERTY_KEY)) {
-            String value = resourceBundle.getString(PROPERTY_KEY);
-            if (isAllowedEnvironmentValue(value)) {
-                returnValue = !StringUtils.equals(PROPERTY_VALUE_PRODUCTION_ENVIRONMENT, value);
-            }
-        }
-        return returnValue;
-    }
-
-    private boolean isAllowedEnvironmentValue(String environmentValue) {
-        return Arrays.asList(ALLOWED_ENVIRONMENT_VALUES).contains(environmentValue);
-    }
-
-    @Override
-    protected List<Task> getStartupTasks(InstallContext installContext) {
-        final List<Task> startupTasks = new ArrayList<Task>();
-        startupTasks.add(_bootstrapApertoTools);
-        return startupTasks;
     }
 
     @Override
