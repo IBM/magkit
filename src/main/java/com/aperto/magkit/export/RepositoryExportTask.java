@@ -28,9 +28,6 @@ import java.util.zip.GZIPInputStream;
  * @author Jan Haderka
  */
 public class RepositoryExportTask extends MatchingTask {
-    /**
-     * @noinspection UNUSED_SYMBOL
-     */
     private static final Logger LOGGER = Logger.getLogger(RepositoryExportTask.class);
 
     private String _repository;
@@ -66,14 +63,6 @@ public class RepositoryExportTask extends MatchingTask {
         _outputPath = outputPath;
     }
 
-    public String getMgnlUser() {
-        return _mgnlUser;
-    }
-
-    public void setMgnlUser(String mgnlUser) {
-        _mgnlUser = mgnlUser;
-    }
-
     public String getMgnlPassword() {
         return _mgnlPassword;
     }
@@ -82,12 +71,12 @@ public class RepositoryExportTask extends MatchingTask {
         _mgnlPassword = mgnlPassword;
     }
 
-    public boolean isVerbose() {
-        return _verbose;
+    public String getMgnlUser() {
+        return _mgnlUser;
     }
 
-    public void setVerbose(boolean verbose) {
-        _verbose = verbose;
+    public void setMgnlUser(String mgnlUser) {
+        _mgnlUser = mgnlUser;
     }
 
     public String getTargetHost() {
@@ -98,16 +87,24 @@ public class RepositoryExportTask extends MatchingTask {
         _targetHost = targetHost;
     }
 
+    public boolean isVerbose() {
+        return _verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        _verbose = verbose;
+    }
+
+    private String getLogin() {
+        return "&mgnlUserId=" + _mgnlUser + "&mgnlUserPSWD=" + _mgnlPassword;
+    }
+
     public int getTargetPort() {
         return _targetPort;
     }
 
     public void setTargetPort(int targetPort) {
         _targetPort = targetPort;
-    }
-
-    private String getLogin() {
-        return "&mgnlUserId=" + _mgnlUser + "&mgnlUserPSWD=" + _mgnlPassword;
     }
 
     /**
@@ -151,26 +148,6 @@ public class RepositoryExportTask extends MatchingTask {
         }
     }
 
-    private void recursiveGetSite(String currentSite) {
-        String[] elements;
-        elements = getChildNodes(currentSite);
-        if (elements.length > 1) {
-            // there are subcontents ...
-            for (int i = 1; i < elements.length; i++) {
-                String element = elements[i];
-                info("check element: " + element);
-                recursiveGetSite(currentSite + "." + element);
-            }
-        } else if (elements.length == 1) {
-            // this is the node to export
-            info("exporting node: " + currentSite + "." + elements[0]);
-            exportNode(currentSite);
-        } else {
-            info("Should not appear here: " + currentSite);
-            // ... this should never happen.
-        }
-    }
-
     private String[] getChildNodes(String currentSite) {
         URL url;
         String[] elements;
@@ -204,43 +181,6 @@ public class RepositoryExportTask extends MatchingTask {
             IOUtils.closeQuietly(stream);
         }
         return elements;
-    }
-
-    private void exportNode(String exportSite) {
-        URL url;
-        String[] elements = exportSite.split("\\.");
-        if (elements.length > 0) {
-            StringBuffer path = new StringBuffer(getWebapp() + "/.magnolia/pages/export.html?mgnlRepository=" + _repository + "&mgnlPath=");
-            String repository = elements[0];
-            if (repository != null) {
-                try {
-                    for (int i = 1; i < elements.length; i++) {
-                        String s = elements[i];
-                        path.append("/");
-                        path.append(s);
-                    }
-                    path.append("&mgnlFormat=true&ext=.xml&command=exportxml&exportxml=Export");
-                    path.append(getLogin());
-                    url = new URL("http", _targetHost, _targetPort, path.toString());
-                    HttpClient httpClient = new HttpClient();
-                    GetMethod getMethod = new GetMethod(url.toString());
-                    info("export: " + url.toExternalForm());
-                    int statusCode = httpClient.executeMethod(getMethod);
-                    if (statusCode != HttpStatus.SC_OK) {
-                        throw new BuildException("Unable to call debug suite properly. Return code was: " + statusCode);
-                    }
-
-                    File file = new File(_outputPath);
-                    file = new File(file, exportSite + ".xml");
-                    info("writing file: " + file.getPath());
-                    writeToFile(getMethod, file);
-                } catch (IOException e) {
-                    throw new BuildException(e);
-                }
-            }
-        } else {
-            info("skip exporting: " + exportSite);
-        }
     }
 
     private void writeToFile(GetMethod getMethod, File file) {

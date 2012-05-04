@@ -45,11 +45,11 @@ import static java.util.Locale.ENGLISH;
  * The thumbnail size can be configured by spring and is per default 65x65 pixels.
  * Cropping is per default on, but you can switch it off. Then the thumbnail has the same ratio like original image.
  * <code>
- * <bean id="photoGalleryController" class="com.aperto.magcit.mvc.controller.PhotoGalleryController">
- * <property name="thumbHeight" value="65" />
- * <property name="thumbWidth" value="65" />
- * <property name="cropping" value="true" />
- * </bean>
+ * &lt;bean id="photoGalleryController" class="com.aperto.magcit.mvc.controller.PhotoGalleryController"&gt;
+ * &lt;property name="thumbHeight" value="65" /&gt;
+ * &lt;property name="thumbWidth" value="65" /&gt;
+ * &lt;property name="cropping" value="true" /&gt;
+ * &lt;/bean&gt;
  * </code>
  * The images are set html escaped in the request variable <em>imageList</em>.
  *

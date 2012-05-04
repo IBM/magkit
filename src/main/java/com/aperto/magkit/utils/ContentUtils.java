@@ -94,9 +94,7 @@ public final class ContentUtils {
             closeQuietly(inStream);
             file.delete();
             if (!StringUtils.equals(src.getName(), destNodeName)) {
-                String currentPath = destParentPath.equals("/") ?
-                    "/" + src.getName()
-                    : destParentPath + "/" + src.getName();
+                String currentPath = "/".equals(destParentPath) ?  "/" + src.getName() : destParentPath + "/" + src.getName();
                 session.move(currentPath, dest);
             }
         } catch (IOException e) {

@@ -31,7 +31,6 @@ import java.util.*;
  * If the messagePath property is not set, no property file will be updated. 
  *
  * @author Frank Sommer 19.08.2008
- *
  */
 public class ExportTask extends MatchingTask {
     private static final Logger LOGGER = Logger.getLogger(ExportTask.class);
@@ -205,15 +204,6 @@ public class ExportTask extends MatchingTask {
         }
     }
 
-    /**
-     * Filter which checks if file name starts with "messages_templating_custom".
-     */
-    static class FileNameFilter implements FilenameFilter {
-        public boolean accept(File dir, String name) {
-            return name.startsWith("messages_templating_custom");
-        }
-    }
-
     private void recursiveGetSite(String currentSite) {
         String[] elements;
         elements = getChildNodes(currentSite);
@@ -364,9 +354,9 @@ public class ExportTask extends MatchingTask {
     /**
      * Adds a label or description node.
      * <code>
-     * <sv:property sv:name="label" sv:type="String">
-     *  <sv:value>bshkw.dialog.articleImage.label</sv:value>
-     * </sv:property>
+     * &lt;sv:property sv:name="label" sv:type="String"&gt;
+     *  &lt;sv:value>bshkw.dialog.articleImage.label&lt;/sv:value&gt;
+     * &lt;/sv:property&gt;
      * </code>
      */
     private Element createI18nNode(String type, String... keyParts) {
@@ -459,9 +449,9 @@ public class ExportTask extends MatchingTask {
             } else if (name.equals(TYPE_DESCRIPTION)) {
                 descriptionFound = true;
                 checkValue(property, TYPE_DESCRIPTION, keyParts);
-            } else if (name.equals("controlType")) {
+            } else if ("controlType".equals(name)) {
                 Node valueNode = property.selectSingleNode("sv:value");
-                if (valueNode.getText().equals("tab")) {
+                if ("tab".equals(valueNode.getText())) {
                     dontSetDescription = true;
                 }
             }
@@ -510,6 +500,15 @@ public class ExportTask extends MatchingTask {
             } catch (NullPointerException e) {
                 LOGGER.info(s);
             }
+        }
+    }
+
+    /**
+     * Filter which checks if file name starts with "messages_templating_custom".
+     */
+    static class FileNameFilter implements FilenameFilter {
+        public boolean accept(File dir, String name) {
+            return name.startsWith("messages_templating_custom");
         }
     }
 
