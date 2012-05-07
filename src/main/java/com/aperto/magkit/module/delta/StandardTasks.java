@@ -20,7 +20,7 @@ public class StandardTasks {
      */
     public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
         return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
-            addOrGetNode("config/menu" + moduleName).then(
+            addOrGetNode("config/menu/" + moduleName).then(
                 addOrSetProperty("icon", "/.resources/icons/24/gears.gif"),
                 addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')"),
                 addOrSetProperty("label", moduleDisplayName),

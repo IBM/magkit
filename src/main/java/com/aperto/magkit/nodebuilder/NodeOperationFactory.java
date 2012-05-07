@@ -2,16 +2,18 @@ package com.aperto.magkit.nodebuilder;
 
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.ItemType;
-import static info.magnolia.cms.util.ContentUtil.createPath;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.nodebuilder.ErrorHandler;
 import info.magnolia.nodebuilder.NodeOperation;
 import info.magnolia.nodebuilder.Ops;
-import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang.StringUtils.removeEnd;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
+
+import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
+import static info.magnolia.cms.util.ContentUtil.createPath;
+import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang.StringUtils.removeEnd;
 
 /**
  * An Utility class that extends info.magnolia.nodebuilder.Ops.
@@ -32,17 +34,7 @@ public abstract class NodeOperationFactory extends Ops {
      * @return the new or existing content with the given name
      */
     public static NodeOperation addOrGetNode(final String name) {
-        return new AbstractOp() {
-            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                Content result = null;
-                if (context.hasContent(name)) {
-                    result = context.getContent(name);
-                } else {
-                    result = context.createContent(name);
-                }
-                return result;
-            }
-        };
+        return addOrGetNode(name, NT_CONTENTNODE);
     }
 
     /**
