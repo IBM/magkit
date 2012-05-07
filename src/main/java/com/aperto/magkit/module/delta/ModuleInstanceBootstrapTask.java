@@ -1,6 +1,5 @@
 package com.aperto.magkit.module.delta;
 
-import com.google.inject.Inject;
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.ModuleBootstrapTask;
@@ -12,9 +11,6 @@ import info.magnolia.module.delta.ModuleBootstrapTask;
  */
 public class ModuleInstanceBootstrapTask extends ModuleBootstrapTask {
 
-    @Inject
-    private ServerConfiguration _serverConfig;
-
     /**
      * Accepts any resource under "/mgnl-bootstrap/moduleName" including any subfolders.
      * And accepts on author instance any resources under "/mgnl-bootstrap/author/moduleName"
@@ -24,7 +20,7 @@ public class ModuleInstanceBootstrapTask extends ModuleBootstrapTask {
         boolean acceptResources = super.acceptResource(ctx, resourceName);
         final String moduleName = ctx.getCurrentModuleDefinition().getName();
         if (!acceptResources) {
-            if (_serverConfig.isAdmin()) {
+            if (ServerConfiguration.getInstance().isAdmin()) {
                 acceptResources = resourceName.startsWith("/mgnl-bootstrap/author/" + moduleName + "/") && resourceName.endsWith(".xml");
             } else {
                 acceptResources = resourceName.startsWith("/mgnl-bootstrap/public/" + moduleName + "/") && resourceName.endsWith(".xml");
