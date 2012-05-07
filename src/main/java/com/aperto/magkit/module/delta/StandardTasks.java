@@ -6,6 +6,7 @@ import info.magnolia.module.delta.Task;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
+import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
 
 /**
  * Collection of standard module version handler tasks.
@@ -20,21 +21,21 @@ public class StandardTasks {
      */
     public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
         return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
-            addOrGetNode("config/menu/" + moduleName).then(
+            addOrGetNode("config/menu/" + moduleName, NT_CONTENTNODE).then(
                 addOrSetProperty("icon", "/.resources/icons/24/gears.gif"),
                 addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')"),
                 addOrSetProperty("label", moduleDisplayName),
-                addOrGetNode("templates").then(
+                addOrGetNode("templates", NT_CONTENTNODE).then(
                     addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
                     addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates')"),
                     addOrSetProperty("label", "menu.config.templates")
                 ),
-                addOrGetNode("paragraphs").then(
+                addOrGetNode("paragraphs", NT_CONTENTNODE).then(
                     addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
                     addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/paragraphs')"),
                     addOrSetProperty("label", "menu.config.paragraphs")
                 ),
-                addOrGetNode("dialogs").then(
+                addOrGetNode("dialogs", NT_CONTENTNODE).then(
                     addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
                     addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')"),
                     addOrSetProperty("label", "menu.config.dialogs")
@@ -49,7 +50,7 @@ public class StandardTasks {
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
             addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("robots").then(
+                addOrGetNode("robots", NT_CONTENTNODE).then(
                     addOrSetProperty("class", DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty("fromURI", "/robots.txt"),
                     addOrSetProperty("toURI", "forward:/docroot/" + moduleName + "/robots.txt"))));
@@ -61,7 +62,7 @@ public class StandardTasks {
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
             addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("favicon").then(
+                addOrGetNode("favicon", NT_CONTENTNODE).then(
                     addOrSetProperty("class", DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty("fromURI", "/favicon.ico"),
                     addOrSetProperty("toURI", "forward:/docroot/" + moduleName + "/favicon.ico"))));

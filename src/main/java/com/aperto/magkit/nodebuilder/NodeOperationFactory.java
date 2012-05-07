@@ -10,7 +10,7 @@ import info.magnolia.nodebuilder.Ops;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 
-import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
+import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENT;
 import static info.magnolia.cms.util.ContentUtil.createPath;
 import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang.StringUtils.removeEnd;
@@ -34,7 +34,17 @@ public abstract class NodeOperationFactory extends Ops {
      * @return the new or existing content with the given name
      */
     public static NodeOperation addOrGetNode(final String name) {
-        return addOrGetNode(name, NT_CONTENTNODE);
+        return new AbstractOp() {
+            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+                Content result;
+                if (context.hasContent(name)) {
+                    result = context.getContent(name);
+                } else {
+                    result = context.createContent(name);
+                }
+                return result;
+            }
+        };
     }
 
     /**
@@ -48,7 +58,7 @@ public abstract class NodeOperationFactory extends Ops {
     public static NodeOperation addOrGetNode(final String name, final String type) {
         return new AbstractOp() {
             Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                Content result = null;
+                Content result;
                 if (context.hasContent(name)) {
                     result = context.getContent(name);
                     if (!equalsIgnoreCase(type, result.getNodeTypeName())) {
