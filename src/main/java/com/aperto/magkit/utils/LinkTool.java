@@ -205,7 +205,7 @@ public final class LinkTool {
         try {
             if (s != null) {
                 // from magnolia Document class:
-                name = replaceChars(s, "ÇÈ<>\"'/\\", "________");
+                name = replaceChars(s, "\u00AB\u00BB<>\"'/\\", "________");
                 name = encode(name, "UTF-8");
                 name = replace(name, "+", "%20");
             }
