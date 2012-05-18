@@ -25,14 +25,14 @@ public class StandardTasks {
                 addOrSetProperty("icon", "/.resources/icons/24/gears.gif"),
                 addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')"),
                 addOrSetProperty("label", moduleDisplayName),
-                addOrGetNode("templates", NT_CONTENTNODE).then(
+                addOrGetNode("pages", NT_CONTENTNODE).then(
                     addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
-                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/pages/templates')"),
+                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')"),
                     addOrSetProperty("label", "menu.config.templates")
                 ),
-                addOrGetNode("paragraphs", NT_CONTENTNODE).then(
+                addOrGetNode("components", NT_CONTENTNODE).then(
                     addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
-                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/pages/components')"),
+                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')"),
                     addOrSetProperty("label", "menu.config.paragraphs")
                 ),
                 addOrGetNode("dialogs", NT_CONTENTNODE).then(
