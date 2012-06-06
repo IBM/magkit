@@ -32,6 +32,10 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
     public static final String CN_BASENAMES = "i18nBasenames";
     public static final String SERVER_I18N_BASENAMES = SERVER_I18N_CONTENT + "/" + CN_BASENAMES;
 
+    public ExtendedMessagesManager() {
+        load();
+    }
+
     @Override
     protected Messages newMessages(MessagesID messagesId) {
         Messages result = null;
