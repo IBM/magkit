@@ -123,11 +123,6 @@
 
         <!-- Test Scope Dependencies -->
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymockclassextension</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-mock</artifactId>
             <scope>test</scope>
@@ -163,6 +158,11 @@
             <artifactId>commons-el</artifactId>
             <version>1.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 
