@@ -4,11 +4,14 @@ import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
 import info.magnolia.cms.core.*;
 import info.magnolia.cms.util.ContentUtil;
 import static info.magnolia.context.MgnlContext.getHierarchyManager;
+
+import info.magnolia.context.MgnlContext;
 import info.magnolia.link.LinkUtil;
 import static info.magnolia.link.LinkUtil.DEFAULT_EXTENSION;
 import static info.magnolia.link.LinkUtil.isExternalLinkOrAnchor;
 import info.magnolia.module.dms.beans.Document;
 import static org.apache.commons.lang.ArrayUtils.remove;
+import static org.apache.commons.lang.StringEscapeUtils.unescapeXml;
 import static org.apache.commons.lang.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,9 @@ import javax.jcr.PropertyType;
 import java.io.UnsupportedEncodingException;
 import static java.net.URLEncoder.encode;
 import static java.util.Locale.ENGLISH;
+
+import java.net.URLEncoder;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +36,7 @@ public final class LinkTool {
     private static final String DMS_REPOSITORY = "dms";
     public static final Pattern UUID_PATTERN = Pattern.compile("^[-a-z0-9]{30,40}$");
     private static final char SLASH = '/';
+    private static final String ENCODING = "UTF-8";
 
     /**
      * Returns absolutePath-Link nevertheless if u give it a "uuidLink" or a "link".
@@ -206,7 +213,7 @@ public final class LinkTool {
             if (s != null) {
                 // from magnolia Document class:
                 name = replaceChars(s, "\u00AB\u00BB<>\"'/\\", "________");
-                name = encode(name, "UTF-8");
+                name = encode(name, ENCODING);
                 name = replace(name, "+", "%20");
             }
         } catch (UnsupportedEncodingException e) {
@@ -233,6 +240,35 @@ public final class LinkTool {
             newLink += join(newParts, '.');
         }
         return newLink;
+    }
+
+    /**
+     * Returns encoded parameter string of all parameters.
+     *
+     * @return parameter string for link
+     */
+    public static String getEncodedParameterLinkString() {
+        String seperator = "?";
+        Map<String, Object> parameterMap = MgnlContext.getWebContext().getRequest().getParameterMap();
+        StringBuilder stringBuilder = new StringBuilder();
+        if (!parameterMap.isEmpty()) {
+            for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
+                try {
+                    String name = URLEncoder.encode(unescapeXml(entry.getKey()), ENCODING);
+                    String[] values = (String []) parameterMap.get(entry.getKey());
+                    for (String value : values) {
+                        stringBuilder.append(seperator);
+                        stringBuilder.append(name);
+                        stringBuilder.append("=");
+                        stringBuilder.append(URLEncoder.encode(unescapeXml(value), ENCODING));
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.info("Send to friend url encoding failed.", e);
+                }
+                seperator = "&";
+            }
+        }
+        return stringBuilder.toString();
     }
 
     private LinkTool() {

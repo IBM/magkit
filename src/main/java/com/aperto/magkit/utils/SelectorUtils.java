@@ -2,6 +2,8 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.context.MgnlContext;
+
+import static com.aperto.magkit.utils.LinkTool.getEncodedParameterLinkString;
 import static org.apache.commons.lang.StringUtils.*;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
@@ -147,10 +149,7 @@ public final class SelectorUtils {
 
         // add the extension and the query string
         link.append('.').append(MgnlContext.getAggregationState().getExtension());
-        String queryString = substringAfterLast(MgnlContext.getAggregationState().getOriginalURL(), "?");
-        if (isNotBlank(queryString)) {
-            link.append("?").append(queryString);
-        }
+        link.append(getEncodedParameterLinkString());
         return link.toString();
     }
 
