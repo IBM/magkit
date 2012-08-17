@@ -21,7 +21,6 @@ import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubMa
 import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
-import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -41,21 +40,21 @@ public class SecureRedirectFilterTest {
 
     @Test
     public void testDocrootHttpRequest() throws IOException, ServletException, RepositoryException {
-        initContext(null, "js");
+        initContext(null, "js", null);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, times(1)).doFilter(_request, _response);
     }
 
     @Test
     public void testStandardHttpRequest() throws IOException, ServletException, RepositoryException {
-        initContext("magkit-stk:pages/folder", null);
+        initContext("magkit-stk:pages/folder", null, null);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, times(1)).doFilter(_request, _response);
     }
 
     @Test
     public void testDocrootHttpsRequest() throws IOException, ServletException, RepositoryException {
-        initContext(null, "css");
+        initContext(null, "css", null);
         _request.setSecure(true);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, times(1)).doFilter(_request, _response);
@@ -63,7 +62,7 @@ public class SecureRedirectFilterTest {
 
     @Test
     public void testStandardHttpsRequest() throws IOException, ServletException, RepositoryException {
-        initContext("magkit-stk:pages/folder", null);
+        initContext("magkit-stk:pages/folder", null, null);
         _request.setSecure(true);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, never()).doFilter(_request, _response);
@@ -72,14 +71,25 @@ public class SecureRedirectFilterTest {
 
     @Test
     public void testSecureHttpRequest() throws IOException, ServletException, RepositoryException {
-        initContext("standard-templating-kit:pages/stkForm", null);
+        initContext("standard-templating-kit:pages/stkForm", null, null);
         _request.setSecure(false);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, never()).doFilter(_request, _response);
         assertThat(_response.getRedirectedUrl(), equalTo("https://www.aperto.de/stkForm.html"));
     }
 
-    private void initContext(String template, String extension) throws RepositoryException {
+    @Test
+    public void testSecureHttpRequestWithPorts() throws IOException, ServletException, RepositoryException {
+        initContext("standard-templating-kit:pages/stkForm", null, ":80");
+        _request.setSecure(false);
+        _redirectFilter.setHttpPort("80");
+        _redirectFilter.setHttpsPort("443");
+        _redirectFilter.doFilter(_request, _response, _chain);
+        verify(_chain, never()).doFilter(_request, _response);
+        assertThat(_response.getRedirectedUrl(), equalTo("https://www.aperto.de:443/stkForm.html"));
+    }
+
+    private void initContext(String template, String extension, String portSuffix) throws RepositoryException {
         if (isNotBlank(template)) {
             String nodeName = substringAfterLast(template, "/");
             Content actPage = mockContent(nodeName);
@@ -91,7 +101,7 @@ public class SecureRedirectFilterTest {
 
             LinkTransformerManager linkManager = mock(LinkTransformerManager.class);
             CompleteUrlPathTransformer transformer = mock(CompleteUrlPathTransformer.class);
-            when(transformer.transform(Matchers.<Link>any())).thenReturn("http://www.aperto.de/" + nodeName + ".html");
+            when(transformer.transform(Matchers.<Link>any())).thenReturn("http://www.aperto.de" + defaultString(portSuffix) + "/" + nodeName + ".html");
             when(linkManager.getCompleteUrl()).thenReturn(transformer);
             _redirectFilter.setLinkTransformer(linkManager);
         } else {
@@ -108,7 +118,7 @@ public class SecureRedirectFilterTest {
     public void initServletContainer() {
         cleanContext();
         _redirectFilter = new SecureRedirectFilter();
-        _redirectFilter.setSecuredTemplates(asList("standard-templating-kit:pages/stkForm"));
+        _redirectFilter.addSecuredTemplate("standard-templating-kit:pages/stkForm");
         _request = new MockHttpServletRequest();
         _response = new MockHttpServletResponse();
         _request.setMethod("GET");

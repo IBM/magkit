@@ -6,6 +6,7 @@ import info.magnolia.cms.filters.AbstractMgnlFilter;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.Link;
 import info.magnolia.link.LinkTransformerManager;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 import static info.magnolia.context.MgnlContext.getAggregationState;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
@@ -31,15 +31,25 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 public class SecureRedirectFilter extends AbstractMgnlFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecureRedirectFilter.class);
 
-    private List<String> _securedTemplates;
+    private String _httpsPort = "";
+    private String _httpPort = "";
+    private String[] _securedTemplates = new String[0];
     private LinkTransformerManager _linkTransformer;
 
-    public List<String> getSecuredTemplates() {
+    public String[] getSecuredTemplates() {
         return _securedTemplates;
     }
 
-    public void setSecuredTemplates(List<String> securedTemplates) {
-        _securedTemplates = securedTemplates;
+    public void addSecuredTemplate(String template) {
+        _securedTemplates = (String[]) ArrayUtils.add(_securedTemplates, template);
+    }
+
+    public void setHttpsPort(String httpsPort) {
+        _httpsPort = httpsPort;
+    }
+
+    public void setHttpPort(String httpPort) {
+        _httpPort = httpPort;
     }
 
     @Inject
@@ -52,7 +62,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
         AggregationState state = getAggregationState();
         Content actPage = state.getMainContent();
         if (actPage != null && _securedTemplates != null) {
-            boolean isSecureTemplate = _securedTemplates.contains(actPage.getTemplate());
+            boolean isSecureTemplate = ArrayUtils.contains(_securedTemplates, actPage.getTemplate());
             boolean isSecureRequest = request.isSecure();
 
             LOGGER.debug("Secure: {} and secure template {}.", isSecureRequest, isSecureTemplate);
@@ -83,6 +93,9 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
 
         if (secureProtocol) {
             link = link.replace("http://", "https://");
+            if (isNotBlank(_httpPort)) {
+                link = link.replace(":" + _httpPort, ":" + _httpsPort);
+            }
         }
 
         if (link.startsWith(secureProtocol ? "https" : "http")) {
