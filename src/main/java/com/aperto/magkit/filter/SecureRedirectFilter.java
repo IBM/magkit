@@ -71,7 +71,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
                     chain.doFilter(request, response);
                 } else {
                     String mimeType = response.getContentType();
-                    if ("text/html".equals(mimeType)) {
+                    if (mimeType.startsWith("text/html")) {
                         tryRedirect(request, response, actPage, false);
                     } else {
                         chain.doFilter(request, response);
