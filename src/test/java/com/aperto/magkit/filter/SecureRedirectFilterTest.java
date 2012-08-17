@@ -1,6 +1,7 @@
 package com.aperto.magkit.filter;
 
 import info.magnolia.cms.core.Content;
+import info.magnolia.context.MgnlContext;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.Link;
 import info.magnolia.link.LinkTransformerManager;
@@ -10,8 +11,7 @@ import org.mockito.Matchers;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import javax.jcr.RepositoryException;
-import javax.jcr.Workspace;
+import javax.jcr.*;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubMa
 import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static info.magnolia.cms.core.MetaData.DEFAULT_META_NODE;
 import static org.apache.commons.lang.StringUtils.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -93,7 +94,15 @@ public class SecureRedirectFilterTest {
         if (isNotBlank(template)) {
             String nodeName = substringAfterLast(template, "/");
             Content actPage = mockContent(nodeName);
-            when(actPage.getTemplate()).thenReturn(template);
+            Session session = mock(Session.class);
+            Node node = mock(Node.class);
+            Node metaDataNode = mock(Node.class);
+            Property property = mock(Property.class);
+            when(property.getString()).thenReturn(template);
+            when(metaDataNode.getProperty(anyString())).thenReturn(property);
+            when(node.getNode(DEFAULT_META_NODE)).thenReturn(metaDataNode);
+            when(session.getNode(anyString())).thenReturn(node);
+            when(MgnlContext.getJCRSession(anyString())).thenReturn(session);
             Workspace workspace = mock(Workspace.class);
             when(workspace.getName()).thenReturn("website");
             when(actPage.getWorkspace()).thenReturn(workspace);
@@ -118,7 +127,9 @@ public class SecureRedirectFilterTest {
     public void initServletContainer() {
         cleanContext();
         _redirectFilter = new SecureRedirectFilter();
-        _redirectFilter.addSecuredTemplate("standard-templating-kit:pages/stkForm");
+        TemplateNameVoter voter = new TemplateNameVoter();
+        voter.addTemplate("standard-templating-kit:pages/stkForm");
+        _redirectFilter.addSecure(voter);
         _request = new MockHttpServletRequest();
         _response = new MockHttpServletResponse();
         _request.setMethod("GET");

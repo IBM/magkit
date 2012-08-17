@@ -6,6 +6,8 @@ import info.magnolia.cms.filters.AbstractMgnlFilter;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.Link;
 import info.magnolia.link.LinkTransformerManager;
+import info.magnolia.voting.Voter;
+import info.magnolia.voting.Voting;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,15 +35,15 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
 
     private String _httpsPort = "";
     private String _httpPort = "";
-    private String[] _securedTemplates = new String[0];
+    private Voter[] _secure = new Voter[0];
     private LinkTransformerManager _linkTransformer;
 
-    public String[] getSecuredTemplates() {
-        return _securedTemplates;
+    public Voter[] getSecure() {
+        return _secure;
     }
 
-    public void addSecuredTemplate(String template) {
-        _securedTemplates = (String[]) ArrayUtils.add(_securedTemplates, template);
+    public void addSecure(Voter template) {
+        _secure = (Voter[]) ArrayUtils.add(_secure, template);
     }
 
     public void setHttpsPort(String httpsPort) {
@@ -61,13 +63,13 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         AggregationState state = getAggregationState();
         Content actPage = state.getMainContent();
-        if (actPage != null && _securedTemplates != null) {
-            boolean isSecureTemplate = ArrayUtils.contains(_securedTemplates, actPage.getTemplate());
+        if (actPage != null) {
+            boolean isSecure = shouldSecure(request);
             boolean isSecureRequest = request.isSecure();
 
-            LOGGER.debug("Secure: {} and secure template {}.", isSecureRequest, isSecureTemplate);
+            LOGGER.debug("Secure: {} and secure template {}.", isSecureRequest, isSecure);
             if (isSecureRequest) {
-                if (isSecureTemplate) {
+                if (isSecure) {
                     chain.doFilter(request, response);
                 } else {
                     String mimeType = response.getContentType();
@@ -77,7 +79,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
                         chain.doFilter(request, response);
                     }
                 }
-            } else if (isSecureTemplate) {
+            } else if (isSecure) {
                 tryRedirect(request, response, actPage, true);
             } else {
                 chain.doFilter(request, response);
@@ -112,5 +114,10 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
             }
             response.sendRedirect(link);
         }
+    }
+
+    protected boolean shouldSecure(HttpServletRequest request) {
+        Voting voting = Voting.HIGHEST_LEVEL;
+        return voting.vote(_secure, request) > 0;
     }
 }

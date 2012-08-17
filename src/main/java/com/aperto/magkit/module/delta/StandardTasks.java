@@ -80,8 +80,12 @@ public final class StandardTasks {
                 addOrGetNode("filters/cms/secure-redirect").then(
                     addOrSetProperty("class", SecureRedirectFilter.class.getName()),
                     addOrSetProperty("enabled", true),
-                    addOrGetNode("securedTemplates").then(
-                        addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
+                    addOrGetNode("secure", NT_CONTENTNODE).then(
+                        addOrGetNode("template_de", NT_CONTENTNODE).then(
+                            addOrGetNode("templates", NT_CONTENTNODE).then(
+                                addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
+                            )
+                        )
                     ),
                     orderBefore("secure-redirect", "intercept")
                 )
