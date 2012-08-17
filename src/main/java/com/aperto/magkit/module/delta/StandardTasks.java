@@ -1,5 +1,6 @@
 package com.aperto.magkit.module.delta;
 
+import com.aperto.magkit.filter.SecureCachePolicy;
 import com.aperto.magkit.filter.SecureRedirectFilter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.module.delta.ArrayDelegateTask;
@@ -84,6 +85,11 @@ public final class StandardTasks {
                         addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
                     ),
                     orderBefore("secure-redirect", "intercept")
+                )
+            ),
+            selectModuleConfig("Adapt cache config", "Change cache policy for secure redirects.", "cache",
+                getNode("config/configurations/default/cachePolicy").then(
+                    addOrSetProperty("class", SecureCachePolicy.class.getName())
                 )
             )
         );
