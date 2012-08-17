@@ -1,11 +1,13 @@
 package com.aperto.magkit.module.delta;
 
+import com.aperto.magkit.filter.SecureRedirectFilter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
+import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
 
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
 
 /**
@@ -13,7 +15,7 @@ import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
  *
  * @author Norman Wiechmann (Aperto AG)
  */
-public class StandardTasks {
+public final class StandardTasks {
     public static final String URI_MAPPING = "virtualURIMapping";
 
     /**
@@ -68,7 +70,26 @@ public class StandardTasks {
                     addOrSetProperty("toURI", "forward:/docroot/" + moduleName + "/favicon.ico"))));
     }
 
-    protected StandardTasks() {
+    /**
+     * Task for installing the secure redirect filter in the magnolia filter chain.
+     * @see SecureRedirectFilter
+     */
+    public static Task secureRedirectFilter() {
+        return new ArrayDelegateTask("Install secure redirect", "Install secure redirect filter in filter chain.",
+            selectServerConfig("Add filter node", "Add filter node to chain.",
+                addOrGetNode("filters/cms/secure-redirect").then(
+                    addOrSetProperty("class", SecureRedirectFilter.class.getName()),
+                    addOrSetProperty("enabled", true),
+                    addOrGetNode("securedTemplates").then(
+                        addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
+                    ),
+                    orderBefore("secure-redirect", "intercept")
+                )
+            )
+        );
+    }
+
+    private StandardTasks() {
         // hidden default constructor
     }
 }
