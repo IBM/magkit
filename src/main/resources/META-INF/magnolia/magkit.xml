@@ -11,4 +11,28 @@
             <version>3.5/*</version>
         </dependency>
     </dependencies>
+    <servlets>
+        <servlet>
+            <name>404RedirectServlet</name>
+            <class>com.aperto.magkit.servlet.NotFoundRedirectServlet</class>
+            <comment>Redirect to error page.</comment>
+            <mappings>
+                <mapping>/notFountRedirect</mapping>
+            </mappings>
+            <params>
+                <param>
+                  <name>default</name>
+                  <value>/de/global/fehlerseite</value>
+                </param>
+                <param>
+                  <name>de</name>
+                  <value>/de/global/fehlerseite</value>
+                </param>
+                <param>
+                  <name>en</name>
+                  <value>/en/global/errorpage</value>
+                </param>
+            </params>
+        </servlet>
+    </servlets>
 </module>

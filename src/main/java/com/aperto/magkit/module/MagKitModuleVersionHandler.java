@@ -21,12 +21,6 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
 public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
 
-    private final Task _addBypassFor404 = new NodeExistsDelegateTask(
-        "Check 404 bypass", "Check 404 bypass in server config.",
-        CONFIG, PATH_FILTER + "/bypasses/404", null,
-        new AddFilterBypassTask(PATH_FILTER, "404", URIStartsWithVoter.class, "/docroot/magkit")
-    );
-
     private final Task _addBypassForDebugSuite = new NodeExistsDelegateTask(
         "Check debug suite bypass", "Check debug suite bypass in server config.",
         CONFIG, PATH_FILTER + "/bypasses/debug", null,
@@ -48,7 +42,6 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
         final List<Task> tasks = new ArrayList<Task>();
-        tasks.add(_addBypassFor404);
         tasks.add(_addBypassForDebugSuite);
         tasks.add(_addSpringByPass);
         return tasks;
@@ -57,7 +50,6 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     @Override
     protected List<Task> getDefaultUpdateTasks(Version forVersion) {
         List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
-        updateTasks.add(_addBypassFor404);
         updateTasks.add(_addBypassForDebugSuite);
         updateTasks.add(_addSpringByPass);
         return updateTasks;
