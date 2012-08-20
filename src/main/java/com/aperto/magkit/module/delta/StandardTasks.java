@@ -1,6 +1,7 @@
 package com.aperto.magkit.module.delta;
 
 import com.aperto.magkit.filter.SecureRedirectFilter;
+import com.aperto.magkit.filter.TemplateNameVoter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
@@ -72,6 +73,7 @@ public final class StandardTasks {
 
     /**
      * Task for installing the secure redirect filter in the magnolia filter chain.
+     * Including a default configuration for stkForm template.
      * @see SecureRedirectFilter
      */
     public static Task secureRedirectFilter() {
@@ -84,7 +86,9 @@ public final class StandardTasks {
                         addOrGetNode("template_de", NT_CONTENTNODE).then(
                             addOrGetNode("templates", NT_CONTENTNODE).then(
                                 addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
-                            )
+                            ),
+                            addOrSetProperty("class", TemplateNameVoter.class.getName()),
+                            addOrSetProperty("rootPath", "/de")
                         )
                     ),
                     orderBefore("secure-redirect", "intercept")
