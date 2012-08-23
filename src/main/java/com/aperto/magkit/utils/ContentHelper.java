@@ -6,6 +6,7 @@ import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.i18n.I18nContentSupportFactory;
 import info.magnolia.cms.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.PropertyType;
@@ -20,7 +21,7 @@ import java.util.Date;
  * @author jds
  */
 public final class ContentHelper {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ContentHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentHelper.class);
     private static final String DATE_PATTERN = "dd.MM.yyyy";
 
     public static String getData(Content content, String nodeName) {
