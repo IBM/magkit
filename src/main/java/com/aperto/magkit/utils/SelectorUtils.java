@@ -2,16 +2,18 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.context.MgnlContext;
-
-import static com.aperto.magkit.utils.LinkTool.getEncodedParameterLinkString;
-import static org.apache.commons.lang.StringUtils.*;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.aperto.magkit.utils.LinkTool.getEncodedParameterLinkString;
+import static org.apache.commons.lang.StringUtils.*;
+
 /**
  * Util class for handle magnolia resource.
  * E.g. Helper for accessing the activePage, localContent or selectors.
+ *
+ * TODO: change to new selector handling
  *
  * @author frank.sommer (29.05.2008)
  */

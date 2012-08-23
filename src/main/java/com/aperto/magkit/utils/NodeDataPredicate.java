@@ -2,14 +2,15 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.cms.core.Content;
 import org.apache.commons.collections15.Predicate;
-import static org.apache.commons.lang.BooleanUtils.isTrue;
-import static org.apache.commons.lang.BooleanUtils.toBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
+
+import static org.apache.commons.lang.BooleanUtils.isTrue;
+import static org.apache.commons.lang.BooleanUtils.toBoolean;
 
 /**
  * Checks a node data of the content. In positive case the content would be excluded.
@@ -18,6 +19,8 @@ import javax.jcr.Value;
  *
  * "hideFromSearch" is default node data name.
  * inheritance is per default off.
+ *
+ * TODO: change to node API
  *
  * @author frank.sommer (22.10.2009)
  */

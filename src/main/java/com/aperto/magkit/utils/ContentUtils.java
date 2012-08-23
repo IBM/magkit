@@ -1,27 +1,37 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.cms.core.*;
+import info.magnolia.cms.core.Content;
+import info.magnolia.cms.core.NodeData;
+import info.magnolia.cms.core.Path;
 import org.apache.commons.lang.StringUtils;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
-import javax.jcr.*;
-import javax.xml.transform.*;
+import javax.jcr.ImportUUIDBehavior;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import static java.io.File.createTempFile;
 import static java.util.Collections.sort;
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang.StringUtils.substringAfterLast;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * Util class for handle magnolia content.
+ *
+ * TODO migrate to node API
  *
  * @author frank.sommer (15.05.2008)
  */

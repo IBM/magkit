@@ -1,36 +1,39 @@
 package com.aperto.magkit.utils;
 
-import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
-import info.magnolia.cms.core.*;
+import info.magnolia.cms.core.Content;
+import info.magnolia.cms.core.HierarchyManager;
+import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.ContentUtil;
-import static info.magnolia.context.MgnlContext.getHierarchyManager;
-
 import info.magnolia.context.MgnlContext;
 import info.magnolia.link.LinkUtil;
-import static info.magnolia.link.LinkUtil.DEFAULT_EXTENSION;
-import static info.magnolia.link.LinkUtil.isExternalLinkOrAnchor;
 import info.magnolia.module.dms.beans.Document;
-import static org.apache.commons.lang.ArrayUtils.remove;
-import static org.apache.commons.lang.StringEscapeUtils.unescapeXml;
-import static org.apache.commons.lang.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.PropertyType;
 import java.io.UnsupportedEncodingException;
-import static java.net.URLEncoder.encode;
-import static java.util.Locale.ENGLISH;
-
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static info.magnolia.cms.beans.config.ContentRepository.WEBSITE;
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import static info.magnolia.link.LinkUtil.DEFAULT_EXTENSION;
+import static info.magnolia.link.LinkUtil.isExternalLinkOrAnchor;
+import static java.net.URLEncoder.encode;
+import static java.util.Locale.ENGLISH;
+import static org.apache.commons.lang.ArrayUtils.remove;
+import static org.apache.commons.lang.StringEscapeUtils.unescapeXml;
+import static org.apache.commons.lang.StringUtils.*;
+
 /**
  * Helper class for links.
  *
  * @author Rainer Blumenthal (13.02.2007), Frank Sommer (25.10.2007)
+ * @deprecated use the magnolia link manager, this methods are not site safe
  */
+@Deprecated
 public final class LinkTool {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkTool.class);
     private static final String DMS_REPOSITORY = "dms";

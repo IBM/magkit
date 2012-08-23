@@ -1,21 +1,22 @@
 package com.aperto.magkit.utils;
 
+import info.magnolia.cms.beans.runtime.FileProperties;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.NodeData;
-import info.magnolia.cms.beans.runtime.FileProperties;
-import info.magnolia.cms.util.DateUtil;
 import info.magnolia.cms.i18n.I18nContentSupportFactory;
-
-import javax.jcr.PropertyType;
-import javax.jcr.RepositoryException;
-
+import info.magnolia.cms.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.PropertyType;
+import javax.jcr.RepositoryException;
 import java.util.Date;
 
 /**
  * ContentHelper.
+ *
+ * TODO: check use and move to ContentUtils
+ *
  * @author jds
  */
 public final class ContentHelper {
