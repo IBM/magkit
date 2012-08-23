@@ -8,7 +8,9 @@ import info.magnolia.cms.util.Rule;
  * Template filter.
  *
  * @author frank.sommer (13.11.2007)
+ * @deprecated since 4.5, because of use of the content api
  */
+@Deprecated
 public class TemplateFilter implements Content.ContentFilter {
     private static final Logger LOGGER = Logger.getLogger(TemplateFilter.class);
 
