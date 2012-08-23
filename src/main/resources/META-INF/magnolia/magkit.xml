@@ -8,7 +8,7 @@
     <dependencies>
         <dependency>
             <name>adminInterface</name>
-            <version>3.5/*</version>
+            <version>4.5/*</version>
         </dependency>
     </dependencies>
     <servlets>
