@@ -4,9 +4,10 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -21,7 +22,7 @@ import static org.apache.commons.lang.StringUtils.split;
  * @since 09.05.2012 reimplementation
  */
 public class ExportTask extends MatchingTask {
-    private static final Logger LOGGER = Logger.getLogger(ExportTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportTask.class);
     private static final int DEFAULT_TARGET_PORT = 8001;
 
     private String _rootNode;
