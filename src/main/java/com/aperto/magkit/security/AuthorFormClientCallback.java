@@ -6,9 +6,12 @@ import info.magnolia.init.MagnoliaConfigurationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 /**
  * Sends a login form only if server is author.
@@ -18,10 +21,11 @@ import java.io.IOException;
  * @since 01.10.12
  */
 public class AuthorFormClientCallback extends FormClientCallback {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthorFormClientCallback.class);
-
     private static final String AUTHORIZED_PATH = "/.magnolia";
+
+    @Inject
+    private ServerConfiguration _serverConfiguration;
 
     public AuthorFormClientCallback(MagnoliaConfigurationProperties configurationProperties) {
         super(configurationProperties);
@@ -29,21 +33,19 @@ public class AuthorFormClientCallback extends FormClientCallback {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) {
-
-        if (ServerConfiguration.getInstance().isAdmin() || request.getRequestURI().startsWith(request.getContextPath() + AUTHORIZED_PATH)) {
+        if (_serverConfiguration.isAdmin() || request.getRequestURI().startsWith(request.getContextPath() + AUTHORIZED_PATH)) {
             // process the login form.
             super.handle(request, response);
         } else {
             // send a 404 Not Found response instead of the login form.
-            LOGGER.debug("Unauthorized to display the login form for this path {0}.", request.getRequestURI());
+            LOGGER.debug("Unauthorized to display the login form for this path {}.", request.getRequestURI());
             try {
                 if (!response.isCommitted()) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    response.sendError(SC_NOT_FOUND);
                 }
             } catch (IOException e) {
                 LOGGER.error("exception while modifying the response", e);
             }
-
         }
     }
 }

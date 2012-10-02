@@ -1,5 +1,6 @@
 package com.aperto.magkit.module;
 
+import com.aperto.magkit.security.AuthorFormClientCallback;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.NodeExistsDelegateTask;
 import info.magnolia.module.delta.Task;
@@ -10,6 +11,9 @@ import info.magnolia.voting.voters.URIStartsWithVoter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
+import static info.magnolia.nodebuilder.Ops.getNode;
+import static info.magnolia.nodebuilder.Ops.setProperty;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**
@@ -33,6 +37,12 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
         new AddFilterBypassTask(PATH_FILTER + "/cms", "spring", URIStartsWithVoter.class, "/service/")
     );
 
+    private final Task _setSecurityCallback = selectServerConfig("Change callback", "Set the author form client callback.",
+        getNode("filters/securityCallback/clientCallbacks/form").then(
+            setProperty("class", AuthorFormClientCallback.class.getName())
+        )
+    );
+
     /**
      * Constructor for adding update builder.
      */
@@ -44,6 +54,7 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
         final List<Task> tasks = new ArrayList<Task>();
         tasks.add(_addBypassForDebugSuite);
         tasks.add(_addSpringByPass);
+        tasks.add(_setSecurityCallback);
         return tasks;
     }
 
@@ -52,6 +63,7 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
         List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
         updateTasks.add(_addBypassForDebugSuite);
         updateTasks.add(_addSpringByPass);
+        updateTasks.add(_setSecurityCallback);
         return updateTasks;
     }
 }
