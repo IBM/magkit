@@ -1,4 +1,4 @@
-package com.aperto.magkit.auth.callbak;
+package com.aperto.magkit.security;
 
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.cms.security.auth.callback.FormClientCallback;
