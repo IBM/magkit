@@ -184,4 +184,11 @@
             </resource>
         </resources>
     </build>
+    <scm>
+    	<url>scm:svn:https://subversion.aperto.de/magkit/trunk/magkit</url>
+    </scm>
+    <issueManagement>
+    	<url>https://jira.aperto.de/browse/MGKT</url>
+    	<system>JIRA</system>
+    </issueManagement>
 </project>
