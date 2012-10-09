@@ -1,7 +1,6 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.core.Path;
 import org.apache.commons.lang.StringUtils;
 import org.xml.sax.ContentHandler;
@@ -20,11 +19,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.Collection;
-import java.util.List;
 
 import static java.io.File.createTempFile;
-import static java.util.Collections.sort;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang.StringUtils.*;
 
@@ -36,28 +32,6 @@ import static org.apache.commons.lang.StringUtils.*;
  * @author frank.sommer (15.05.2008)
  */
 public final class ContentUtils {
-    /**
-     * Orders the given collection of NodeDatas by name.
-     *
-     * @param collection of NodeDatas
-     * @return ordered collection
-     */
-    public static Collection<NodeData> orderNodeDataCollection(Collection<NodeData> collection) {
-        List<NodeData> nodeDataList = (List<NodeData>) collection;
-        NodeDataComparator nodeDataComparator = new NodeDataComparator();
-        nodeDataComparator.setCompareByValue(false);
-        sort(nodeDataList, nodeDataComparator);
-        return nodeDataList;
-    }
-
-    private ContentUtils() {
-    }
-
-    public static Collection<NodeData> orderNodeDataCollectionByValue(Collection<NodeData> collection) {
-        List<NodeData> nodeDataList = (List<NodeData>) collection;
-        sort(nodeDataList, new NodeDataComparator());
-        return nodeDataList;
-    }
 
     /**
      * Session based copy operation. As JCR only supports workspace based copies this operation is performed
@@ -140,5 +114,11 @@ public final class ContentUtils {
             throw new RepositoryException(
                 "Error creating an XML export content handler", e);
         }
+    }
+
+    /**
+     * Private because it's a util class.
+     */
+    private ContentUtils() {
     }
 }
