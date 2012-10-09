@@ -26,7 +26,7 @@ public final class PropertyUtils {
     /**
      * Retrieves the properties created by Magnolias MultiSelect.
      * @param multiSelectNode node contains the properties
-     * @return collection of properties
+     * @return collection of properties, null if multiSelectNode is null
      */
     public static Collection<Property> retrieveMultiSelectProperties(Node multiSelectNode) {
         Collection<Property> properties = null;

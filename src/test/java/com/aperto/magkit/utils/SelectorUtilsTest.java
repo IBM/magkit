@@ -1,14 +1,14 @@
 package com.aperto.magkit.utils;
 
-import com.aperto.magkit.MagKitTest;
+import org.junit.Before;
+import org.junit.Test;
+
 import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCharacterEncoding;
 import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubSelector;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Test of the resource utils.
@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author frank.sommer (11.12.2008)
  * @see SelectorUtils
  */
-public class SelectorUtilsTest extends MagKitTest {
+public class SelectorUtilsTest {
     @Test
     public void retrieveValueOfSelector() {
         String value = SelectorUtils.retrieveValueOfSelector("pid");
