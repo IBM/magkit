@@ -1,6 +1,7 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.cms.core.NodeData;
+
 import java.util.Comparator;
 
 /**
@@ -8,8 +9,10 @@ import java.util.Comparator;
  * It is possible to sort by name or value.
  * Value is default.
  *
+ * @deprecated since 4.5, use TODO
  * @author frank.sommer (22.09.2008)
  */
+@Deprecated
 public class NodeDataComparator implements Comparator<NodeData> {
     private boolean _compareByValue = true;
 
