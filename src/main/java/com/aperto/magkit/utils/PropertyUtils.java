@@ -9,6 +9,7 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Collections.sort;
@@ -47,18 +48,7 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node multiSelectNode) {
-        return collect(retrieveMultiSelectProperties(multiSelectNode), new Transformer<Property, String>() {
-            @Override
-            public String transform(Property property) {
-                String value = "";
-                try {
-                    value = property.getString();
-                } catch (RepositoryException e) {
-                    LOGGER.error("Error get string value from property.", e);
-                }
-                return value;
-            }
-        });
+        return collect(retrieveMultiSelectProperties(multiSelectNode), new PropertyStringTransformer());
     }
 
     /**
@@ -67,12 +57,36 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
-        List<String> values = new ArrayList<String>();
-        values.addAll(retrieveMultiSelectValues(multiSelectNode));
-        sort(values);
-        return values;
+        List<Property> values = new ArrayList<Property>();
+        values.addAll(retrieveMultiSelectProperties(multiSelectNode));
+        sort(values, new Comparator<Property>() {
+            @Override
+            public int compare(Property p1, Property p2) {
+                int compareValue = 0;
+                try {
+                    compareValue = p1.getName().compareTo(p2.getName());
+                } catch (RepositoryException e) {
+                    LOGGER.error("Error comparing by name of properties.", e);
+                }
+                return compareValue;
+            }
+        });
+        return collect(values, new PropertyStringTransformer());
     }
 
     private PropertyUtils() {
+    }
+
+    private static class PropertyStringTransformer implements Transformer<Property, String> {
+        @Override
+        public String transform(Property property) {
+            String value = "";
+            try {
+                value = property.getString();
+            } catch (RepositoryException e) {
+                LOGGER.error("Error get string value from property.", e);
+            }
+            return value;
+        }
     }
 }

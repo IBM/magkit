@@ -12,7 +12,6 @@ import static com.aperto.magkit.mockito.NodeStubbingOperation.stubProperty;
 import static com.aperto.magkit.utils.PropertyUtils.retrieveMultiSelectProperties;
 import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -35,16 +34,16 @@ public class PropertyUtilsTest {
         Node node = mockPageNode(
             stubPath("/node/subNode"),
             stubProperty("jcr:created", "2012"),
-            stubProperty("0", "1."),
+            stubProperty("1", "zwei1"),
+            stubProperty("0", "eins0"),
             stubProperty("title", "title"),
-            stubProperty("1", "2."),
-            stubProperty("2", "3.")
+            stubProperty("2", "drei2")
         );
         Collection<String> values = retrieveOrderedMultiSelectValues(node);
         assertThat(values.size(), is(3));
-        int i = 1;
+        int i = 0;
         for (String value : values) {
-            assertThat(value, equalTo(i + "."));
+            assertThat(value.endsWith(String.valueOf(i)), is(true));
             i++;
         }
     }
