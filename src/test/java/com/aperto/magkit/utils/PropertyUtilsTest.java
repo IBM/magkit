@@ -7,7 +7,6 @@ import javax.jcr.Property;
 import java.util.Collection;
 
 import static com.aperto.magkit.mockito.NodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.NodeStubbingOperation.stubPath;
 import static com.aperto.magkit.mockito.NodeStubbingOperation.stubProperty;
 import static com.aperto.magkit.utils.PropertyUtils.retrieveMultiSelectProperties;
 import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
@@ -31,8 +30,7 @@ public class PropertyUtilsTest {
 
     @Test
     public void testRetrieveOrderedMultiSelectValues() throws Exception {
-        Node node = mockPageNode(
-            stubPath("/node/subNode"),
+        Node node = mockPageNode("/node/subNode",
             stubProperty("jcr:created", "2012"),
             stubProperty("1", "zwei1"),
             stubProperty("0", "eins0"),
