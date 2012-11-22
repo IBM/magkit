@@ -9,8 +9,6 @@ import info.magnolia.cms.filters.MultipartRequestWrapper;
 import info.magnolia.cms.filters.OncePerRequestAbstractMgnlFilter;
 import info.magnolia.context.MgnlContext;
 import org.apache.commons.lang.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
@@ -32,7 +30,6 @@ import static org.apache.commons.lang.StringUtils.defaultString;
  * @since 09.07.2008
  */
 public class CosMultipartRequestFilter extends OncePerRequestAbstractMgnlFilter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CosMultipartRequestFilter.class);
 
     /**
      * Max file upload size. Default 50 MB.
