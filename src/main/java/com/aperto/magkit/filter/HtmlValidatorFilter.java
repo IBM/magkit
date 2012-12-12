@@ -1,27 +1,32 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.webkit.lang.IoRuntimeException;
-import com.aperto.webkit.utils.IoTools;
-import static com.aperto.webkit.utils.StringTools.asInt;
-import static com.aperto.webkit.utils.StringTools.replacePlaceHolders;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.*;
-import static org.apache.commons.httpclient.util.EncodingUtil.getString;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.substringAfter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.SocketTimeoutException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static com.aperto.webkit.utils.StringTools.replacePlaceHolders;
+import static org.apache.commons.httpclient.util.EncodingUtil.getString;
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.io.IOUtils.copy;
+import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 
 /**
  * Complete class from aperto commons needed. Because elimination of Magnolia MainBar needed to validate HTML
@@ -67,11 +72,13 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
                 throw new RuntimeException("Could not load " + templateLocation + ".");
             } else {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                IoTools.copy(in, buffer);
+                copy(in, buffer);
                 _warningLayerTemplate = buffer.toString();
             }
+        } catch (IOException e) {
+            LOGGER.warn(e.getLocalizedMessage());
         } finally {
-            IoTools.closeQuietly(in);
+            closeQuietly(in);
         }
     }
 
@@ -122,7 +129,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
             // Extract validation result number ...
             String s = url.substring(i + VALIDATION_RESULT_URL_PREFIX.length());
             s = s.substring(0, s.length() - VALIDATION_RESULT_URL_SUFFIX.length());
-            i = asInt(s);
+            i = toInt(s);
             // Display w3c validator result ...
             String html;
             if (i < (_resultCounter - MAX_CACHED_RESULTS)) {
@@ -211,7 +218,7 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         String[] patterns = split(_validPattern, '|');
         boolean valid = true;
         for (String pattern : patterns) {
-            valid = validationResult.indexOf(pattern.trim()) > -1;
+            valid = validationResult.contains(pattern.trim());
             if (!valid) {
                 break;
             }
@@ -249,18 +256,16 @@ public class HtmlValidatorFilter extends AbstractMgnlFilter {
         return validationResult;
     }
 
-    private String getHtml(HttpMethodBase httpMethod) throws IoRuntimeException {
+    private String getHtml(HttpMethodBase httpMethod) throws IOException {
         InputStream in = null;
         String html = "";
         try {
             in = httpMethod.getResponseBodyAsStream();
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            IoTools.copy(in, buffer);
+            copy(in, buffer);
             html = getString(buffer.toByteArray(), httpMethod.getResponseCharSet());
-        } catch (IOException e) {
-            throw new IoRuntimeException(e);
         } finally {
-            IoTools.closeQuietly(in);
+            closeQuietly(in);
         }
         return html;
     }
