@@ -65,7 +65,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
         Content actPage = state.getMainContent();
         if (actPage != null) {
             boolean isSecure = shouldSecure(request);
-            boolean isSecureRequest = request.isSecure();
+            boolean isSecureRequest = isSecureRequest(request);
 
             LOGGER.debug("Secure: {} and secure template {}.", isSecureRequest, isSecure);
             if (isSecureRequest) {
@@ -94,10 +94,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
         String link = completeUrl.transform(new Link(page));
 
         if (secureProtocol) {
-            link = link.replace("http://", "https://");
-            if (isNotBlank(_httpPort)) {
-                link = link.replace(":" + _httpPort, ":" + _httpsPort);
-            }
+            link = changeToSecureUrl(link);
         }
 
         if (link.startsWith(secureProtocol ? "https" : "http")) {
@@ -114,6 +111,24 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
             }
             response.sendRedirect(link);
         }
+    }
+
+    /**
+     * Check if the given request is secure.
+     */
+    protected boolean isSecureRequest(final HttpServletRequest request) {
+        return request.isSecure();
+    }
+
+    /**
+     * Transforms the given link to the secure link.
+     */
+    protected String changeToSecureUrl(String link) {
+        link = link.replace("http://", "https://");
+        if (isNotBlank(_httpPort)) {
+            link = link.replace(":" + _httpPort, ":" + _httpsPort);
+        }
+        return link;
     }
 
     protected boolean shouldSecure(HttpServletRequest request) {
