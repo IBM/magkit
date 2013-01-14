@@ -124,11 +124,11 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
      * Transforms the given link to the secure link.
      */
     protected String changeToSecureUrl(String link) {
-        link = link.replace("http://", "https://");
+        String secureLink = link.replace("http://", "https://");
         if (isNotBlank(_httpPort)) {
-            link = link.replace(":" + _httpPort, ":" + _httpsPort);
+            secureLink = secureLink.replace(":" + _httpPort, ":" + _httpsPort);
         }
-        return link;
+        return secureLink;
     }
 
     protected boolean shouldSecure(HttpServletRequest request) {
