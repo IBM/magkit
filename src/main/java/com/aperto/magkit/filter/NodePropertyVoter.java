@@ -50,7 +50,7 @@ public class NodePropertyVoter extends BasePatternVoter {
             try {
                 Session jcrSession = _systemContext.getJCRSession(WEBSITE);
                 Node node = jcrSession.getNode(path);
-                String currentValue = getString(node, _propertyName);
+                String currentValue = getString(node, _propertyName, "");
                 vote = _regex.matcher(currentValue).matches();
             } catch (RepositoryException e) {
                 LOGGER.warn("No website content found on {}. Perhaps use an additional voter.", path);

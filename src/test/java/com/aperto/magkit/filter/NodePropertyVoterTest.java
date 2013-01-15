@@ -65,6 +65,14 @@ public class NodePropertyVoterTest {
         assertThat(voting, is(true));
     }
 
+    @Test
+    public void testNodePropertyNullMatch() {
+        _propertyVoter.setPropertyName("notexists");
+        _propertyVoter.setPattern("true");
+        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
+        assertThat(voting, is(false));
+    }
+
     @Before
     public void initVoter() throws RepositoryException {
         _propertyVoter = new NodePropertyVoter();
