@@ -1,18 +1,19 @@
 package com.aperto.magkit.controller;
 
-import javax.jcr.RepositoryException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.AggregationState;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.context.MgnlContext;
-import static info.magnolia.voting.voters.DontDispatchOnForwardAttributeVoter.DONT_DISPATCH_ON_FORWARD_ATTRIBUTE;
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.jcr.RepositoryException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import static info.magnolia.voting.voters.DontDispatchOnForwardAttributeVoter.DONT_DISPATCH_ON_FORWARD_ATTRIBUTE;
 
 /**
  * This spring {@link org.springframework.web.servlet.HandlerInterceptor} implementation is responsible for providing
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * <p/>
  *
  * @author Norman Wiechmann (Aperto AG)
+ * @deprecated TODO: should spring be used anymore?
  */
 public class BypassedControllerInterceptor extends HandlerInterceptorAdapter {
     private static final Logger LOGGER = Logger.getLogger(BypassedControllerInterceptor.class);

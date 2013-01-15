@@ -1,16 +1,17 @@
 package com.aperto.magkit.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 /**
@@ -18,6 +19,7 @@ import static org.springframework.web.util.HtmlUtils.htmlEscape;
  * suite. The default configuration grants access to aperto ip addresses only.
  *
  * @author Norman Wiechmann (Aperto AG)
+ * @deprecated TODO: should spring be used anymore?
  */
 public class IpRangeAccessControlInterceptor extends HandlerInterceptorAdapter {
     private static final Logger LOGGER = Logger.getLogger(IpRangeAccessControlInterceptor.class);
