@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.regex.Pattern;
 
 import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
@@ -17,7 +18,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.substringBeforeLast;
 
 /**
- * Voter that matches on a configured property name and value.
+ * Voter that matches on a configured property name the configured regex pattern.
  *
  * @author frank.sommer
  * @since 14.01.13
@@ -27,14 +28,10 @@ public class NodePropertyVoter extends BasePatternVoter {
 
     private Context _systemContext;
     private String _propertyName;
-    private String _propertyValue;
+    private Pattern _regex;
 
     public void setPropertyName(final String propertyName) {
         _propertyName = propertyName;
-    }
-
-    public void setPropertyValue(final String propertyValue) {
-        _propertyValue = propertyValue;
     }
 
     @Inject
@@ -46,7 +43,7 @@ public class NodePropertyVoter extends BasePatternVoter {
     protected boolean boolVote(final Object value) {
         boolean vote = false;
 
-        if (isNotBlank(_propertyName) && isNotBlank(_propertyValue)) {
+        if (isNotBlank(_propertyName) && isNotBlank(getPattern())) {
             String uri = resolveURIFromValue(value);
             String path = substringBeforeLast(uri, ".");
 
@@ -54,7 +51,7 @@ public class NodePropertyVoter extends BasePatternVoter {
                 Session jcrSession = _systemContext.getJCRSession(WEBSITE);
                 Node node = jcrSession.getNode(path);
                 String currentValue = getString(node, _propertyName);
-                vote = _propertyValue.equals(currentValue);
+                vote = _regex.matcher(currentValue).matches();
             } catch (RepositoryException e) {
                 LOGGER.warn("No website content found on {}. Perhaps use an additional voter.", path);
             }
@@ -62,5 +59,11 @@ public class NodePropertyVoter extends BasePatternVoter {
             LOGGER.warn("Configuration of a {} seems to be incomlete.", getClass().getName());
         }
         return vote;
+    }
+
+    @Override
+    public void setPattern(String pattern) {
+        super.setPattern(pattern);
+        _regex = Pattern.compile(pattern);
     }
 }

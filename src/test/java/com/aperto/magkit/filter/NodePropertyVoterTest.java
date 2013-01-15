@@ -35,9 +35,16 @@ public class NodePropertyVoterTest {
     }
 
     @Test
+    public void testMissingPattern() {
+        _propertyVoter.setPattern(".*");
+        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
+        assertThat(voting, is(false));
+    }
+
+    @Test
     public void testMissingNode() {
         _propertyVoter.setPropertyName("secure");
-        _propertyVoter.setPropertyValue("true");
+        _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/old.html");
         assertThat(voting, is(false));
     }
@@ -45,7 +52,7 @@ public class NodePropertyVoterTest {
     @Test
     public void testNodePropertyNoMatch() {
         _propertyVoter.setPropertyName("secure");
-        _propertyVoter.setPropertyValue("false");
+        _propertyVoter.setPattern("false");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
         assertThat(voting, is(false));
     }
@@ -53,7 +60,7 @@ public class NodePropertyVoterTest {
     @Test
     public void testNodePropertyMatch() {
         _propertyVoter.setPropertyName("secure");
-        _propertyVoter.setPropertyValue("true");
+        _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
         assertThat(voting, is(true));
     }
