@@ -31,13 +31,11 @@ import static org.apache.commons.lang.StringUtils.*;
  * Helper class for links.
  *
  * @author Rainer Blumenthal (13.02.2007), Frank Sommer (25.10.2007)
- * @deprecated use the magnolia link manager, this methods are not site safe
  */
-@Deprecated
 public final class LinkTool {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkTool.class);
     private static final String DMS_REPOSITORY = "dms";
-    public static final Pattern UUID_PATTERN = Pattern.compile("^[-a-z0-9]{30,40}$");
+    public static final Pattern UUID_PATTERN = Pattern.compile("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$");
     private static final char SLASH = '/';
     private static final String ENCODING = "UTF-8";
 
@@ -50,7 +48,9 @@ public final class LinkTool {
      *
      * @param link the uuid or normal external link
      * @return the converted link
+     * @deprecated use the magnolia link manager, this methods are not site safe
      */
+    @Deprecated
     public static String convertLink(String link) {
         return convertLink(link, false);
     }
@@ -61,7 +61,9 @@ public final class LinkTool {
      * @param link         the link or uuid, in case of uuid it converts it to a absolute link
      * @param addExtension if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
      * @return the absolute link with optional .html
+     * @deprecated use the magnolia link manager, this methods are not site safe
      */
+    @Deprecated
     public static String convertLink(String link, boolean addExtension) {
         return convertLink(link, addExtension, null);
     }
@@ -74,7 +76,9 @@ public final class LinkTool {
      * @param addExtension          if true .html as added at the end of the link, only adds .html if there is no .htm or .html already
      * @param alternativeRepository which were checked, too.
      * @return the handle with optional .html
+     * @deprecated use the magnolia link manager, this methods are not site safe
      */
+    @Deprecated
     public static String convertLink(String link, boolean addExtension, String alternativeRepository) {
         String newLink = EMPTY;
         String extension = DEFAULT_EXTENSION;
@@ -112,6 +116,7 @@ public final class LinkTool {
      * Api compatibility method for magnolia 4.0 api change.
      * {@link LinkUtil#convertUUIDtoHandle} throws new info.magnolia.link.LinkException class.
      */
+    @Deprecated
     public static String convertUUIDtoHandle(final String link, final String repository) {
         String handle = null;
         try {
@@ -131,11 +136,18 @@ public final class LinkTool {
         return isBlank(path) ? (isUuid(link) ? EMPTY : link) : path;
     }
 
+    /**
+     * Checks if the given link is a uuid.
+     *
+     * @see #UUID_PATTERN
+     * @param link to check
+     * @return true or false
+     */
     public static boolean isUuid(String link) {
         boolean isUuid = false;
-        Matcher matcher = UUID_PATTERN.matcher(link);
-        if (matcher.matches()) {
-            isUuid = true;
+        if (isNotEmpty(link)) {
+            Matcher matcher = UUID_PATTERN.matcher(link);
+            isUuid = matcher.matches();
         }
         return isUuid;
     }
@@ -146,6 +158,7 @@ public final class LinkTool {
      * @param link the link to check
      * @return true if the link is present, false if broken
      */
+    @Deprecated
     public static boolean checkLink(String link) {
         HierarchyManager hm = getHierarchyManager(WEBSITE);
         return isNotEmpty(link) && hm.isExist(link);
@@ -157,6 +170,7 @@ public final class LinkTool {
      * @param content the content to get the url for
      * @return the url as String
      */
+    @Deprecated
     public static String getUrl(Content content) {
         String url = content.getHandle();
         if (!hasHtmlExtension(url)) {
@@ -171,6 +185,7 @@ public final class LinkTool {
      * @param binaryNode binary NodeData
      * @return link to a binary
      */
+    @Deprecated
     public static String getBinaryLink(NodeData binaryNode) {
         return getBinaryLink(binaryNode, "");
     }
@@ -184,6 +199,7 @@ public final class LinkTool {
      * @return link to a binary
      * @throws RuntimeException if file name could not be url encoded with encoding 'UTF-8'.
      */
+    @Deprecated
     public static String getBinaryLink(NodeData binaryNode, String repository) {
         StringBuilder binaryLink = new StringBuilder(64);
         if (binaryNode != null && binaryNode.isExist()) {
@@ -210,6 +226,7 @@ public final class LinkTool {
      * @return a new URL encoded String or an empty String if the parameter s has been NULL.
      * @throws UnsupportedEncodingException if encoding fails for encoding 'UTF-8'
      */
+    @Deprecated
     public static String mgnlUrlEncode(String s) {
         String name = EMPTY;
         try {
@@ -228,6 +245,7 @@ public final class LinkTool {
     /**
      * Inserts a selector in the given link.
      */
+    @Deprecated
     public static String insertSelector(String link, String selector) {
         String newLink = link;
         if (isNotBlank(selector) && !isExternalLinkOrAnchor(link)) {
@@ -250,6 +268,7 @@ public final class LinkTool {
      *
      * @return parameter string for link
      */
+    @Deprecated
     public static String getEncodedParameterLinkString() {
         String seperator = "?";
         Map<String, Object> parameterMap = MgnlContext.getWebContext().getRequest().getParameterMap();
