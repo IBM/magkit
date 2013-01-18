@@ -1,6 +1,7 @@
 package com.aperto.magkit.filter;
 
 import info.magnolia.context.Context;
+import info.magnolia.context.MgnlContext;
 import info.magnolia.context.SystemContext;
 import info.magnolia.voting.voters.BasePatternVoter;
 import org.slf4j.Logger;
@@ -44,10 +45,9 @@ public class NodePropertyVoter extends BasePatternVoter {
         boolean vote = false;
 
         if (isNotBlank(_propertyName) && isNotBlank(getPattern())) {
-            String uri = resolveURIFromValue(value);
-            String path = substringBeforeLast(uri, ".");
-
+            String path = "no-path";
             try {
+                path = resolveNodePath(value);
                 Session jcrSession = _systemContext.getJCRSession(WEBSITE);
                 Node node = jcrSession.getNode(path);
                 String currentValue = getString(node, _propertyName, "");
@@ -59,6 +59,17 @@ public class NodePropertyVoter extends BasePatternVoter {
             LOGGER.warn("Configuration of a {} seems to be incomlete.", getClass().getName());
         }
         return vote;
+    }
+
+    private String resolveNodePath(final Object value) throws RepositoryException {
+        String nodePath;
+        if (MgnlContext.hasInstance() && MgnlContext.getAggregationState() != null && MgnlContext.getAggregationState().getCurrentContent() != null) {
+            nodePath = MgnlContext.getAggregationState().getCurrentContent().getHandle();
+        } else {
+            String uri = resolveURIFromValue(value);
+            nodePath = substringBeforeLast(uri, ".");
+        }
+        return nodePath;
     }
 
     @Override

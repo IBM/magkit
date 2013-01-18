@@ -1,5 +1,7 @@
 package com.aperto.magkit.filter;
 
+import info.magnolia.cms.core.AggregationState;
+import info.magnolia.cms.core.Content;
 import info.magnolia.context.SystemContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,8 +11,11 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
 import static com.aperto.magkit.mockito.NodeMockUtils.mockPageNode;
 import static com.aperto.magkit.mockito.NodeStubbingOperation.stubProperty;
+import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubAggregationState;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -66,6 +71,19 @@ public class NodePropertyVoterTest {
     }
 
     @Test
+    public void testNodePropertyMatchWithContext() {
+        AggregationState aggregationState = new AggregationState();
+        Content content = mock(Content.class);
+        when(content.getHandle()).thenReturn("/bs/secure");
+        aggregationState.setCurrentContent(content);
+        mockWebContext(stubAggregationState(aggregationState));
+        _propertyVoter.setPropertyName("secure");
+        _propertyVoter.setPattern("true");
+        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
+        assertThat(voting, is(true));
+    }
+
+    @Test
     public void testNodePropertyNullMatch() {
         _propertyVoter.setPropertyName("notexists");
         _propertyVoter.setPattern("true");
@@ -75,6 +93,7 @@ public class NodePropertyVoterTest {
 
     @Before
     public void initVoter() throws RepositoryException {
+        cleanContext();
         _propertyVoter = new NodePropertyVoter();
         SystemContext systemContext = mock(SystemContext.class);
         Session session = mock(Session.class);
