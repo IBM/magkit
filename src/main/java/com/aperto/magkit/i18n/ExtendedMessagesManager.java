@@ -18,7 +18,6 @@ import java.util.Set;
 
 import static com.aperto.magkit.utils.ContentUtils.orderNodeDataCollection;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
-import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
  * Delivers all configurated basenames under /server/i18n/content/i18nBasenames for all basenames which matchs pattern PATTERN_MESSAGES and PATTERN_DIALOGS.
@@ -96,24 +95,6 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
         Messages msgs = new ExtendedMessagesImpl(basename, locale);
         if (!getDefaultLocale().equals(locale)) {
             msgs = new MessagesChain(msgs).chain(new ExtendedMessagesImpl(basename, getDefaultLocale()));
-        }
-        return msgs;
-    }
-
-    @Override
-    public Messages getMessagesInternal(final String basename, final Locale locale) {
-        Messages msgs = null;
-        if (isEmpty(basename)) {
-            Set<String> basenames = retrieveBasenames();
-            if (!basenames.isEmpty()) {
-                String firstBasename = basenames.iterator().next();
-                if (firstBasename.matches(PATTERN_MESSAGES)) {
-                    msgs = super.getMessagesInternal(firstBasename, locale);
-                }
-            }
-        }
-        if (msgs == null) {
-            msgs = super.getMessagesInternal(basename, locale);
         }
         return msgs;
     }
