@@ -22,7 +22,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
  * Delivers all configurated basenames under /server/i18n/content/i18nBasenames for all basenames which matchs pattern PATTERN_MESSAGES and PATTERN_DIALOGS.
- * The ExtendedMessagesManager class must be specified in magnolia.proeprties under info.magnolia.cms.i18n.MessagesManager.
+ * The ExtendedMessagesManager class must be specified in magnolia.properties under info.magnolia.cms.i18n.MessagesManager.
  *
  * @author Achim.Herbertz, diana.racho (Aperto AG)
  */
