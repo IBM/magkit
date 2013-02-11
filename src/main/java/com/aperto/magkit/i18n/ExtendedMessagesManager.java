@@ -7,14 +7,18 @@ import info.magnolia.cms.i18n.DefaultMessagesManager;
 import info.magnolia.cms.i18n.Messages;
 import info.magnolia.cms.i18n.MessagesChain;
 import info.magnolia.context.MgnlContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
+import static com.aperto.magkit.utils.ContentUtils.orderNodeDataCollection;
+import static info.magnolia.repository.RepositoryConstants.CONFIG;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
  * Delivers all configurated basenames under /server/i18n/content/i18nBasenames for all basenames which matchs pattern PATTERN_MESSAGES and PATTERN_DIALOGS.
@@ -23,8 +27,7 @@ import static info.magnolia.cms.beans.config.ContentRepository.CONFIG;
  * @author Achim.Herbertz, diana.racho (Aperto AG)
  */
 public class ExtendedMessagesManager extends DefaultMessagesManager {
-
-    private static final Logger LOGGER = Logger.getLogger(ExtendedMessagesManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedMessagesManager.class);
 
     private static final String PATTERN_MESSAGES = "com.aperto.+.messages";
     private static final String PATTERN_DIALOGS = "com.aperto.+.dialogs";
@@ -72,12 +75,14 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
     }
 
     protected static Set<String> retrieveBasenames() {
-        Set<String> basenames = new HashSet<String>();
+        Set<String> basenames = new LinkedHashSet<String>();
         HierarchyManager cfgManager = MgnlContext.getSystemContext().getHierarchyManager(CONFIG);
         if (cfgManager.isExist(SERVER_I18N_BASENAMES)) {
             try {
                 Content content = cfgManager.getContent(SERVER_I18N_BASENAMES);
-                for (NodeData basename : content.getNodeDataCollection()) {
+                Collection<NodeData> nodeDataCollection = content.getNodeDataCollection();
+                nodeDataCollection = orderNodeDataCollection(nodeDataCollection);
+                for (NodeData basename : nodeDataCollection) {
                     basenames.add(basename.getString());
                 }
             } catch (RepositoryException e) {
@@ -91,6 +96,24 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
         Messages msgs = new ExtendedMessagesImpl(basename, locale);
         if (!getDefaultLocale().equals(locale)) {
             msgs = new MessagesChain(msgs).chain(new ExtendedMessagesImpl(basename, getDefaultLocale()));
+        }
+        return msgs;
+    }
+
+    @Override
+    public Messages getMessagesInternal(final String basename, final Locale locale) {
+        Messages msgs = null;
+        if (isEmpty(basename)) {
+            Set<String> basenames = retrieveBasenames();
+            if (!basenames.isEmpty()) {
+                String firstBasename = basenames.iterator().next();
+                if (firstBasename.matches(PATTERN_MESSAGES)) {
+                    msgs = super.getMessagesInternal(firstBasename, locale);
+                }
+            }
+        }
+        if (msgs == null) {
+            msgs = super.getMessagesInternal(basename, locale);
         }
         return msgs;
     }
