@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
 import static org.apache.commons.collections15.CollectionUtils.collect;
 
@@ -44,6 +45,26 @@ public final class PropertyUtils {
     }
 
     /**
+     * Retrieves the properties created by Magnolias MultiSelect.
+     *
+     * @param baseNode Parent node of the multi select node
+     * @param nodeName Name of the multi select node
+     * @return multi select properties
+     */
+    public static Collection<Property> retrieveMultiSelectProperties(Node baseNode, String nodeName) {
+        Collection<Property> properties = emptyList();
+        try {
+            if (baseNode.hasNode(nodeName)) {
+                Node multiSelectNode = baseNode.getNode(nodeName);
+                properties = retrieveMultiSelectProperties(multiSelectNode);
+            }
+        } catch (RepositoryException e) {
+            LOGGER.error("Error retrieving multi select values.", e);
+        }
+        return properties;
+    }
+
+    /**
      * Retrieves the String values created by Magnolias MultiSelect.
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
@@ -52,25 +73,32 @@ public final class PropertyUtils {
     }
 
     /**
-     * Retrieves the ordered String values created by Magnolias MultiSelect.
+     * Retrieves the String values created by Magnolias MultiSelect.
      * @see #retrieveMultiSelectValues(javax.jcr.Node)
-     * @see #retrieveMultiSelectProperties(javax.jcr.Node)
+     */
+    public static Collection<String> retrieveMultiSelectValues(Node baseNode, String nodeName) {
+        return collect(retrieveMultiSelectProperties(baseNode, nodeName), new PropertyStringTransformer());
+    }
+
+    /**
+     * Retrieves the ordered String values created by Magnolias MultiSelect.
+     * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
         List<Property> values = new ArrayList<Property>();
         values.addAll(retrieveMultiSelectProperties(multiSelectNode));
-        sort(values, new Comparator<Property>() {
-            @Override
-            public int compare(Property p1, Property p2) {
-                int compareValue = 0;
-                try {
-                    compareValue = p1.getName().compareTo(p2.getName());
-                } catch (RepositoryException e) {
-                    LOGGER.error("Error comparing by name of properties.", e);
-                }
-                return compareValue;
-            }
-        });
+        sort(values, new PropertyComparator());
+        return collect(values, new PropertyStringTransformer());
+    }
+
+    /**
+     * Retrieves the ordered String values created by Magnolias MultiSelect.
+     * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
+     */
+    public static Collection<String> retrieveOrderedMultiSelectValues(Node baseNode, String nodeName) {
+        List<Property> values = new ArrayList<Property>();
+        values.addAll(retrieveMultiSelectProperties(baseNode, nodeName));
+        sort(values, new PropertyComparator());
         return collect(values, new PropertyStringTransformer());
     }
 
@@ -87,6 +115,19 @@ public final class PropertyUtils {
                 LOGGER.error("Error get string value from property.", e);
             }
             return value;
+        }
+    }
+
+    private static class PropertyComparator implements Comparator<Property> {
+        @Override
+        public int compare(Property p1, Property p2) {
+            int compareValue = 0;
+            try {
+                compareValue = p1.getName().compareTo(p2.getName());
+            } catch (RepositoryException e) {
+                LOGGER.error("Error comparing by name of properties.", e);
+            }
+            return compareValue;
         }
     }
 }
