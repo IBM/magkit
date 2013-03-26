@@ -15,6 +15,7 @@ import java.util.List;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
 import static org.apache.commons.collections15.CollectionUtils.collect;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Util class for Property handling.
@@ -100,6 +101,27 @@ public final class PropertyUtils {
         values.addAll(retrieveMultiSelectProperties(baseNode, nodeName));
         sort(values, new PropertyComparator());
         return collect(values, new PropertyStringTransformer());
+    }
+
+    /**
+     * Get the {@link Long} value from a node.
+     *
+     * @param node Node
+     * @param propertyName Property name of the {@Long} value.
+     * @param defaultValue Default value.
+     * @return value
+     */
+    public static Long getLong(Node node, String propertyName, Long defaultValue) {
+        Long longValue = defaultValue;
+        try {
+            if (node != null && isNotEmpty(propertyName) && node.hasProperty(propertyName)) {
+                Property property = node.getProperty(propertyName);
+                longValue = property.getLong();
+            }
+        } catch (RepositoryException e) {
+            LOGGER.info("Error message was {}", e.getLocalizedMessage());
+        }
+        return longValue;
     }
 
     private PropertyUtils() {

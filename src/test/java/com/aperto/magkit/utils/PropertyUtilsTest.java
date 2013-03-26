@@ -6,10 +6,10 @@ import javax.jcr.Node;
 import javax.jcr.Property;
 import java.util.Collection;
 
+import static com.aperto.magkit.mockito.NodeMockUtils.mockNode;
 import static com.aperto.magkit.mockito.NodeMockUtils.mockPageNode;
 import static com.aperto.magkit.mockito.NodeStubbingOperation.stubProperty;
-import static com.aperto.magkit.utils.PropertyUtils.retrieveMultiSelectProperties;
-import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
+import static com.aperto.magkit.utils.PropertyUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -44,5 +44,19 @@ public class PropertyUtilsTest {
             assertThat(value.endsWith(String.valueOf(i)), is(true));
             i++;
         }
+    }
+
+    @Test
+    public void testGetValidLong() {
+        Node node = mockNode("/node", stubProperty("test", 12L));
+        Long longValue = getLong(node, "test", 0L);
+        assertThat(longValue, is(12L));
+    }
+
+    @Test
+    public void testGetInValidLong() {
+        Node node = mockNode("/node", stubProperty("test", "abc"));
+        Long longValue = getLong(node, "test", 0L);
+        assertThat(longValue, is(0L));
     }
 }
