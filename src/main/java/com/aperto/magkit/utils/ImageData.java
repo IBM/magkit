@@ -6,20 +6,27 @@ import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.module.dms.beans.Document;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jcr.RepositoryException;
 
 /**
  * Class to capsulate the image data.
+ *
  * @author frank.sommer (23.11.2007)
+ * @deprecated with usage of stk assets
  */
+@Deprecated
 public class ImageData {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkTool.class);
+    private static final String SUFFIX_RESIZED = "_resized";
+
     private String _width;
     private String _height;
     private String _alt;
     private String _handle;
     private String _filesize;
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(LinkTool.class);
-    private static final String SUFFIX_RESIZED = "_resized";
 
     /**
      * Constructor with some given data.
