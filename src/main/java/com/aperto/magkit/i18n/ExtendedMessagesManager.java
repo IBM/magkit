@@ -1,29 +1,28 @@
 package com.aperto.magkit.i18n;
 
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.HierarchyManager;
-import info.magnolia.cms.core.NodeData;
 import info.magnolia.cms.i18n.DefaultMessagesManager;
 import info.magnolia.cms.i18n.Messages;
 import info.magnolia.cms.i18n.MessagesChain;
-import info.magnolia.context.MgnlContext;
+import info.magnolia.context.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-import java.util.Collection;
+import javax.jcr.Session;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import static com.aperto.magkit.utils.ContentUtils.orderNodeDataCollection;
+import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**
  * Delivers all configurated basenames under /server/i18n/content/i18nBasenames for all basenames which matchs pattern PATTERN_MESSAGES and PATTERN_DIALOGS.
  * The ExtendedMessagesManager class must be specified in magnolia.properties under info.magnolia.cms.i18n.MessagesManager.
  *
- * @author Achim.Herbertz, diana.racho (Aperto AG)
+ * @author Achim.Herbertz, diana.racho, frank.sommer
  */
 public class ExtendedMessagesManager extends DefaultMessagesManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedMessagesManager.class);
@@ -33,6 +32,9 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
     public static final String SERVER_I18N_CONTENT = "/server/i18n/content";
     public static final String CN_BASENAMES = "i18nBasenames";
     public static final String SERVER_I18N_BASENAMES = SERVER_I18N_CONTENT + "/" + CN_BASENAMES;
+
+    @Inject
+    private SystemContext _systemContext;
 
     public ExtendedMessagesManager() {
         load();
@@ -44,11 +46,15 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
         String[] basenames = null;
         if (messagesId != null && messagesId.getBasename() != null) {
             if (isProjectBasename(messagesId.getBasename())) {
-                Set<String> basenamesList = retrieveBasenames();
-                if (!basenamesList.contains(messagesId.getBasename())) {
-                    basenamesList.add(messagesId.getBasename());
+                Set<String> basenameSet = retrieveBasenames();
+                if (!basenameSet.contains(messagesId.getBasename())) {
+                    // put configured message id at first place
+                    Set<String> tempSet = new LinkedHashSet<String>();
+                    tempSet.add(messagesId.getBasename());
+                    tempSet.addAll(basenameSet);
+                    basenameSet = tempSet;
                 }
-                basenames = basenamesList.toArray(new String[basenamesList.size()]);
+                basenames = basenameSet.toArray(new String[basenameSet.size()]);
             } else {
                 basenames = new String[]{messagesId.getBasename()};
             }
@@ -73,21 +79,19 @@ public class ExtendedMessagesManager extends DefaultMessagesManager {
         return basename.matches(PATTERN_MESSAGES) || basename.matches(PATTERN_DIALOGS);
     }
 
-    protected static Set<String> retrieveBasenames() {
+    protected Set<String> retrieveBasenames() {
         Set<String> basenames = new LinkedHashSet<String>();
-        HierarchyManager cfgManager = MgnlContext.getSystemContext().getHierarchyManager(CONFIG);
-        if (cfgManager.isExist(SERVER_I18N_BASENAMES)) {
-            try {
-                Content content = cfgManager.getContent(SERVER_I18N_BASENAMES);
-                Collection<NodeData> nodeDataCollection = content.getNodeDataCollection();
-                nodeDataCollection = orderNodeDataCollection(nodeDataCollection);
-                for (NodeData basename : nodeDataCollection) {
-                    basenames.add(basename.getString());
-                }
-            } catch (RepositoryException e) {
-                LOGGER.error("Error retrieving i18n basenames from i18n config.", e);
+
+        try {
+            Session jcrSession = _systemContext.getJCRSession(CONFIG);
+            if (jcrSession.nodeExists(SERVER_I18N_BASENAMES)) {
+                Node basenamesNode = jcrSession.getNode(SERVER_I18N_BASENAMES);
+                basenames.addAll(retrieveOrderedMultiSelectValues(basenamesNode));
             }
+        } catch (RepositoryException e) {
+            LOGGER.error("Error retrieving i18n basenames from i18n config.", e);
         }
+
         return basenames;
     }
 
