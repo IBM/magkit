@@ -3,6 +3,7 @@ package com.aperto.magkit.nodebuilder;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.ItemType;
 import info.magnolia.cms.util.NodeDataUtil;
+import info.magnolia.nodebuilder.AbstractNodeOperation;
 import info.magnolia.nodebuilder.ErrorHandler;
 import info.magnolia.nodebuilder.NodeOperation;
 import info.magnolia.nodebuilder.Ops;
@@ -10,7 +11,6 @@ import info.magnolia.nodebuilder.Ops;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 
-import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENT;
 import static info.magnolia.cms.util.ContentUtil.createPath;
 import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang.StringUtils.removeEnd;
@@ -34,8 +34,9 @@ public abstract class NodeOperationFactory extends Ops {
      * @return the new or existing content with the given name
      */
     public static NodeOperation addOrGetNode(final String name) {
-        return new AbstractOp() {
-            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
                 Content result;
                 if (context.hasContent(name)) {
                     result = context.getContent(name);
@@ -56,8 +57,9 @@ public abstract class NodeOperationFactory extends Ops {
      * @return the new or existing content with the given name
      */
     public static NodeOperation addOrGetNode(final String name, final String type) {
-        return new AbstractOp() {
-            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
                 Content result;
                 if (context.hasContent(name)) {
                     result = context.getContent(name);
@@ -81,12 +83,11 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     public static NodeOperation createItemTypePath(final String relativePath, final ItemType type) {
-        return new AbstractOp() {
-            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
                 String path = removeEnd(relativePath.trim(), PATH_SEPARATOR);
-                Content result = context;
-                result = createPath(context, path, type);
-                return result;
+                return createPath(context, path, type);
             }
         };
     }
@@ -99,8 +100,9 @@ public abstract class NodeOperationFactory extends Ops {
      * @return the NodeOperation performing the ordering operation
      */
     public static NodeOperation orderBefore(final String nodeName, final String orderBeforeNodeName) {
-        return new AbstractOp() {
-            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
                 context.getParent().orderBefore(nodeName, orderBeforeNodeName);
                 return context;
             }
@@ -117,8 +119,9 @@ public abstract class NodeOperationFactory extends Ops {
      * @return the NodeOperation performing the operation
      */
     public static NodeOperation addOrSetProperty(final String name, final Object newValue) {
-        return new AbstractOp() {
-            Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
                 final Value value = NodeDataUtil.createValue(newValue, context.getJCRNode().getSession().getValueFactory());
                 context.setNodeData(name, value);
                 return context;
@@ -126,35 +129,20 @@ public abstract class NodeOperationFactory extends Ops {
         };
     }
 
-
     /**
-     * Default implementation. Copied from superclass because it is package private there.
+     * Checks the name before try to delete.
+     * @see Ops#remove(String)
      */
-    abstract static class AbstractOp implements NodeOperation {
-        private NodeOperation[] _childrenOps = {};
-
-        public void exec(Content context, ErrorHandler errorHandler) {
-            Content transfomed = null;
-            try {
-                transfomed = doExec(context, errorHandler);
-            } catch (RepositoryException e) {
-                errorHandler.handle(e, context);
+    public static NodeOperation removeIfExists(final String name) {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+                if (context.hasNodeData(name) || context.hasContent(name)) {
+                    context.delete(name);
+                }
+                return context;
             }
-
-            for (NodeOperation childrenOp : _childrenOps) {
-                childrenOp.exec(transfomed, errorHandler);
-            }
-        }
-
-        /**
-         * @return the node that should now be used as the context for subsequent operations
-         */
-        abstract Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException;
-
-        public NodeOperation then(NodeOperation... childrenOps) {
-            _childrenOps = childrenOps;
-            return this;
-        }
+        };
     }
 
     private NodeOperationFactory() {
