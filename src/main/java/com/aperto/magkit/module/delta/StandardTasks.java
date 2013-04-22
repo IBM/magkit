@@ -1,10 +1,13 @@
 package com.aperto.magkit.module.delta;
 
+import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
 import com.aperto.magkit.filter.SecureRedirectFilter;
 import com.aperto.magkit.filter.TemplateNameVoter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
+import info.magnolia.nodebuilder.NodeOperation;
+import info.magnolia.voting.voters.URIStartsWithVoter;
 
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
@@ -18,32 +21,29 @@ import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
  */
 public final class StandardTasks {
     public static final String URI_MAPPING = "virtualURIMapping";
+    public static final String PN_CLASS = "class";
+    public static final String PN_ENABLED = "enabled";
+    public static final String PN_FROM_URI = "fromURI";
+    public static final String PN_TO_URI = "toURI";
 
     /**
      * Creates an menu for the given module with templates, paragraphs and dialogs links.
      */
     public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
         return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
-            addOrGetNode("config/menu/" + moduleName, NT_CONTENTNODE).then(
-                addOrSetProperty("icon", "/.resources/icons/24/gears.gif"),
-                addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')"),
-                addOrSetProperty("label", moduleDisplayName),
-                addOrGetNode("pages", NT_CONTENTNODE).then(
-                    addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
-                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')"),
-                    addOrSetProperty("label", "menu.config.templates")
-                ),
-                addOrGetNode("components", NT_CONTENTNODE).then(
-                    addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
-                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')"),
-                    addOrSetProperty("label", "menu.config.paragraphs")
-                ),
-                addOrGetNode("dialogs", NT_CONTENTNODE).then(
-                    addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
-                    addOrSetProperty("onclick", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')"),
-                    addOrSetProperty("label", "menu.config.dialogs")
-                )
+            addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName).then(
+                addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates"),
+                addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs"),
+                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/dialogs')", "menu.config.dialogs")
             )
+        );
+    }
+
+    private static NodeOperation addMenuEntry(final String relPath, final String onclick, final String label) {
+        return addOrGetNode(relPath, NT_CONTENTNODE).then(
+            addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
+            addOrSetProperty("onclick", onclick),
+            addOrSetProperty("label", label)
         );
     }
 
@@ -54,9 +54,9 @@ public final class StandardTasks {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
             addOrGetNode(URI_MAPPING).then(
                 addOrGetNode("robots", NT_CONTENTNODE).then(
-                    addOrSetProperty("class", DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty("fromURI", "/robots.txt"),
-                    addOrSetProperty("toURI", "forward:/docroot/" + moduleName + "/robots.txt"))));
+                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                    addOrSetProperty(PN_FROM_URI, "/robots.txt"),
+                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt"))));
     }
 
     /**
@@ -66,9 +66,9 @@ public final class StandardTasks {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
             addOrGetNode(URI_MAPPING).then(
                 addOrGetNode("favicon", NT_CONTENTNODE).then(
-                    addOrSetProperty("class", DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty("fromURI", "/favicon.ico"),
-                    addOrSetProperty("toURI", "forward:/docroot/" + moduleName + "/favicon.ico"))));
+                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                    addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
+                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico"))));
     }
 
     /**
@@ -80,18 +80,39 @@ public final class StandardTasks {
         return new ArrayDelegateTask("Install secure redirect", "Install secure redirect filter in filter chain.",
             selectServerConfig("Add filter node", "Add filter node to chain.",
                 addOrGetNode("filters/cms/secure-redirect").then(
-                    addOrSetProperty("class", SecureRedirectFilter.class.getName()),
-                    addOrSetProperty("enabled", true),
+                    addOrSetProperty(PN_CLASS, SecureRedirectFilter.class.getName()),
+                    addOrSetProperty(PN_ENABLED, Boolean.TRUE),
                     addOrGetNode("secure", NT_CONTENTNODE).then(
                         addOrGetNode("template_de", NT_CONTENTNODE).then(
                             addOrGetNode("templates", NT_CONTENTNODE).then(
                                 addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
                             ),
-                            addOrSetProperty("class", TemplateNameVoter.class.getName()),
+                            addOrSetProperty(PN_CLASS, TemplateNameVoter.class.getName()),
                             addOrSetProperty("rootPath", "/de")
                         )
                     ),
                     orderBefore("secure-redirect", "intercept")
+                )
+            )
+        );
+    }
+
+    /**
+     * Task for configuring the extended multi part filter.
+     *
+     * @param maxRequestSize set the max request set setting
+     */
+    public static Task multiPartFilter(final String maxRequestSize) {
+        return selectServerConfig("Configuring filter", "Configuring Multipart request filter",
+            getNode("filters/multipartRequest").then(
+                addOrSetProperty(PN_CLASS, ExtendedMultipartRequestFilter.class.getName()),
+                addOrSetProperty(PN_ENABLED, Boolean.TRUE),
+                addOrSetProperty("maxRequestSize", maxRequestSize),
+                addOrGetNode("useSystemDefault", NT_CONTENTNODE).then(
+                    addOrGetNode("magnoliaUri", NT_CONTENTNODE).then(
+                        addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
+                        addOrSetProperty("pattern", "/.magnolia")
+                    )
                 )
             )
         );
