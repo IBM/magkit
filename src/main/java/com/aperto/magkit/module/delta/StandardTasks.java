@@ -9,10 +9,12 @@ import info.magnolia.module.delta.Task;
 import info.magnolia.nodebuilder.NodeOperation;
 import info.magnolia.voting.voters.URIStartsWithVoter;
 
+import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Collection of standard module version handler tasks.
@@ -25,6 +27,7 @@ public final class StandardTasks {
     public static final String PN_ENABLED = "enabled";
     public static final String PN_FROM_URI = "fromURI";
     public static final String PN_TO_URI = "toURI";
+    public static final String PN_PATTERN = "pattern";
 
     /**
      * Creates an menu for the given module with templates, paragraphs and dialogs links.
@@ -100,18 +103,18 @@ public final class StandardTasks {
     /**
      * Task for configuring the extended multi part filter.
      *
-     * @param maxRequestSize set the max request set setting
+     * @param maxRequestSize set the max request set setting, if empty 50MB will be set
      */
     public static Task multiPartFilter(final String maxRequestSize) {
         return selectServerConfig("Configuring filter", "Configuring Multipart request filter",
             getNode("filters/multipartRequest").then(
                 addOrSetProperty(PN_CLASS, ExtendedMultipartRequestFilter.class.getName()),
                 addOrSetProperty(PN_ENABLED, Boolean.TRUE),
-                addOrSetProperty("maxRequestSize", maxRequestSize),
+                addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
                 addOrGetNode("useSystemDefault", NT_CONTENTNODE).then(
                     addOrGetNode("magnoliaUri", NT_CONTENTNODE).then(
                         addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-                        addOrSetProperty("pattern", "/.magnolia")
+                        addOrSetProperty(PN_PATTERN, "/.magnolia")
                     )
                 )
             )

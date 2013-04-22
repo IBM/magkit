@@ -39,7 +39,7 @@ public class ExtendedMultipartRequestFilter extends CosMultipartRequestFilter {
     /**
      * Max request content size (50 MB).
      */
-    private static final int DEFAULT_MAX_SIZE = 52428800;
+    public static final int DEFAULT_MAX_SIZE = 52428800;
 
     /**
      * Maximum allowed request content size.
