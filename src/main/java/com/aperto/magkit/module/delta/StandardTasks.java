@@ -28,23 +28,25 @@ public final class StandardTasks {
     public static final String PN_FROM_URI = "fromURI";
     public static final String PN_TO_URI = "toURI";
     public static final String PN_PATTERN = "pattern";
+    public static final String ICON_DOT = "/.resources/icons/16/dot.gif";
+    public static final String ICON_GEARS = "/.resources/icons/24/gears.gif";
 
     /**
      * Creates an menu for the given module with templates, paragraphs and dialogs links.
      */
     public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
         return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
-            addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName).then(
-                addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates"),
-                addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs"),
-                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/dialogs')", "menu.config.dialogs")
+            addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName, ICON_GEARS).then(
+                addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates", ICON_DOT),
+                addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs", ICON_DOT),
+                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/dialogs')", "menu.config.dialogs", ICON_DOT)
             )
         );
     }
 
-    private static NodeOperation addMenuEntry(final String relPath, final String onclick, final String label) {
+    private static NodeOperation addMenuEntry(final String relPath, final String onclick, final String label, final String icon) {
         return addOrGetNode(relPath, NT_CONTENTNODE).then(
-            addOrSetProperty("icon", "/.resources/icons/16/dot.gif"),
+            addOrSetProperty("icon", icon),
             addOrSetProperty("onclick", onclick),
             addOrSetProperty("label", label)
         );
