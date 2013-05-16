@@ -92,10 +92,12 @@
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Java Extensions -->
@@ -115,11 +117,13 @@
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
             <version>1.9.0</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt-spring31</artifactId>
             <version>1.9.0</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Test Scope Dependencies -->
