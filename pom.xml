@@ -79,11 +79,6 @@
         </dependency>
 
         <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
             <groupId>net.sourceforge.collections</groupId>
             <artifactId>collections-generic</artifactId>
         </dependency>
