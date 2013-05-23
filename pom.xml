@@ -81,6 +81,7 @@
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-inplace-templating</artifactId>
             <version>1.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
