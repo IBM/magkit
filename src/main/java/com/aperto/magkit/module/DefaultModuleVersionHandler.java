@@ -1,16 +1,16 @@
 package com.aperto.magkit.module;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.ModuleVersionHandler;
 import info.magnolia.module.delta.Delta;
 import info.magnolia.module.delta.DeltaBuilder;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A default {@link ModuleVersionHandler} implementation that can be used to extend
@@ -21,6 +21,7 @@ import info.magnolia.module.model.Version;
  * a more suitable interface for inheritance.
  *
  * @author Norman Wiechmann, Aperto AG
+ * @deprecated use BootstrapModuleVersionHandler
  */
 public abstract class DefaultModuleVersionHandler implements ModuleVersionHandler {
 
