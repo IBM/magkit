@@ -39,7 +39,7 @@ public final class StandardTasks {
             addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName, ICON_GEARS).then(
                 addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates", ICON_DOT),
                 addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs", ICON_DOT),
-                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/dialogs')", "menu.config.dialogs", ICON_DOT)
+                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')", "menu.config.dialogs", ICON_DOT)
             )
         );
     }
