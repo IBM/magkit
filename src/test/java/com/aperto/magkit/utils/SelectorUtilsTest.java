@@ -1,14 +1,16 @@
 package com.aperto.magkit.utils;
 
+import info.magnolia.context.WebContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCharacterEncoding;
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubSelector;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
-import static org.hamcrest.CoreMatchers.is;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static com.aperto.magkit.utils.SelectorUtils.DEF_PAGE;
+import static com.aperto.magkit.utils.SelectorUtils.SELECTOR_PAGING;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 /**
  * Test of the resource utils.
@@ -18,21 +20,35 @@ import static org.junit.Assert.assertThat;
  */
 public class SelectorUtilsTest {
     @Test
-    public void retrieveValueOfSelector() {
-        String value = SelectorUtils.retrieveValueOfSelector("pid");
-        assertThat(value, is("2"));
-        value = SelectorUtils.retrieveValueOfSelector("kid");
-        assertThat(value, is("test"));
-        value = SelectorUtils.retrieveValueOfSelector("sid");
-        assertThat(value, is(""));
+    public void retrieveActivePageWithNoValue() {
+        WebContext webContext = mockWebContext();
+        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn(null);
+        assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
+    }
+
+    @Test
+    public void retrieveActivePageWithLetterValue() {
+        WebContext webContext = mockWebContext();
+        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("abc");
+        assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
+    }
+
+    @Test
+    public void retrieveActivePageWithInvalidValue() {
+        WebContext webContext = mockWebContext();
+        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("-5");
+        assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
+    }
+
+    @Test
+    public void retrieveActivePageWithValidValue() {
+        WebContext webContext = mockWebContext();
+        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("5");
+        assertThat(SelectorUtils.retrieveActivePage(), is(5));
     }
 
     @Before
     public void createMgnlContext() {
         cleanContext();
-        mockAggregationState(
-            stubCharacterEncoding("UTF-8"),
-            stubSelector("aid-6.pid-2.kid-test")
-        );
     }
 }

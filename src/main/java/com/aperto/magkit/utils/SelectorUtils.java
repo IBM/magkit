@@ -2,26 +2,26 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.context.MgnlContext;
-import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.aperto.magkit.utils.LinkTool.getEncodedParameterLinkString;
-import static org.apache.commons.lang.StringUtils.*;
+import static info.magnolia.cms.core.Path.SELECTOR_DELIMITER;
+import static java.lang.Math.max;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 
 /**
- * Util class for handle magnolia resource.
- * E.g. Helper for accessing the activePage, localContent or selectors.
- *
- * TODO: change to new selector handling
+ * Util class for handle with magnolia selectors.
  *
  * @author frank.sommer (29.05.2008)
  */
 public final class SelectorUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(SelectorUtils.class);
+    public static final int DEF_PAGE = 1;
     public static final String SELECTOR_PRINT = "print";
     public static final String SELECTOR_PAGING = "pid";
-    public static final String SELECTOR_DELIMITER = "-";
     public static final String SELECTOR_PAGING_WITH_DELIMITER = SELECTOR_PAGING + SELECTOR_DELIMITER;
 
     /**
@@ -39,62 +39,43 @@ public final class SelectorUtils {
     }
 
     /**
-     * Retrieve the actual page number from selector. Default is 1.
+     * Retrieve the actual page number from selector. Default is {@link #DEF_PAGE}.
+     * @return positiv integer value of the page selector.
      */
     public static int retrieveActivePage() {
-        int actPage = 1;
-        if (!isBlank(SelectorUtil.getSelector())) {
-            String[] strings = split(SelectorUtil.getSelector(), '.');
-            for (String s : strings) {
-                boolean found = false;
-                if (s.contains(SELECTOR_PAGING_WITH_DELIMITER)) {
-                    found = true;
-                    actPage = NumberUtils.toInt(s.substring(SELECTOR_PAGING_WITH_DELIMITER.length()), 1);
-                }
-                if (found) {
-                    break;
-                }
-            }
+        int actPage = DEF_PAGE;
+        String pagingValue = MgnlContext.getAttribute(SELECTOR_PAGING);
+        if (isNotBlank(pagingValue)) {
+            actPage = toInt(pagingValue, DEF_PAGE);
+            actPage = max(actPage, DEF_PAGE);
         }
         return actPage;
     }
 
     /**
-     * Retrieves the value of the wanted selector. <br />
-     * E.g.: "pid-5" ==&gt; "5". 
+     * Retrieves the value of the wanted selector.
      * @param selectorId of the wanted selector value
-     * @return value of selector, empty string if not found.
+     * @return value of selector
+     * @deprecated use MgnlContext.getAttribute() for new selector handling
      */
     public static String retrieveValueOfSelector(String selectorId) {
-        String value = "";
-        String selector = SelectorUtil.getSelector();
-        if (isNotBlank(selectorId) && isNotBlank(selector)) {
-            String[] strings = split(SelectorUtil.getSelector(), '.');
-            String idWithDelimiter = selectorId + SELECTOR_DELIMITER;
-            for (String s : strings) {
-                if (s.startsWith(idWithDelimiter)) {
-                    value = s.substring(idWithDelimiter.length());
-                    break;
-                }
-            }
-        }
-        return value;
+        return MgnlContext.getAttribute(selectorId);
     }
 
     /**
-     * Checks, if the selector contains the search pattern.
-     * @param search pattern
-     * @param startsWith selector starts only with pattern
+     * Checks, if the selector contains the search term.
+     * @param search search term
+     * @param startsWith selector starts only with search term
      */
     public static boolean selectorContains(String search, boolean startsWith) {
         boolean contains = false;
-        if (!isBlank(SelectorUtil.getSelector())) {
-            String[] strings = split(SelectorUtil.getSelector(), '.');
-            for (String s : strings) {
+        if (isNotBlank(SelectorUtil.getSelector())) {
+            String[] parts = split(SelectorUtil.getSelector(), SELECTOR_DELIMITER);
+            for (String part : parts) {
                 if (startsWith) {
-                    contains = s.startsWith(search);
+                    contains = part.startsWith(search);
                 } else {
-                    contains = s.equalsIgnoreCase(search);
+                    contains = part.equalsIgnoreCase(search);
                 }
                 if (contains) {
                     break;    
