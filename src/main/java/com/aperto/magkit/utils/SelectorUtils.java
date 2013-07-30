@@ -136,13 +136,14 @@ public final class SelectorUtils {
         boolean selectorFound = false;
 
         for (String selector : selectors) {
-            String selectorId = substringBefore(selector, "=");
+            String newSelector = selector;
+            String selectorId = substringBefore(newSelector, "=");
             if (selectorId.equals(id)) {
-                selector = selectorId + "=" + encodedSelectorValue;
+                newSelector = selectorId + "=" + encodedSelectorValue;
                 selectorFound = true;
             }
             if (!ArrayUtils.contains(notAllowedSelectors, selectorId)) {
-                newSelectors.add(selector);
+                newSelectors.add(newSelector);
             }
         }
 
