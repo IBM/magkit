@@ -6,9 +6,9 @@ import org.junit.Test;
 
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.utils.SelectorUtils.DEF_PAGE;
-import static com.aperto.magkit.utils.SelectorUtils.SELECTOR_PAGING;
+import static com.aperto.magkit.utils.SelectorUtils.*;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +45,36 @@ public class SelectorUtilsTest {
         WebContext webContext = mockWebContext();
         when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("5");
         assertThat(SelectorUtils.retrieveActivePage(), is(5));
+    }
+
+    @Test
+    public void addSelectorWithNoExtension() {
+        assertThat(updateSelectors("/test", "pid", "1"), equalTo("/test~pid=1~.html"));
+    }
+
+    @Test
+    public void addSelectorWithNoExtensionButQueryString() {
+        assertThat(updateSelectors("/test?123", "pid", "1"), equalTo("/test~pid=1~.html?123"));
+    }
+
+    @Test
+    public void addSelectorWithExtensionAndQueryString() {
+        assertThat(updateSelectors("/test.xml?123", "pid", "1"), equalTo("/test~pid=1~.xml?123"));
+    }
+
+    @Test
+    public void addSelectorWithEncoding() {
+        assertThat(updateSelectors("/test.html", "pid", "\u00FC"), equalTo("/test~pid=%C3%BC~.html"));
+    }
+
+    @Test
+    public void updateSelector() {
+        assertThat(updateSelectors("/test~kid=1~pid=2~.html", "pid", "1"), equalTo("/test~kid=1~pid=1~.html"));
+    }
+
+    @Test
+    public void removeSelector() {
+        assertThat(updateSelectors("/test~kid=1~pid=2~.html", "pid", "1", "kid"), equalTo("/test~pid=1~.html"));
     }
 
     @Before

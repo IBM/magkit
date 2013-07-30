@@ -2,14 +2,17 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.context.MgnlContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.ArrayUtils;
 
-import static com.aperto.magkit.utils.LinkTool.getEncodedParameterLinkString;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
 import static info.magnolia.cms.core.Path.SELECTOR_DELIMITER;
 import static java.lang.Math.max;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.codec.CharEncoding.UTF_8;
+import static org.apache.commons.lang.StringUtils.*;
 import static org.apache.commons.lang.math.NumberUtils.toInt;
 
 /**
@@ -18,11 +21,11 @@ import static org.apache.commons.lang.math.NumberUtils.toInt;
  * @author frank.sommer (29.05.2008)
  */
 public final class SelectorUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SelectorUtils.class);
     public static final int DEF_PAGE = 1;
     public static final String SELECTOR_PRINT = "print";
     public static final String SELECTOR_PAGING = "pid";
     public static final String SELECTOR_PAGING_WITH_DELIMITER = SELECTOR_PAGING + SELECTOR_DELIMITER;
+    private static final String DEF_EXTENSION = "html";
 
     /**
      * Checks, if a print selector is given.
@@ -86,54 +89,79 @@ public final class SelectorUtils {
     }
 
     /**
-     * Add or replace the selector with the id and value for the current page url.
+     * Add or replace the selector with the id and value for the given url.
      * If the value is blank, the selector id will be removed.
      * Not allowed selectors are removed.
      *
-     * @param id Id of the selector, e.g. 'pid'.
-     * @param value Value of the selector id.
-     * @param notAllowedSelectors array of not allowed selector ids.
-     * @return url of the current page with updated selectors.
+     * @param url url to manipulate
+     * @param id Id of the selector, e.g. 'pid'
+     * @param value Value of the selector id
+     * @param notAllowedSelectors array of not allowed selector ids
+     * @return url with updated selectors
      */
-    public static String updateSelectors(String id, String value, String... notAllowedSelectors) {
-        boolean found = false;
+    public static String updateSelectors(String url, String id, String value, String... notAllowedSelectors) {
+        String encodedSelectorValue = urlEncode(value);
 
-        // build the URI
-        StringBuilder link = new StringBuilder(MgnlContext.getContextPath());
-        String handle = MgnlContext.getAggregationState().getHandle();
-        link.append(handle);
+        String extensionWithQueryString = substringAfterLast(url, ".");
+        String pathWithSelector = substringBeforeLast(url, ".");
+        String extension = DEF_EXTENSION;
+        String query = "";
 
-        // check the actual selectors
-        String actSelector = SelectorUtil.getSelector();
-        String[] parts = split(actSelector, '.');
-        for (String part : parts) {
-            if (part.startsWith(id + SELECTOR_DELIMITER)) {
-                if (isNotBlank(value)) {
-                    link.append('.').append(id).append(SELECTOR_DELIMITER).append(value);
-                }
-                LOGGER.debug("Replace selector {} with value {}.", id, value);
-                found = true;
-            } else if (notAllowedSelectors.length > 0) {
-                for (String allowed : notAllowedSelectors) {
-                    if (!part.startsWith(allowed + SELECTOR_DELIMITER)) {
-                        link.append('.').append(part);
-                        break;
-                    }
-                }
-            } else {
-                link.append('.').append(part);
+        if (isBlank(extensionWithQueryString)) {
+            if (url.contains("?")) {
+                query = substringAfter(url, "?");
+                pathWithSelector = substringBefore(url, "?");
+            }
+        } else if (extensionWithQueryString.contains("?")) {
+            extension = substringBefore(extensionWithQueryString, "?");
+            query = substringAfter(extensionWithQueryString, "?");
+        } else {
+            extension = extensionWithQueryString;
+        }
+
+        String path = substringBefore(pathWithSelector, SELECTOR_DELIMITER);
+        String selectorString = substringAfter(pathWithSelector, SELECTOR_DELIMITER);
+        String[] selectors = split(selectorString, SELECTOR_DELIMITER);
+        List<String> newSelectors = createNewSelectors(id, encodedSelectorValue, selectors, notAllowedSelectors);
+
+        String result = join(new String[]{path, SELECTOR_DELIMITER, join(newSelectors, SELECTOR_DELIMITER), SELECTOR_DELIMITER, ".", extension});
+        if (isNotEmpty(query)) {
+            result += "?" + query;
+        }
+        return result;
+    }
+
+    private static List<String> createNewSelectors(final String id, final String encodedSelectorValue, final String[] selectors, final String[] notAllowedSelectors) {
+        List<String> newSelectors = new ArrayList<String>();
+        boolean selectorFound = false;
+
+        for (String selector : selectors) {
+            String selectorId = substringBefore(selector, "=");
+            if (selectorId.equals(id)) {
+                selector = selectorId + "=" + encodedSelectorValue;
+                selectorFound = true;
+            }
+            if (!ArrayUtils.contains(notAllowedSelectors, selectorId)) {
+                newSelectors.add(selector);
             }
         }
 
-        // add the selector, if not found
-        if (!found) {
-            link.append('.').append(id).append(SELECTOR_DELIMITER).append(value);
+        if (!selectorFound) {
+            newSelectors.add(id + "=" + encodedSelectorValue);
         }
+        return newSelectors;
+    }
 
-        // add the extension and the query string
-        link.append('.').append(MgnlContext.getAggregationState().getExtension());
-        link.append(getEncodedParameterLinkString());
-        return link.toString();
+    private static String urlEncode(final String value) {
+        String encodedSelectorValue = null;
+        if (isNotEmpty(value)) {
+            try {
+                encodedSelectorValue = URLEncoder.encode(value, UTF_8);
+            } catch (UnsupportedEncodingException e) {
+                // should not happen
+            }
+        }
+        return encodedSelectorValue;
     }
 
     private SelectorUtils() {
