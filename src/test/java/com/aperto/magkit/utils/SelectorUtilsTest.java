@@ -48,6 +48,21 @@ public class SelectorUtilsTest {
     }
 
     @Test
+    public void testWithNullUrl() {
+        assertThat(updateSelectors(null, "pid", "1"), equalTo(""));
+    }
+
+    @Test
+    public void testWithEmptyUrl() {
+        assertThat(updateSelectors("", "pid", "1"), equalTo(""));
+    }
+
+    @Test
+    public void testWithWhitespaceUrl() {
+        assertThat(updateSelectors(" \t ", "pid", "1"), equalTo(""));
+    }
+
+    @Test
     public void addSelectorWithNoExtension() {
         assertThat(updateSelectors("/test", "pid", "1"), equalTo("/test~pid=1~.html"));
     }

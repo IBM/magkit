@@ -97,36 +97,38 @@ public final class SelectorUtils {
      * @param id Id of the selector, e.g. 'pid'
      * @param value Value of the selector id
      * @param notAllowedSelectors array of not allowed selector ids
-     * @return url with updated selectors
+     * @return url with updated selectors or empty string if url is null or empty
      */
     public static String updateSelectors(String url, String id, String value, String... notAllowedSelectors) {
-        String encodedSelectorValue = urlEncode(value);
+        String result = trimToEmpty(url);
+        if (isNotEmpty(result)) {
+            String encodedSelectorValue = urlEncode(value);
+            String extensionWithQueryString = substringAfterLast(result, ".");
+            String pathWithSelector = substringBeforeLast(result, ".");
+            String extension = DEF_EXTENSION;
+            String query = "";
 
-        String extensionWithQueryString = substringAfterLast(url, ".");
-        String pathWithSelector = substringBeforeLast(url, ".");
-        String extension = DEF_EXTENSION;
-        String query = "";
-
-        if (isBlank(extensionWithQueryString)) {
-            if (url.contains("?")) {
-                query = substringAfter(url, "?");
-                pathWithSelector = substringBefore(url, "?");
+            if (isBlank(extensionWithQueryString)) {
+                if (result.contains("?")) {
+                    query = substringAfter(result, "?");
+                    pathWithSelector = substringBefore(result, "?");
+                }
+            } else if (extensionWithQueryString.contains("?")) {
+                extension = substringBefore(extensionWithQueryString, "?");
+                query = substringAfter(extensionWithQueryString, "?");
+            } else {
+                extension = extensionWithQueryString;
             }
-        } else if (extensionWithQueryString.contains("?")) {
-            extension = substringBefore(extensionWithQueryString, "?");
-            query = substringAfter(extensionWithQueryString, "?");
-        } else {
-            extension = extensionWithQueryString;
-        }
 
-        String path = substringBefore(pathWithSelector, SELECTOR_DELIMITER);
-        String selectorString = substringAfter(pathWithSelector, SELECTOR_DELIMITER);
-        String[] selectors = split(selectorString, SELECTOR_DELIMITER);
-        List<String> newSelectors = createNewSelectors(id, encodedSelectorValue, selectors, notAllowedSelectors);
+            String path = substringBefore(pathWithSelector, SELECTOR_DELIMITER);
+            String selectorString = substringAfter(pathWithSelector, SELECTOR_DELIMITER);
+            String[] selectors = split(selectorString, SELECTOR_DELIMITER);
+            List<String> newSelectors = createNewSelectors(id, encodedSelectorValue, selectors, notAllowedSelectors);
 
-        String result = join(new String[]{path, SELECTOR_DELIMITER, join(newSelectors, SELECTOR_DELIMITER), SELECTOR_DELIMITER, ".", extension});
-        if (isNotEmpty(query)) {
-            result += "?" + query;
+            result = join(new String[]{path, SELECTOR_DELIMITER, join(newSelectors, SELECTOR_DELIMITER), SELECTOR_DELIMITER, ".", extension});
+            if (isNotEmpty(query)) {
+                result += "?" + query;
+            }
         }
         return result;
     }
