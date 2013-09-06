@@ -1,7 +1,7 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.context.MgnlContext;
-import info.magnolia.jcr.util.NodeUtil;
+import info.magnolia.jcr.util.SessionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,20 +46,7 @@ public final class NodeUtils {
      * Gets a node by identifier from website workspace.
      */
     public static Node getNodeByIdentifier(String identifier) {
-        return getNodeByIdentifier(WEBSITE, identifier);
-    }
-
-    /**
-     * Gets a node by identifier from given workspace.
-     */
-    public static Node getNodeByIdentifier(String workspace, String identifier) {
-        Node node = null;
-        try {
-            node = NodeUtil.getNodeByIdentifier(workspace, identifier);
-        } catch (RepositoryException e) {
-            LOGGER.error("Error getting node by identifier.", e);
-        }
-        return node;
+        return SessionUtil.getNodeByIdentifier(WEBSITE, identifier);
     }
 
     private NodeUtils() {
