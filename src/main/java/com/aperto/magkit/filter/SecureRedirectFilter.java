@@ -64,12 +64,12 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
         AggregationState state = getAggregationState();
         Content actPage = state.getMainContent();
         if (actPage != null) {
-            boolean isSecure = shouldSecure(request);
+            boolean shouldSecure = shouldSecure(request);
             boolean isSecureRequest = isSecureRequest(request);
 
-            LOGGER.debug("Secure: {} and secure template {}.", isSecureRequest, isSecure);
+            LOGGER.debug("Secure: {} and secure template {}.", isSecureRequest, shouldSecure);
             if (isSecureRequest) {
-                if (isSecure) {
+                if (shouldSecure) {
                     chain.doFilter(request, response);
                 } else {
                     String mimeType = response.getContentType();
@@ -79,7 +79,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
                         chain.doFilter(request, response);
                     }
                 }
-            } else if (isSecure) {
+            } else if (shouldSecure) {
                 tryRedirect(request, response, actPage, true);
             } else {
                 chain.doFilter(request, response);
@@ -89,7 +89,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
         }
     }
 
-    private void tryRedirect(HttpServletRequest request, HttpServletResponse response, Content page, boolean secureProtocol) throws IOException {
+    protected void tryRedirect(HttpServletRequest request, HttpServletResponse response, Content page, boolean secureProtocol) throws IOException {
         CompleteUrlPathTransformer completeUrl = _linkTransformer.getCompleteUrl();
         String link = completeUrl.transform(new Link(page));
 
