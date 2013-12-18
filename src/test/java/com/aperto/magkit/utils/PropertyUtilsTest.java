@@ -6,9 +6,9 @@ import javax.jcr.Node;
 import javax.jcr.Property;
 import java.util.Collection;
 
-import static com.aperto.magkit.mockito.NodeMockUtils.mockNode;
 import static com.aperto.magkit.mockito.NodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.NodeStubbingOperation.stubProperty;
+import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
+import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
 import static com.aperto.magkit.utils.PropertyUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
