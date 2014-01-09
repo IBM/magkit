@@ -1,7 +1,6 @@
 package com.aperto.magkit.filter;
 
 import info.magnolia.cms.core.AggregationState;
-import info.magnolia.cms.core.Content;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.Link;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.jcr.Node;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +62,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         AggregationState state = getAggregationState();
-        Content actPage = state.getMainContent();
+        Node actPage = state.getMainContentNode();
         if (actPage != null) {
             boolean shouldSecure = shouldSecure(request);
             boolean isSecureRequest = isSecureRequest(request);
@@ -89,7 +89,7 @@ public class SecureRedirectFilter extends AbstractMgnlFilter {
         }
     }
 
-    protected void tryRedirect(HttpServletRequest request, HttpServletResponse response, Content page, boolean secureProtocol) throws IOException {
+    protected void tryRedirect(HttpServletRequest request, HttpServletResponse response, Node page, boolean secureProtocol) throws IOException {
         CompleteUrlPathTransformer completeUrl = _linkTransformer.getCompleteUrl();
         String link = completeUrl.transform(new Link(page));
 

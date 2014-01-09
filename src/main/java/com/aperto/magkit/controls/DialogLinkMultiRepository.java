@@ -1,16 +1,20 @@
 package com.aperto.magkit.controls;
 
-import static com.aperto.magkit.utils.LinkTool.convertUUIDtoHandle;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.gui.control.Button;
 import info.magnolia.cms.gui.dialog.DialogUUIDLink;
-import static info.magnolia.context.MgnlContext.getHierarchyManager;
-import static info.magnolia.context.MgnlContext.getParameter;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import info.magnolia.link.LinkException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import static info.magnolia.context.MgnlContext.getParameter;
+import static info.magnolia.link.LinkUtil.convertUUIDtoHandle;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * A link control with two buttons for different repositories.
@@ -18,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author frank.sommer (08.02.2008)
  */
 public class DialogLinkMultiRepository extends DialogUUIDLink {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DialogLinkMultiRepository.class);
     private static final String SECOND_REPOSITORY = "secondRepository";
 
     /**
@@ -60,7 +65,12 @@ public class DialogLinkMultiRepository extends DialogUUIDLink {
             }
         } else if (getStorageNode() != null) {
             String value = readValue();
-            String handle = convertUUIDtoHandle(value, repository);
+            String handle = null;
+            try {
+                handle = convertUUIDtoHandle(value, repository);
+            } catch (LinkException e) {
+                LOGGER.info("Error converting link {}.", value, e);
+            }
             if (isBlank(handle)) {
                 repository = getConfigValue(SECOND_REPOSITORY, "data");
             }
