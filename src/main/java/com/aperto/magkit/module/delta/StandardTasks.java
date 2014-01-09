@@ -33,7 +33,9 @@ public final class StandardTasks {
 
     /**
      * Creates an menu for the given module with templates, paragraphs and dialogs links.
+     * TODO: Should this removed or migrated?
      */
+    @Deprecated
     public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
         return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
             addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName, ICON_GEARS).then(
