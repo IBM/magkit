@@ -64,42 +64,12 @@
             <artifactId>magnolia-empty-webapp</artifactId>
             <type>pom</type>
         </dependency>
-        <!--dependency>
-            <groupId>info.magnolia</groupId>
-            <artifactId>magnolia-templating</artifactId>
-            <version>${magnolia.version}</version>
-            <scope>provided</scope>
-        </dependency-->
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-inplace-templating</artifactId>
             <version>2.2.1</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Spring Framework -->
-        <!--dependency>
-            <artifactId>spring-core</artifactId>
-            <groupId>org.springframework</groupId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <artifactId>spring-webmvc</artifactId>
-            <groupId>org.springframework</groupId>
-            <optional>true</optional>
-        </dependency-->
-
-        <!-- Java Extensions -->
-        <!--dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.1</version>
-        </dependency-->
 
         <!-- jasypt: for reading encrypted passwords from property files -->
         <dependency>
@@ -116,16 +86,6 @@
         </dependency>
 
         <!-- Test Scope Dependencies -->
-        <!--dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-mock</artifactId>
-            <scope>test</scope>
-        </dependency-->
-        <!--dependency>
-            <groupId>com.mockrunner</groupId>
-            <artifactId>mockrunner</artifactId>
-            <scope>test</scope>
-        </dependency-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
