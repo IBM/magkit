@@ -25,10 +25,10 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
 public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
 
-    private final Task _addBypassForDebugSuite = new NodeExistsDelegateTask(
-        "Check debug suite bypass", "Check debug suite bypass in server config.",
-        CONFIG, PATH_FILTER + "/bypasses/debug", null,
-        new AddFilterBypassTask(PATH_FILTER, "debug", URIStartsWithVoter.class, "/debug/")
+    private final Task _addBypassForMonitoring = new NodeExistsDelegateTask(
+        "Check monitoring bypass", "Check monitoring bypass in server config.",
+        CONFIG, PATH_FILTER + "/bypasses/monitoring", null,
+        new AddFilterBypassTask(PATH_FILTER, "monitoring", URIStartsWithVoter.class, "/monitoring/")
     );
 
     private final Task _addSpringByPass = new NodeExistsDelegateTask(
@@ -52,7 +52,7 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
         final List<Task> tasks = new ArrayList<Task>();
-        tasks.add(_addBypassForDebugSuite);
+        tasks.add(_addBypassForMonitoring);
         tasks.add(_addSpringByPass);
         tasks.add(_setSecurityCallback);
         return tasks;
@@ -61,7 +61,7 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     @Override
     protected List<Task> getDefaultUpdateTasks(Version forVersion) {
         List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
-        updateTasks.add(_addBypassForDebugSuite);
+        updateTasks.add(_addBypassForMonitoring);
         updateTasks.add(_addSpringByPass);
         updateTasks.add(_setSecurityCallback);
         return updateTasks;
