@@ -1,5 +1,6 @@
 package com.aperto.magkit.utils;
 
+import info.magnolia.jcr.util.PropertyUtil;
 import org.apache.commons.collections15.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import static info.magnolia.jcr.util.PropertyUtil.getValuesStringList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
 import static org.apache.commons.collections15.CollectionUtils.collect;
@@ -25,6 +27,33 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
  */
 public final class PropertyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyUtils.class);
+
+    /**
+     * Add missing util method for retrieving multi value property values.
+     * @see PropertyUtil
+     *
+     * @param node containing the multivalue
+     * @param relPath relative path to the multi value property
+     * @return string values as collection, if not available empty collection and if single value the collection of size one.
+     */
+    public static Collection<String> getStringValues(final Node node, final String relPath) {
+        Collection<String> values = new ArrayList<String>();
+
+        try {
+            if (node != null && isNotEmpty(relPath) && node.hasProperty(relPath)) {
+                Property property = node.getProperty(relPath);
+                if (property.isMultiple()) {
+                    values = getValuesStringList(property.getValues());
+                } else {
+                    values.add(property.getString());
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.error("Error retrieving property {}.", relPath, e);
+        }
+
+        return values;
+    }
 
     /**
      * Retrieves the properties created by Magnolias MultiSelect.
