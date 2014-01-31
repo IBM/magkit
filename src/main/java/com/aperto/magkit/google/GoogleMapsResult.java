@@ -7,10 +7,8 @@ import java.math.BigDecimal;
  *
  * @author Mathias Broekelmann
  * @author Mayo Fragoso
- *
  */
 public class GoogleMapsResult {
-
     private BigDecimal _longitude;
     private BigDecimal _latitude;
     private String _street;
@@ -126,7 +124,6 @@ public class GoogleMapsResult {
     public void setAddress(String adress) {
         _address = adress;
     }
-
 
     @Override
     public String toString() {

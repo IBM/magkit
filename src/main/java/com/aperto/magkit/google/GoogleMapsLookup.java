@@ -4,24 +4,27 @@ import org.apache.commons.digester.Digester;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.stripToEmpty;
+
 /**
  * Class allows to send a request to the google maps web service and parses out a GoogleMapsResult list.
+ * TODO: old implementation for the V2 google api. Migrate to V3 API, see degewo project.
  *
  * @author Mayo Fragoso
  */
 public class GoogleMapsLookup {
-
-    private static final Logger LOGGER = Logger.getLogger(GoogleMapsLookup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleMapsLookup.class);
     private static final String URL = "http://maps.google.com/maps/geo";
     private static final String ENCODING = "UTF-8";
     private String _key = "";
@@ -40,7 +43,7 @@ public class GoogleMapsLookup {
      * @throws RuntimeException when the google maps service sends an error status a RuntimeException is thrown containing the corresponding  <code>GoogleMapsLookup.Status</code> name as message
      */
     public List<GoogleMapsResult> lookup(String street, String streetnr, String zipcode, String city, String country) {
-        String address = StringUtils.stripToEmpty(country) + " " + StringUtils.stripToEmpty(city) + " " + StringUtils.stripToEmpty(zipcode) + " " + StringUtils.stripToEmpty(street) + " " + StringUtils.stripToEmpty(streetnr);
+        String address = stripToEmpty(country) + " " + stripToEmpty(city) + " " + stripToEmpty(zipcode) + " " + stripToEmpty(street) + " " + stripToEmpty(streetnr);
         return lookup(address.trim());
     }
 
@@ -53,9 +56,8 @@ public class GoogleMapsLookup {
      * @throws RuntimeException when the google maps service sends an error status a RuntimeException is thrown containing the corresponding  <code>GoogleMapsLookup.Status</code> name as message
      */
     public List<GoogleMapsResult> lookup(String address) {
-
-        if (address == null || address.length() == 0) {
-            throw new RuntimeException("address cannot be empty or null!");
+        if (isEmpty(address)) {
+            throw new IllegalArgumentException("address must not be empty or null!");
         }
 
         Digester digester = new Digester();
@@ -72,13 +74,7 @@ public class GoogleMapsLookup {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             } finally {
-                try {
-                    if (xmlSource.getCharacterStream() != null) {
-                        xmlSource.getCharacterStream().close();
-                    }  
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                closeQuietly(xmlSource.getCharacterStream());
             }
             status = response.getStatus();
         } else {
@@ -116,7 +112,7 @@ public class GoogleMapsLookup {
         InputSource inputSource = null;
         try {
             HttpClient client = new HttpClient();
-            String url = new StringBuilder().append(URL).append("?output=xml&q=").append(URLEncoder.encode(address, ENCODING)).append("&key=").append(_key).append("&oe=").append(ENCODING).toString();
+            String url = URL + "?output=xml&q=" + URLEncoder.encode(address, ENCODING) + "&key=" + _key + "&oe=" + ENCODING;
             HttpMethod method = new GetMethod(url);
             int status = client.executeMethod(method);
             LOGGER.debug("HTTP response headers: " + Arrays.asList(method.getResponseHeaders()));
@@ -191,5 +187,4 @@ public class GoogleMapsLookup {
             return _code;
         }
     }
-
 }
