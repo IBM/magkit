@@ -44,6 +44,7 @@ public final class NodeUtils {
 
     /**
      * Gets a node by identifier from website workspace.
+     * @see SessionUtil
      */
     public static Node getNodeByIdentifier(String identifier) {
         return SessionUtil.getNodeByIdentifier(WEBSITE, identifier);
