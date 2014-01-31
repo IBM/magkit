@@ -1,6 +1,5 @@
 package com.aperto.magkit.utils.filters;
 
-import org.apache.log4j.Logger;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.util.Rule;
 
@@ -12,7 +11,6 @@ import info.magnolia.cms.util.Rule;
  */
 @Deprecated
 public class TemplateFilter implements Content.ContentFilter {
-    private static final Logger LOGGER = Logger.getLogger(TemplateFilter.class);
 
     /**
      * Rule on which this filter works.
