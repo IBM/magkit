@@ -155,20 +155,4 @@ public class ExportTask extends MatchingTask {
             }
         }
     }
-
-    /**
-     * Main method for testing.
-     */
-    /*public static void main(String[] args) {
-        ExportTask exportTask = new ExportTask();
-        exportTask.setTargetPort(8001);
-        exportTask.setTargetHost("localhost");
-        exportTask.setVerbose(true);
-        exportTask.setWebapp("author");
-        exportTask.setRootNode("config.modules.wmam-webapp.templates.pages");
-        exportTask.setOutputPath("../../logs");
-        exportTask.setMgnlUser("superuser");
-        exportTask.setMgnlPassword("superuser");
-        exportTask.execute(); 
-    } */
 }
