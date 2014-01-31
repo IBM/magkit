@@ -7,6 +7,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Dialog control for validating the input as email address.
+ * TODO: migrate to a M5 FieldDefinition
  *
  * @author rainer.blumenthal, frank.sommer
  * @since 08.04.2008
