@@ -11,6 +11,7 @@ import info.magnolia.voting.voters.URIStartsWithVoter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.nodebuilder.Ops.getNode;
 import static info.magnolia.nodebuilder.Ops.setProperty;
@@ -25,21 +26,17 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
 public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
 
-    private final Task _addBypassForMonitoring = new NodeExistsDelegateTask(
-        "Check monitoring bypass", "Check monitoring bypass in server config.",
-        CONFIG, PATH_FILTER + "/bypasses/monitoring", null,
+    private final Task _addBypassForMonitoring = new NodeExistsDelegateTask("Check monitoring bypass", "Check monitoring bypass in server config.", CONFIG, PATH_FILTER + "/bypasses/monitoring", null,
         new AddFilterBypassTask(PATH_FILTER, "monitoring", URIStartsWithVoter.class, "/monitoring/")
     );
 
-    private final Task _addSpringByPass = new NodeExistsDelegateTask(
-        "Check spring bypass", "Check spring bypass in server config.",
-        CONFIG, PATH_FILTER + "/cms/bypasses/spring", null,
+    private final Task _addSpringByPass = new NodeExistsDelegateTask("Check spring bypass", "Check spring bypass in server config.", CONFIG, PATH_FILTER + "/cms/bypasses/spring", null,
         new AddFilterBypassTask(PATH_FILTER + "/cms", "spring", URIStartsWithVoter.class, "/service/")
     );
 
     private final Task _setSecurityCallback = selectServerConfig("Change callback", "Set the author form client callback.",
         getNode("filters/securityCallback/clientCallbacks/form").then(
-            setProperty("class", AuthorFormClientCallback.class.getName())
+            setProperty(PN_CLASS, AuthorFormClientCallback.class.getName())
         )
     );
 
