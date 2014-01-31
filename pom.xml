@@ -15,23 +15,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.aperto.freshview</groupId>
-            <artifactId>campaign-monitor-service</artifactId>
-            <version>1.0.2</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.collections</groupId>
@@ -48,27 +37,14 @@
             <artifactId>jsp-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+        </dependency>
 
-        <!--
-              Magnolia dependencies. Following dependencies belong to Magnolia CMS
-              and are meant not to be transitive. A project that must specify its
-              own dependecies especially its own versions of dependencies.
-          -->
-        <dependency>
-            <groupId>info.magnolia</groupId>
-            <artifactId>magnolia-empty-webapp</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia</groupId>
-            <artifactId>magnolia-empty-webapp</artifactId>
-            <type>pom</type>
-        </dependency>
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-inplace-templating</artifactId>
-            <version>2.2.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- jasypt: for reading encrypted passwords from property files -->
