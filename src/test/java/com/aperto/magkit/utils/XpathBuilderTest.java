@@ -37,6 +37,11 @@ public class XpathBuilderTest {
     }
 
     @Test
+    public void testPathWithNumbers() {
+        assertEquals(_xpath.path("/test/content/00").build(), "/jcr:root/test/content/_x0030_0");
+    }
+
+    @Test
     public void testPathDouble() {
         assertEquals(_xpath.path(TEST_PATH).path(TEST_PATH).build(), JCR_ROOT_PATH + TEST_PATH + TEST_PATH);
     }

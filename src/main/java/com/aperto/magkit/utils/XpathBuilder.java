@@ -1,5 +1,7 @@
 package com.aperto.magkit.utils;
 
+import org.apache.jackrabbit.util.ISO9075;
+
 /**
  * A simple xpath query builder for jcr.
  *
@@ -34,8 +36,14 @@ public class XpathBuilder {
         return new XpathBuilder();
     }
 
+    /**
+     * Path will be escaped.
+     *
+     * @param path path contraint
+     * @return an instance of XpathBuilder
+     */
     public XpathBuilder path(final String path) {
-        _query.append(path);
+        _query.append(ISO9075.encodePath(path));
         return this;
     }
 
