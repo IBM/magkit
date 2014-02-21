@@ -13,8 +13,8 @@ import java.util.List;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
-import static info.magnolia.nodebuilder.Ops.getNode;
-import static info.magnolia.nodebuilder.Ops.setProperty;
+import static info.magnolia.jcr.nodebuilder.Ops.getNode;
+import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**

@@ -6,7 +6,6 @@ import com.aperto.magkit.filter.TemplateNameVoter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
-import info.magnolia.nodebuilder.NodeOperation;
 import info.magnolia.voting.voters.URIStartsWithVoter;
 
 import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
@@ -32,29 +31,6 @@ public final class StandardTasks {
     public static final String ICON_GEARS = "/.resources/icons/24/gears.gif";
 
     /**
-     * Creates an menu for the given module with templates, paragraphs and dialogs links.
-     * TODO: Should this removed or migrated?
-     */
-    @Deprecated
-    public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
-        return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
-            addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName, ICON_GEARS).then(
-                addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates", ICON_DOT),
-                addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs", ICON_DOT),
-                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')", "menu.config.dialogs", ICON_DOT)
-            )
-        );
-    }
-
-    private static NodeOperation addMenuEntry(final String relPath, final String onclick, final String label, final String icon) {
-        return addOrGetNode(relPath, NT_CONTENTNODE).then(
-            addOrSetProperty("icon", icon),
-            addOrSetProperty("onclick", onclick),
-            addOrSetProperty("label", label)
-        );
-    }
-
-    /**
      * Maps {@code /robots.txt} to {@code /docroot/moduleName/robots.txt}.
      */
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
@@ -63,7 +39,10 @@ public final class StandardTasks {
                 addOrGetNode("robots", NT_CONTENTNODE).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/robots.txt"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt"))));
+                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt")
+                )
+            )
+        );
     }
 
     /**
@@ -75,7 +54,10 @@ public final class StandardTasks {
                 addOrGetNode("favicon", NT_CONTENTNODE).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico"))));
+                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico")
+                )
+            )
+        );
     }
 
     /**

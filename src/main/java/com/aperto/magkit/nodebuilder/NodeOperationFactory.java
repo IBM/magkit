@@ -1,19 +1,15 @@
 package com.aperto.magkit.nodebuilder;
 
-import info.magnolia.cms.core.Content;
-import info.magnolia.cms.core.ItemType;
-import info.magnolia.cms.util.NodeDataUtil;
-import info.magnolia.nodebuilder.AbstractNodeOperation;
-import info.magnolia.nodebuilder.ErrorHandler;
-import info.magnolia.nodebuilder.NodeOperation;
-import info.magnolia.nodebuilder.Ops;
+import info.magnolia.jcr.nodebuilder.AbstractNodeOperation;
+import info.magnolia.jcr.nodebuilder.ErrorHandler;
+import info.magnolia.jcr.nodebuilder.NodeOperation;
+import info.magnolia.jcr.nodebuilder.Ops;
+import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.jcr.util.PropertyUtil;
 
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
-
-import static info.magnolia.cms.util.ContentUtil.createPath;
-import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang.StringUtils.removeEnd;
 
 /**
  * An Utility class that extends info.magnolia.nodebuilder.Ops.
@@ -26,68 +22,52 @@ public abstract class NodeOperationFactory extends Ops {
     public static final String PATH_SEPARATOR = "/";
 
     /**
-     * New Operation to solve problems with dublicating of Content on repeated updates.
-     * Creates content with given name, if it does not exist allready.
-     * If such content exists, the existing content will be returned.
+     * New Operation to solve problems with dublicating of nodes on repeated updates.
+     * Creates node with given name, if it does not exist allready.
+     * If such node exists, the existing node will be returned.
      *
-     * @param name the content name as String
-     * @return the new or existing content with the given name
+     * @param name the node name as String
+     * @return the new or existing node with the given name
      */
     public static NodeOperation addOrGetNode(final String name) {
-        return new AbstractNodeOperation() {
-            @Override
-            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                Content result;
-                if (context.hasContent(name)) {
-                    result = context.getContent(name);
-                } else {
-                    result = context.createContent(name);
-                }
-                return result;
-            }
-        };
+        return addOrGetNode(name, null);
     }
 
     /**
-     * New Operation to solve problems with dublicating of Content on repeated updates.
-     * Creates content with given name, if it does not exist allready.
-     * If such content exists, the existing content will be returned.
+     * New Operation to solve problems with dublicating of nodes on repeated updates.
+     * Creates node with given name and nodetype {@link info.magnolia.jcr.util.NodeTypes.ContentNode#NAME},
+     * if it does not exist allready.
+     * If such node exists, the existing node will be returned.
      *
-     * @param name the content name as String
-     * @return the new or existing content with the given name
+     * @param name the node name as String
+     * @return the new or existing node with the given name
+     */
+    public static NodeOperation addOrGetContentNode(final String name) {
+        return addOrGetNode(name, NodeTypes.ContentNode.NAME);
+    }
+
+    /**
+     * New Operation to solve problems with dublicating of nodes on repeated updates.
+     * Creates node with given name, if it does not exist allready.
+     * If such node exists, the existing node will be returned.
+     *
+     * @param name the node name as String
+     * @return the new or existing node with the given name
      */
     public static NodeOperation addOrGetNode(final String name, final String type) {
         return new AbstractNodeOperation() {
             @Override
-            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                Content result;
-                if (context.hasContent(name)) {
-                    result = context.getContent(name);
-                    if (!equalsIgnoreCase(type, result.getNodeTypeName())) {
-                        throw new RepositoryException("Type of Node '" + name + "' does not match. Expected: " + type + "   found : " + result.getNodeTypeName());
+            protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
+                Node result;
+                if (context.hasNode(name)) {
+                    result = context.getNode(name);
+                    if (type != null && !result.isNodeType(type)) {
+                        throw new RepositoryException("Type of Node '" + name + "' does not match. Expected: " + type + "   found : " + result.getPrimaryNodeType().getName());
                     }
                 } else {
-                    result = context.createContent(name, type);
+                    result = context.addNode(name, type);
                 }
                 return result;
-            }
-        };
-    }
-
-    public static NodeOperation createContentPath(final String relativePath) {
-        return createItemTypePath(relativePath, ItemType.CONTENT);
-    }
-
-    public static NodeOperation createContentNodePath(final String relativePath) {
-        return createItemTypePath(relativePath, ItemType.CONTENTNODE);
-    }
-
-    public static NodeOperation createItemTypePath(final String relativePath, final ItemType type) {
-        return new AbstractNodeOperation() {
-            @Override
-            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                String path = removeEnd(relativePath.trim(), PATH_SEPARATOR);
-                return createPath(context, path, type);
             }
         };
     }
@@ -102,7 +82,7 @@ public abstract class NodeOperationFactory extends Ops {
     public static NodeOperation orderBefore(final String nodeName, final String orderBeforeNodeName) {
         return new AbstractNodeOperation() {
             @Override
-            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
+            protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
                 context.getParent().orderBefore(nodeName, orderBeforeNodeName);
                 return context;
             }
@@ -121,9 +101,9 @@ public abstract class NodeOperationFactory extends Ops {
     public static NodeOperation addOrSetProperty(final String name, final Object newValue) {
         return new AbstractNodeOperation() {
             @Override
-            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                final Value value = NodeDataUtil.createValue(newValue, context.getJCRNode().getSession().getValueFactory());
-                context.setNodeData(name, value);
+            protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
+                final Value value = PropertyUtil.createValue(newValue, context.getSession().getValueFactory());
+                context.setProperty(name, value);
                 return context;
             }
         };
@@ -131,14 +111,13 @@ public abstract class NodeOperationFactory extends Ops {
 
     /**
      * Checks the name before try to delete.
-     * @see Ops#remove(String)
      */
     public static NodeOperation removeIfExists(final String name) {
         return new AbstractNodeOperation() {
             @Override
-            protected Content doExec(Content context, ErrorHandler errorHandler) throws RepositoryException {
-                if (context.hasNodeData(name) || context.hasContent(name)) {
-                    context.delete(name);
+            protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
+                if (context.hasProperty(name) || context.hasNode(name)) {
+                    context.getSession().removeItem(context.getPath() + PATH_SEPARATOR + name);
                 }
                 return context;
             }
