@@ -4,9 +4,13 @@ import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
 import com.aperto.magkit.filter.SecureRedirectFilter;
 import com.aperto.magkit.filter.TemplateNameVoter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
+import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.voting.voters.URIStartsWithVoter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
@@ -14,6 +18,7 @@ import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectMo
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Collection of standard module version handler tasks.
@@ -101,6 +106,33 @@ public final class StandardTasks {
                     addOrGetNode("magnoliaUri", NT_CONTENTNODE).then(
                         addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
                         addOrSetProperty(PN_PATTERN, "/.magnolia")
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * Task to add an apps to the app launcher.
+     *
+     * @param groupName Name of the apps group on app launcher
+     * @param color color value of the group, if empty no color will be set. E.g. #cccccc
+     * @param permanent group is permanent (on top) or collapsed (on bottom)
+     * @param appNames names of the single apps
+     */
+    public static Task addAppsToLauncher(final String groupName, final String color, final boolean permanent, final String... appNames) {
+        List<NodeOperation> appsOperations = new ArrayList<NodeOperation>();
+        for (String appName : appNames) {
+            appsOperations.add(addOrGetContentNode(appName));
+        }
+
+        return selectModuleConfig("Add apps to " + groupName, "Add apps to app launcher to group: " + groupName, "ui-admincentral",
+            getNode("config/appLauncherLayout/groups").then(
+                addOrGetContentNode(groupName).then(
+                    isNotEmpty(color) ? addOrSetProperty("color", color) : noop(),
+                    addOrSetProperty("permanent", Boolean.toString(permanent)),
+                    addOrGetContentNode("apps").then(
+                        appsOperations.toArray(new NodeOperation[appsOperations.size()])
                     )
                 )
             )
