@@ -1,10 +1,11 @@
 package com.aperto.magkit.export;
 
-import static java.util.Collections.sort;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+
+import static java.util.Collections.sort;
 
 /**
  * Extends the Properties by sorting.

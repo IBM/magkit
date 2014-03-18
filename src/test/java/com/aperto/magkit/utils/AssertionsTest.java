@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import static com.aperto.magkit.utils.Assertions.assertArgument;
 import static com.aperto.magkit.utils.Assertions.assertState;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**

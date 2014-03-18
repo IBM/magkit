@@ -21,16 +21,16 @@
             </mappings>
             <params>
                 <param>
-                  <name>default</name>
-                  <value>/de/global/fehlerseite</value>
+                    <name>default</name>
+                    <value>/de/global/fehlerseite</value>
                 </param>
                 <param>
-                  <name>de</name>
-                  <value>/de/global/fehlerseite</value>
+                    <name>de</name>
+                    <value>/de/global/fehlerseite</value>
                 </param>
                 <param>
-                  <name>en</name>
-                  <value>/en/global/errorpage</value>
+                    <name>en</name>
+                    <value>/en/global/errorpage</value>
                 </param>
             </params>
         </servlet>

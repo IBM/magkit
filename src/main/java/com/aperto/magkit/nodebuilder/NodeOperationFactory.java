@@ -131,6 +131,7 @@ public abstract class NodeOperationFactory extends Ops {
 
     /**
      * Checks the name before try to delete.
+     *
      * @see Ops#remove(String)
      */
     public static NodeOperation removeIfExists(final String name) {

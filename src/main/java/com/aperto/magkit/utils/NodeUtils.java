@@ -24,7 +24,7 @@ public final class NodeUtils {
     /**
      * Determines the path to given workspace and node identifier. Uses the jcr session from {@link MgnlContext}.
      *
-     * @param workspace Workspace for node identifier lookup
+     * @param workspace  Workspace for node identifier lookup
      * @param identifier Node identifier fka. uuid
      * @return Node path
      */

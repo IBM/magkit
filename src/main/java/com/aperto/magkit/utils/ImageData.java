@@ -30,8 +30,9 @@ public class ImageData {
 
     /**
      * Constructor with some given data.
-     * @param imageNode imageNode
-     * @param alt alternative image text
+     *
+     * @param imageNode  imageNode
+     * @param alt        alternative image text
      * @param repository node repository
      */
     public ImageData(NodeData imageNode, String alt, String repository) {
@@ -44,8 +45,9 @@ public class ImageData {
 
     /**
      * Constructor.
+     *
      * @param imageNode imageNode
-     * @param alt alternative image text
+     * @param alt       alternative image text
      */
     public ImageData(NodeData imageNode, String alt) {
         _alt = alt;
@@ -57,7 +59,8 @@ public class ImageData {
 
     /**
      * Constructor.
-     * @param content content with image node data
+     *
+     * @param content  content with image node data
      * @param imageKey node data key for image.
      */
     public ImageData(Content content, String imageKey) {
@@ -66,8 +69,9 @@ public class ImageData {
 
     /**
      * Constructor.
-     * @param content content with image node data
-     * @param imageKey node data key for image.
+     *
+     * @param content      content with image node data
+     * @param imageKey     node data key for image.
      * @param checkResizer checks a possible resizer node data
      */
     public ImageData(Content content, String imageKey, boolean checkResizer) {
@@ -107,9 +111,10 @@ public class ImageData {
 
     /**
      * Constructor.
-     * @param content content with image node data.
+     *
+     * @param content  content with image node data.
      * @param imageKey node data key for image.
-     * @param altKey node data key for alt text.
+     * @param altKey   node data key for alt text.
      */
     public ImageData(Content content, String imageKey, String altKey) {
         _alt = "";
@@ -137,6 +142,7 @@ public class ImageData {
 
     /**
      * Constructor.
+     *
      * @param document from dms
      */
     public ImageData(Document document) {
@@ -157,6 +163,7 @@ public class ImageData {
 
     /**
      * Constructor.
+     *
      * @param imageNode image node
      */
     public ImageData(NodeData imageNode) {

@@ -30,7 +30,7 @@ import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * Util class for handle magnolia content.
- *
+ * <p/>
  * TODO migrate to node API
  *
  * @author frank.sommer (15.05.2008)
@@ -101,7 +101,7 @@ public final class ContentUtils {
             closeQuietly(inStream);
             file.delete();
             if (!StringUtils.equals(src.getName(), destNodeName)) {
-                String currentPath = "/".equals(destParentPath) ?  "/" + src.getName() : destParentPath + "/" + src.getName();
+                String currentPath = "/".equals(destParentPath) ? "/" + src.getName() : destParentPath + "/" + src.getName();
                 session.move(currentPath, dest);
             }
         } catch (IOException e) {
@@ -119,8 +119,7 @@ public final class ContentUtils {
      * @return SAX content handler
      * @throws RepositoryException if an error occurs
      */
-    private static ContentHandler getExportContentHandler(OutputStream stream)
-        throws RepositoryException {
+    private static ContentHandler getExportContentHandler(OutputStream stream) throws RepositoryException {
         try {
             SAXTransformerFactory stf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
             TransformerHandler handler = stf.newTransformerHandler();
@@ -132,10 +131,10 @@ public final class ContentUtils {
             return handler;
         } catch (TransformerFactoryConfigurationError e) {
             throw new RepositoryException(
-                "SAX transformer implementation not available", e);
+                    "SAX transformer implementation not available", e);
         } catch (TransformerException e) {
             throw new RepositoryException(
-                "Error creating an XML export content handler", e);
+                    "Error creating an XML export content handler", e);
         }
     }
 

@@ -7,26 +7,20 @@ import info.magnolia.cms.gui.dialog.DialogMultiSelect;
 
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Multi select control storing nodes as UUIDs rather then paths.
- * @author jan.haderka
  *
+ * @author jan.haderka
  */
 public class OrderingMultiSelect extends DialogMultiSelect {
 
     /**
      * Gets repository path.
-     * @see info.magnolia.cms.gui.dialog.UUIDDialogControl#getRepository()
+     *
      * @return Current repository path.
+     * @see info.magnolia.cms.gui.dialog.UUIDDialogControl#getRepository()
      */
     public String getRepository() {
         return getConfigValue("repository", ContentRepository.WEBSITE);
@@ -34,6 +28,7 @@ public class OrderingMultiSelect extends DialogMultiSelect {
 
     /**
      * Reads and formats values for this control.
+     *
      * @see info.magnolia.cms.gui.dialog.DialogControlImpl#readValues()
      */
     protected List readValues() {
@@ -41,7 +36,7 @@ public class OrderingMultiSelect extends DialogMultiSelect {
         Map<String, String> tmp = new HashMap<String, String>();
         Content cnt = getStorageNode();
         if (cnt != null) {
-            try {                 
+            try {
                 Iterator it = cnt.getContent(getName()).getNodeDataCollection().iterator();
                 while (it.hasNext()) {
                     NodeData data = (NodeData) it.next();
@@ -51,7 +46,7 @@ public class OrderingMultiSelect extends DialogMultiSelect {
 
                     public int compare(String o1, String o2) {
                         int ret = 0;
-                    
+
                         if (o1.length() < o2.length()) {
                             ret = -1;
                         } else if (o2.length() < o1.length()) {

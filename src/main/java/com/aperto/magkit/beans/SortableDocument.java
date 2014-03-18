@@ -3,6 +3,7 @@ package com.aperto.magkit.beans;
 import info.magnolia.cms.core.Content;
 import info.magnolia.module.dms.beans.Document;
 import org.apache.log4j.Logger;
+
 import javax.jcr.RepositoryException;
 import java.util.Calendar;
 
@@ -26,6 +27,7 @@ public class SortableDocument extends Document implements Comparable {
 
     /**
      * constructor.
+     *
      * @see Document#Constructor(Content)
      */
     public SortableDocument(Content node) {
@@ -34,6 +36,7 @@ public class SortableDocument extends Document implements Comparable {
 
     /**
      * constructor.
+     *
      * @see Document#Constructor(Content, String)
      */
     public SortableDocument(Content node, String version) throws RepositoryException {
@@ -43,12 +46,13 @@ public class SortableDocument extends Document implements Comparable {
     /**
      * Implementation of {@link Comparable}.
      * Compares by given sort criteria.
+     *
      * @see #_sortCriteria
      */
     public int compareTo(Object o) {
         int compareValue = 0;
         SortableDocument otherDocument = (SortableDocument) o;
-        switch(_sortCriteria) {
+        switch (_sortCriteria) {
             case title: {
                 compareValue = getTitle().compareToIgnoreCase(otherDocument.getTitle());
                 break;

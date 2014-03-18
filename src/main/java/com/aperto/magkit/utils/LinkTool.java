@@ -139,9 +139,9 @@ public final class LinkTool {
     /**
      * Checks if the given link is a uuid.
      *
-     * @see #UUID_PATTERN
      * @param link to check
      * @return true or false
+     * @see #UUID_PATTERN
      */
     public static boolean isUuid(String link) {
         boolean isUuid = false;
@@ -277,7 +277,7 @@ public final class LinkTool {
             for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
                 try {
                     String name = URLEncoder.encode(unescapeXml(entry.getKey()), ENCODING);
-                    String[] values = (String []) parameterMap.get(entry.getKey());
+                    String[] values = (String[]) parameterMap.get(entry.getKey());
                     for (String value : values) {
                         stringBuilder.append(seperator);
                         stringBuilder.append(name);

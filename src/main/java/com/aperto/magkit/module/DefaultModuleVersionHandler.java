@@ -112,7 +112,7 @@ public abstract class DefaultModuleVersionHandler implements ModuleVersionHandle
      * {@link info.magnolia.module.AbstractModuleVersionHandler}.
      */
     private static class DefaultModuleVersionHandlerAdapter
-        extends info.magnolia.module.DefaultModuleVersionHandler {
+            extends info.magnolia.module.DefaultModuleVersionHandler {
 
         private List<Task> _extraInstallTasks;
         private Collection<Task> _extraUpdateTasks;

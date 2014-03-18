@@ -1,18 +1,19 @@
 package com.aperto.magkit.filter;
 
-import java.io.IOException;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.split;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.web.context.support.WebApplicationContextUtils.getRequiredWebApplicationContext;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Exposes one or more beans defined within the spring application context to the current request.
@@ -34,8 +35,7 @@ public class ExposeApplicationContextBeanToRequest extends OncePerRequestFilter 
         _exposedBeanNames = split(exposedBeanNames, ", ");
     }
 
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (_exposedBeanNames != null) {
             exposeBeans(request, getRequiredWebApplicationContext(getServletContext()));
         }

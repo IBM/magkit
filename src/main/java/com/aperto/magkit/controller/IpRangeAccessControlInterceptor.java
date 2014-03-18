@@ -24,8 +24,7 @@ import static org.springframework.web.util.HtmlUtils.htmlEscape;
 public class IpRangeAccessControlInterceptor extends HandlerInterceptorAdapter {
     private static final Logger LOGGER = Logger.getLogger(IpRangeAccessControlInterceptor.class);
     private PathMatcher _pathMatcher = new AntPathMatcher();
-    private static final String[] APERTO_REMOTE_HOSTS = new String[]{"127.0.0.1", "localhost", "213.61.132.3",
-                                                                     "10.18.*", "*.aperto.de"};
+    private static final String[] APERTO_REMOTE_HOSTS = new String[]{"127.0.0.1", "localhost", "213.61.132.3", "10.18.*", "*.aperto.de"};
     private String[] _securedUrls = new String[0];
     private String[] _allowedRemoteHosts = new String[0];
     private boolean _allowAccessByAperto = true;
@@ -57,7 +56,7 @@ public class IpRangeAccessControlInterceptor extends HandlerInterceptorAdapter {
         boolean accessGranted = false;
         if (remoteHost != null) {
             accessGranted = (_allowAccessByAperto && matches(remoteHost, APERTO_REMOTE_HOSTS))
-                || matches(remoteHost, _allowedRemoteHosts);
+                    || matches(remoteHost, _allowedRemoteHosts);
         }
         return accessGranted;
     }

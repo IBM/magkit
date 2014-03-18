@@ -6,6 +6,7 @@ import info.magnolia.cms.gui.dialog.DialogFile;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -161,7 +162,7 @@ public class DialogValidateImageFile extends DialogFile {
         }
         return result;
     }
-	
+
     public String getErrorMessage() {
         return _errorMessage;
     }

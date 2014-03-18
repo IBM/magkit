@@ -1,9 +1,5 @@
 package com.aperto.magkit.i18n;
 
-import java.text.MessageFormat;
-import java.util.Locale;
-import javax.jcr.RepositoryException;
-
 import info.magnolia.cms.beans.config.ContentRepository;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
@@ -11,6 +7,10 @@ import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.context.MgnlContext;
 import org.apache.log4j.Logger;
 import org.springframework.context.support.AbstractMessageSource;
+
+import javax.jcr.RepositoryException;
+import java.text.MessageFormat;
+import java.util.Locale;
 
 /**
  * Implementation of spring {@link org.springframework.context.MessageSource} interface.

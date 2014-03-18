@@ -1,8 +1,5 @@
 package com.aperto.magkit.module.delta;
 
-import javax.jcr.RepositoryException;
-
-import static com.aperto.magkit.utils.ContentUtils.copyInSessionFiltered;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.module.InstallContext;
@@ -12,6 +9,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.helpers.XMLFilterImpl;
+
+import javax.jcr.RepositoryException;
+
+import static com.aperto.magkit.utils.ContentUtils.copyInSessionFiltered;
 
 /**
  * Copies a node by performing a in session copy operation. Additionally you may specify a {@link XMLFilter} that is

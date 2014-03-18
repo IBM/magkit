@@ -1,12 +1,11 @@
 package com.aperto.magkit.controls;
 
+import info.magnolia.cms.gui.dialog.DialogEdit;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import info.magnolia.cms.gui.dialog.DialogEdit;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.contains;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Dialog control that ensures the input string is a valid url.
@@ -31,7 +30,7 @@ public class DialogUrlEditBox extends DialogEdit {
                 setValidationMessage("dialog.validation.url.wrongFormat");
             }
             for (int i = 0; i < value.length(); i++) {
-            	if (Character.isWhitespace(value.charAt(i))) {
+                if (Character.isWhitespace(value.charAt(i))) {
                     isValid = false;
                     setValidationMessage("dialog.validation.url.wrongFormat");
                     break;

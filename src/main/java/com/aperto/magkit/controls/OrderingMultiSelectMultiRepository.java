@@ -10,6 +10,7 @@ import info.magnolia.cms.util.NodeDataUtil;
 import info.magnolia.freemarker.FreemarkerUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import java.util.*;
 
 /**
  * Control to select multiple values. The values can get stored as list, in JSON format or as a multiple values
+ *
  * @author Philipp Bracher
  * @version $Revision: 6341 $ ($Author: philipp $)
  */
@@ -27,22 +29,18 @@ public class OrderingMultiSelectMultiRepository extends OrderingMultiSelect {
 
     /**
      * Gets repository path.
-     * @see com.aperto.nektar.mgnl.control.OrderingMultiSelect#getRepository()
+     *
      * @return Current repository path.
      */
     public String getRepository() {
         String result = super.getRepository();
-        for (SelectOption option : (List<SelectOption>) getOptions().iterator()){
+        for (SelectOption option : (List<SelectOption>) getOptions().iterator()) {
             if (option.getSelected()) {
                 result = option.getValue();
             }
         }
         return result;
     }
-
-//    private String getRepository(Content websiteNode) {
-//        return "website";
-//    }
 
     /**
      * If this control has a choose button.
@@ -87,32 +85,28 @@ public class OrderingMultiSelectMultiRepository extends OrderingMultiSelect {
         Collection result = new ArrayList();
         Content optionsNode = null;
 
-        if (configNode.hasContent("options")){
+        if (configNode.hasContent("options")) {
             optionsNode = configNode.getContent("options");
         } else {
             String repository = getConfigValue("repository", ContentRepository.WEBSITE);
             String path = getConfigValue("path");
-            if (StringUtils.isNotEmpty(path)){
+            if (StringUtils.isNotEmpty(path)) {
                 optionsNode = ContentUtil.getContent(repository, path);
             }
         }
 
-        if (optionsNode != null){
+        if (optionsNode != null) {
             result = ContentUtil.getAllChildren(optionsNode);
         }
         return result;
     }
 
     /**
-     * @see info.magnolia.cms.gui.dialog.DialogControl#init(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse, Content, Content)
+     * @see info.magnolia.cms.gui.dialog.DialogControl#init(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, Content, Content)
      */
-    public void init(HttpServletRequest request, HttpServletResponse response, Content websiteNode, Content configNode)
-        throws RepositoryException {
+    public void init(HttpServletRequest request, HttpServletResponse response, Content websiteNode, Content configNode) throws RepositoryException {
         super.init(request, response, websiteNode, configNode);
         String repository = "website";
-//        if (websiteNode != null) {
-//            repository = getRepository(ContentUtil.getContent(websiteNode, getName()));
-//        }
         if (configNode != null) {
             setOptions(configNode, repository);
         }
@@ -120,6 +114,7 @@ public class OrderingMultiSelectMultiRepository extends OrderingMultiSelect {
 
     /**
      * If this control has a select field.
+     *
      * @return the html-snippet for a select box with magnolia repostiories
      */
     public String getRepositorySelect() {

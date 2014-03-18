@@ -5,6 +5,7 @@ import info.magnolia.cms.gui.misc.Sources;
 import info.magnolia.module.admininterface.dialogs.ParagraphEditDialog;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.PrintWriter;
 
 /**
  * Dialog handler that allows execution of arbitrary JS on closing dialog.
+ *
  * @author jan haderka
  */
 public class CallbackEditDialog extends ParagraphEditDialog {
@@ -26,12 +28,13 @@ public class CallbackEditDialog extends ParagraphEditDialog {
      * Config node.
      */
     private Content _configNode;
-    
+
     /**
      * Creates new edit dialog.
-     * @param name Dialog name.
-     * @param request Incoming http request.
-     * @param response Outgoing http response.
+     *
+     * @param name       Dialog name.
+     * @param request    Incoming http request.
+     * @param response   Outgoing http response.
      * @param configNode Configuration node.
      */
     public CallbackEditDialog(String name, HttpServletRequest request, HttpServletResponse response, Content configNode) {
@@ -41,19 +44,20 @@ public class CallbackEditDialog extends ParagraphEditDialog {
 
     /**
      * Renders dialog html.
+     *
      * @see info.magnolia.cms.servlets.MVCServletHandler#renderHtml(java.lang.String)
      */
     public void renderHtml(String view) throws IOException {
         PrintWriter out = getResponse().getWriter();
-        
+
         // after saving
         if (VIEW_CLOSE_WINDOW.equals(view)) {
-            out.println("<html>"); 
+            out.println("<html>");
             out.println(new Sources(getRequest().getContextPath()).getHtmlJs());
-            out.println("<script type=\"text/javascript\">"); 
+            out.println("<script type=\"text/javascript\">");
             out.println("var path = '" + path + "'");
-            out.println(StringUtils.defaultIfEmpty(_configNode.getNodeData("jsExecutedAfterSaving").getString(), "mgnlDialogReloadOpener();")); 
-            out.println("</script></html>"); 
+            out.println(StringUtils.defaultIfEmpty(_configNode.getNodeData("jsExecutedAfterSaving").getString(), "mgnlDialogReloadOpener();"));
+            out.println("</script></html>");
         } else if (VIEW_SHOW_DIALOG.equals(view)) {
             try {
                 getDialog().drawHtml(out);
@@ -62,9 +66,10 @@ public class CallbackEditDialog extends ParagraphEditDialog {
             }
         }
     }
-    
+
     /**
      * Gets arbitrary java script to execute when closing edit dialog.
+     *
      * @return script to be executed.
      */
     public String getJsExecutedAfterSaving() {
@@ -74,6 +79,7 @@ public class CallbackEditDialog extends ParagraphEditDialog {
 
     /**
      * Sets arbitrary java script to execute when closing edit dialog.
+     *
      * @param jsExecutedAfterSaving script to be executed.
      */
     public void setJsExecutedAfterSaving(String jsExecutedAfterSaving) {

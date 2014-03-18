@@ -37,18 +37,18 @@ public final class StandardTasks {
     public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
         return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
             addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName, ICON_GEARS).then(
-                addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates", ICON_DOT),
-                addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs", ICON_DOT),
-                addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')", "menu.config.dialogs", ICON_DOT)
+                    addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates", ICON_DOT),
+                    addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs", ICON_DOT),
+                    addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')", "menu.config.dialogs", ICON_DOT)
             )
         );
     }
 
     private static NodeOperation addMenuEntry(final String relPath, final String onclick, final String label, final String icon) {
         return addOrGetNode(relPath, NT_CONTENTNODE).then(
-            addOrSetProperty("icon", icon),
-            addOrSetProperty("onclick", onclick),
-            addOrSetProperty("label", label)
+                addOrSetProperty("icon", icon),
+                addOrSetProperty("onclick", onclick),
+                addOrSetProperty("label", label)
         );
     }
 
@@ -57,11 +57,11 @@ public final class StandardTasks {
      */
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
-            addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("robots", NT_CONTENTNODE).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty(PN_FROM_URI, "/robots.txt"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt"))));
+                addOrGetNode(URI_MAPPING).then(
+                        addOrGetNode("robots", NT_CONTENTNODE).then(
+                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                                addOrSetProperty(PN_FROM_URI, "/robots.txt"),
+                                addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt"))));
     }
 
     /**
@@ -69,16 +69,17 @@ public final class StandardTasks {
      */
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
-            addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("favicon", NT_CONTENTNODE).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico"))));
+                addOrGetNode(URI_MAPPING).then(
+                        addOrGetNode("favicon", NT_CONTENTNODE).then(
+                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                                addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
+                                addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico"))));
     }
 
     /**
      * Task for installing the secure redirect filter in the magnolia filter chain.
      * Including a default configuration for stkForm template.
+     *
      * @see SecureRedirectFilter
      */
     public static Task secureRedirectFilter() {
@@ -115,8 +116,8 @@ public final class StandardTasks {
                 addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
                 addOrGetNode("useSystemDefault", NT_CONTENTNODE).then(
                     addOrGetNode("magnoliaUri", NT_CONTENTNODE).then(
-                        addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-                        addOrSetProperty(PN_PATTERN, "/.magnolia")
+                            addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
+                            addOrSetProperty(PN_PATTERN, "/.magnolia")
                     )
                 )
             )

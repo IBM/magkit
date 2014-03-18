@@ -26,15 +26,15 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
 
     private final Task _addBypassForDebugSuite = new NodeExistsDelegateTask(
-        "Check debug suite bypass", "Check debug suite bypass in server config.",
-        CONFIG, PATH_FILTER + "/bypasses/debug", null,
-        new AddFilterBypassTask(PATH_FILTER, "debug", URIStartsWithVoter.class, "/debug/")
+            "Check debug suite bypass", "Check debug suite bypass in server config.",
+            CONFIG, PATH_FILTER + "/bypasses/debug", null,
+            new AddFilterBypassTask(PATH_FILTER, "debug", URIStartsWithVoter.class, "/debug/")
     );
 
     private final Task _addSpringByPass = new NodeExistsDelegateTask(
-        "Check spring bypass", "Check spring bypass in server config.",
-        CONFIG, PATH_FILTER + "/cms/bypasses/spring", null,
-        new AddFilterBypassTask(PATH_FILTER + "/cms", "spring", URIStartsWithVoter.class, "/service/")
+            "Check spring bypass", "Check spring bypass in server config.",
+            CONFIG, PATH_FILTER + "/cms/bypasses/spring", null,
+            new AddFilterBypassTask(PATH_FILTER + "/cms", "spring", URIStartsWithVoter.class, "/service/")
     );
 
     private final Task _setSecurityCallback = selectServerConfig("Change callback", "Set the author form client callback.",

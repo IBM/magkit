@@ -1,16 +1,17 @@
 package com.aperto.magkit.controls;
 
-import static com.aperto.magkit.utils.LinkTool.convertUUIDtoHandle;
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.gui.control.Button;
 import info.magnolia.cms.gui.dialog.DialogUUIDLink;
-import static info.magnolia.context.MgnlContext.getHierarchyManager;
-import static info.magnolia.context.MgnlContext.getParameter;
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static com.aperto.magkit.utils.LinkTool.convertUUIDtoHandle;
+import static info.magnolia.context.MgnlContext.getHierarchyManager;
+import static info.magnolia.context.MgnlContext.getParameter;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * A link control with two buttons for different repositories.

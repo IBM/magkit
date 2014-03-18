@@ -75,7 +75,7 @@ public class GoogleMapsLookup {
                 try {
                     if (xmlSource.getCharacterStream() != null) {
                         xmlSource.getCharacterStream().close();
-                    }  
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

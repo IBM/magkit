@@ -22,7 +22,8 @@ public class Item implements Comparable {
 
     /**
      * Constructor with key and value.
-     * @param key Key of pair.
+     *
+     * @param key   Key of pair.
      * @param value Value of pair.
      */
     public Item(String key, String value) {
@@ -32,6 +33,7 @@ public class Item implements Comparable {
 
     /**
      * if used with xxx# notation to enable sorting through ResourceBundles.
+     *
      * @return key
      */
     public String getKey() {
@@ -44,6 +46,7 @@ public class Item implements Comparable {
 
     /**
      * Gets the position, if one is given in the key, else -1.
+     *
      * @return position
      */
     public int getPosition() {

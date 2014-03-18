@@ -43,6 +43,7 @@ public final class SelectorUtils {
 
     /**
      * Retrieve the actual page number from selector. Default is {@link #DEF_PAGE}.
+     *
      * @return positiv integer value of the page selector.
      */
     public static int retrieveActivePage() {
@@ -57,6 +58,7 @@ public final class SelectorUtils {
 
     /**
      * Retrieves the value of the wanted selector.
+     *
      * @param selectorId of the wanted selector value
      * @return value of selector
      * @deprecated use MgnlContext.getAttribute() for new selector handling
@@ -67,7 +69,8 @@ public final class SelectorUtils {
 
     /**
      * Checks, if the selector contains the search term.
-     * @param search search term
+     *
+     * @param search     search term
      * @param startsWith selector starts only with search term
      */
     public static boolean selectorContains(String search, boolean startsWith) {
@@ -81,7 +84,7 @@ public final class SelectorUtils {
                     contains = part.equalsIgnoreCase(search);
                 }
                 if (contains) {
-                    break;    
+                    break;
                 }
             }
         }
@@ -93,9 +96,9 @@ public final class SelectorUtils {
      * If the value is blank, the selector id will be removed.
      * Not allowed selectors are removed.
      *
-     * @param url url to manipulate
-     * @param id Id of the selector, e.g. 'pid'
-     * @param value Value of the selector id
+     * @param url                 url to manipulate
+     * @param id                  Id of the selector, e.g. 'pid'
+     * @param value               Value of the selector id
      * @param notAllowedSelectors array of not allowed selector ids
      * @return url with updated selectors or empty string if url is null or empty
      */

@@ -7,7 +7,6 @@ import java.math.BigDecimal;
  *
  * @author Mathias Broekelmann
  * @author Mayo Fragoso
- *
  */
 public class GoogleMapsResult {
 
@@ -63,6 +62,7 @@ public class GoogleMapsResult {
 
     /**
      * Allows to set the longitude and latitude as comma separated coordinates string (lng,lat).
+     *
      * @param coordinates coordinates value from google maps for this position
      */
     public void setCoordinates(String coordinates) {
