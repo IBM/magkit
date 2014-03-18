@@ -11,8 +11,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.strip;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * An Utility class that extends info.magnolia.nodebuilder.Ops.
@@ -106,7 +105,7 @@ public abstract class NodeOperationFactory extends Ops {
             @Override
             protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
                 if (context.hasProperty(name) || context.hasNode(name)) {
-                    context.getSession().removeItem(context.getPath() + PATH_SEPARATOR + name);
+                    context.getSession().removeItem(removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR + name);
                 }
                 return context;
             }
