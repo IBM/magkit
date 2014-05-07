@@ -28,10 +28,13 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 public final class StandardTasks {
     public static final String URI_MAPPING = "virtualURIMapping";
     public static final String PN_CLASS = "class";
+    public static final String PN_IMPL_CLASS = "implementationClass";
     public static final String PN_ENABLED = "enabled";
     public static final String PN_FROM_URI = "fromURI";
     public static final String PN_TO_URI = "toURI";
     public static final String PN_PATTERN = "pattern";
+    public static final String PN_EXTENDS = "extends";
+    public static final String PN_ICON = "icon";
     public static final String ICON_DOT = "/.resources/icons/16/dot.gif";
     public static final String ICON_GEARS = "/.resources/icons/24/gears.gif";
 
