@@ -7,9 +7,7 @@ import info.magnolia.jcr.nodebuilder.Ops;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.jcr.util.PropertyUtil;
 
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Value;
+import javax.jcr.*;
 
 import static org.apache.commons.lang.StringUtils.*;
 
@@ -106,6 +104,25 @@ public abstract class NodeOperationFactory extends Ops {
             protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
                 if (context.hasProperty(name) || context.hasNode(name)) {
                     context.getSession().removeItem(removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR + name);
+                }
+                return context;
+            }
+        };
+    }
+
+    /**
+     * Removes all child nodes.
+     */
+    public static NodeOperation removeAllChilds() {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
+                Session session = context.getSession();
+                String parentPath = removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR;
+                NodeIterator nodes = context.getNodes();
+                while (nodes.hasNext()) {
+                    Node nodeToRemove = nodes.nextNode();
+                    session.removeItem(parentPath + nodeToRemove.getName());
                 }
                 return context;
             }
