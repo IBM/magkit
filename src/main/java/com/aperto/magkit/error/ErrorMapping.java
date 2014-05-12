@@ -10,7 +10,7 @@ public class ErrorMapping {
     protected static final String DEF_SITE = "default";
 
     private String _siteName = DEF_SITE;
-    private String _language;
+    private String _locale;
     private String _errorPath;
 
     public String getSiteName() {
@@ -21,12 +21,12 @@ public class ErrorMapping {
         _siteName = siteName;
     }
 
-    public String getLanguage() {
-        return _language;
+    public String getLocale() {
+        return _locale;
     }
 
-    public void setLanguage(final String language) {
-        _language = language;
+    public void setLocale(final String locale) {
+        _locale = locale;
     }
 
     public String getErrorPath() {

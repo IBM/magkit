@@ -62,12 +62,12 @@ public class NotFoundRedirectServlet extends HttpServlet {
             if (aggregationState instanceof ExtendedAggregationState) {
                 siteName = ((ExtendedAggregationState) aggregationState).getSite().getName();
             }
-            String language = _i18nProvider.get().getLocale().getLanguage();
-            LOGGER.info("Try to find 404 mapping for {} - {}.", siteName, language);
+            String locale = _i18nProvider.get().getLocale().toString();
+            LOGGER.info("Try to find 404 mapping for {} - {}.", siteName, locale);
 
             List<ErrorMapping> errorMappings = notFoundConfig.getErrorMappings();
             for (ErrorMapping errorMapping : errorMappings) {
-                if (siteName.equals(errorMapping.getSiteName()) && language.equals(errorMapping.getLanguage())) {
+                if (siteName.equals(errorMapping.getSiteName()) && locale.equals(errorMapping.getLocale())) {
                     handle = errorMapping.getErrorPath();
                     break;
                 }

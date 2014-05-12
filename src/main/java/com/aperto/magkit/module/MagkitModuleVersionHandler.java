@@ -2,6 +2,7 @@ package com.aperto.magkit.module;
 
 import com.aperto.magkit.security.AuthorFormClientCallback;
 import info.magnolia.module.InstallContext;
+import info.magnolia.module.delta.DeltaBuilder;
 import info.magnolia.module.delta.NodeExistsDelegateTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
@@ -12,9 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
+import static info.magnolia.module.delta.DeltaBuilder.update;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**
@@ -40,10 +45,28 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         )
     );
 
+    private final Task _addNew404Config = selectModuleConfig("Add new config", "Add new 404 error config.", "magkit",
+        addOrGetContentNode("config").then(
+            addOrGetContentNode("notFoundConfig").then(
+                addOrSetProperty("default", "/404"),
+                addOrGetContentNode("errorMappings").then(
+                    addOrGetContentNode("en").then(
+                        addOrSetProperty("siteName", "default"),
+                        addOrSetProperty("locale", "en"),
+                        addOrSetProperty("errorPath", "/en/404")
+                    )
+                )
+            )
+        )
+    );
+
     /**
      * Constructor for adding update builder.
      */
     public MagkitModuleVersionHandler() {
+        DeltaBuilder update301 = update("3.0.1", "Updates for version 3.0.1.");
+        update301.addTask(_addNew404Config);
+        register(update301);
     }
 
     @Override
@@ -52,6 +75,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         tasks.add(_addBypassForMonitoring);
         tasks.add(_addSpringByPass);
         tasks.add(_setSecurityCallback);
+        tasks.add(_addNew404Config);
         return tasks;
     }
 
