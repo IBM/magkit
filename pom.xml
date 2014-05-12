@@ -43,6 +43,10 @@
         </dependency>
 
         <dependency>
+			<groupId>info.magnolia</groupId>
+            <artifactId>magnolia-module-standard-templating-kit</artifactId>
+		</dependency>
+        <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-inplace-templating</artifactId>
         </dependency>

@@ -3,6 +3,7 @@
     <name>magkit</name>
     <display-name>magkit</display-name>
     <description>Aperto Magnolia Module</description>
+    <class>com.aperto.magkit.module.MagkitModule</class>
     <versionHandler>com.aperto.magkit.module.MagkitModuleVersionHandler</versionHandler>
     <version>${project.version}</version>
     <dependencies>
