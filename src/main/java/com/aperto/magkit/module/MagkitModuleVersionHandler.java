@@ -23,7 +23,7 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
  * @author frank.sommer
  * @since 03.04.2008
  */
-public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
+public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
 
     private final Task _addBypassForMonitoring = new NodeExistsDelegateTask("Check monitoring bypass", "Check monitoring bypass in server config.", CONFIG, PATH_FILTER + "/bypasses/monitoring", null,
@@ -43,7 +43,7 @@ public class MagKitModuleVersionHandler extends BootstrapModuleVersionHandler {
     /**
      * Constructor for adding update builder.
      */
-    public MagKitModuleVersionHandler() {
+    public MagkitModuleVersionHandler() {
     }
 
     @Override
