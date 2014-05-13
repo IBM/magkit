@@ -2,7 +2,6 @@ package com.aperto.magkit.error;
 
 import com.aperto.magkit.module.MagkitModule;
 import info.magnolia.cms.core.AggregationState;
-import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.module.templatingkit.ExtendedAggregationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +16,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static com.aperto.magkit.utils.LocaleUtil.determineLocaleFromPath;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * 404 error redirect servlet.
@@ -33,7 +33,6 @@ public class NotFoundRedirectServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotFoundRedirectServlet.class);
 
     private Provider<MagkitModule> _moduleProvider;
-    private Provider<I18nContentSupport> _i18nProvider;
     private Provider<AggregationState> _aggregationStateProvider;
 
     @Override
@@ -62,7 +61,12 @@ public class NotFoundRedirectServlet extends HttpServlet {
             if (aggregationState instanceof ExtendedAggregationState) {
                 siteName = ((ExtendedAggregationState) aggregationState).getSite().getName();
             }
-            String locale = _i18nProvider.get().getLocale().toString();
+
+            // can not use i18nContentSupport, because the current request is on the redirect servlet,
+            // using original uri from aggregation state
+            String locale = determineLocaleFromPath(substringBeforeLast(aggregationState.getOriginalURI(), "."));
+            locale = defaultIfBlank(locale, aggregationState.getLocale().toString());
+
             LOGGER.info("Try to find 404 mapping for {} - {}.", siteName, locale);
 
             List<ErrorMapping> errorMappings = notFoundConfig.getErrorMappings();
@@ -80,11 +84,6 @@ public class NotFoundRedirectServlet extends HttpServlet {
     @Inject
     public void setModuleProvider(final Provider<MagkitModule> moduleProvider) {
         _moduleProvider = moduleProvider;
-    }
-
-    @Inject
-    public void setI18nProvider(final Provider<I18nContentSupport> i18nProvider) {
-        _i18nProvider = i18nProvider;
     }
 
     @Inject
