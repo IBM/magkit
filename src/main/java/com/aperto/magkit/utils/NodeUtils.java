@@ -35,8 +35,10 @@ public final class NodeUtils {
         if (isNotEmpty(workspace) && isNotEmpty(identifier)) {
             try {
                 Session jcrSession = MgnlContext.getJCRSession(workspace);
-                Node node = jcrSession.getNodeByIdentifier(identifier);
-                path = node.getPath();
+                if (jcrSession != null) {
+                    Node node = jcrSession.getNodeByIdentifier(identifier);
+                    path = node.getPath();
+                }
             } catch (RepositoryException e) {
                 LOGGER.info("Can't get path to node. Error message was {}.", e.getLocalizedMessage());
             }
