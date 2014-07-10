@@ -38,6 +38,8 @@ public final class StandardTasks {
     public static final String PN_ICON = "icon";
     public static final String ICON_DOT = "/.resources/icons/16/dot.gif";
     public static final String ICON_GEARS = "/.resources/icons/24/gears.gif";
+    public static final String PN_ROLES = "roles";
+    public static final String NN_PERMISSIONS = "permissions";
 
     /**
      * Maps {@code /robots.txt} to {@code /docroot/moduleName/robots.txt}.
@@ -150,10 +152,7 @@ public final class StandardTasks {
      * @return Task to execute
      */
     public static Task addWorkspaceToCacheFlush(final String... workspaces) {
-        List<NodeOperation> setWorkspaceOps = new ArrayList<NodeOperation>();
-        for (String workspace : workspaces) {
-            setWorkspaceOps.add(addOrSetProperty(workspace, workspace));
-        }
+        List<NodeOperation> setWorkspaceOps = getSetPropertyOps(workspaces);
 
         return selectModuleConfig("Add entries to flushAll policy", "Add flushAll policy for " + ArrayUtils.toString(workspaces), "cache",
             getNode("config/configurations/default/flushPolicy/policies/flushAll/repositories").then(
@@ -172,17 +171,47 @@ public final class StandardTasks {
      * @return Task to execute
      */
     public static Task addAppRolesPermission(final String module, final String appName, final boolean removeOthers, final String... roles) {
+        List<NodeOperation> rolesOps = getSetPropertyOps(roles);
+
+        return selectModuleConfig("Add app permissions", "Add app permissions for " + appName + " with roles " + ArrayUtils.toString(roles), module,
+            getNode("apps/" + appName).then(
+                addOrGetContentNode(NN_PERMISSIONS).then(
+                    removeOthers ? removeIfExists(PN_ROLES) : noop(),
+                    addOrGetContentNode(PN_ROLES).then(
+                        rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                    )
+                )
+            )
+        );
+    }
+
+    private static List<NodeOperation> getSetPropertyOps(final String[] roles) {
         List<NodeOperation> rolesOps = new ArrayList<NodeOperation>();
         for (String role : roles) {
             rolesOps.add(addOrSetProperty(role, role));
         }
+        return rolesOps;
+    }
 
-        return selectModuleConfig("Add app permissions", "Add app permissions for " + appName + " with roles " + ArrayUtils.toString(roles), module,
-            getNode("apps/" + appName).then(
-                addOrGetContentNode("permissions").then(
-                    removeOthers ? removeIfExists("roles") : noop(),
-                    addOrGetContentNode("roles").then(
-                        rolesOps.toArray(new NodeOperation[rolesOps.size()])
+    /**
+     * Adds roles permission to an app launcher group.
+     *
+     * @param groupName group name
+     * @param removeOthers other roles will remove
+     * @param roles roles to configure
+     * @return Task to execute
+     */
+    public static Task addAppLauncherGroupPermission(final String groupName, final boolean removeOthers, final String... roles) {
+        List<NodeOperation> rolesOps = getSetPropertyOps(roles);
+
+        return selectModuleConfig("Add applauncher group permission", "Add app group permission for " + groupName + " with roles " + ArrayUtils.toString(roles), "ui-admincentral",
+            getNode("config/appLauncherLayout/groups").then(
+                addOrGetContentNode(groupName).then(
+                    addOrGetContentNode(NN_PERMISSIONS).then(
+                        removeOthers ? removeIfExists(PN_ROLES) : noop(),
+                        addOrGetContentNode(PN_ROLES).then(
+                            rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                        )
                     )
                 )
             )
