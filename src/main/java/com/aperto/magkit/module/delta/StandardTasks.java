@@ -162,6 +162,33 @@ public final class StandardTasks {
         );
     }
 
+    /**
+     * Adds a cache exclude config to the magnolia and to the browser cache configuration.
+     *
+     * @param name name of the entry
+     * @param urlStartsWith begin of the url
+     * @return task to execute
+     */
+    public static Task addCacheExclude(final String name, final String urlStartsWith) {
+        return selectModuleConfig("Add cache exclude", "Add cache exclude for " + urlStartsWith, "cache",
+            getNode("config/configurations/default").then(
+                getNode("cachePolicy/voters/urls/excludes").then(
+                    addCacheConfigEntry(name, urlStartsWith)
+                ),
+                getNode("browserCachePolicy/policies/dontCachePages/voters").then(
+                    addCacheConfigEntry(name, urlStartsWith)
+                )
+            )
+        );
+    }
+
+    private static NodeOperation addCacheConfigEntry(final String nodeName, final String startsWithPattern) {
+        return addOrGetContentNode(nodeName).then(
+            addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
+            addOrSetProperty(PN_PATTERN, startsWithPattern)
+        );
+    }
+
     private StandardTasks() {
         // hidden default constructor
     }
