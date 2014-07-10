@@ -7,8 +7,8 @@ import javax.jcr.Property;
 import java.util.Collection;
 
 import static com.aperto.magkit.mockito.NodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
+import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
 import static com.aperto.magkit.utils.PropertyUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -31,11 +31,11 @@ public class PropertyUtilsTest {
     @Test
     public void testRetrieveOrderedMultiSelectValues() throws Exception {
         Node node = mockPageNode("/node/subNode",
-                stubProperty("jcr:created", "2012"),
-                stubProperty("1", "zwei1"),
-                stubProperty("0", "eins0"),
-                stubProperty("title", "title"),
-                stubProperty("2", "drei2")
+            stubProperty("jcr:created", "2012"),
+            stubProperty("1", "zwei1"),
+            stubProperty("0", "eins0"),
+            stubProperty("title", "title"),
+            stubProperty("2", "drei2")
         );
         Collection<String> values = retrieveOrderedMultiSelectValues(node);
         assertThat(values.size(), is(3));

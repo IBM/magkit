@@ -1,5 +1,6 @@
 package com.aperto.magkit.utils;
 
+import info.magnolia.jcr.util.PropertyUtil;
 import org.apache.commons.collections15.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+import static info.magnolia.jcr.util.PropertyUtil.getValuesStringList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
 import static org.apache.commons.collections15.CollectionUtils.collect;
@@ -27,8 +29,34 @@ public final class PropertyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyUtils.class);
 
     /**
-     * Retrieves the properties created by Magnolias MultiSelect.
+     * Add missing util method for retrieving multi value property values.
+     * @see PropertyUtil
      *
+     * @param node containing the multivalue
+     * @param relPath relative path to the multi value property
+     * @return string values as collection, if not available empty collection and if single value the collection of size one.
+     */
+    public static Collection<String> getStringValues(final Node node, final String relPath) {
+        Collection<String> values = new ArrayList<String>();
+
+        try {
+            if (node != null && isNotEmpty(relPath) && node.hasProperty(relPath)) {
+                Property property = node.getProperty(relPath);
+                if (property.isMultiple()) {
+                    values = getValuesStringList(property.getValues());
+                } else {
+                    values.add(property.getString());
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.error("Error retrieving property {}.", relPath, e);
+        }
+
+        return values;
+    }
+
+    /**
+     * Retrieves the properties created by Magnolias MultiSelect.
      * @param multiSelectNode node contains the properties
      * @return collection of properties, null if multiSelectNode is null
      */
@@ -68,7 +96,6 @@ public final class PropertyUtils {
 
     /**
      * Retrieves the String values created by Magnolias MultiSelect.
-     *
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node multiSelectNode) {
@@ -77,7 +104,6 @@ public final class PropertyUtils {
 
     /**
      * Retrieves the String values created by Magnolias MultiSelect.
-     *
      * @see #retrieveMultiSelectValues(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node baseNode, String nodeName) {
@@ -86,7 +112,6 @@ public final class PropertyUtils {
 
     /**
      * Retrieves the ordered String values created by Magnolias MultiSelect.
-     *
      * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
@@ -98,7 +123,6 @@ public final class PropertyUtils {
 
     /**
      * Retrieves the ordered String values created by Magnolias MultiSelect.
-     *
      * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node baseNode, String nodeName) {
@@ -111,7 +135,7 @@ public final class PropertyUtils {
     /**
      * Get the {@link Long} value from a node.
      *
-     * @param node         Node
+     * @param node Node
      * @param propertyName Property name of the {@Long} value.
      * @param defaultValue Default value.
      * @return value

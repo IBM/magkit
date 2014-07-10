@@ -16,10 +16,10 @@ import static org.apache.commons.lang.BooleanUtils.toBoolean;
  * Checks a node data of the content. In positive case the content would be excluded.
  * The node data could be a boolean or a string.
  * By string 'yes', 'on' and 'true' are valid values.
- * <p/>
+ *
  * "hideFromSearch" is default node data name.
  * inheritance is per default off.
- * <p/>
+ *
  * TODO: change to node API
  *
  * @author frank.sommer (22.10.2009)

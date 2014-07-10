@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
  * <p></p>
  * E.g.: for multi select values use the following call:
  * <code>
- * RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<Property>(new ArrayList<Property>(), "\\d+", false, 1, Property.class);
- * multiselectNode.accept(collector);
- * Collection<Property> valueProperties = collector.getCollectedChildren();
+ *      RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<Property>(new ArrayList<Property>(), "\\d+", false, 1, Property.class);
+ *      multiselectNode.accept(collector);
+ *      Collection<Property> valueProperties = collector.getCollectedChildren();
  * </code>
  *
  * @param <T> subclass of {@link javax.jcr.Item}
+ *
  * @author lars.gendner
  */
 public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisitor.Default {
@@ -41,11 +42,12 @@ public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisit
     /**
      * Constructs an instance using a pattern string.
      *
-     * @param collectedChildren      collection in which items will be collected
+     * @param collectedChildren collection in which items will be collected
      * @param childNamePatternString regular expression for children names
-     * @param breadthFirst           set to <code>true</code> if children hierarchy shall be traversed breadth-first, set to <code>false</code> if depth-first
-     * @param maxLevel               maximum level of traversal (set to <code>1</code> for direct children collection)
-     * @param classToCollect         only instances of this class will be collected (reasonable values: <code>Item.class</code>, <code>Property.class</code>, <code>Node.class</code>)
+     * @param breadthFirst set to <code>true</code> if children hierarchy shall be traversed breadth-first, set to <code>false</code> if depth-first
+     * @param maxLevel maximum level of traversal (set to <code>1</code> for direct children collection)
+     * @param classToCollect only instances of this class will be collected (reasonable values: <code>Item.class</code>, <code>Property.class</code>, <code>Node.class</code>)
+     *
      * @see java.util.regex.Pattern#compile(String)
      */
     public RegexpChildrenCollector(Collection<T> collectedChildren, String childNamePatternString, boolean breadthFirst, int maxLevel, Class<? extends T> classToCollect) {
@@ -56,10 +58,11 @@ public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisit
      * Constructs an instance using a {@link java.util.regex.Pattern}.
      *
      * @param collectedChildren collection in which items will be collected
-     * @param childNamePattern  pattern for children names
-     * @param breadthFirst      set to <code>true</code> if children hierarchy shall be traversed breadth-first, set to <code>false</code> if depth-first
-     * @param maxLevel          maximum level of traversal (set to <code>1</code> for direct children collection)
-     * @param classToCollect    only instances of this class will be collected (reasonable values: <code>Item.class</code>, <code>Property.class</code>, <code>Node.class</code>)
+     * @param childNamePattern pattern for children names
+     * @param breadthFirst set to <code>true</code> if children hierarchy shall be traversed breadth-first, set to <code>false</code> if depth-first
+     * @param maxLevel maximum level of traversal (set to <code>1</code> for direct children collection)
+     * @param classToCollect only instances of this class will be collected (reasonable values: <code>Item.class</code>, <code>Property.class</code>, <code>Node.class</code>)
+     *
      * @see java.util.regex.Pattern#compile(String)
      */
     public RegexpChildrenCollector(Collection<T> collectedChildren, Pattern childNamePattern, boolean breadthFirst, int maxLevel, Class<? extends T> classToCollect) {
@@ -95,7 +98,6 @@ public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisit
 
     /**
      * Checks if the name of an item matches the {@link #_childNamePattern}.
-     *
      * @param item item to be checked
      * @return <code>true</code> if name matches, otherwise <code>false</code>
      * @throws javax.jcr.RepositoryException if an error occurs retrieving the name of the item

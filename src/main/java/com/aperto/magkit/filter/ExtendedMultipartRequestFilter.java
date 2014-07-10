@@ -28,9 +28,9 @@ import static org.apache.commons.lang.StringUtils.defaultString;
  * 1. Adds a filename policy to prevent filename conflicts on upload files.<br/>
  * 2. Make maximum file size configurable.<br/>
  * 3. System default usage is configurable, too.
+ * @see CosMultipartRequestFilter
  *
  * @author frank.sommer
- * @see CosMultipartRequestFilter
  * @since 09.07.2008
  */
 public class ExtendedMultipartRequestFilter extends CosMultipartRequestFilter {

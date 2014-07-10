@@ -9,8 +9,8 @@ import java.util.Comparator;
  * It is possible to sort by name or value.
  * Value is default.
  *
- * @author frank.sommer (22.09.2008)
  * @deprecated since 4.5, use {@link PropertyUtils}
+ * @author frank.sommer (22.09.2008)
  */
 @Deprecated
 public class NodeDataComparator implements Comparator<NodeData> {

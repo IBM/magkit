@@ -3,36 +3,23 @@
     <name>magkit</name>
     <display-name>magkit</display-name>
     <description>Aperto Magnolia Module</description>
-    <versionHandler>com.aperto.magkit.module.MagKitModuleVersionHandler</versionHandler>
+    <class>com.aperto.magkit.module.MagkitModule</class>
+    <versionHandler>com.aperto.magkit.module.MagkitModuleVersionHandler</versionHandler>
     <version>${project.version}</version>
     <dependencies>
         <dependency>
-            <name>adminInterface</name>
-            <version>4.5/*</version>
+            <name>ui-admincentral</name>
+            <version>${magnolia.version}/*</version>
         </dependency>
     </dependencies>
     <servlets>
         <servlet>
             <name>404RedirectServlet</name>
-            <class>com.aperto.magkit.servlet.NotFoundRedirectServlet</class>
+            <class>com.aperto.magkit.error.NotFoundRedirectServlet</class>
             <comment>Redirect to error page.</comment>
             <mappings>
                 <mapping>/notFountRedirect</mapping>
             </mappings>
-            <params>
-                <param>
-                    <name>default</name>
-                    <value>/de/global/fehlerseite</value>
-                </param>
-                <param>
-                    <name>de</name>
-                    <value>/de/global/fehlerseite</value>
-                </param>
-                <param>
-                    <name>en</name>
-                    <value>/en/global/errorpage</value>
-                </param>
-            </params>
         </servlet>
     </servlets>
 </module>

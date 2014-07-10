@@ -4,10 +4,13 @@ import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
 import com.aperto.magkit.filter.SecureRedirectFilter;
 import com.aperto.magkit.filter.TemplateNameVoter;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
+import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
-import info.magnolia.nodebuilder.NodeOperation;
 import info.magnolia.voting.voters.URIStartsWithVoter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
@@ -15,6 +18,7 @@ import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectMo
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.cms.core.MgnlNodeType.NT_CONTENTNODE;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Collection of standard module version handler tasks.
@@ -24,44 +28,29 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 public final class StandardTasks {
     public static final String URI_MAPPING = "virtualURIMapping";
     public static final String PN_CLASS = "class";
+    public static final String PN_IMPL_CLASS = "implementationClass";
     public static final String PN_ENABLED = "enabled";
     public static final String PN_FROM_URI = "fromURI";
     public static final String PN_TO_URI = "toURI";
     public static final String PN_PATTERN = "pattern";
+    public static final String PN_EXTENDS = "extends";
+    public static final String PN_ICON = "icon";
     public static final String ICON_DOT = "/.resources/icons/16/dot.gif";
     public static final String ICON_GEARS = "/.resources/icons/24/gears.gif";
-
-    /**
-     * Creates an menu for the given module with templates, paragraphs and dialogs links.
-     */
-    public static Task createAdminInterfaceMenu(final String moduleName, final String moduleDisplayName) {
-        return selectModuleConfig("Module Menu", "Create " + moduleDisplayName + " menue items within module adminInterface.", "adminInterface",
-            addMenuEntry("config/menu/" + moduleName, "MgnlAdminCentral.showTree('config', '/modules/" + moduleName + "')", moduleDisplayName, ICON_GEARS).then(
-                    addMenuEntry("pages", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/pages')", "menu.config.templates", ICON_DOT),
-                    addMenuEntry("components", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/templates/components')", "menu.config.paragraphs", ICON_DOT),
-                    addMenuEntry("dialogs", "MgnlAdminCentral.showTree('config','/modules/" + moduleName + "/dialogs')", "menu.config.dialogs", ICON_DOT)
-            )
-        );
-    }
-
-    private static NodeOperation addMenuEntry(final String relPath, final String onclick, final String label, final String icon) {
-        return addOrGetNode(relPath, NT_CONTENTNODE).then(
-                addOrSetProperty("icon", icon),
-                addOrSetProperty("onclick", onclick),
-                addOrSetProperty("label", label)
-        );
-    }
 
     /**
      * Maps {@code /robots.txt} to {@code /docroot/moduleName/robots.txt}.
      */
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
-                addOrGetNode(URI_MAPPING).then(
-                        addOrGetNode("robots", NT_CONTENTNODE).then(
-                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                                addOrSetProperty(PN_FROM_URI, "/robots.txt"),
-                                addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt"))));
+            addOrGetNode(URI_MAPPING).then(
+                addOrGetNode("robots", NT_CONTENTNODE).then(
+                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                    addOrSetProperty(PN_FROM_URI, "/robots.txt"),
+                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt")
+                )
+            )
+        );
     }
 
     /**
@@ -69,17 +58,19 @@ public final class StandardTasks {
      */
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
-                addOrGetNode(URI_MAPPING).then(
-                        addOrGetNode("favicon", NT_CONTENTNODE).then(
-                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                                addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                                addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico"))));
+            addOrGetNode(URI_MAPPING).then(
+                addOrGetNode("favicon", NT_CONTENTNODE).then(
+                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                    addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
+                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico")
+                )
+            )
+        );
     }
 
     /**
      * Task for installing the secure redirect filter in the magnolia filter chain.
      * Including a default configuration for stkForm template.
-     *
      * @see SecureRedirectFilter
      */
     public static Task secureRedirectFilter() {
@@ -116,8 +107,35 @@ public final class StandardTasks {
                 addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
                 addOrGetNode("useSystemDefault", NT_CONTENTNODE).then(
                     addOrGetNode("magnoliaUri", NT_CONTENTNODE).then(
-                            addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-                            addOrSetProperty(PN_PATTERN, "/.magnolia")
+                        addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
+                        addOrSetProperty(PN_PATTERN, "/.magnolia")
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * Task to add an apps to the app launcher.
+     *
+     * @param groupName Name of the apps group on app launcher
+     * @param color color value of the group, if empty no color will be set. E.g. #cccccc
+     * @param permanent group is permanent (on top) or collapsed (on bottom)
+     * @param appNames names of the single apps
+     */
+    public static Task addAppsToLauncher(final String groupName, final String color, final boolean permanent, final String... appNames) {
+        List<NodeOperation> appsOperations = new ArrayList<NodeOperation>();
+        for (String appName : appNames) {
+            appsOperations.add(addOrGetContentNode(appName));
+        }
+
+        return selectModuleConfig("Add apps to " + groupName, "Add apps to app launcher to group: " + groupName, "ui-admincentral",
+            getNode("config/appLauncherLayout/groups").then(
+                addOrGetContentNode(groupName).then(
+                    isNotEmpty(color) ? addOrSetProperty("color", color) : noop(),
+                    addOrSetProperty("permanent", Boolean.toString(permanent)),
+                    addOrGetContentNode("apps").then(
+                        appsOperations.toArray(new NodeOperation[appsOperations.size()])
                     )
                 )
             )

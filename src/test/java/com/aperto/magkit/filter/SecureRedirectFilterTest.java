@@ -1,30 +1,25 @@
 package com.aperto.magkit.filter;
 
-import info.magnolia.cms.core.Content;
-import info.magnolia.context.MgnlContext;
+import info.magnolia.cms.core.AggregationState;
+import info.magnolia.context.WebContext;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.Link;
 import info.magnolia.link.LinkTransformerManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.jcr.*;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubExtension;
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubMainContent;
-import static com.aperto.magkit.mockito.ContentMockUtils.mockContent;
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
-import static info.magnolia.cms.core.MetaData.DEFAULT_META_NODE;
+import static com.aperto.magkit.mockito.ContextMockUtils.*;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang.StringUtils.*;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -35,8 +30,8 @@ import static org.mockito.Mockito.*;
  */
 public class SecureRedirectFilterTest {
     private SecureRedirectFilter _redirectFilter;
-    private MockHttpServletRequest _request;
-    private MockHttpServletResponse _response;
+    private HttpServletRequest _request;
+    private HttpServletResponse _response;
     private FilterChain _chain;
 
     @Test
@@ -56,7 +51,7 @@ public class SecureRedirectFilterTest {
     @Test
     public void testDocrootHttpsRequest() throws IOException, ServletException, RepositoryException {
         initContext(null, "css", null);
-        _request.setSecure(true);
+        when(_request.isSecure()).thenReturn(true);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, times(1)).doFilter(_request, _response);
     }
@@ -64,49 +59,50 @@ public class SecureRedirectFilterTest {
     @Test
     public void testStandardHttpsRequest() throws IOException, ServletException, RepositoryException {
         initContext("magkit-stk:pages/folder", null, null);
-        _request.setSecure(true);
+        when(_request.isSecure()).thenReturn(true);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, never()).doFilter(_request, _response);
-        assertThat(_response.getRedirectedUrl(), equalTo("http://www.aperto.de/folder.html"));
+        verify(_response).sendRedirect("http://www.aperto.de/folder.html");
     }
 
     @Test
     public void testSecureHttpRequest() throws IOException, ServletException, RepositoryException {
         initContext("standard-templating-kit:pages/stkForm", null, null);
-        _request.setSecure(false);
+        when(_request.isSecure()).thenReturn(false);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, never()).doFilter(_request, _response);
-        assertThat(_response.getRedirectedUrl(), equalTo("https://www.aperto.de/stkForm.html"));
+        verify(_response).sendRedirect("https://www.aperto.de/stkForm.html");
     }
 
     @Test
     public void testSecureHttpRequestWithPorts() throws IOException, ServletException, RepositoryException {
         initContext("standard-templating-kit:pages/stkForm", null, ":80");
-        _request.setSecure(false);
+        when(_request.isSecure()).thenReturn(false);
         _redirectFilter.setHttpPort("80");
         _redirectFilter.setHttpsPort("443");
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, never()).doFilter(_request, _response);
-        assertThat(_response.getRedirectedUrl(), equalTo("https://www.aperto.de:443/stkForm.html"));
+        verify(_response).sendRedirect("https://www.aperto.de:443/stkForm.html");
     }
 
     private void initContext(String template, String extension, String portSuffix) throws RepositoryException {
         if (isNotBlank(template)) {
             String nodeName = substringAfterLast(template, "/");
-            Content actPage = mockContent(nodeName);
+            Node actPage = mock(Node.class);
+            when(actPage.getName()).thenReturn(nodeName);
             Session session = mock(Session.class);
-            Node node = mock(Node.class);
-            Node metaDataNode = mock(Node.class);
             Property property = mock(Property.class);
             when(property.getString()).thenReturn(template);
-            when(metaDataNode.getProperty(anyString())).thenReturn(property);
-            when(node.getNode(DEFAULT_META_NODE)).thenReturn(metaDataNode);
-            when(session.getNode(anyString())).thenReturn(node);
-            when(MgnlContext.getJCRSession(anyString())).thenReturn(session);
+            when(actPage.getProperty(anyString())).thenReturn(property);
+            when(session.getNode(anyString())).thenReturn(actPage);
+            WebContext webContext = mockWebContext();
+            when(webContext.getJCRSession(anyString())).thenReturn(session);
             Workspace workspace = mock(Workspace.class);
-            when(workspace.getName()).thenReturn("website");
-            when(actPage.getWorkspace()).thenReturn(workspace);
-            mockAggregationState(stubExtension(isBlank(extension) ? "html" : extension), stubMainContent(actPage));
+            when(workspace.getName()).thenReturn(WEBSITE);
+            when(actPage.getSession()).thenReturn(session);
+            when(session.getWorkspace()).thenReturn(workspace);
+            AggregationState aggregationState = mockAggregationState(stubExtension(isBlank(extension) ? "html" : extension));
+            when(aggregationState.getMainContentNode()).thenReturn(actPage);
 
             LinkTransformerManager linkManager = mock(LinkTransformerManager.class);
             CompleteUrlPathTransformer transformer = mock(CompleteUrlPathTransformer.class);
@@ -117,9 +113,9 @@ public class SecureRedirectFilterTest {
             mockAggregationState();
         }
         if (isBlank(extension)) {
-            _response.setContentType("text/html");
+            when(_response.getContentType()).thenReturn("text/html");
         } else {
-            _response.setContentType("text/" + extension);
+            when(_response.getContentType()).thenReturn("text/" + extension);
         }
     }
 
@@ -130,9 +126,9 @@ public class SecureRedirectFilterTest {
         TemplateNameVoter voter = new TemplateNameVoter();
         voter.addTemplate("standard-templating-kit:pages/stkForm");
         _redirectFilter.addSecure(voter);
-        _request = new MockHttpServletRequest();
-        _response = new MockHttpServletResponse();
-        _request.setMethod("GET");
+        _request = mock(HttpServletRequest.class);
+        _response = mock(HttpServletResponse.class);
+        when(_request.getMethod()).thenReturn("GET");
         _chain = mock(FilterChain.class);
     }
 }

@@ -9,7 +9,6 @@ import java.math.BigDecimal;
  * @author Mayo Fragoso
  */
 public class GoogleMapsResult {
-
     private BigDecimal _longitude;
     private BigDecimal _latitude;
     private String _street;
@@ -62,7 +61,6 @@ public class GoogleMapsResult {
 
     /**
      * Allows to set the longitude and latitude as comma separated coordinates string (lng,lat).
-     *
      * @param coordinates coordinates value from google maps for this position
      */
     public void setCoordinates(String coordinates) {
@@ -126,7 +124,6 @@ public class GoogleMapsResult {
     public void setAddress(String adress) {
         _address = adress;
     }
-
 
     @Override
     public String toString() {

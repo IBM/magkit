@@ -19,14 +19,14 @@
             if (elem) {
                 var parent = elem.parentNode;
                 var sibling = parent.nextSibling;
-                while (sibling != null) {
+                while (sibling != null ) {
                     if (sibling.nodeType == 1) {
                         toggleDisplayProperty(sibling, 'block');
                     }
                     sibling = sibling.nextSibling;
                 }
                 parent.style.height = (parent.style.height != '11px') ? '11px' : '14px';
-                elem.style.backgroundPosition = (elem.style.backgroundPosition.indexOf('-') != -1) ? '1px 50%' : '-39px 50%';
+                elem.style.backgroundPosition = (elem.style.backgroundPosition.indexOf('-') != -1) ? '1px 50%': '-39px 50%';
                 elem.blur();
             }
         }
@@ -38,14 +38,10 @@
         //]]>
     </script>
     <div>
-        <a id="validator-warning-toggle" href="" title="Hide warning"
-           onclick="toggleValidatorWarning(this); return false;">Hide warning</a>
-        <a id="validator-warning-close" href="" title="Close warning"
-           onclick="document.getElementById('validator-warning').style.display = 'none'; return false;">Close
-            warning</a>
+        <a id="validator-warning-toggle" href="" title="Hide warning" onclick="toggleValidatorWarning(this); return false;">Hide warning</a>
+        <a id="validator-warning-close" href="" title="Close warning" onclick="document.getElementById('validator-warning').style.display = 'none'; return false;">Close warning</a>
     </div>
     <h1>This page is <strong>${validationOk}</strong> valid (X)HTML!</h1>
-
     <p>
         <a href="${validationResultUrl}">Please check the results of the validator.</a>
     </p>

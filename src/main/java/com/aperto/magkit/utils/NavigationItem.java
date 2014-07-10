@@ -1,7 +1,6 @@
 package com.aperto.magkit.utils;
 
 import org.apache.commons.collections.CollectionUtils;
-
 import java.util.List;
 
 /**
@@ -15,7 +14,6 @@ public class NavigationItem extends Item {
 
     /**
      * Accessor for the list of subitems. Default is NULL.
-     *
      * @return A java.util.List&lt;NavigationItem&gt; or NULL if not set.
      */
     public List<NavigationItem> getSubItems() {
@@ -57,7 +55,6 @@ public class NavigationItem extends Item {
 
     /**
      * Flag, if the item should be rendered as selected Item. Default is 'false'.
-     *
      * @return True, if marked as selected.
      */
     public boolean isSelected() {

@@ -2,7 +2,6 @@ package com.aperto.magkit.utils.filters;
 
 import info.magnolia.cms.core.Content;
 import info.magnolia.cms.util.Rule;
-import org.apache.log4j.Logger;
 
 /**
  * Template filter.
@@ -12,7 +11,6 @@ import org.apache.log4j.Logger;
  */
 @Deprecated
 public class TemplateFilter implements Content.ContentFilter {
-    private static final Logger LOGGER = Logger.getLogger(TemplateFilter.class);
 
     /**
      * Rule on which this filter works.
@@ -21,7 +19,6 @@ public class TemplateFilter implements Content.ContentFilter {
 
     /**
      * Konstruktor.
-     *
      * @param rule of magnolia
      */
     public TemplateFilter(Rule rule) {
@@ -30,7 +27,6 @@ public class TemplateFilter implements Content.ContentFilter {
 
     /**
      * Test if this content should be included in a resultant collection.
-     *
      * @param content node for filtering
      * @return if true this will be a part of collection
      */
