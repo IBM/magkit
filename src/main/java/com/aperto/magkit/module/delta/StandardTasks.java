@@ -8,6 +8,7 @@ import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.voting.voters.URIStartsWithVoter;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,6 +139,25 @@ public final class StandardTasks {
                         appsOperations.toArray(new NodeOperation[appsOperations.size()])
                     )
                 )
+            )
+        );
+    }
+
+    /**
+     * Task to add several workspaces to the cache flush policy.
+     *
+     * @param workspaces workspace names
+     * @return Task to execute
+     */
+    public static Task addWorkspaceToCacheFlush(final String... workspaces) {
+        List<NodeOperation> setWorkspaceOps = new ArrayList<NodeOperation>();
+        for (String workspace : workspaces) {
+            setWorkspaceOps.add(addOrSetProperty(workspace, workspace));
+        }
+
+        return selectModuleConfig("Add entries to flushAll policy", "Add flushAll policy for " + ArrayUtils.toString(workspaces), "cache",
+            getNode("config/configurations/default/flushPolicy/policies/flushAll/repositories").then(
+                setWorkspaceOps.toArray(new NodeOperation[setWorkspaceOps.size()])
             )
         );
     }
