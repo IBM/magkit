@@ -163,6 +163,33 @@ public final class StandardTasks {
     }
 
     /**
+     * Task to add a several roles to the app permissions config.
+     *
+     * @param module module name
+     * @param appName app name to reconfigure
+     * @param removeOthers remove all existing roles
+     * @param roles roles to set
+     * @return Task to execute
+     */
+    public static Task addAppRolesPermission(final String module, final String appName, final boolean removeOthers, final String... roles) {
+        List<NodeOperation> rolesOps = new ArrayList<NodeOperation>();
+        for (String role : roles) {
+            rolesOps.add(addOrSetProperty(role, role));
+        }
+
+        return selectModuleConfig("Add app permissions", "Add app permissions for " + appName + " with roles " + ArrayUtils.toString(roles), module,
+            getNode("apps/" + appName).then(
+                addOrGetContentNode("permissions").then(
+                    removeOthers ? removeIfExists("roles") : noop(),
+                    addOrGetContentNode("roles").then(
+                        rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                    )
+                )
+            )
+        );
+    }
+
+    /**
      * Adds a cache exclude config to the magnolia and to the browser cache configuration.
      *
      * @param name name of the entry
