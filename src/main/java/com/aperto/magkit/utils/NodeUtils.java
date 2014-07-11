@@ -1,6 +1,7 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.context.MgnlContext;
+import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.jcr.util.NodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import static info.magnolia.jcr.util.NodeTypes.Component;
+import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
@@ -91,6 +93,22 @@ public final class NodeUtils {
             }
         }
         return hasSubComponents;
+    }
+
+    /**
+     * Delivers the template of the given node or null.
+     *
+     * @param node node to check
+     * @return template name or null
+     */
+    public static String getTemplateIdOrNull(Node node) {
+        String template = null;
+        try {
+            template = NodeTypes.Renderable.getTemplate(node);
+        } catch (RepositoryException e) {
+            LOGGER.info("Unable to get template id from node {}.", getPathIfPossible(node), e);
+        }
+        return template;
     }
 
     private NodeUtils() {
