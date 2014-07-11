@@ -6,6 +6,7 @@ import info.magnolia.jcr.util.NodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -13,8 +14,7 @@ import javax.jcr.Session;
 import static info.magnolia.jcr.util.NodeTypes.Component;
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * Util class for handling nodes ({@link Node}).
@@ -96,15 +96,17 @@ public final class NodeUtils {
     }
 
     /**
-     * Delivers the template of the given node or null.
+     * Delivers the template of the given node.
      *
      * @param node node to check
-     * @return template name or null
+     * @return template name or empty string
      */
-    public static String getTemplateIdOrNull(Node node) {
-        String template = null;
+    public static String getTemplate(@Nullable Node node) {
+        String template = EMPTY;
         try {
-            template = NodeTypes.Renderable.getTemplate(node);
+            if (node != null) {
+                template = defaultString(NodeTypes.Renderable.getTemplate(node));
+            }
         } catch (RepositoryException e) {
             LOGGER.info("Unable to get template id from node {}.", getPathIfPossible(node), e);
         }
