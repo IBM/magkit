@@ -27,12 +27,12 @@ public class ExportTask extends MatchingTask {
 
     private String _rootNode;
     private String _outputPath;
-    private String _mgnlUser;
-    private String _mgnlPassword;
+    private String _mgnlUser = "superuser";
+    private String _mgnlPassword = "superuser";
     private String _targetHost = "localhost";
     private int _targetPort = DEFAULT_TARGET_PORT;
-    private boolean _verbose;
     private String _webapp = "author";
+    private boolean _verbose;
 
     public String getWebapp() {
         return _webapp.indexOf('/') == 0 ? _webapp : "/" + _webapp;
@@ -134,7 +134,7 @@ public class ExportTask extends MatchingTask {
                 info("export: " + url.toExternalForm());
                 int statusCode = httpClient.executeMethod(getMethod);
                 if (statusCode != HttpStatus.SC_OK) {
-                    throw new BuildException("Unable to call debug suite properly. Return code was: " + statusCode);
+                    throw new BuildException("Unable to call Magnolias development tools properly. Return code was: " + statusCode);
                 }
             } catch (IOException e) {
                 LOGGER.error("Could not export nodes.", e);
