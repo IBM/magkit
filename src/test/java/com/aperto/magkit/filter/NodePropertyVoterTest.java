@@ -13,7 +13,7 @@ import javax.jcr.Session;
 
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.mockito.NodeMockUtils.mockPageNode;
+import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
 import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubAggregationState;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
 import static org.hamcrest.core.Is.is;
@@ -71,7 +71,7 @@ public class NodePropertyVoterTest {
     }
 
     @Test
-    public void testNodePropertyMatchWithContext() {
+    public void testNodePropertyMatchWithContext() throws RepositoryException {
         AggregationState aggregationState = new AggregationState();
         Content content = mock(Content.class);
         when(content.getHandle()).thenReturn("/bs/secure");

@@ -4,6 +4,8 @@ import info.magnolia.context.WebContext;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.jcr.RepositoryException;
+
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
 import static com.aperto.magkit.utils.SelectorUtils.*;
@@ -20,28 +22,28 @@ import static org.mockito.Mockito.when;
  */
 public class SelectorUtilsTest {
     @Test
-    public void retrieveActivePageWithNoValue() {
+    public void retrieveActivePageWithNoValue() throws RepositoryException {
         WebContext webContext = mockWebContext();
         when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn(null);
         assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
     }
 
     @Test
-    public void retrieveActivePageWithLetterValue() {
+    public void retrieveActivePageWithLetterValue() throws RepositoryException {
         WebContext webContext = mockWebContext();
         when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("abc");
         assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
     }
 
     @Test
-    public void retrieveActivePageWithInvalidValue() {
+    public void retrieveActivePageWithInvalidValue() throws RepositoryException {
         WebContext webContext = mockWebContext();
         when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("-5");
         assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
     }
 
     @Test
-    public void retrieveActivePageWithValidValue() {
+    public void retrieveActivePageWithValidValue() throws RepositoryException {
         WebContext webContext = mockWebContext();
         when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("5");
         assertThat(SelectorUtils.retrieveActivePage(), is(5));
