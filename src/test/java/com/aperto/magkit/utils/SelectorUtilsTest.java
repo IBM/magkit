@@ -1,5 +1,6 @@
 package com.aperto.magkit.utils;
 
+import com.aperto.magkit.mockito.WebContextStubbingOperation;
 import info.magnolia.context.WebContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import javax.jcr.RepositoryException;
 
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubAttribute;
 import static com.aperto.magkit.utils.SelectorUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -23,29 +25,25 @@ import static org.mockito.Mockito.when;
 public class SelectorUtilsTest {
     @Test
     public void retrieveActivePageWithNoValue() throws RepositoryException {
-        WebContext webContext = mockWebContext();
-        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn(null);
+        mockWebContext(stubAttribute(SELECTOR_PAGING, null));
         assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
     }
 
     @Test
     public void retrieveActivePageWithLetterValue() throws RepositoryException {
-        WebContext webContext = mockWebContext();
-        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("abc");
+        mockWebContext(stubAttribute(SELECTOR_PAGING, "abc"));
         assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
     }
 
     @Test
     public void retrieveActivePageWithInvalidValue() throws RepositoryException {
-        WebContext webContext = mockWebContext();
-        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("-5");
+        mockWebContext(stubAttribute(SELECTOR_PAGING, "-5"));
         assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
     }
 
     @Test
     public void retrieveActivePageWithValidValue() throws RepositoryException {
-        WebContext webContext = mockWebContext();
-        when(webContext.getAttribute(SELECTOR_PAGING)).thenReturn("5");
+        mockWebContext(stubAttribute(SELECTOR_PAGING, "5"));
         assertThat(SelectorUtils.retrieveActivePage(), is(5));
     }
 
