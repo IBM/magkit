@@ -1,8 +1,8 @@
 package com.aperto.magkit.filter;
 
-import info.magnolia.cms.core.AggregationState;
-import info.magnolia.cms.core.Content;
+import com.aperto.magkit.mockito.jcr.SessionMockUtils;
 import info.magnolia.context.SystemContext;
+import info.magnolia.repository.RepositoryConstants;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,16 +11,14 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import static com.aperto.magkit.mockito.ContextMockUtils.*;
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubAggregationState;
+import static com.aperto.magkit.mockito.SystemContextStubbingOperation.stubJcrSession;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -72,11 +70,7 @@ public class NodePropertyVoterTest {
 
     @Test
     public void testNodePropertyMatchWithContext() throws RepositoryException {
-        AggregationState aggregationState = new AggregationState();
-        Content content = mock(Content.class);
-        when(content.getHandle()).thenReturn("/bs/secure");
-        aggregationState.setCurrentContent(content);
-        mockWebContext(stubAggregationState(aggregationState));
+        mockAggregationState(stubCurrentContent("/bs/secure"));
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
@@ -95,12 +89,10 @@ public class NodePropertyVoterTest {
     public void initVoter() throws RepositoryException {
         cleanContext();
         _propertyVoter = new NodePropertyVoter();
-        SystemContext systemContext = mock(SystemContext.class);
-        Session session = mock(Session.class);
+        Session session = SessionMockUtils.mockSession(RepositoryConstants.WEBSITE);
         when(session.getNode(contains("old"))).thenThrow(new PathNotFoundException());
-        Node node = mockPageNode("/bs/secure", stubProperty("secure", "true"));
-        when(session.getNode("/bs/secure")).thenReturn(node);
-        when(systemContext.getJCRSession(anyString())).thenReturn(session);
+        mockPageNode("/bs/secure", stubProperty("secure", "true"));
+        SystemContext systemContext = mockSystemContext(stubJcrSession(RepositoryConstants.WEBSITE));
         _propertyVoter.setSystemContext(systemContext);
     }
 }
