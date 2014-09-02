@@ -6,7 +6,6 @@ import info.magnolia.repository.RepositoryConstants;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
