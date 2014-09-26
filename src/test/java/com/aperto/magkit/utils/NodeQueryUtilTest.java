@@ -1,17 +1,20 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.context.WebContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.jcr.*;
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
-import javax.jcr.query.QueryResult;
 
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubJcrSession;
+import static com.aperto.magkit.mockito.jcr.QueryManagerStubbingOperation.stubbQuery;
+import static com.aperto.magkit.mockito.jcr.QueryMockUtils.mockQueryManager;
+import static com.aperto.magkit.mockito.jcr.QueryStubbingOperation.stubbResult;
 import static com.aperto.magkit.utils.NodeQueryUtil.getComponentsWithTemplate;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.jcr.query.Query.XPATH;
@@ -92,20 +95,13 @@ public class NodeQueryUtilTest {
 
     @Before
     public void setUp() throws RepositoryException {
-        WebContext webContext = mockWebContext();
-        Session session = mock(Session.class);
-        Workspace workspace = mock(Workspace.class);
-        _queryManager = mock(QueryManager.class);
-        Query query = mock(Query.class);
-        QueryResult queryResult = mock(QueryResult.class);
-        NodeIterator nodeIterator = mock(NodeIterator.class);
-        when(nodeIterator.hasNext()).thenReturn(false);
-        when(queryResult.getNodes()).thenReturn(nodeIterator);
-        when(query.execute()).thenReturn(queryResult);
-        when(_queryManager.createQuery(anyString(), anyString())).thenReturn(query);
-        when(workspace.getQueryManager()).thenReturn(_queryManager);
-        when(session.getWorkspace()).thenReturn(workspace);
-        when(webContext.getJCRSession(WEBSITE)).thenReturn(session);
+        // setup mock context
+        mockWebContext(stubJcrSession(WEBSITE));
+
+        // setup mock QueryManager
+        _queryManager = mockQueryManager(WEBSITE,
+                stubbQuery(Query.XPATH, anyString(), stubbResult())
+        );
     }
 
     @After
