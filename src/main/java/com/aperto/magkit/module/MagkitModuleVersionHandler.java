@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
@@ -46,10 +47,18 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
      * Constructor for adding update builder.
      */
     public MagkitModuleVersionHandler() {
-        DeltaBuilder update301 = update("3.0.1", "Updates for version 3.0.1.");
-        Task addNew404Config = new BootstrapConditionally("Check config", "Check config in magkit", "/mgnl-bootstrap/install/magkit/config.modules.magkit.config.xml");
-        update301.addTask(addNew404Config);
+        Task addNew404Config = new BootstrapConditionally("Check config", "Check 404 config in magkit", "/mgnl-bootstrap/install/magkit/config.modules.magkit.config.notFoundConfig.xml");
+        DeltaBuilder update301 = update("3.0.1", "Updates for version 3.0.1.").addTask(addNew404Config);
         register(update301);
+
+        DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(
+            selectServerConfig("Change FTL loader", "Change template jcr loader for supporting loading templates with extension for inplace editing.",
+                getNode("rendering/freemarker/templateLoaders/jcr").then(
+                    removeIfExists("extension")
+                )
+            )
+        );
+        register(update310);
     }
 
     @Override
