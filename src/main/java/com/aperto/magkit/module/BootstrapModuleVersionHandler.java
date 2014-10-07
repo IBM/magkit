@@ -44,7 +44,7 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
     protected Delta getDefaultUpdate(final InstallContext installContext) {
         DeltaBuilder defaultUpdate = (DeltaBuilder) super.getDefaultUpdate(installContext);
         String moduleName = installContext.getCurrentModuleDefinition().getName();
-        defaultUpdate.addTask(new IsModuleInstalledOrRegistered("Install FTLs for inplace editing", "Install all FTLs from modul to inplace templating repository.", "inplace-templating", new TemplatesInstallTask(".*/" + moduleName + "/.*\\.ftl", true)));
+        defaultUpdate.addTask(new IsModuleInstalledOrRegistered("Install FTLs for inplace editing", "Install all FTLs from modul to inplace templating repository.", "inplace-templating", new TemplatesInstallTask(".*/" + moduleName + "/.*\\.ftl", false)));
         return defaultUpdate;
     }
 
