@@ -34,12 +34,6 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
      */
     private final Task _checkServletRegistrationTask = new CheckModuleServletsTask();
 
-    /**
-     * Constructor for adding update builder.
-     */
-    public BootstrapModuleVersionHandler() {
-    }
-
     @Override
     protected Delta getDefaultUpdate(final InstallContext installContext) {
         DeltaBuilder defaultUpdate = (DeltaBuilder) super.getDefaultUpdate(installContext);
