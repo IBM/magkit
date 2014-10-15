@@ -7,8 +7,11 @@ import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
+import info.magnolia.module.model.Version;
 import info.magnolia.voting.voters.URIStartsWithVoter;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,8 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
  * @author Norman Wiechmann (Aperto AG)
  */
 public final class StandardTasks {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandardTasks.class);
+
     public static final String URI_MAPPING = "virtualURIMapping";
     public static final String PN_CLASS = "class";
     public static final String PN_IMPL_CLASS = "implementationClass";
@@ -74,6 +79,7 @@ public final class StandardTasks {
     /**
      * Task for installing the secure redirect filter in the magnolia filter chain.
      * Including a default configuration for stkForm template.
+     *
      * @see SecureRedirectFilter
      */
     public static Task secureRedirectFilter() {
@@ -122,9 +128,9 @@ public final class StandardTasks {
      * Task to add an apps to the app launcher.
      *
      * @param groupName Name of the apps group on app launcher
-     * @param color color value of the group, if empty no color will be set. E.g. #cccccc
+     * @param color     color value of the group, if empty no color will be set. E.g. #cccccc
      * @param permanent group is permanent (on top) or collapsed (on bottom)
-     * @param appNames names of the single apps
+     * @param appNames  names of the single apps
      */
     public static Task addAppsToLauncher(final String groupName, final String color, final boolean permanent, final String... appNames) {
         List<NodeOperation> appsOperations = new ArrayList<NodeOperation>();
@@ -164,10 +170,10 @@ public final class StandardTasks {
     /**
      * Task to add a several roles to the app permissions config.
      *
-     * @param module module name
-     * @param appName app name to reconfigure
+     * @param module       module name
+     * @param appName      app name to reconfigure
      * @param removeOthers remove all existing roles
-     * @param roles roles to set
+     * @param roles        roles to set
      * @return Task to execute
      */
     public static Task addAppRolesPermission(final String module, final String appName, final boolean removeOthers, final String... roles) {
@@ -196,9 +202,9 @@ public final class StandardTasks {
     /**
      * Adds roles permission to an app launcher group.
      *
-     * @param groupName group name
+     * @param groupName    group name
      * @param removeOthers other roles will remove
-     * @param roles roles to configure
+     * @param roles        roles to configure
      * @return Task to execute
      */
     public static Task addAppLauncherGroupPermission(final String groupName, final boolean removeOthers, final String... roles) {
@@ -221,7 +227,7 @@ public final class StandardTasks {
     /**
      * Adds a cache exclude config to the magnolia and to the browser cache configuration.
      *
-     * @param name name of the entry
+     * @param name          name of the entry
      * @param urlStartsWith begin of the url
      * @return task to execute
      */
@@ -243,6 +249,25 @@ public final class StandardTasks {
             addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
             addOrSetProperty(PN_PATTERN, startsWithPattern)
         );
+    }
+
+    /**
+     * Compares the versions and the revision classifier. If the version numbers are equal, a different classifier should trigger a module update.
+     */
+    public static boolean hasModuleNewRevision(final Version fromVersion, final Version toVersion) {
+        boolean triggerUpdate = false;
+        if (toVersion.isEquivalent(fromVersion)) {
+            String toClassifier = toVersion.getClassifier();
+            String fromClassifier = fromVersion.getClassifier();
+            if (toClassifier == null && fromClassifier != null) {
+                LOGGER.debug("A released version was found. Trigger module update.");
+                triggerUpdate = true;
+            } else if (fromClassifier != null && !fromClassifier.equals(toClassifier)) {
+                LOGGER.debug("A new classifier version was found. Trigger module update.");
+                triggerUpdate = true;
+            }
+        }
+        return triggerUpdate;
     }
 
     private StandardTasks() {

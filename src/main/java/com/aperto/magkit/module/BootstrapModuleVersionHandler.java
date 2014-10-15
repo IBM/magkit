@@ -15,6 +15,8 @@ import info.magnolia.module.model.Version;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.aperto.magkit.module.delta.StandardTasks.hasModuleNewRevision;
+
 /**
  * A ModuleVersionHandler which just do the bootstrap on update and bootstraps on module install all bootstrap files under "/mgnl-bootstrap/install/moduleName".
  *
@@ -33,6 +35,18 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
      * Registers all unregistered servlets.
      */
     private final Task _checkServletRegistrationTask = new CheckModuleServletsTask();
+
+    @Override
+    protected List<Delta> getUpdateDeltas(final InstallContext installContext, final Version from) {
+        List<Delta> updateDeltas = super.getUpdateDeltas(installContext, from);
+        final Version toVersion = installContext.getCurrentModuleDefinition().getVersion();
+
+        if (hasModuleNewRevision(from, toVersion)) {
+            updateDeltas.add(getDefaultUpdate(installContext));
+        }
+
+        return updateDeltas;
+    }
 
     @Override
     protected Delta getDefaultUpdate(final InstallContext installContext) {
