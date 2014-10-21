@@ -1,0 +1,35 @@
+package com.aperto.magkit.dialogs.fields;
+
+import info.magnolia.ui.form.field.converter.BaseIdentifierToPathConverter;
+
+import java.util.Locale;
+
+import static com.aperto.magkit.utils.LinkTool.isExternalLink;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
+/**
+ * Handles input of links by urls (external) or absolute paths (internal).
+ *
+ * @author philipp.guettler
+ * @since 06.03.14
+ */
+public class LinkConverter extends BaseIdentifierToPathConverter {
+
+    @Override
+    public String convertToModel(final String path, final Class<? extends String> targetType, final Locale locale) {
+        String result = path;
+        if (!isExternalLink(path) && isNotBlank(path)) {
+            result = super.convertToModel(path, targetType, locale);
+        }
+        return result;
+    }
+
+    @Override
+    public String convertToPresentation(final String uuid, final Class<? extends String> targetType, final Locale locale) {
+        String result = uuid;
+        if (!isExternalLink(uuid) && isNotBlank(uuid)) {
+            result = super.convertToPresentation(uuid, targetType, locale);
+        }
+        return result;
+    }
+}

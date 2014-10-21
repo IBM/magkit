@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 
 /**
  * Helper class for links.
@@ -27,6 +28,16 @@ public final class LinkTool {
             isUuid = matcher.matches();
         }
         return isUuid;
+    }
+
+    /**
+     * Checks, if the link starts with a web protocol.
+     *
+     * @param linkValue to check
+     * @return true for external link
+     */
+    public static boolean isExternalLink(final String linkValue) {
+        return startsWithIgnoreCase(linkValue, "https://") || startsWithIgnoreCase(linkValue, "http://");
     }
 
     private LinkTool() {
