@@ -10,8 +10,11 @@ import javax.annotation.Nullable;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.Collections;
+import java.util.List;
 
 import static info.magnolia.jcr.util.NodeTypes.Component;
+import static info.magnolia.jcr.util.NodeTypes.Page;
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang.StringUtils.*;
@@ -71,6 +74,27 @@ public final class NodeUtils {
             LOGGER.debug(e.getLocalizedMessage(), e);
         }
         return node;
+    }
+
+    /**
+     * Retrieves from given node the child page nodes.
+     *
+     * @param pageNode page node
+     * @return list of child pages, fallback empty list
+     */
+    public static List<Node> getChildPages(Node pageNode) {
+        List<Node> childPages = Collections.emptyList();
+
+        if (pageNode != null) {
+            try {
+                childPages = NodeUtil.asList(NodeUtil.getNodes(pageNode, Page.NAME));
+            } catch (RepositoryException e) {
+                LOGGER.info("Error getting child page nodes of page: {}.", getPathIfPossible(pageNode));
+                LOGGER.debug(e.getLocalizedMessage(), e);
+            }
+        }
+
+        return childPages;
     }
 
     /**
