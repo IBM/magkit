@@ -1,7 +1,7 @@
 package com.aperto.magkit.nodebuilder.task;
 
 import info.magnolia.jcr.nodebuilder.NodeOperation;
-import info.magnolia.nodebuilder.task.ErrorHandling;
+import info.magnolia.jcr.nodebuilder.task.ErrorHandling;
 
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 

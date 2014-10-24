@@ -8,7 +8,7 @@ import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
 import info.magnolia.module.delta.TaskExecutionException;
 import info.magnolia.nodebuilder.NodeOperationException;
-import info.magnolia.nodebuilder.task.ErrorHandling;
+import info.magnolia.jcr.nodebuilder.task.ErrorHandling;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -66,5 +66,4 @@ public class NodeBuilderTask extends AbstractRepositoryTask {
         }
         return errorHandler;
     }
-
 }
