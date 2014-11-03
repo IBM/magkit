@@ -18,7 +18,7 @@
             <class>com.aperto.magkit.error.NotFoundRedirectServlet</class>
             <comment>Redirect to error page.</comment>
             <mappings>
-                <mapping>/notFountRedirect</mapping>
+                <mapping>/notFoundRedirect</mapping>
             </mappings>
         </servlet>
     </servlets>
