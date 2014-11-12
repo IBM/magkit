@@ -45,6 +45,7 @@ public final class StandardTasks {
     public static final String ICON_GEARS = "/.resources/icons/24/gears.gif";
     public static final String PN_ROLES = "roles";
     public static final String NN_PERMISSIONS = "permissions";
+    private static final String NN_WORKFLOW = "workflow";
 
     /**
      * Maps {@code /robots.txt} to {@code /docroot/moduleName/robots.txt}.
@@ -248,6 +249,24 @@ public final class StandardTasks {
         return addOrGetContentNode(nodeName).then(
             addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
             addOrSetProperty(PN_PATTERN, startsWithPattern)
+        );
+    }
+
+    /**
+     * Set for activation and deactivation the simple workflow.
+     *
+     * @return task to execute
+     */
+    public static Task setSimpleWorkflow() {
+        return selectModuleConfig("Configure simple workflow", "Set simple workflow for activate and deactivate.", NN_WORKFLOW,
+            getNode("commands/" + NN_WORKFLOW).then(
+                getNode("activate/activate").then(
+                    setProperty(NN_WORKFLOW, "simpleActivate")
+                ),
+                getNode("deactivate/deactivate").then(
+                    setProperty(NN_WORKFLOW, "simpleDeactivate")
+                )
+            )
         );
     }
 
