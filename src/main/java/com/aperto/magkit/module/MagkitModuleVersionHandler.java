@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
@@ -28,6 +29,7 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
  */
 public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private static final String PATH_FILTER = "/server/filters";
+    private static final long IMAGING_QUALITY = 95L;
 
     private final Task _addBypassForMonitoring = new NodeExistsDelegateTask("Check monitoring bypass", "Check monitoring bypass in server config.", CONFIG, PATH_FILTER + "/bypasses/monitoring", null,
         new AddFilterBypassTask(PATH_FILTER, "monitoring", URIStartsWithVoter.class, "/monitoring")
@@ -40,6 +42,14 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
     private final Task _setSecurityCallback = selectServerConfig("Change callback", "Set the author form client callback.",
         getNode("filters/securityCallback/clientCallbacks/form").then(
             setProperty(PN_CLASS, AuthorFormClientCallback.class.getName())
+        )
+    );
+
+    private final Task _increaseImageQuality = selectModuleConfig("Increase image quality", "Increase imaging rendering quality to " + IMAGING_QUALITY + "%.", "imaging",
+        addOrGetNode("config/generators").then(
+            addOrGetContentNode("stk/outputFormat").then(
+                addOrSetProperty("quality", IMAGING_QUALITY)
+            )
         )
     );
 
@@ -67,6 +77,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         tasks.add(_addBypassForMonitoring);
         tasks.add(_addSpringByPass);
         tasks.add(_setSecurityCallback);
+        tasks.add(_increaseImageQuality);
         return tasks;
     }
 }
