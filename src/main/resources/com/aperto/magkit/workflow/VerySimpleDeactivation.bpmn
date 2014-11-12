@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                   xmlns:tns="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools"
+                   xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd"
+                   id="Definition" expressionLanguage="http://www.mvel.org/2.0"
+                   targetNamespace="http://www.jboss.org/drools" typeLanguage="http://www.java.com/javaTypes">
+  <bpmn2:itemDefinition id="ItemDefinition_2" itemKind="Physical" structureRef="java.util.Map"/>
+  <bpmn2:itemDefinition id="ItemDefinition_9086" itemKind="Physical" structureRef="String"/>
+  <bpmn2:itemDefinition id="ItemDefinition_2572" itemKind="Physical" structureRef="Boolean"/>
+  <bpmn2:process id="com.aperto.magkit.workflow.VerySimpleDeactivation" tns:version="1" tns:packageName="com.aperto.magkit.workflow" tns:adHoc="false" name="VerySimpleDeactivation" isExecutable="true" processType="Private">
+    <bpmn2:extensionElements>
+      <tns:import name="java.util.Map"/>
+    </bpmn2:extensionElements>
+    <bpmn2:property id="mgnlData" itemSubjectRef="ItemDefinition_2"/>
+    <bpmn2:intermediateCatchEvent id="IntermediateCatchEvent_1" name="PublicationTimer">
+      <bpmn2:incoming>SequenceFlow_12</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_11</bpmn2:outgoing>
+      <bpmn2:timerEventDefinition id="TimerEventDefinition_1">
+        <bpmn2:timeDate xsi:type="bpmn2:tFormalExpression" id="FormalExpression_7">#{mgnlData.publicationDate}</bpmn2:timeDate>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:intermediateCatchEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_11" tns:priority="1" name="" sourceRef="IntermediateCatchEvent_1" targetRef="ExclusiveGateway_5"/>
+    <bpmn2:exclusiveGateway id="ExclusiveGateway_4" name="isScheduled" gatewayDirection="Diverging" default="SequenceFlow_13">
+      <bpmn2:documentation id="Documentation_2">Checks whether a publication date has been passsed.</bpmn2:documentation>
+      <bpmn2:incoming>SequenceFlow_6</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_12</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_13</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_12" tns:priority="1" name="schedule" sourceRef="ExclusiveGateway_4" targetRef="IntermediateCatchEvent_1">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" id="FormalExpression_9" language="http://www.java.com/java">Map data = (Map) kcontext.getVariable(&quot;mgnlData&quot;);
+return data.containsKey(&quot;publicationDate&quot;);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SequenceFlow_13" tns:priority="1" name="immediate" sourceRef="ExclusiveGateway_4" targetRef="ExclusiveGateway_5"/>
+    <bpmn2:task id="Task_4" tns:taskName="command" tns:displayName="Command" tns:icon="task.png" name="Deactivate">
+      <bpmn2:documentation id="Documentation_9">Execute deactivation command.</bpmn2:documentation>
+      <bpmn2:extensionElements>
+        <tns:onEntry-script scriptFormat="http://www.java.com/java">
+          <tns:script></tns:script>
+        </tns:onEntry-script>
+        <tns:onExit-script scriptFormat="http://www.java.com/java">
+          <tns:script></tns:script>
+        </tns:onExit-script>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_14</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+      <bpmn2:ioSpecification id="_InputOutputSpecification_12">
+        <bpmn2:dataInput id="_DataInput_36" itemSubjectRef="ItemDefinition_9086" name="commandName"/>
+        <bpmn2:dataInput id="DataInput_4" itemSubjectRef="ItemDefinition_2" name="mgnlData"/>
+        <bpmn2:inputSet id="_InputSet_12" name="Input Set 12">
+          <bpmn2:dataInputRefs>_DataInput_36</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>DataInput_4</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet id="OutputSet_1"/>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation id="_DataInputAssociation_37">
+        <bpmn2:targetRef>_DataInput_36</bpmn2:targetRef>
+        <bpmn2:assignment id="Assignment_1">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_2" language="http://www.java.com/java">deactivate</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_1">_DataInput_36</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_1">
+        <bpmn2:sourceRef>mgnlData</bpmn2:sourceRef>
+        <bpmn2:targetRef>DataInput_4</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="SequenceFlow_5" tns:priority="1" name="" sourceRef="Task_4" targetRef="ExclusiveGateway_3"/>
+    <bpmn2:exclusiveGateway id="ExclusiveGateway_5" name="Converging gateway" gatewayDirection="Converging">
+      <bpmn2:incoming>SequenceFlow_11</bpmn2:incoming>
+      <bpmn2:incoming>SequenceFlow_13</bpmn2:incoming>
+      <bpmn2:incoming>SequenceFlow_10</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_14</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_14" tns:priority="1" name="" sourceRef="ExclusiveGateway_5" targetRef="Task_4"/>
+    <bpmn2:task id="Task_2" tns:taskName="errorNotification" tns:displayName="Error" tns:icon="task.png" name="Error">
+      <bpmn2:incoming>SequenceFlow_8</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_10</bpmn2:outgoing>
+      <bpmn2:ioSpecification id="InputOutputSpecification_1">
+        <bpmn2:dataInput id="DataInput_1" itemSubjectRef="ItemDefinition_2" name="mgnlData"/>
+        <bpmn2:dataInput id="DataInput_5" itemSubjectRef="ItemDefinition_9086" name="subject"/>
+        <bpmn2:inputSet id="InputSet_2">
+          <bpmn2:dataInputRefs>DataInput_1</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>DataInput_5</bpmn2:dataInputRefs>
+        </bpmn2:inputSet>
+        <bpmn2:outputSet id="OutputSet_4"/>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_2">
+        <bpmn2:sourceRef>mgnlData</bpmn2:sourceRef>
+        <bpmn2:targetRef>DataInput_1</bpmn2:targetRef>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_5">
+        <bpmn2:targetRef>DataInput_5</bpmn2:targetRef>
+        <bpmn2:assignment id="Assignment_2">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_4" language="http://www.java.com/java">workflow-jbpm.unpublishNotification.subject.failed</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_3">DataInput_5</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="SequenceFlow_10" tns:priority="1" name="" sourceRef="Task_2" targetRef="ExclusiveGateway_5"/>
+    <bpmn2:endEvent id="EndEvent_1" name="">
+      <bpmn2:incoming>SequenceFlow_9</bpmn2:incoming>
+      <bpmn2:terminateEventDefinition id="TerminateEventDefinition_1"/>
+    </bpmn2:endEvent>
+    <bpmn2:exclusiveGateway id="ExclusiveGateway_3" name="SucceededOrFailedGateway" gatewayDirection="Diverging">
+      <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_8</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_9</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_8" tns:priority="1" name="Failed" sourceRef="ExclusiveGateway_3" targetRef="Task_2">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" id="FormalExpression_5" language="http://www.java.com/java">Map data = (Map) kcontext.getVariable(&quot;mgnlData&quot;);
+return data.containsKey(&quot;exception&quot;);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SequenceFlow_9" tns:priority="1" name="Succeeded" sourceRef="ExclusiveGateway_3" targetRef="EndEvent_1">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" id="FormalExpression_6" language="http://www.jboss.org/drools/rule">eval(true);</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:startEvent id="StartEvent_1" name="StartProcess">
+      <bpmn2:outgoing>SequenceFlow_6</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_6" tns:priority="1" name="" sourceRef="StartEvent_1" targetRef="ExclusiveGateway_4"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="VerySimpleDeactivation">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="com.aperto.magkit.workflow.VerySimpleDeactivation">
+      <bpmndi:BPMNShape id="BPMNShape_StartEvent_1" bpmnElement="StartEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="435.0" y="277.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_1" bpmnElement="EndEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="994.0" y="403.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_3" bpmnElement="ExclusiveGateway_3" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="861.0" y="396.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_IntermediateCatchEvent_1" bpmnElement="IntermediateCatchEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="646.0" y="206.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_4" bpmnElement="ExclusiveGateway_4" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="560.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_5" bpmnElement="ExclusiveGateway_5" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="710.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_4" bpmnElement="Task_4">
+        <dc:Bounds height="50.0" width="110.0" x="831.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_2" bpmnElement="Task_2">
+        <dc:Bounds height="50.0" width="110.0" x="680.0" y="396.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="BPMNShape_Task_4" targetElement="BPMNShape_ExclusiveGateway_3">
+        <di:waypoint xsi:type="dc:Point" x="886.0" y="320.0"/>
+        <di:waypoint xsi:type="dc:Point" x="886.0" y="354.0"/>
+        <di:waypoint xsi:type="dc:Point" x="886.0" y="354.0"/>
+        <di:waypoint xsi:type="dc:Point" x="886.0" y="396.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="SequenceFlow_6" sourceElement="BPMNShape_StartEvent_1" targetElement="BPMNShape_ExclusiveGateway_4">
+        <di:waypoint xsi:type="dc:Point" x="471.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="511.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="511.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="560.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="SequenceFlow_8" sourceElement="BPMNShape_ExclusiveGateway_3" targetElement="BPMNShape_Task_2">
+        <di:waypoint xsi:type="dc:Point" x="861.0" y="421.0"/>
+        <di:waypoint xsi:type="dc:Point" x="830.0" y="421.0"/>
+        <di:waypoint xsi:type="dc:Point" x="830.0" y="421.0"/>
+        <di:waypoint xsi:type="dc:Point" x="790.0" y="421.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_9" bpmnElement="SequenceFlow_9" sourceElement="BPMNShape_ExclusiveGateway_3" targetElement="BPMNShape_EndEvent_1">
+        <di:waypoint xsi:type="dc:Point" x="912.0" y="421.0"/>
+        <di:waypoint xsi:type="dc:Point" x="948.0" y="421.0"/>
+        <di:waypoint xsi:type="dc:Point" x="948.0" y="421.0"/>
+        <di:waypoint xsi:type="dc:Point" x="994.0" y="421.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_10" bpmnElement="SequenceFlow_10" sourceElement="BPMNShape_Task_2" targetElement="BPMNShape_ExclusiveGateway_5">
+        <di:waypoint xsi:type="dc:Point" x="735.0" y="396.0"/>
+        <di:waypoint xsi:type="dc:Point" x="735.0" y="363.0"/>
+        <di:waypoint xsi:type="dc:Point" x="735.0" y="363.0"/>
+        <di:waypoint xsi:type="dc:Point" x="735.0" y="321.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_11" bpmnElement="SequenceFlow_11" sourceElement="BPMNShape_IntermediateCatchEvent_1" targetElement="BPMNShape_ExclusiveGateway_5">
+        <di:waypoint xsi:type="dc:Point" x="682.0" y="224.0"/>
+        <di:waypoint xsi:type="dc:Point" x="735.0" y="224.0"/>
+        <di:waypoint xsi:type="dc:Point" x="735.0" y="270.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_12" bpmnElement="SequenceFlow_12" sourceElement="BPMNShape_ExclusiveGateway_4" targetElement="BPMNShape_IntermediateCatchEvent_1">
+        <di:waypoint xsi:type="dc:Point" x="585.0" y="270.0"/>
+        <di:waypoint xsi:type="dc:Point" x="585.0" y="223.0"/>
+        <di:waypoint xsi:type="dc:Point" x="646.0" y="224.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_13" bpmnElement="SequenceFlow_13" sourceElement="BPMNShape_ExclusiveGateway_4" targetElement="BPMNShape_ExclusiveGateway_5">
+        <di:waypoint xsi:type="dc:Point" x="611.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="655.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="655.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="710.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_14" bpmnElement="SequenceFlow_14" sourceElement="BPMNShape_ExclusiveGateway_5" targetElement="BPMNShape_Task_4">
+        <di:waypoint xsi:type="dc:Point" x="761.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="792.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="792.0" y="295.0"/>
+        <di:waypoint xsi:type="dc:Point" x="831.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
