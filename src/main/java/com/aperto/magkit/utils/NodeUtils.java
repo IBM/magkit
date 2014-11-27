@@ -137,6 +137,23 @@ public final class NodeUtils {
         return template;
     }
 
+    /**
+     * Allows {@link Node#isNodeType(String)} in a null-safe manner and catches the {@link RepositoryException}.
+     * @param node node to check
+     * @param nodeType the type to check
+     * @return true if node has the given type
+     */
+    public static boolean isNodeType(@Nullable final Node node, @Nullable final String nodeType) {
+        boolean isNodeType = false;
+        try {
+            isNodeType = node != null && node.isNodeType(defaultString(nodeType));
+        } catch (RepositoryException e) {
+            LOGGER.info("Unable to check node type [{}] for node [{]}]", nodeType, getPathIfPossible(node));
+            LOGGER.debug(e.getLocalizedMessage());
+        }
+        return isNodeType;
+    }
+
     private NodeUtils() {
     }
 }
