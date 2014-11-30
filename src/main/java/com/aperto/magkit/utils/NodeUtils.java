@@ -17,7 +17,10 @@ import static info.magnolia.jcr.util.NodeTypes.Component;
 import static info.magnolia.jcr.util.NodeTypes.Page;
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Util class for handling nodes ({@link Node}).
@@ -31,7 +34,7 @@ public final class NodeUtils {
     /**
      * Determines the path to given workspace and node identifier. Uses the jcr session from {@link MgnlContext}.
      *
-     * @param workspace Workspace for node identifier lookup
+     * @param workspace  Workspace for node identifier lookup
      * @param identifier Node identifier fka. uuid
      * @return Node path
      */
@@ -53,6 +56,7 @@ public final class NodeUtils {
 
     /**
      * Gets a node by identifier from website workspace.
+     *
      * @see #getNodeByIdentifier(String, String)
      */
     public static Node getNodeByIdentifier(String identifier) {
@@ -99,7 +103,8 @@ public final class NodeUtils {
 
     /**
      * Checks an area for sub components.
-     * @param node a page or component node to check
+     *
+     * @param node     a page or component node to check
      * @param areaName name of the area node
      * @return true, if the area contains components.
      */
@@ -148,8 +153,8 @@ public final class NodeUtils {
         try {
             isNodeType = node != null && node.isNodeType(defaultString(nodeType));
         } catch (RepositoryException e) {
-            LOGGER.info("Unable to check node type [{}] for node [{]}]", nodeType, getPathIfPossible(node));
-            LOGGER.debug(e.getLocalizedMessage());
+            LOGGER.info("Unable to check node type [{}] for node [{}]", nodeType, getPathIfPossible(node));
+            LOGGER.debug(e.getLocalizedMessage(), e);
         }
         return isNodeType;
     }
