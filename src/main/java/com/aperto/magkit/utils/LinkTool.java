@@ -13,6 +13,8 @@ import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
  */
 public final class LinkTool {
     public static final Pattern UUID_PATTERN = Pattern.compile("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$");
+    public static final String HTTP_PREFIX = "http://";
+    public static final String HTTPS_PREFIX = "https://";
 
     /**
      * Checks if the given link is a uuid.
@@ -37,7 +39,17 @@ public final class LinkTool {
      * @return true for external link
      */
     public static boolean isExternalLink(final String linkValue) {
-        return startsWithIgnoreCase(linkValue, "https://") || startsWithIgnoreCase(linkValue, "http://");
+        return startsWithIgnoreCase(linkValue, HTTPS_PREFIX) || startsWithIgnoreCase(linkValue, HTTP_PREFIX);
+    }
+
+    /**
+     * Checks, if the link starts with a slash.
+     *
+     * @param linkValue to check
+     * @return true for path links
+     */
+    public static boolean isPath(final String linkValue) {
+        return startsWithIgnoreCase(linkValue, "/");
     }
 
     private LinkTool() {
