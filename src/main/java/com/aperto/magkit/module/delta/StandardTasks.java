@@ -3,12 +3,15 @@ package com.aperto.magkit.module.delta;
 import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
 import com.aperto.magkit.filter.SecureRedirectFilter;
 import com.aperto.magkit.filter.TemplateNameVoter;
+
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
+import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
 import info.magnolia.voting.voters.URIStartsWithVoter;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public final class StandardTasks {
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
             addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("robots", NT_CONTENTNODE).then(
+                addOrGetNode("robots", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/robots.txt"),
                     addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt")
@@ -68,7 +71,7 @@ public final class StandardTasks {
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
             addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("favicon", NT_CONTENTNODE).then(
+                addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
                     addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico")
@@ -89,9 +92,9 @@ public final class StandardTasks {
                 addOrGetNode("filters/cms/secure-redirect").then(
                     addOrSetProperty(PN_CLASS, SecureRedirectFilter.class.getName()),
                     addOrSetProperty(PN_ENABLED, Boolean.TRUE),
-                    addOrGetNode("secure", NT_CONTENTNODE).then(
-                        addOrGetNode("template_de", NT_CONTENTNODE).then(
-                            addOrGetNode("templates", NT_CONTENTNODE).then(
+                    addOrGetNode("secure", NodeTypes.ContentNode.NAME).then(
+                        addOrGetNode("template_de", NodeTypes.ContentNode.NAME).then(
+                            addOrGetNode("templates", NodeTypes.ContentNode.NAME).then(
                                 addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
                             ),
                             addOrSetProperty(PN_CLASS, TemplateNameVoter.class.getName()),
@@ -115,8 +118,8 @@ public final class StandardTasks {
                 addOrSetProperty(PN_CLASS, ExtendedMultipartRequestFilter.class.getName()),
                 addOrSetProperty(PN_ENABLED, Boolean.TRUE),
                 addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
-                addOrGetNode("useSystemDefault", NT_CONTENTNODE).then(
-                    addOrGetNode("magnoliaUri", NT_CONTENTNODE).then(
+                addOrGetNode("useSystemDefault", NodeTypes.ContentNode.NAME).then(
+                    addOrGetNode("magnoliaUri", NodeTypes.ContentNode.NAME).then(
                         addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
                         addOrSetProperty(PN_PATTERN, "/.magnolia")
                     )
