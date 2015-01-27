@@ -73,11 +73,12 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
 
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
-        final List<Task> tasks = new ArrayList<Task>();
-        tasks.add(_addBypassForMonitoring);
-        tasks.add(_addSpringByPass);
-        tasks.add(_setSecurityCallback);
-        tasks.add(_increaseImageQuality);
-        return tasks;
+        List<Task> installTasks = new ArrayList<Task>();
+        installTasks.addAll(super.getExtraInstallTasks(installContext));
+        installTasks.add(_addBypassForMonitoring);
+        installTasks.add(_addSpringByPass);
+        installTasks.add(_setSecurityCallback);
+        installTasks.add(_increaseImageQuality);
+        return installTasks;
     }
 }
