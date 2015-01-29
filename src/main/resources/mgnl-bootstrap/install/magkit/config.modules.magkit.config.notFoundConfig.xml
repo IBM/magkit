@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sv:node sv:name="notFoundConfig" xmlns:sv="http://www.jcp.org/jcr/sv/1.0">
+<sv:node sv:name="notFoundConfig" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <sv:property sv:name="jcr:primaryType" sv:type="Name">
     <sv:value>mgnl:contentNode</sv:value>
   </sv:property>
@@ -7,7 +7,7 @@
     <sv:value>7b20d285-2e59-4fcb-907a-1b305e7c273f</sv:value>
   </sv:property>
   <sv:property sv:name="default" sv:type="String">
-    <sv:value>/404</sv:value>
+    <sv:value>/en/404-not-found</sv:value>
   </sv:property>
   <sv:property sv:name="jcr:createdBy" sv:type="String">
     <sv:value>admin</sv:value>
@@ -19,7 +19,7 @@
     <sv:value>superuser</sv:value>
   </sv:property>
   <sv:property sv:name="mgnl:lastModified" sv:type="Date">
-    <sv:value>2014-10-07T14:49:53.542+02:00</sv:value>
+    <sv:value>2015-01-27T18:00:28.629+01:00</sv:value>
   </sv:property>
   <sv:property sv:name="mgnl:lastModifiedBy" sv:type="String">
     <sv:value>superuser</sv:value>
@@ -46,38 +46,6 @@
     <sv:property sv:name="mgnl:lastModifiedBy" sv:type="String">
       <sv:value>superuser</sv:value>
     </sv:property>
-    <sv:node sv:name="ag">
-      <sv:property sv:name="jcr:primaryType" sv:type="Name">
-        <sv:value>mgnl:contentNode</sv:value>
-      </sv:property>
-      <sv:property sv:name="jcr:uuid" sv:type="String">
-        <sv:value>e9bfab3d-127a-45a5-9b71-ac410720f57e</sv:value>
-      </sv:property>
-      <sv:property sv:name="errorPath" sv:type="String">
-        <sv:value>/airbusgroup/int/en/toolbox/404</sv:value>
-      </sv:property>
-      <sv:property sv:name="jcr:createdBy" sv:type="String">
-        <sv:value>admin</sv:value>
-      </sv:property>
-      <sv:property sv:name="locale" sv:type="String">
-        <sv:value>en</sv:value>
-      </sv:property>
-      <sv:property sv:name="mgnl:created" sv:type="Date">
-        <sv:value>2014-05-12T15:29:00.709+02:00</sv:value>
-      </sv:property>
-      <sv:property sv:name="mgnl:createdBy" sv:type="String">
-        <sv:value>superuser</sv:value>
-      </sv:property>
-      <sv:property sv:name="mgnl:lastModified" sv:type="Date">
-        <sv:value>2014-10-07T14:49:53.542+02:00</sv:value>
-      </sv:property>
-      <sv:property sv:name="mgnl:lastModifiedBy" sv:type="String">
-        <sv:value>superuser</sv:value>
-      </sv:property>
-      <sv:property sv:name="siteName" sv:type="String">
-        <sv:value>airbusgroup</sv:value>
-      </sv:property>
-    </sv:node>
     <sv:node sv:name="en">
       <sv:property sv:name="jcr:primaryType" sv:type="Name">
         <sv:value>mgnl:contentNode</sv:value>
@@ -86,7 +54,7 @@
         <sv:value>26fe9310-f49e-48c2-9580-a76b0d2447ea</sv:value>
       </sv:property>
       <sv:property sv:name="errorPath" sv:type="String">
-        <sv:value>/airbusgroup/int/en/toolbox/404</sv:value>
+        <sv:value>/en/404-not-found</sv:value>
       </sv:property>
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>admin</sv:value>
@@ -101,7 +69,7 @@
         <sv:value>superuser</sv:value>
       </sv:property>
       <sv:property sv:name="mgnl:lastModified" sv:type="Date">
-        <sv:value>2014-10-07T14:49:53.542+02:00</sv:value>
+        <sv:value>2015-01-27T18:00:32.038+01:00</sv:value>
       </sv:property>
       <sv:property sv:name="mgnl:lastModifiedBy" sv:type="String">
         <sv:value>superuser</sv:value>
@@ -118,7 +86,7 @@
         <sv:value>b4cee538-a6f3-47ea-8a7b-f8e302013a14</sv:value>
       </sv:property>
       <sv:property sv:name="errorPath" sv:type="String">
-        <sv:value>/airbusgroup/int/de/404</sv:value>
+        <sv:value>/de/404-fehler</sv:value>
       </sv:property>
       <sv:property sv:name="jcr:createdBy" sv:type="String">
         <sv:value>admin</sv:value>
@@ -136,19 +104,19 @@
         <sv:value>superuser</sv:value>
       </sv:property>
       <sv:property sv:name="mgnl:lastActivated" sv:type="Date">
-        <sv:value>2014-05-13T15:05:54.015+02:00</sv:value>
+        <sv:value>2015-01-27T18:10:51.425+01:00</sv:value>
       </sv:property>
       <sv:property sv:name="mgnl:lastActivatedBy" sv:type="String">
         <sv:value>superuser</sv:value>
       </sv:property>
       <sv:property sv:name="mgnl:lastModified" sv:type="Date">
-        <sv:value>2014-10-07T14:49:53.542+02:00</sv:value>
+        <sv:value>2015-01-27T18:00:20.964+01:00</sv:value>
       </sv:property>
       <sv:property sv:name="mgnl:lastModifiedBy" sv:type="String">
         <sv:value>superuser</sv:value>
       </sv:property>
       <sv:property sv:name="siteName" sv:type="String">
-        <sv:value>default</sv:value>
+        <sv:value>de</sv:value>
       </sv:property>
     </sv:node>
   </sv:node>
