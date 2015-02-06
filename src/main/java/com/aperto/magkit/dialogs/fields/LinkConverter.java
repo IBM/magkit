@@ -18,7 +18,7 @@ public class LinkConverter extends BaseIdentifierToPathConverter {
     @Override
     public String convertToModel(final String path, final Class<? extends String> targetType, final Locale locale) {
         String result = path;
-        if (!isExternalLink(path) && isNotBlank(path)) {
+        if (isNotBlank(path) && !isExternalLink(path) && !isAnchor(path)) {
             result = super.convertToModel(path, targetType, locale);
         }
         return result;
@@ -27,9 +27,13 @@ public class LinkConverter extends BaseIdentifierToPathConverter {
     @Override
     public String convertToPresentation(final String uuid, final Class<? extends String> targetType, final Locale locale) {
         String result = uuid;
-        if (!isExternalLink(uuid) && isNotBlank(uuid)) {
+        if (isNotBlank(uuid) && !isExternalLink(uuid) && !isAnchor(uuid)) {
             result = super.convertToPresentation(uuid, targetType, locale);
         }
         return result;
+    }
+
+    private boolean isAnchor(final String value) {
+        return value.startsWith("#");
     }
 }
