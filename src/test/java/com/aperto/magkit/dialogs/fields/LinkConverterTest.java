@@ -14,6 +14,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Test the {@link LinkConverter}.
+ *
+ * @author frank.sommer
+ * @since 3.1.3
+ */
 public class LinkConverterTest {
 
     @Test
