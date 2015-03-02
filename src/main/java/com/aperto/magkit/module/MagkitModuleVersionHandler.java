@@ -53,6 +53,12 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         )
     );
 
+    private final Task _setTemplateLoaderConfig = selectServerConfig("Change FTL loader", "Change template jcr loader for supporting loading templates with extension for inplace editing.",
+        getNode("rendering/freemarker/templateLoaders/jcr").then(
+            removeIfExists("extension")
+        )
+    );
+
     /**
      * Constructor for adding update builder.
      */
@@ -61,13 +67,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         DeltaBuilder update313 = update("3.1.3", "Updates for version 3.1.3.").addTask(addNew404Config);
         register(update313);
 
-        DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(
-            selectServerConfig("Change FTL loader", "Change template jcr loader for supporting loading templates with extension for inplace editing.",
-                getNode("rendering/freemarker/templateLoaders/jcr").then(
-                    removeIfExists("extension")
-                )
-            )
-        );
+        DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(_setTemplateLoaderConfig);
         register(update310);
     }
 
@@ -78,6 +78,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         installTasks.add(_addBypassForMonitoring);
         installTasks.add(_addSpringByPass);
         installTasks.add(_setSecurityCallback);
+        installTasks.add(_setTemplateLoaderConfig);
         installTasks.add(_increaseImageQuality);
         return installTasks;
     }
