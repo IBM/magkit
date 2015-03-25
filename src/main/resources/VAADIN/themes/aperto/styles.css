@@ -1,0 +1,11 @@
+.aperto-extended-textfield-label {
+    text-align: right;
+    color: #666;
+    white-space: nowrap;
+    line-height: 25px;
+    right: 2px;
+    position: relative;
+    font-size: 10px;
+    top: -12px;
+    height: 18px;
+}
