@@ -46,16 +46,7 @@ public class ExtendedTextField extends CustomField<String> {
     }
 
     public void configureLabel() {
-        final int maxLength = _definition.getMaxLength();
-        final int recommendedLength = _definition.getRecommendedLength();
-        final int availableLength;
-        if (maxLength > 0) {
-            availableLength = maxLength;
-        } else if (recommendedLength > 0) {
-            availableLength = recommendedLength;
-        } else {
-            availableLength = -1;
-        }
+        final int availableLength = determineLabelMaxLength();
 
         // check the initial value of the text field
         int textLength = 0;
@@ -84,6 +75,27 @@ public class ExtendedTextField extends CustomField<String> {
                 }
             });
         }
+    }
+
+    /**
+     * Determines the maximum value for the label.
+     *
+     * @return second value of the label
+     */
+    protected int determineLabelMaxLength() {
+        final int maxLength = _definition.getMaxLength();
+        final int recommendedLength = _definition.getRecommendedLength();
+        final int availableLength;
+        if (maxLength > 0 && recommendedLength > 0) {
+            availableLength = Math.min(maxLength, recommendedLength);
+        } else if (maxLength > 0) {
+            availableLength = maxLength;
+        } else if (recommendedLength > 0) {
+            availableLength = recommendedLength;
+        } else {
+            availableLength = -1;
+        }
+        return availableLength;
     }
 
     /**
