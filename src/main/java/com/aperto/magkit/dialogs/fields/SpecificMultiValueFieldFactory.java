@@ -29,7 +29,6 @@ public class SpecificMultiValueFieldFactory extends MultiValueFieldFactory<Speci
 
     @Override
     protected Field<PropertysetItem> createFieldComponent() {
-        SpecificMultiField field = new SpecificMultiField(definition, _fieldFactoryFactory, _i18nContentSupport, _componentProvider, item);
-        return field;
+        return new SpecificMultiField(definition, _fieldFactoryFactory, _i18nContentSupport, _componentProvider, item);
     }
 }

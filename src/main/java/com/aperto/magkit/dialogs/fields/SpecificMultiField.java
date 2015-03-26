@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-import java.util.Iterator;
 
 import static info.magnolia.jcr.util.PropertyUtil.getLong;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
@@ -37,13 +36,12 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * @author diana.racho (Aperto AG)
  */
 public class SpecificMultiField extends MultiField {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecificMultiField.class);
+    private static final long DEFAULT_COUNT = 3;
 
     private final ConfiguredFieldDefinition _fieldDefinition;
 
-    private static final Long DEFAULT_COUNT = Long.valueOf(3);
-    private Long _multiValueCount = Long.valueOf(-1);
+    private Long _multiValueCount = -1L;
 
     public SpecificMultiField(MultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, I18nContentSupport i18nContentSupport, ComponentProvider componentProvider, Item relatedFieldItem) {
         super(definition, fieldFactoryFactory, i18nContentSupport, componentProvider, relatedFieldItem);
@@ -99,7 +97,7 @@ public class SpecificMultiField extends MultiField {
                 if (transformer instanceof MultiTransformer) {
                     // create property and find its propertyId
                     property = ((MultiTransformer) transformer).createProperty();
-                    newPropertyId = (Integer) findPropertyId(item, property);
+                    newPropertyId = findPropertyId(item, property);
                 } else {
                     // get next propertyId based on property count
                     newPropertyId = item.getItemPropertyIds().size();
@@ -122,9 +120,7 @@ public class SpecificMultiField extends MultiField {
     @Override
     protected void initFields(PropertysetItem newValue) {
         root.removeAllComponents();
-        Iterator<?> it = newValue.getItemPropertyIds().iterator();
-        while (it.hasNext()) {
-            Object propertyId = it.next();
+        for (Object propertyId : newValue.getItemPropertyIds()) {
             Property<?> property = newValue.getItemProperty(propertyId);
             root.addComponent(createEntryComponent(propertyId, property));
         }
