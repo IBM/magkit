@@ -1,7 +1,6 @@
 package com.aperto.magkit.dialogs.fields;
 
 import com.vaadin.data.Property;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
@@ -106,7 +105,7 @@ public class ExtendedTextField extends CustomField<String> {
     }
 
     @Override
-    public void setValue(String newValue) throws ReadOnlyException, Converter.ConversionException {
+    public void setValue(String newValue) {
         _field.setValue(newValue);
     }
 
