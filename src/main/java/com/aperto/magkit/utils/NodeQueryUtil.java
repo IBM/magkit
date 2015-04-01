@@ -1,6 +1,8 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.context.MgnlContext;
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +18,12 @@ import static info.magnolia.jcr.util.NodeUtil.*;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.jcr.query.Query.JCR_SQL2;
 import static javax.jcr.query.Query.XPATH;
+import static org.apache.commons.collections15.CollectionUtils.collect;
 import static org.apache.commons.lang.StringUtils.*;
 
 /**
- * Utility methods for common queries. 
- * 
+ * Utility methods for common queries.
+ *
  * @author angelika.foerst
  * @author frank.sommer
  */
@@ -48,7 +51,7 @@ public final class NodeQueryUtil {
      * This method can only deal with queries containing just one selector (no joins).
      *
      * @param sqlQueryStatement the query in JCR-SQL2 syntax
-     * @param repository target repository
+     * @param repository        target repository
      * @return a list of nodes or null
      */
     public static List<Node> executeSqlQuery(final String sqlQueryStatement, final String repository) {
@@ -58,11 +61,11 @@ public final class NodeQueryUtil {
     /**
      * Executes a query and returns a list of nodes.
      *
-     * @see info.magnolia.cms.util.QueryUtil
      * @param queryStatement query statement
-     * @param language language of the query statement
-     * @param repository target repository
+     * @param language       language of the query statement
+     * @param repository     target repository
      * @return a list of nodes or null
+     * @see info.magnolia.cms.util.QueryUtil
      */
     public static List<Node> executeQuery(final String queryStatement, final String language, final String repository) {
         List<Node> nodes = null;
@@ -74,23 +77,23 @@ public final class NodeQueryUtil {
         }
         return nodes;
     }
-    
+
     /**
      * Returns pages having a given template. A root node for the search may be specified.
      *
      * @param templateName name of the page template. Fully qualified, e.g. 'rsmn-main:pages/rmArticle'
-     * @param searchRoot the search root or null
+     * @param searchRoot   the search root or null
      * @return a list of nodes or null
      */
     public static List<Node> getPagesWithTemplate(final String templateName, final Node searchRoot) {
         return getPagesWithTemplate(templateName, searchRoot, null);
     }
-    
+
     /**
      * Returns pages having a given template. A root node and additional constraints on the page may be specified.
      *
-     * @param templateName name of the page template. Fully qualified, e.g. 'rsmn-main:pages/rmArticle'
-     * @param searchRoot the search root or null
+     * @param templateName       name of the page template. Fully qualified, e.g. 'rsmn-main:pages/rmArticle'
+     * @param searchRoot         the search root or null
      * @param xPathPageCondition additional condition that wil be applied on the page. Uses XPath notation and is surrounded by square brackets.
      * @return a list of nodes or null
      */
@@ -105,12 +108,12 @@ public final class NodeQueryUtil {
         statement.append(defaultString(xPathPageCondition));
         return executeQuery(statement.toString(), XPATH, WEBSITE);
     }
-    
+
     /**
      * Returns components having a given template. A root node and additional constraints on the component may be specified.
      *
-     * @param templateName name of the component template. Fully qualified, e.g. 'rsmn-main:components/rmDynamicGuideList'
-     * @param searchRoot the search root or null
+     * @param templateName   name of the component template. Fully qualified, e.g. 'rsmn-main:components/rmDynamicGuideList'
+     * @param searchRoot     the search root or null
      * @param xPathCondition additional condition that wil be applied on the component. Uses XPath notation and is surrounded by square brackets.
      * @return a list of nodes or null
      */
@@ -122,8 +125,8 @@ public final class NodeQueryUtil {
     /**
      * Returns components having a given template. A root node and additional constraints on the component may be specified.
      *
-     * @param templateName name of the component template. Fully qualified, e.g. 'rsmn-main:components/rmDynamicGuideList'
-     * @param searchRoot the search root or empty string
+     * @param templateName   name of the component template. Fully qualified, e.g. 'rsmn-main:components/rmDynamicGuideList'
+     * @param searchRoot     the search root or empty string
      * @param xPathCondition additional condition that wil be applied on the component. Uses XPath notation and is surrounded by square brackets.
      * @return a list of nodes or null
      */
@@ -144,14 +147,90 @@ public final class NodeQueryUtil {
         xpathBuilder.orderBy(DUMMY_ORDERING);
         return executeQuery(xpathBuilder.build(), XPATH, WEBSITE);
     }
-    
+
+    /**
+     * Creates a query for a component inside a page.
+     *
+     * @param componentsTemplateName template name of the component
+     * @param searchRoot             search root (path of the page node)
+     * @return component node or null
+     */
+    public static Node findComponentOnPage(final String componentsTemplateName, final String searchRoot) {
+        Node componentNode = null;
+        List<String> areaRoots = retrieveChildAreas(searchRoot);
+        final NodeIterator componentsIterator = findDescendantComponents(componentsTemplateName, areaRoots.toArray(new String[areaRoots.size()]));
+        if (componentsIterator != null && componentsIterator.hasNext()) {
+            componentNode = componentsIterator.nextNode();
+        }
+        return componentNode;
+    }
+
+    private static List<String> retrieveChildAreas(final String searchRoot) {
+        final List<Node> nodes = executeSqlQuery("select * from [mgnl:area] where ischildnode('" + searchRoot + "')");
+        return (List<String>) collect(nodes, new Transformer<Node, String>() {
+            @Override
+            public String transform(final Node node) {
+                return getPathIfPossible(node);
+            }
+        });
+    }
+
+    /**
+     * Find a descendant component node.
+     *
+     * @param componentsTemplateName component template name
+     * @param searchRoot search root
+     *
+     * @return component node
+     */
+    public static Node findDescendantComponent(final String componentsTemplateName, final String searchRoot) {
+        Node componentNode = null;
+        final NodeIterator componentsIterator = findDescendantComponents(componentsTemplateName, searchRoot);
+        if (componentsIterator != null && componentsIterator.hasNext()) {
+            componentNode = componentsIterator.nextNode();
+        }
+        return componentNode;
+    }
+
+    /**
+     * Find descendant component nodes.
+     *
+     * @param componentsTemplateName component template name
+     * @param searchRoots search roots
+     *
+     * @return node iterator
+     */
+    public static NodeIterator findDescendantComponents(final String componentsTemplateName, final String... searchRoots) {
+        NodeIterator nodeIterator = null;
+
+        StringBuilder statement = new StringBuilder();
+        statement.append("select * from [mgnl:component] where [mgnl:template] = '").append(componentsTemplateName).append("'");
+        if (ArrayUtils.isNotEmpty(searchRoots)) {
+            statement.append(" and (");
+            for (String searchRoot : searchRoots) {
+                statement.append("ISDESCENDANTNODE('").append(searchRoot).append("') ");
+            }
+            statement.append(")");
+        }
+
+        try {
+            final Query sqlQuery = createSqlQuery(statement.toString(), null);
+            final QueryResult queryResult = sqlQuery.execute();
+            nodeIterator = queryResult.getNodes();
+        } catch (RepositoryException e) {
+            LOGGER.error("Error executing query for component {}.", componentsTemplateName, e);
+        }
+
+        return nodeIterator;
+    }
+
     /**
      * Creates a {@link javax.jcr.query.Query}.
      *
      * @param queryStatement the query statement
-     * @param language the query language
-     * @param bindValues a mapping of parameter names to values
-     * @param repository the repository on which the query is executed
+     * @param language       the query language
+     * @param bindValues     a mapping of parameter names to values
+     * @param repository     the repository on which the query is executed
      * @return a query object
      */
     public static Query createQuery(final String queryStatement, final String language, final Map<String, Value> bindValues, final String repository) {
@@ -196,7 +275,8 @@ public final class NodeQueryUtil {
 
     /**
      * Executes a query and retrieves the results identified by a selector.
-     * @param query the query object
+     *
+     * @param query        the query object
      * @param selectorName the selector
      * @return a list of nodes or null
      */
@@ -206,7 +286,7 @@ public final class NodeQueryUtil {
             if (query != null) {
                 final QueryResult result = query.execute();
                 final RowIterator rows = result.getRows();
-    
+
                 while (rows.hasNext()) {
                     final Row row = rows.nextRow();
                     resultList.add(row.getNode(selectorName));
@@ -217,7 +297,7 @@ public final class NodeQueryUtil {
         }
         return resultList;
     }
-    
+
     private NodeQueryUtil() {
         //private constructor
     }
