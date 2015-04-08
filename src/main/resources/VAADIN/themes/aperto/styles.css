@@ -9,3 +9,17 @@
     top: -12px;
     height: 18px;
 }
+
+/*Styles for the sortable multivaluefield*/
+.aperto-multifield > .v-expand > .v-slot {
+    width: 80% !important;
+}
+
+.aperto-multifield {
+    margin-bottom: 20px;
+}
+
+.aperto-multi-buttons {
+    top: 10px;
+    position: relative;
+}
