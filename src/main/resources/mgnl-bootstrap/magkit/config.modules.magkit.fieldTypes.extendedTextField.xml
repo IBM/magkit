@@ -4,7 +4,7 @@
     <sv:value>mgnl:contentNode</sv:value>
   </sv:property>
   <sv:property sv:name="jcr:uuid" sv:type="String">
-    <sv:value>045c51c6-6563-4ea3-ad91-2c18fd499be1</sv:value>
+    <sv:value>045c51c6-6563-4ea3-ad91-2c18fd499be3</sv:value>
   </sv:property>
   <sv:property sv:name="definitionClass" sv:type="String">
     <sv:value>com.aperto.magkit.dialogs.fields.ExtendedTextFieldDefinition</sv:value>
