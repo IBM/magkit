@@ -4,8 +4,8 @@ import info.magnolia.ui.form.field.definition.MultiValueFieldDefinition;
 import info.magnolia.ui.form.field.transformer.multi.MultiValueTransformer;
 
 /**
- * Definition class for the sortable MultivalueField.
- * There are two new Properties (maxComponents and sortable).
+ * Definition class for the sortable MultiValueField.
+ * There are two new properties (maxComponents and sortable).
  *
  * @author Stefan Jahn
  * @since 02.12.14

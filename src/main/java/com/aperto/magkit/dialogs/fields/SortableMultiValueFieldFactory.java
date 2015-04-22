@@ -5,7 +5,6 @@ import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.ui.Field;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
-import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
 import info.magnolia.ui.form.field.factory.FieldFactoryFactory;
 import info.magnolia.ui.form.field.transformer.Transformer;
@@ -26,8 +25,7 @@ public class SortableMultiValueFieldFactory extends AbstractFieldFactory<Sortabl
     private final I18nContentSupport _i18nContentSupport;
 
     @Inject
-    public SortableMultiValueFieldFactory(final SortableMultiValueFieldDefinition definition, final Item relatedFieldItem, final FieldFactoryFactory fieldFactoryFactory, final ComponentProvider componentProvider, final I18nContentSupport
-            i18nContentSupport) {
+    public SortableMultiValueFieldFactory(final SortableMultiValueFieldDefinition definition, final Item relatedFieldItem, final FieldFactoryFactory fieldFactoryFactory, final ComponentProvider componentProvider, final I18nContentSupport i18nContentSupport) {
         super(definition, relatedFieldItem);
         _relatedFieldItem = relatedFieldItem;
         _fieldFactoryFactory = fieldFactoryFactory;

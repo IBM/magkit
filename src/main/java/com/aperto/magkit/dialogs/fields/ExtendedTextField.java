@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
  */
 public class ExtendedTextField extends CustomField<String> {
     private static final long serialVersionUID = -6599211749794929718L;
+    public static final int FULL_WIDTH = 100;
 
     private final ExtendedTextFieldDefinition _definition;
     private final VerticalLayout _rootLayout = new VerticalLayout();
@@ -34,7 +35,7 @@ public class ExtendedTextField extends CustomField<String> {
         _rootLayout.setPrimaryStyleName("aperto-extended-textfield");
 
         _field.setImmediate(true);
-        _field.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        _field.setWidth(FULL_WIDTH, Sizeable.Unit.PERCENTAGE);
         _field.setNullRepresentation("");
         _field.setNullSettingAllowed(true);
 

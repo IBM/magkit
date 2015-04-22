@@ -6,7 +6,6 @@ import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.ui.*;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
-import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.AbstractCustomMultiField;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.form.field.factory.FieldFactoryFactory;
@@ -16,7 +15,7 @@ import info.magnolia.ui.form.field.transformer.multi.MultiTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
+import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
 
 /**
  * Sortable MultiValueField based on {@link info.magnolia.ui.form.field.MultiField}.
@@ -28,10 +27,10 @@ import java.util.Iterator;
  * @since 02.12.14
  */
 public class SortableMultiValueField extends AbstractCustomMultiField<SortableMultiValueFieldDefinition, PropertysetItem> {
-
     private static final long serialVersionUID = 5843108445147449041L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SortableMultiValueField.class);
+
     private static final int PROPERTY_ID_NOT_FOUND = -1;
 
     private final ConfiguredFieldDefinition _fieldDefinition;
@@ -39,8 +38,6 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
 
     private String _buttonCaptionAdd;
     private String _buttonCaptionRemove;
-    private String _buttonCaptionMoveUp = "move up";
-    private String _buttonCaptionMoveDown = "move down";
 
     public SortableMultiValueField(SortableMultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, ComponentProvider componentProvider, Item relatedFieldItem, I18nContentSupport i18nContentSupport) {
         super(definition, fieldFactoryFactory, i18nContentSupport, componentProvider, relatedFieldItem);
@@ -53,7 +50,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         addStyleName("linkfield");
         root = new VerticalLayout();
         root.setSpacing(true);
-        root.setWidth(100, Unit.PERCENTAGE);
+        root.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
         root.setHeight(-1, Unit.PIXELS);
 
         addRootListener();
@@ -85,7 +82,6 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         });
 
         initFields();
-
         return root;
     }
 
@@ -117,14 +113,11 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
     @Override
     protected void initFields(PropertysetItem newValue) {
         root.removeAllComponents();
-        Iterator<?> it = newValue.getItemPropertyIds().iterator();
-        while (it.hasNext()) {
-            Object propertyId = it.next();
+        for (Object propertyId : newValue.getItemPropertyIds()) {
             Property<?> property = newValue.getItemProperty(propertyId);
             root.addComponent(createEntryComponent(propertyId, property));
         }
         root.addComponent(_addButton);
-
     }
 
     /**
@@ -132,37 +125,36 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
      * <p/>
      * Create a single element.<br> This single element is composed of:<br> - a configured field <br> - a remove Button<br>
      */
-    // CHECKSTYLE:OFF
     protected Component createEntryComponent(Object propertyId, Property<?> property) {
+        Property propertyToBind = property;
+
         HorizontalLayout layout = new HorizontalLayout();
         layout.addStyleName("aperto-multifield");
-        layout.setWidth(100, Unit.PERCENTAGE);
+        layout.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
         layout.setHeight(-1, Unit.PIXELS);
 
         // creates property datasource if given property is null
-        Field<?> field = createLocalField(_fieldDefinition, property, true);
+        Field<?> field = createLocalField(_fieldDefinition, propertyToBind, true);
         layout.addComponent(field);
 
         // bind the field's property to the item
-        if (property == null) {
-            property = field.getPropertyDataSource();
-            ((PropertysetItem) getPropertyDataSource().getValue()).addItemProperty(propertyId, property);
+        if (propertyToBind == null) {
+            propertyToBind = field.getPropertyDataSource();
+            ((PropertysetItem) getPropertyDataSource().getValue()).addItemProperty(propertyId, propertyToBind);
         }
-
-        initButtons(layout, property);
+        initButtons(layout, propertyToBind);
 
         // set layout to full width
-        layout.setWidth(100, Unit.PERCENTAGE);
+        layout.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
         return layout;
     }
-    // CHECKSTYLE:ON
 
     protected void initButtons(Layout layout, Property property) {
         boolean isSortable = definition.getSortable();
         final Property<?> propertyReference = property;
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setPrimaryStyleName("aperto-multi-buttons");
-        // Delete Button - von Magnolia übernommen
+        // Delete Button - inspired by Magnolia
         Button deleteButton = new Button();
         deleteButton.setHtmlContentAllowed(true);
         deleteButton.setCaption("<span class=\"" + "icon-trash" + "\"></span>");
@@ -181,7 +173,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
                     ((MultiTransformer) transformer).removeProperty(propertyId);
                     ((MultiTransformer) transformer).createProperty();
                 } else {
-                    if (propertyId != null && propertyId.getClass().isAssignableFrom(Integer.class)) {
+                    if (propertyId.getClass().isAssignableFrom(Integer.class)) {
                         removeValueProperty((Integer) propertyId);
                     }
                     getPropertyDataSource().setValue(getValue());
@@ -208,9 +200,9 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         // move up Button
         Button moveUpButton = new Button();
         moveUpButton.setHtmlContentAllowed(true);
-        moveUpButton.setCaption("<span class=\"" + "icon-arrow2_n" + "\"></span>");
+        moveUpButton.setCaption("<span class=\"icon-arrow2_n\"></span>");
         moveUpButton.addStyleName("inline");
-        moveUpButton.setDescription(_buttonCaptionMoveUp);
+        moveUpButton.setDescription("move up");
         moveUpButton.addClickListener(new Button.ClickListener() {
 
             @Override
@@ -229,9 +221,9 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         // move down Button
         Button moveDownButton = new Button();
         moveDownButton.setHtmlContentAllowed(true);
-        moveDownButton.setCaption("<span class=\"" + "icon-arrow2_s" + "\"></span>");
+        moveDownButton.setCaption("<span class=\"icon-arrow2_s\"></span>");
         moveDownButton.addStyleName("inline");
-        moveDownButton.setDescription(_buttonCaptionMoveDown);
+        moveDownButton.setDescription("move down");
         moveDownButton.addClickListener(new Button.ClickListener() {
 
             @Override
@@ -275,13 +267,12 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
     protected void removeValueProperty(int toDelete) {
         getValue().removeItemProperty(toDelete);
         int fromIndex = toDelete;
-        int toIndex = fromIndex;
         int valuesSize = getValue().getItemPropertyIds().size();
         if (fromIndex == valuesSize) {
             return;
         }
         while (fromIndex < valuesSize) {
-            toIndex = fromIndex;
+            int toIndex = fromIndex;
             fromIndex += 1;
             getValue().addItemProperty(toIndex, getValue().getItemProperty(fromIndex));
             getValue().removeItemProperty(fromIndex);
@@ -313,7 +304,5 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
             }
             getPropertyDataSource().setValue(getValue());
         }
-
     }
-
 }

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
+import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
 import static info.magnolia.jcr.util.PropertyUtil.getLong;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -82,7 +83,7 @@ public class SpecificMultiField extends MultiField {
         addStyleName("linkfield");
         root = new VerticalLayout();
         root.setSpacing(true);
-        root.setWidth(100, Unit.PERCENTAGE);
+        root.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
         root.setHeight(-1, Unit.PIXELS);
 
         // Initialize Existing field
@@ -134,7 +135,7 @@ public class SpecificMultiField extends MultiField {
      */
     private Component createEntryComponent(Object propertyId, Property<?> property) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidth(100, Unit.PERCENTAGE);
+        layout.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
         layout.setHeight(-1, Unit.PIXELS);
 
         // creates property datasource if given property is null
@@ -149,7 +150,7 @@ public class SpecificMultiField extends MultiField {
         }
 
         // set layout to full width
-        layout.setWidth(100, Unit.PERCENTAGE);
+        layout.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
 
         // distribute space in favour of field over delete button
         layout.setExpandRatio(field, 1);
