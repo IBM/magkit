@@ -7,7 +7,7 @@
     <sv:value>mix:lockable</sv:value>
   </sv:property>
   <sv:property sv:name="jcr:uuid" sv:type="String">
-    <sv:value>f2983fe0-cd93-4234-81d0-a37ebc8d2059</sv:value>
+    <sv:value>f2983fe0-cd93-4234-81d0-a37ebc8d205a</sv:value>
   </sv:property>
   <sv:property sv:name="id" sv:type="String">
     <sv:value>com.aperto.magkit.workflow.VerySimpleActivation</sv:value>
