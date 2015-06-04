@@ -1,29 +1,24 @@
 package com.aperto.magkit.dialogs.fields;
 
 import com.aperto.magkit.mockito.ContextMockUtils;
-import com.aperto.magkit.mockito.jcr.SessionMockUtils;
 import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.jcr.Node;
-import javax.jcr.Session;
 import java.util.UUID;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubJcrSession;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNewNode;
-import static com.aperto.magkit.mockito.jcr.SessionMockUtils.mockSession;
+import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
+import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubIdentifier;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static java.util.Locale.GERMAN;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 /**
+ * Tests for converter of extended link field.
+ *
  * @author Philipp Güttler (Aperto AG)
  * @since 04.06.2015
  */
@@ -31,32 +26,20 @@ public class ExtendedLinkConverterTest {
 
     private static final String IDENTIFIER = UUID.randomUUID().toString();
     private static final String PATH = "/path/to/node";
-    private static final String PATH_NOT_FOUND = "/path/to/deleted/node";
+    private static final String PATH_NOT_FOUND = "/path/not/found";
     private static final String ANCHOR = "#anchor";
     private static final String EXTERNAL_URL = "http://www.aperto.com";
-    public static final String IDENTIFIER_NOT_FOUND = UUID.randomUUID().toString();
-    private ExtendedLinkFieldHelper _helper;
+    private static final String IDENTIFIER_NOT_FOUND = UUID.randomUUID().toString();
+
     private ExtendedLinkConverter _converter;
-    private Session _session;
 
     @Before
     public void setUp() throws Exception {
-        _helper = new ExtendedLinkFieldHelper();
         _converter = new ExtendedLinkConverter();
-        _converter.setExtendedLinkFieldHelper(_helper);
+        _converter.setExtendedLinkFieldHelper(new ExtendedLinkFieldHelper());
         _converter.setWorkspaceName(WEBSITE);
         ContextMockUtils.cleanContext();
-        Session jcrSession = mockSession(WEBSITE);
-        Node node = mockNewNode(jcrSession, PATH);
-        when(jcrSession.getNodeByIdentifier(IDENTIFIER)).thenReturn(node);
-        when(node.getIdentifier()).thenReturn(IDENTIFIER);
-        mockWebContext(stubJcrSession(WEBSITE, jcrSession));
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ContextMockUtils.cleanContext();
-        SessionMockUtils.cleanSession();
+        mockPageNode(PATH, stubIdentifier(IDENTIFIER));
     }
 
     @Test
