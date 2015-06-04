@@ -4,6 +4,7 @@ import info.magnolia.ui.form.field.converter.BaseIdentifierToPathConverter;
 
 import java.util.Locale;
 
+import static com.aperto.magkit.utils.LinkTool.isAnchor;
 import static com.aperto.magkit.utils.LinkTool.isExternalLink;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -33,7 +34,4 @@ public class LinkConverter extends BaseIdentifierToPathConverter {
         return result;
     }
 
-    private boolean isAnchor(final String value) {
-        return value.startsWith("#");
-    }
 }

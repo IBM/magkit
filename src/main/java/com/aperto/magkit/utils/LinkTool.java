@@ -1,10 +1,11 @@
 package com.aperto.magkit.utils;
 
+import javax.annotation.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.startsWith;
 import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 
 /**
@@ -40,23 +41,32 @@ public final class LinkTool {
     }
 
     /**
-     * Checks, if the link starts with a web protocol.
+     * Null-safe check, if the link starts with a web protocol.
      *
      * @param linkValue to check
      * @return true for external link
      */
-    public static boolean isExternalLink(final String linkValue) {
+    public static boolean isExternalLink(@Nullable final String linkValue) {
         return startsWithIgnoreCase(linkValue, HTTPS_PREFIX) || startsWithIgnoreCase(linkValue, HTTP_PREFIX);
     }
 
     /**
-     * Checks, if the link starts with a slash.
+     * Null-safe check, if the link starts with a slash.
      *
-     * @param linkValue to check
+     * @param value to check
      * @return true for path links
      */
-    public static boolean isPath(final String linkValue) {
-        return isNotBlank(linkValue) && linkValue.startsWith("/");
+    public static boolean isPath(@Nullable final String value) {
+        return startsWith(value, "/");
+    }
+
+    /**
+     * Null-safe check if value starts with #.
+     * @param value to check
+     * @return true for url fragment with starting #
+     */
+    public static boolean isAnchor(@Nullable final String value) {
+        return startsWith(value, "#");
     }
 
     private LinkTool() {
