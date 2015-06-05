@@ -64,74 +64,78 @@ public class ExtendedLinkFieldFactory<D extends FieldDefinition> extends LinkFie
     }
 
     private Button.ClickListener createButtonClickListener() {
-        return new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                ChooseDialogCallback callback = createChooseDialogCallback();
-                String value = _linkField.getTextField().getValue();
-                if (isNotBlank(_definition.getTargetTreeRootPath())) {
-                    _appController.openChooseDialog(_definition.getAppName(), _uiContext, _definition.getTargetTreeRootPath(), stripUriExtension(value), callback);
-                } else {
-                    _appController.openChooseDialog(_definition.getAppName(), _uiContext, stripUriExtension(value), callback);
-                }
-            }
-
-            /**
-             * Kuerzt die URI Erweiterung des Wertes, wenn es keine externe URL ist.
-             *
-             * @param value eine URI oder ein Identifier
-             * @return die gekuerzte URI
-             */
-            private String stripUriExtension(final String value) {
-                String stripped = EMPTY;
-                if (!isExternalLink(value) && isNotBlank(value)) {
-                    stripped = _extendedLinkFieldHelper.getBase(value);
-                }
-                return stripped;
-            }
-        };
+        return new ExtendedLinkFieldClickListener();
     }
 
     @Override
     protected ChooseDialogCallback createChooseDialogCallback() {
-        return new ChooseDialogCallback() {
-            /**
-             * Gibt die Erweiterung vom alten Feldinhalt zurück, wenn der alte Wert keine externe Url ist.
-             *
-             * @param value Wert des alten Felds
-             * @return die URI Erweiterung des alten Felds
-             */
-            private String unstripUriExtension(final String value) {
-                String unStripped = EMPTY;
-                if (!isExternalLink(value) && isNotBlank(value)) {
-                    unStripped = removeStart(value, _extendedLinkFieldHelper.getBase(value));
-                }
-                return unStripped;
-            }
+        return new ExtendedLinkFieldChooseDialogCallback();
+    }
 
-            @Override
-            public void onCancel() {
-                // keine Funktionalität
+    private class ExtendedLinkFieldChooseDialogCallback implements ChooseDialogCallback {
+        /**
+         * Returns the components for internal uri.
+         *
+         * @param value old field value
+         * @return the uri components other than path
+         */
+        private String unstripUriExtension(final String value) {
+            String unStripped = EMPTY;
+            if (!isExternalLink(value) && isNotBlank(value)) {
+                unStripped = removeStart(value, _extendedLinkFieldHelper.getBase(value));
             }
+            return unStripped;
+        }
 
-            @Override
-            public void onItemChosen(String actionName, final Object chosenValue) {
-                String propertyName = _definition.getTargetPropertyToPopulate();
-                String newValue = null;
-                if (chosenValue instanceof JcrItemId) {
-                    try {
-                        javax.jcr.Item jcrItem = JcrItemUtil.getJcrItem((JcrItemId) chosenValue);
-                        if (jcrItem.isNode()) {
-                            final Node selected = (Node) jcrItem;
-                            boolean isPropertyExisting = isNotBlank(propertyName) && selected.hasProperty(propertyName);
-                            newValue = (isPropertyExisting ? selected.getProperty(propertyName).getString() : selected.getPath()) + unstripUriExtension(_linkField.getTextField().getValue());
-                        }
-                    } catch (RepositoryException e) {
-                        LOGGER.error("Not able to access the configured property. Value will not be set.", e);
+        @Override
+        public void onCancel() {
+            // keine Funktionalität
+        }
+
+        @Override
+        public void onItemChosen(String actionName, final Object chosenValue) {
+            String propertyName = _definition.getTargetPropertyToPopulate();
+            String newValue = null;
+            if (chosenValue instanceof JcrItemId) {
+                try {
+                    javax.jcr.Item jcrItem = JcrItemUtil.getJcrItem((JcrItemId) chosenValue);
+                    if (jcrItem.isNode()) {
+                        final Node selected = (Node) jcrItem;
+                        boolean isPropertyExisting = isNotBlank(propertyName) && selected.hasProperty(propertyName);
+                        newValue = (isPropertyExisting ? selected.getProperty(propertyName).getString() : selected.getPath()) + unstripUriExtension(_linkField.getTextField().getValue());
                     }
+                } catch (RepositoryException e) {
+                    LOGGER.error("Not able to access the configured property. Value will not be set.", e);
                 }
-                _linkField.setValue(newValue);
             }
-        };
+            _linkField.setValue(newValue);
+        }
+    }
+
+    private class ExtendedLinkFieldClickListener implements Button.ClickListener {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+            ChooseDialogCallback callback = createChooseDialogCallback();
+            String value = _linkField.getTextField().getValue();
+            if (isNotBlank(_definition.getTargetTreeRootPath())) {
+                _appController.openChooseDialog(_definition.getAppName(), _uiContext, _definition.getTargetTreeRootPath(), stripUriExtension(value), callback);
+            } else {
+                _appController.openChooseDialog(_definition.getAppName(), _uiContext, stripUriExtension(value), callback);
+            }
+        }
+
+        /**
+         * Removes components other than path from an internal uri.
+         *
+         * @param value the uri or identifier with additional components
+         * @return the base path or identifier
+         */
+        private String stripUriExtension(final String value) {
+            String stripped = EMPTY;
+            if (!isExternalLink(value) && isNotBlank(value)) {
+                stripped = _extendedLinkFieldHelper.getBase(value);
+            }
+            return stripped;
+        }
     }
 }

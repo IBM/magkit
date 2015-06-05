@@ -29,11 +29,11 @@ public class ExtendedLinkConverter implements IdentifierToPathConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkConverter.class);
     private static final long serialVersionUID = 4484406102548210913L;
 
-    private ExtendedLinkFieldHelper _extendedLinkFieldHelper;
+    private transient ExtendedLinkFieldHelper _extendedLinkFieldHelper;
     private String _workspaceName;
 
     @Override
-    public String convertToModel(final String value, final Class<? extends String> targetType, final Locale locale) throws ConversionException {
+    public String convertToModel(final String value, final Class<? extends String> targetType, final Locale locale) {
 
         // Null is required for the property to be removed if path is empty
         String result = null;
@@ -62,7 +62,7 @@ public class ExtendedLinkConverter implements IdentifierToPathConverter {
     }
 
     @Override
-    public String convertToPresentation(final String value, final Class<? extends String> targetType, final Locale locale) throws ConversionException {
+    public String convertToPresentation(final String value, final Class<? extends String> targetType, final Locale locale) {
 
         String result = EMPTY;
 
