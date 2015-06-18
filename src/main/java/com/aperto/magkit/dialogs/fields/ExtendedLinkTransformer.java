@@ -80,7 +80,7 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
         final String query = getPropertyValue(_baseName + SUFFIX_QUERY);
         final String selector = getPropertyValue(_baseName + SUFFIX_SELECTOR);
 
-        if (!isExternalLink(base)) {
+        if (!isExternalLink(base) && isNotBlank(base)) {
             if (isPath(base)) {
                 Node targetNode = NodeUtils.getNodeByIdentifier(RepositoryConstants.WEBSITE, base);
                 if (targetNode != null) {
