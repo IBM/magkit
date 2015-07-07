@@ -3,6 +3,8 @@ package com.aperto.magkit.error;
 import com.aperto.magkit.module.MagkitModule;
 import info.magnolia.cms.core.AggregationState;
 import info.magnolia.module.templatingkit.ExtendedAggregationState;
+import info.magnolia.module.templatingkit.sites.Site;
+import info.magnolia.module.templatingkit.sites.SiteManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ public class NotFoundRedirectServlet extends HttpServlet {
 
     private Provider<MagkitModule> _moduleProvider;
     private Provider<AggregationState> _aggregationStateProvider;
+    private Provider<SiteManager> _siteManagerProvider;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -47,7 +50,7 @@ public class NotFoundRedirectServlet extends HttpServlet {
         }
     }
 
-    private String getRedirectHandle() {
+    protected String getRedirectHandle() {
         String handle = "";
 
         MagkitModule magkitModule = _moduleProvider.get();
@@ -55,18 +58,10 @@ public class NotFoundRedirectServlet extends HttpServlet {
 
         if (notFoundConfig != null) {
             handle = notFoundConfig.getDefault();
-
-            String siteName = ErrorMapping.DEF_SITE;
             AggregationState aggregationState = _aggregationStateProvider.get();
-            if (aggregationState instanceof ExtendedAggregationState) {
-                siteName = ((ExtendedAggregationState) aggregationState).getSite().getName();
-            }
 
-            // can not use i18nContentSupport, because the current request is on the redirect servlet,
-            // using original uri from aggregation state
-            String locale = determineLocaleFromPath(substringBeforeLast(aggregationState.getOriginalURI(), "."));
-            locale = defaultIfBlank(locale, aggregationState.getLocale().toString());
-
+            String siteName = determineSiteName(aggregationState);
+            String locale = determineLocale(aggregationState);
             LOGGER.info("Try to find 404 mapping for {} - {}.", siteName, locale);
 
             List<ErrorMapping> errorMappings = notFoundConfig.getErrorMappings();
@@ -81,6 +76,29 @@ public class NotFoundRedirectServlet extends HttpServlet {
         return handle;
     }
 
+    protected String determineLocale(final AggregationState aggregationState) {
+        // can not use i18nContentSupport, because the current request is on the redirect servlet,
+        // using original uri from aggregation state
+        String locale = determineLocaleFromPath(substringBeforeLast(aggregationState.getOriginalURI(), "."));
+        locale = defaultIfBlank(locale, aggregationState.getLocale().toString());
+        return locale;
+    }
+
+    protected String determineSiteName(final AggregationState aggregationState) {
+        String siteName = ErrorMapping.DEF_SITE;
+        if (aggregationState instanceof ExtendedAggregationState) {
+            // can not use site from aggregation state, because the current request is on the redirect servlet
+            // using original uri and domain from aggregation state
+            final SiteManager siteManager = _siteManagerProvider.get();
+            final ExtendedAggregationState extendedAggregationState = (ExtendedAggregationState) aggregationState;
+            final Site assignedSite = siteManager.getAssignedSite(extendedAggregationState.getDomainName(), extendedAggregationState.getOriginalBrowserURI());
+            if (assignedSite != null) {
+                siteName = assignedSite.getName();
+            }
+        }
+        return siteName;
+    }
+
     @Inject
     public void setModuleProvider(final Provider<MagkitModule> moduleProvider) {
         _moduleProvider = moduleProvider;
@@ -89,5 +107,10 @@ public class NotFoundRedirectServlet extends HttpServlet {
     @Inject
     public void setAggregationStateProvider(final Provider<AggregationState> aggregationStateProvider) {
         _aggregationStateProvider = aggregationStateProvider;
+    }
+
+    @Inject
+    public void setSiteManagerProvider(final Provider<SiteManager> siteManagerProvider) {
+        _siteManagerProvider = siteManagerProvider;
     }
 }
