@@ -7,6 +7,7 @@ import info.magnolia.module.delta.DeltaBuilder;
 import info.magnolia.module.delta.NodeExistsDelegateTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.setup.initial.AddFilterBypassTask;
+import info.magnolia.voting.voters.ExtensionVoter;
 import info.magnolia.voting.voters.URIStartsWithVoter;
 
 import java.util.ArrayList;
@@ -59,11 +60,24 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         )
     );
 
+    private final Task _disableRangeForPdf = selectServerConfig("Disable range for PDF", "Disable range support for PDF - IE (9, 10, 11) cannot handle big PDF > 4 MB sent in chunks",
+        getNode("filters/range/bypasses").then(
+            addOrGetContentNode("pdf").then(
+                addOrSetProperty(PN_CLASS, ExtensionVoter.class.getName()),
+                addOrSetProperty("deny", "pdf")
+            )
+        )
+    );
+
     /**
      * Constructor for adding update builder.
      */
     public MagkitModuleVersionHandler() {
         Task addNew404Config = new BootstrapConditionally("Check config", "Check 404 config in magkit", "/mgnl-bootstrap/install/magkit/config.modules.magkit.config.notFoundConfig.xml");
+
+        DeltaBuilder update314 = update("3.1.4", "Updates for version 3.1.4.").addTask(_disableRangeForPdf);
+        register(update314);
+
         DeltaBuilder update313 = update("3.1.3", "Updates for version 3.1.3.").addTask(addNew404Config);
         register(update313);
 
@@ -80,6 +94,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         installTasks.add(_setSecurityCallback);
         installTasks.add(_setTemplateLoaderConfig);
         installTasks.add(_increaseImageQuality);
+        installTasks.add(_disableRangeForPdf);
         return installTasks;
     }
 }
