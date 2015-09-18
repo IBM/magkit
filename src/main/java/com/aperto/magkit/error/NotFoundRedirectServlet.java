@@ -2,9 +2,9 @@ package com.aperto.magkit.error;
 
 import com.aperto.magkit.module.MagkitModule;
 import info.magnolia.cms.core.AggregationState;
-import info.magnolia.module.templatingkit.ExtendedAggregationState;
-import info.magnolia.module.templatingkit.sites.Site;
-import info.magnolia.module.templatingkit.sites.SiteManager;
+import info.magnolia.module.site.ExtendedAggregationState;
+import info.magnolia.module.site.Site;
+import info.magnolia.module.site.SiteManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,10 +17,7 @@ import static info.magnolia.jcr.util.NodeTypes.Component;
 import static info.magnolia.jcr.util.NodeTypes.Page;
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * Util class for handling nodes ({@link Node}).

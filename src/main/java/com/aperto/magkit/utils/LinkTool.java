@@ -4,9 +4,7 @@ import javax.annotation.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.startsWith;
-import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * Helper class for links.

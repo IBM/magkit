@@ -61,7 +61,7 @@ public class NodePropertyVoter extends BasePatternVoter {
         return vote;
     }
 
-    private String resolveNodePath(final Object value) throws RepositoryException {
+    private String resolveNodePath(final Object value) {
         String nodePath;
         if (MgnlContext.hasInstance() && MgnlContext.getAggregationState() != null && MgnlContext.getAggregationState().getCurrentContent() != null) {
             nodePath = MgnlContext.getAggregationState().getCurrentContent().getHandle();

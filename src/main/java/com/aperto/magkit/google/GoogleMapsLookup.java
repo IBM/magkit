@@ -163,7 +163,7 @@ public class GoogleMapsLookup {
      *
      * @author mayo.fragoso
      */
-    public static enum Status {
+    public enum Status {
         SUCCESS("200"), BAD_REQUEST("400"), GOOGLE_ENCODER_ERROR("500"), MISSING_QUERY("601"), UNKNOWN_ADDRESS("602"), LEGAL_PROBLEM("603"), NO_ROUTE("604"), BAD_KEY("610"), TOO_MANY_QUERIES("620");
 
         private String _code;

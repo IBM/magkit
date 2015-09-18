@@ -136,7 +136,7 @@ public final class PropertyUtils {
      * Get the {@link Long} value from a node.
      *
      * @param node Node
-     * @param propertyName Property name of the {@Long} value.
+     * @param propertyName Property name of the {@link Long} value.
      * @param defaultValue Default value.
      * @return value
      */

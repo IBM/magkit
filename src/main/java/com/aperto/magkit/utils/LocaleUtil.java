@@ -1,7 +1,7 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.cms.i18n.I18nContentSupport;
-import info.magnolia.module.templatingkit.sites.SiteManager;
+import info.magnolia.module.site.SiteManager;
 import info.magnolia.objectfactory.Components;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.aperto.magkit</groupId>
         <artifactId>magkit-multi</artifactId>
-        <version>3.1.5-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -46,14 +46,22 @@
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>
-
         <dependency>
-			<groupId>info.magnolia</groupId>
-            <artifactId>magnolia-module-standard-templating-kit</artifactId>
-		</dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-module-inplace-templating</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>info.magnolia.site</groupId>
+            <artifactId>magnolia-site</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>info.magnolia</groupId>
+            <artifactId>magnolia-templating</artifactId>
         </dependency>
 
         <!-- jasypt: for reading encrypted passwords from property files -->

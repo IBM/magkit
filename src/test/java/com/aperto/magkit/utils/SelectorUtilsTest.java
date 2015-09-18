@@ -1,7 +1,5 @@
 package com.aperto.magkit.utils;
 
-import com.aperto.magkit.mockito.WebContextStubbingOperation;
-import info.magnolia.context.WebContext;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +12,6 @@ import static com.aperto.magkit.utils.SelectorUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 /**
  * Test of the resource utils.

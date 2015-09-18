@@ -1,6 +1,7 @@
 package com.aperto.magkit.utils;
 
 import org.apache.commons.collections.CollectionUtils;
+
 import java.util.List;
 
 /**

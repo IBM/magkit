@@ -8,8 +8,8 @@ import javax.jcr.RepositoryException;
 import java.util.Collection;
 
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
 import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
+import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
 import static com.aperto.magkit.utils.PropertyUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
