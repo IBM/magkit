@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
@@ -48,7 +51,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
 
     private final Task _increaseImageQuality = selectModuleConfig("Increase image quality", "Increase imaging rendering quality to " + IMAGING_QUALITY + "%.", "imaging",
         addOrGetNode("config/generators").then(
-            addOrGetContentNode("stk/outputFormat").then(
+            addOrGetContentNode("mte/outputFormat").then(
                 addOrSetProperty("quality", IMAGING_QUALITY)
             )
         )
