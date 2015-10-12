@@ -1,17 +1,9 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.magkit.mockito.jcr.SessionMockUtils;
-import info.magnolia.context.SystemContext;
-import info.magnolia.repository.RepositoryConstants;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-
 import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
-import static com.aperto.magkit.mockito.ContextMockUtils.*;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockSystemContext;
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
 import static com.aperto.magkit.mockito.SystemContextStubbingOperation.stubJcrSession;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
@@ -19,6 +11,18 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.when;
+
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.aperto.magkit.mockito.jcr.SessionMockUtils;
+
+import info.magnolia.context.SystemContext;
+import info.magnolia.repository.RepositoryConstants;
 
 /**
  * Test for node property voter.

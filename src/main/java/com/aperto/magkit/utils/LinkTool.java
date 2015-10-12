@@ -1,10 +1,13 @@
 package com.aperto.magkit.utils;
 
-import javax.annotation.Nullable;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.startsWith;
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang.StringUtils.*;
+import javax.annotation.Nullable;
 
 /**
  * Helper class for links.

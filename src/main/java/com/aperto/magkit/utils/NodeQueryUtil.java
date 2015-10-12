@@ -1,25 +1,39 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.context.MgnlContext;
+import static info.magnolia.cms.core.MgnlNodeType.NT_COMPONENT;
+import static info.magnolia.cms.util.QueryUtil.search;
+import static info.magnolia.jcr.util.NodeUtil.asIterable;
+import static info.magnolia.jcr.util.NodeUtil.asList;
+import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static javax.jcr.query.Query.JCR_SQL2;
+import static javax.jcr.query.Query.XPATH;
+import static org.apache.commons.collections15.CollectionUtils.collect;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Value;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
+
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jcr.*;
-import javax.jcr.query.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static info.magnolia.cms.core.MgnlNodeType.NT_COMPONENT;
-import static info.magnolia.cms.util.QueryUtil.search;
-import static info.magnolia.jcr.util.NodeUtil.*;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static javax.jcr.query.Query.JCR_SQL2;
-import static javax.jcr.query.Query.XPATH;
-import static org.apache.commons.collections15.CollectionUtils.collect;
-import static org.apache.commons.lang.StringUtils.*;
+import info.magnolia.context.MgnlContext;
 
 /**
  * Utility methods for common queries.

@@ -1,15 +1,21 @@
 package com.aperto.magkit.nodebuilder;
 
+import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.strip;
+
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Value;
+
 import info.magnolia.jcr.nodebuilder.AbstractNodeOperation;
 import info.magnolia.jcr.nodebuilder.ErrorHandler;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.nodebuilder.Ops;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.jcr.util.PropertyUtil;
-
-import javax.jcr.*;
-
-import static org.apache.commons.lang.StringUtils.*;
 
 /**
  * An Utility class that extends info.magnolia.nodebuilder.Ops.
@@ -142,7 +148,7 @@ public abstract class NodeOperationFactory extends Ops {
         private final String _relPath;
         private final String _type;
 
-        public CreatePathNodeOperation(final String relPath, final String type) {
+        CreatePathNodeOperation(final String relPath, final String type) {
             _relPath = relPath;
             _type = type;
         }

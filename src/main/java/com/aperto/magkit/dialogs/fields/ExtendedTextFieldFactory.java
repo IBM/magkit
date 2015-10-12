@@ -1,13 +1,15 @@
 package com.aperto.magkit.dialogs.fields;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.Item;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+
 import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Factory for {@link ExtendedTextField}.

@@ -1,15 +1,16 @@
 package com.aperto.magkit.dialogs.fields;
 
+import javax.inject.Inject;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.ui.Field;
+
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
 import info.magnolia.ui.form.field.factory.FieldFactoryFactory;
 import info.magnolia.ui.form.field.transformer.Transformer;
-
-import javax.inject.Inject;
 
 /**
  * Copy of Magnolia Class with a small change.

@@ -1,23 +1,23 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.jcr.util.PropertyUtil;
-import org.apache.commons.collections15.Transformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
 import static info.magnolia.jcr.util.PropertyUtil.getValuesStringList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
 import static org.apache.commons.collections15.CollectionUtils.collect;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.RepositoryException;
+
+import org.apache.commons.collections15.Transformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Util class for Property handling.

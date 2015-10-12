@@ -1,8 +1,14 @@
 package com.aperto.magkit.module;
 
+import static com.aperto.magkit.module.delta.StandardTasks.hasModuleNewRevision;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import com.aperto.magkit.module.delta.CheckModuleServletsTask;
 import com.aperto.magkit.module.delta.InstallBootstrapTask;
 import com.aperto.magkit.module.delta.ModuleInstanceBootstrapTask;
+
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.Delta;
@@ -11,11 +17,6 @@ import info.magnolia.module.delta.IsModuleInstalledOrRegistered;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.inplacetemplating.setup.TemplatesInstallTask;
 import info.magnolia.module.model.Version;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.aperto.magkit.module.delta.StandardTasks.hasModuleNewRevision;
 
 /**
  * A ModuleVersionHandler which just do the bootstrap on update and bootstraps on module install all bootstrap files under "/mgnl-bootstrap/install/moduleName".

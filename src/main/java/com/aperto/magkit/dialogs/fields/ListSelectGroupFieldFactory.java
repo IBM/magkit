@@ -3,6 +3,7 @@ package com.aperto.magkit.dialogs.fields;
 import com.vaadin.data.Item;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ListSelect;
+
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.form.field.factory.OptionGroupFieldFactory;
 

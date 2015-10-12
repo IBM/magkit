@@ -1,17 +1,29 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.cms.i18n.I18nContentSupport;
-import info.magnolia.module.site.SiteManager;
-import info.magnolia.objectfactory.Components;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.split;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-import java.util.*;
 
-import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
-import static org.apache.commons.lang.StringUtils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.magnolia.cms.i18n.I18nContentSupport;
+import info.magnolia.module.site.SiteManager;
+import info.magnolia.objectfactory.Components;
 
 /**
  * Static utility methods for locales (languages).<br>

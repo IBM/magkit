@@ -1,5 +1,15 @@
 package com.aperto.magkit.dialogs.fields;
 
+import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
+import static info.magnolia.jcr.util.PropertyUtil.getLong;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertysetItem;
@@ -7,6 +17,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.form.field.MultiField;
@@ -18,15 +29,6 @@ import info.magnolia.ui.form.field.transformer.Transformer;
 import info.magnolia.ui.form.field.transformer.multi.MultiTransformer;
 import info.magnolia.ui.vaadin.integration.jcr.JcrNewNodeAdapter;
 import info.magnolia.ui.vaadin.integration.jcr.JcrNodeAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-
-import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
-import static info.magnolia.jcr.util.PropertyUtil.getLong;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Generic Multi Field.<br>

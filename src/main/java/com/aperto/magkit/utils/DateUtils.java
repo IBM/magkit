@@ -1,8 +1,8 @@
 package com.aperto.magkit.utils;
 
-import org.apache.commons.lang.time.DateFormatUtils;
-
 import java.util.Date;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 
 /**
  * Util class for common date handling with Magnolia.

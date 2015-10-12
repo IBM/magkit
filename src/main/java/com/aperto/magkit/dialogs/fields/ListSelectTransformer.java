@@ -1,10 +1,11 @@
 package com.aperto.magkit.dialogs.fields;
 
+import java.util.Collection;
+
 import com.vaadin.data.Item;
+
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.form.field.transformer.basic.ListToSetTransformer;
-
-import java.util.Collection;
 
 /**
  * Transformer filtered empty selection items.

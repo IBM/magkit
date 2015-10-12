@@ -1,24 +1,26 @@
 package com.aperto.magkit.i18n;
 
-import info.magnolia.cms.i18n.DefaultMessagesManager;
-import info.magnolia.cms.i18n.Messages;
-import info.magnolia.cms.i18n.MessagesChain;
-import info.magnolia.context.SystemContext;
-import info.magnolia.jcr.node2bean.Node2BeanProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
+import static info.magnolia.jcr.util.PropertyUtil.getString;
+import static info.magnolia.repository.RepositoryConstants.CONFIG;
+
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Set;
 
-import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
-import static info.magnolia.jcr.util.PropertyUtil.getString;
-import static info.magnolia.repository.RepositoryConstants.CONFIG;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.magnolia.cms.i18n.DefaultMessagesManager;
+import info.magnolia.cms.i18n.Messages;
+import info.magnolia.cms.i18n.MessagesChain;
+import info.magnolia.context.SystemContext;
+import info.magnolia.jcr.node2bean.Node2BeanProcessor;
 
 /**
  * Delivers all configurated basenames under {@link #SERVER_I18N_BASENAMES} for all basenames which matches

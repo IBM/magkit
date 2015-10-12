@@ -1,17 +1,19 @@
 package com.aperto.magkit.utils;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.jcr.RepositoryException;
-
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
 import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubAttribute;
-import static com.aperto.magkit.utils.SelectorUtils.*;
+import static com.aperto.magkit.utils.SelectorUtils.DEF_PAGE;
+import static com.aperto.magkit.utils.SelectorUtils.SELECTOR_PAGING;
+import static com.aperto.magkit.utils.SelectorUtils.updateSelectors;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+
+import javax.jcr.RepositoryException;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test of the resource utils.

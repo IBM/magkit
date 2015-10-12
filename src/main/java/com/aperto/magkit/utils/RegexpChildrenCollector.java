@@ -1,12 +1,13 @@
 package com.aperto.magkit.utils;
 
+import java.util.Collection;
+import java.util.regex.Pattern;
+
 import javax.jcr.Item;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.util.TraversingItemVisitor;
-import java.util.Collection;
-import java.util.regex.Pattern;
 
 /**
  * Used to collect child items of a node, matching a given regular expression.

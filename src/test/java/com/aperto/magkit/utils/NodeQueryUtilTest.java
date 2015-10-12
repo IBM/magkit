@@ -1,13 +1,5 @@
 package com.aperto.magkit.utils;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.query.QueryManager;
-
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
 import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubJcrSession;
@@ -16,7 +8,17 @@ import static com.aperto.magkit.utils.NodeQueryUtil.getComponentsWithTemplate;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.jcr.query.Query.XPATH;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.query.QueryManager;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author philipp.guettler

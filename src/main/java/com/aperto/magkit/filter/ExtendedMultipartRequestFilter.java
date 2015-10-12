@@ -1,7 +1,23 @@
 package com.aperto.magkit.filter;
 
+import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static org.apache.commons.lang.StringUtils.defaultString;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
 import info.magnolia.cms.beans.runtime.MultipartForm;
 import info.magnolia.cms.core.Path;
 import info.magnolia.cms.filters.CosMultipartRequestFilter;
@@ -9,19 +25,6 @@ import info.magnolia.cms.filters.MultipartRequestWrapper;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.voting.Voter;
 import info.magnolia.voting.Voting;
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Enumeration;
-
-import static org.apache.commons.lang.CharEncoding.UTF_8;
-import static org.apache.commons.lang.StringUtils.defaultString;
 
 /**
  * Fixed implementation of the multipart request filter.<br/>

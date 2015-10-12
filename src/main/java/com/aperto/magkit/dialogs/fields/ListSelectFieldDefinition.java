@@ -1,12 +1,12 @@
 package com.aperto.magkit.dialogs.fields;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import info.magnolia.i18nsystem.I18nText;
 import info.magnolia.ui.form.field.definition.OptionGroupFieldDefinition;
 import info.magnolia.ui.form.field.definition.SelectFieldOptionDefinition;
 import info.magnolia.ui.form.field.transformer.Transformer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * List select field definition as alternative for an option group.

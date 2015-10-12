@@ -1,25 +1,31 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.test.mock.jcr.MockSession;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
 import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubJcrSession;
 import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubType;
-import static com.aperto.magkit.utils.NodeUtils.*;
+import static com.aperto.magkit.utils.NodeUtils.getNodeByIdentifier;
+import static com.aperto.magkit.utils.NodeUtils.getPathForIdentifier;
+import static com.aperto.magkit.utils.NodeUtils.hasSubComponents;
+import static com.aperto.magkit.utils.NodeUtils.isNodeType;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static info.magnolia.test.mock.jcr.SessionTestUtil.createSession;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import info.magnolia.test.mock.jcr.MockSession;
 
 /**
  * Tests for node utils.

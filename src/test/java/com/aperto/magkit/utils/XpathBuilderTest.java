@@ -1,11 +1,15 @@
 package com.aperto.magkit.utils;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import static com.aperto.magkit.utils.XpathBuilder.*;
+import static com.aperto.magkit.utils.XpathBuilder.JCR_ROOT_PATH;
+import static com.aperto.magkit.utils.XpathBuilder.SELECTOR_ALL;
+import static com.aperto.magkit.utils.XpathBuilder.SELECTOR_ORDER_BY;
+import static com.aperto.magkit.utils.XpathBuilder.SELECTOR_TYPE_ELEMENT;
+import static com.aperto.magkit.utils.XpathBuilder.SELECTOR_TYPE_EMPTY;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author philipp.guettler

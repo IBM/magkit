@@ -1,26 +1,42 @@
 package com.aperto.magkit.filter;
 
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubExtension;
+import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
+import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.substringAfterLast;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Workspace;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Matchers;
+
 import info.magnolia.cms.core.AggregationState;
 import info.magnolia.context.WebContext;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.Link;
 import info.magnolia.link.LinkTransformerManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Matchers;
-
-import javax.jcr.*;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubExtension;
-import static com.aperto.magkit.mockito.ContextMockUtils.*;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.*;
-import static org.mockito.Mockito.*;
 
 /**
  * Test for secure redirect filter.

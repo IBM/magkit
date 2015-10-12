@@ -1,12 +1,12 @@
 package com.aperto.magkit.dialogs.fields;
 
-import info.magnolia.ui.form.field.converter.BaseIdentifierToPathConverter;
-
-import java.util.Locale;
-
 import static com.aperto.magkit.utils.LinkTool.isAnchor;
 import static com.aperto.magkit.utils.LinkTool.isExternalLink;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+
+import java.util.Locale;
+
+import info.magnolia.ui.form.field.converter.BaseIdentifierToPathConverter;
 
 /**
  * Handles input of links by urls (external) or absolute paths (internal).

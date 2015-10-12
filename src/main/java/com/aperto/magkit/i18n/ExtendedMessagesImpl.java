@@ -1,8 +1,8 @@
 package com.aperto.magkit.i18n;
 
-import info.magnolia.cms.i18n.DefaultMessagesImpl;
-
 import java.util.Locale;
+
+import info.magnolia.cms.i18n.DefaultMessagesImpl;
 
 /**
  * Messages class only to get protected constructor.

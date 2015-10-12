@@ -1,12 +1,12 @@
 package com.aperto.magkit.utils;
 
-import org.junit.Test;
-
-import java.util.Date;
-
 import static com.aperto.magkit.utils.DateUtils.createQueryDate;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+
+import java.util.Date;
+
+import org.junit.Test;
 
 /**
  * Test for DateUtils.

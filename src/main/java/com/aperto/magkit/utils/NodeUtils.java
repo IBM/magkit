@@ -1,23 +1,28 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.context.MgnlContext;
-import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.util.NodeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import java.util.Collections;
-import java.util.List;
 
-import static info.magnolia.jcr.util.NodeTypes.Component;
-import static info.magnolia.jcr.util.NodeTypes.Page;
-import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.magnolia.context.MgnlContext;
+import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.jcr.util.NodeTypes.Component;
+import info.magnolia.jcr.util.NodeTypes.Page;
+import info.magnolia.jcr.util.NodeUtil;
 
 /**
  * Util class for handling nodes ({@link Node}).

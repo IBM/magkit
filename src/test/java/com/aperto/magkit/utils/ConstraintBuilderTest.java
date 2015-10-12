@@ -1,12 +1,12 @@
 package com.aperto.magkit.utils;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-
 import static com.aperto.magkit.utils.ConstraintBuilder.Operator.AND;
 import static com.aperto.magkit.utils.ConstraintBuilder.Operator.OR;
 import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+
+import org.junit.Test;
 
 /**
  * @author philipp.guettler

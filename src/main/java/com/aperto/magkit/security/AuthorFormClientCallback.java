@@ -1,17 +1,19 @@
 package com.aperto.magkit.security;
 
-import info.magnolia.cms.beans.config.ServerConfiguration;
-import info.magnolia.cms.security.auth.callback.FormClientCallback;
-import info.magnolia.init.MagnoliaConfigurationProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.magnolia.cms.beans.config.ServerConfiguration;
+import info.magnolia.cms.security.auth.callback.FormClientCallback;
+import info.magnolia.init.MagnoliaConfigurationProperties;
 
 /**
  * Sends a login form only if server is author.

@@ -1,19 +1,29 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.cms.util.SelectorUtil;
-import info.magnolia.context.MgnlContext;
-import org.apache.commons.lang.ArrayUtils;
+import static info.magnolia.cms.core.Path.SELECTOR_DELIMITER;
+import static java.lang.Math.max;
+import static org.apache.commons.codec.CharEncoding.UTF_8;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.substringAfter;
+import static org.apache.commons.lang.StringUtils.substringAfterLast;
+import static org.apache.commons.lang.StringUtils.substringBefore;
+import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+import static org.apache.commons.lang.StringUtils.trimToEmpty;
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static info.magnolia.cms.core.Path.SELECTOR_DELIMITER;
-import static java.lang.Math.max;
-import static org.apache.commons.codec.CharEncoding.UTF_8;
-import static org.apache.commons.lang.StringUtils.*;
-import static org.apache.commons.lang.math.NumberUtils.toInt;
+import org.apache.commons.lang.ArrayUtils;
+
+import info.magnolia.cms.util.SelectorUtil;
+import info.magnolia.context.MgnlContext;
 
 /**
  * Util class for handle with magnolia selectors.

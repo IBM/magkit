@@ -1,5 +1,9 @@
 package com.aperto.magkit.module.delta;
 
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
+import static info.magnolia.jcr.nodebuilder.Ops.getNode;
+
 import info.magnolia.cms.core.HierarchyManager;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.ArrayDelegateTask;
@@ -7,10 +11,6 @@ import info.magnolia.module.delta.RegisterServletTask;
 import info.magnolia.module.delta.TaskExecutionException;
 import info.magnolia.module.model.ModuleDefinition;
 import info.magnolia.module.model.ServletDefinition;
-
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
-import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 
 /**
  * Checks the registration of all module servlets.

@@ -1,18 +1,5 @@
 package com.aperto.magkit.module;
 
-import com.aperto.magkit.security.AuthorFormClientCallback;
-import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.BootstrapConditionally;
-import info.magnolia.module.delta.DeltaBuilder;
-import info.magnolia.module.delta.NodeExistsDelegateTask;
-import info.magnolia.module.delta.Task;
-import info.magnolia.setup.initial.AddFilterBypassTask;
-import info.magnolia.voting.voters.ExtensionVoter;
-import info.magnolia.voting.voters.URIStartsWithVoter;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
@@ -24,6 +11,20 @@ import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
 import static info.magnolia.module.delta.DeltaBuilder.update;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.aperto.magkit.security.AuthorFormClientCallback;
+
+import info.magnolia.module.InstallContext;
+import info.magnolia.module.delta.BootstrapConditionally;
+import info.magnolia.module.delta.DeltaBuilder;
+import info.magnolia.module.delta.NodeExistsDelegateTask;
+import info.magnolia.module.delta.Task;
+import info.magnolia.setup.initial.AddFilterBypassTask;
+import info.magnolia.voting.voters.ExtensionVoter;
+import info.magnolia.voting.voters.URIStartsWithVoter;
 
 /**
  * The MagKitModuleVersionHandler for the MagKit module.

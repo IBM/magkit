@@ -1,19 +1,22 @@
 package com.aperto.magkit.utils;
 
-import org.junit.Test;
+import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
+import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
+import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
+import static com.aperto.magkit.utils.PropertyUtils.getLong;
+import static com.aperto.magkit.utils.PropertyUtils.retrieveMultiSelectProperties;
+import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
-import java.util.Collection;
 
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
-import static com.aperto.magkit.utils.PropertyUtils.*;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 /**
  * Test for {@link PropertyUtils}.

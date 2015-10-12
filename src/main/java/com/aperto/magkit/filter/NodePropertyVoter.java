@@ -1,22 +1,24 @@
 package com.aperto.magkit.filter;
 
-import info.magnolia.context.Context;
-import info.magnolia.context.MgnlContext;
-import info.magnolia.context.SystemContext;
-import info.magnolia.voting.voters.BasePatternVoter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static info.magnolia.jcr.util.PropertyUtil.getString;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import java.util.regex.Pattern;
 
-import static info.magnolia.jcr.util.PropertyUtil.getString;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.magnolia.context.Context;
+import info.magnolia.context.MgnlContext;
+import info.magnolia.context.SystemContext;
+import info.magnolia.voting.voters.BasePatternVoter;
 
 /**
  * Voter that matches on a configured property name the configured regex pattern.

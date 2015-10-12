@@ -1,9 +1,9 @@
 package com.aperto.magkit.nodebuilder.task;
 
+import static info.magnolia.repository.RepositoryConstants.CONFIG;
+
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.nodebuilder.task.ErrorHandling;
-
-import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**
  * A task using the NodeBuilder API, applying operations on a given path.

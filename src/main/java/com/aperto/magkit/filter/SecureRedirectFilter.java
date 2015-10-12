@@ -1,15 +1,9 @@
 package com.aperto.magkit.filter;
 
-import info.magnolia.cms.core.AggregationState;
-import info.magnolia.cms.filters.AbstractMgnlFilter;
-import info.magnolia.link.CompleteUrlPathTransformer;
-import info.magnolia.link.Link;
-import info.magnolia.link.LinkTransformerManager;
-import info.magnolia.voting.Voter;
-import info.magnolia.voting.Voting;
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
@@ -17,10 +11,18 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import static info.magnolia.context.MgnlContext.getAggregationState;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import info.magnolia.cms.core.AggregationState;
+import info.magnolia.cms.filters.AbstractMgnlFilter;
+import info.magnolia.link.CompleteUrlPathTransformer;
+import info.magnolia.link.Link;
+import info.magnolia.link.LinkTransformerManager;
+import info.magnolia.voting.Voter;
+import info.magnolia.voting.Voting;
 
 /**
  * Filter for switching between HTTP and HTTPS.

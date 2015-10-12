@@ -1,13 +1,26 @@
 package com.aperto.magkit.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import static com.aperto.magkit.utils.LinkTool.isAnchor;
+import static com.aperto.magkit.utils.LinkTool.isPath;
+import static com.aperto.magkit.utils.LinkTool.isUuid;
+import static info.magnolia.cms.core.Path.SELECTOR_DELIMITER;
+import static org.apache.commons.lang3.StringUtils.chomp;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.lastIndexOf;
+import static org.apache.commons.lang3.StringUtils.removeStart;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.substring;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
-import javax.inject.Singleton;
 import java.net.URI;
 
-import static com.aperto.magkit.utils.LinkTool.*;
-import static info.magnolia.cms.core.Path.SELECTOR_DELIMITER;
-import static org.apache.commons.lang3.StringUtils.*;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Helper class to get partitions of an uri.

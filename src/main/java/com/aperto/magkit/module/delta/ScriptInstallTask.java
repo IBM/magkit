@@ -1,27 +1,29 @@
 package com.aperto.magkit.module.delta;
 
-import info.magnolia.cms.util.ClasspathResourcesUtil;
-import info.magnolia.context.MgnlContext;
-import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.AbstractTask;
-import info.magnolia.module.delta.TaskExecutionException;
-import org.apache.commons.io.IOUtils;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import java.io.IOException;
-import java.io.InputStream;
-
 import static info.magnolia.cms.core.Path.getValidatedLabel;
-import static info.magnolia.jcr.util.NodeTypes.Content;
-import static info.magnolia.jcr.util.NodeTypes.Folder;
 import static info.magnolia.jcr.util.NodeUtil.createPath;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.removeEnd;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
+import org.apache.commons.io.IOUtils;
+
+import info.magnolia.cms.util.ClasspathResourcesUtil;
+import info.magnolia.context.MgnlContext;
+import info.magnolia.jcr.util.NodeTypes.Content;
+import info.magnolia.jcr.util.NodeTypes.Folder;
+import info.magnolia.module.InstallContext;
+import info.magnolia.module.delta.AbstractTask;
+import info.magnolia.module.delta.TaskExecutionException;
 
 /**
  * Install task for load groovy scripts in scripts workspace.

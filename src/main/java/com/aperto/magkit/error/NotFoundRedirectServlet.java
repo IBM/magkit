@@ -1,12 +1,15 @@
 package com.aperto.magkit.error;
 
-import com.aperto.magkit.module.MagkitModule;
-import info.magnolia.cms.core.AggregationState;
-import info.magnolia.module.site.ExtendedAggregationState;
-import info.magnolia.module.site.Site;
-import info.magnolia.module.site.SiteManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.aperto.magkit.utils.LocaleUtil.determineLocaleFromPath;
+import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.apache.commons.lang.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -14,14 +17,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
-import static com.aperto.magkit.utils.LocaleUtil.determineLocaleFromPath;
-import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.apache.commons.lang.StringUtils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.aperto.magkit.module.MagkitModule;
+
+import info.magnolia.cms.core.AggregationState;
+import info.magnolia.module.site.ExtendedAggregationState;
+import info.magnolia.module.site.Site;
+import info.magnolia.module.site.SiteManager;
 
 /**
  * 404 error redirect servlet.

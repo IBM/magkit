@@ -1,10 +1,10 @@
 package com.aperto.magkit.utils;
 
-import org.junit.Test;
-
 import static com.aperto.magkit.utils.LinkTool.isUuid;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
 
 /**
  * Test the LinkTool class.

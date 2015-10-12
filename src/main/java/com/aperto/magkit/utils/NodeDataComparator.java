@@ -1,8 +1,8 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.cms.core.NodeData;
-
 import java.util.Comparator;
+
+import info.magnolia.cms.core.NodeData;
 
 /**
  * Comparator for a list of NodeDatas.

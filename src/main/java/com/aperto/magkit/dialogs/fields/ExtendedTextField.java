@@ -1,11 +1,15 @@
 package com.aperto.magkit.dialogs.fields;
 
+import javax.annotation.Nullable;
+
 import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.server.Sizeable;
-import com.vaadin.ui.*;
-
-import javax.annotation.Nullable;
+import com.vaadin.ui.AbstractTextField;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomField;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * Enhance the text field functionality by showing an additional editorial label.
