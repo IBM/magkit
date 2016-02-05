@@ -5,9 +5,11 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import info.magnolia.context.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +31,8 @@ public class AuthorFormClientCallback extends FormClientCallback {
     @Inject
     private ServerConfiguration _serverConfiguration;
 
-    public AuthorFormClientCallback(MagnoliaConfigurationProperties configurationProperties) {
-        super(configurationProperties);
+    public AuthorFormClientCallback(MagnoliaConfigurationProperties configurationProperties, Provider<WebContext> webContextProvider) {
+        super(configurationProperties, webContextProvider);
     }
 
     @Override
