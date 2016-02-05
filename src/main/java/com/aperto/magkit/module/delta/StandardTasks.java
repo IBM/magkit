@@ -61,7 +61,9 @@ public final class StandardTasks {
 
     @Deprecated
     public static final String STK_MODULE = "standard-templating-kit";
-    /** Name of the magnolia site module. */
+    /**
+     * Name of the magnolia site module.
+     */
     public static final String SITE_MODULE = "site";
 
     /**
@@ -69,13 +71,13 @@ public final class StandardTasks {
      */
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
-            addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("robots", NodeTypes.ContentNode.NAME).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty(PN_FROM_URI, "/robots.txt"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt")
+                addOrGetNode(URI_MAPPING).then(
+                        addOrGetNode("robots", NodeTypes.ContentNode.NAME).then(
+                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                                addOrSetProperty(PN_FROM_URI, "/robots.txt"),
+                                addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt")
+                        )
                 )
-            )
         );
     }
 
@@ -84,13 +86,13 @@ public final class StandardTasks {
      */
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
-            addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico")
+                addOrGetNode(URI_MAPPING).then(
+                        addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
+                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                                addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
+                                addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico")
+                        )
                 )
-            )
         );
     }
 
@@ -102,22 +104,22 @@ public final class StandardTasks {
      */
     public static Task secureRedirectFilter() {
         return new ArrayDelegateTask("Install secure redirect", "Install secure redirect filter in filter chain.",
-            selectServerConfig("Add filter node", "Add filter node to chain.",
-                addOrGetNode("filters/cms/secure-redirect").then(
-                    addOrSetProperty(PN_CLASS, SecureRedirectFilter.class.getName()),
-                    addOrSetProperty(PN_ENABLED, Boolean.TRUE),
-                    addOrGetNode("secure", NodeTypes.ContentNode.NAME).then(
-                        addOrGetNode("template_de", NodeTypes.ContentNode.NAME).then(
-                            addOrGetNode("templates", NodeTypes.ContentNode.NAME).then(
-                                addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
-                            ),
-                            addOrSetProperty(PN_CLASS, TemplateNameVoter.class.getName()),
-                            addOrSetProperty("rootPath", "/de")
+                selectServerConfig("Add filter node", "Add filter node to chain.",
+                        addOrGetNode("filters/cms/secure-redirect").then(
+                                addOrSetProperty(PN_CLASS, SecureRedirectFilter.class.getName()),
+                                addOrSetProperty(PN_ENABLED, Boolean.TRUE),
+                                addOrGetNode("secure", NodeTypes.ContentNode.NAME).then(
+                                        addOrGetNode("template_de", NodeTypes.ContentNode.NAME).then(
+                                                addOrGetNode("templates", NodeTypes.ContentNode.NAME).then(
+                                                        addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
+                                                ),
+                                                addOrSetProperty(PN_CLASS, TemplateNameVoter.class.getName()),
+                                                addOrSetProperty("rootPath", "/de")
+                                        )
+                                ),
+                                orderBefore("secure-redirect", "intercept")
                         )
-                    ),
-                    orderBefore("secure-redirect", "intercept")
                 )
-            )
         );
     }
 
@@ -128,17 +130,17 @@ public final class StandardTasks {
      */
     public static Task multiPartFilter(final String maxRequestSize) {
         return selectServerConfig("Configuring filter", "Configuring Multipart request filter",
-            getNode("filters/multipartRequest").then(
-                addOrSetProperty(PN_CLASS, ExtendedMultipartRequestFilter.class.getName()),
-                addOrSetProperty(PN_ENABLED, Boolean.TRUE),
-                addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
-                addOrGetNode("useSystemDefault", NodeTypes.ContentNode.NAME).then(
-                    addOrGetNode("magnoliaUri", NodeTypes.ContentNode.NAME).then(
-                        addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-                        addOrSetProperty(PN_PATTERN, "/.magnolia")
-                    )
+                getNode("filters/multipartRequest").then(
+                        addOrSetProperty(PN_CLASS, ExtendedMultipartRequestFilter.class.getName()),
+                        addOrSetProperty(PN_ENABLED, Boolean.TRUE),
+                        addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
+                        addOrGetNode("useSystemDefault", NodeTypes.ContentNode.NAME).then(
+                                addOrGetNode("magnoliaUri", NodeTypes.ContentNode.NAME).then(
+                                        addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
+                                        addOrSetProperty(PN_PATTERN, "/.magnolia")
+                                )
+                        )
                 )
-            )
         );
     }
 
@@ -157,15 +159,15 @@ public final class StandardTasks {
         }
 
         return selectModuleConfig("Add apps to " + groupName, "Add apps to app launcher to group: " + groupName, "ui-admincentral",
-            getNode("config/appLauncherLayout/groups").then(
-                addOrGetContentNode(groupName).then(
-                    isNotEmpty(color) ? addOrSetProperty("color", color) : noop(),
-                    addOrSetProperty("permanent", Boolean.toString(permanent)),
-                    addOrGetContentNode("apps").then(
-                        appsOperations.toArray(new NodeOperation[appsOperations.size()])
-                    )
+                getNode("config/appLauncherLayout/groups").then(
+                        addOrGetContentNode(groupName).then(
+                                isNotEmpty(color) ? addOrSetProperty("color", color) : noop(),
+                                addOrSetProperty("permanent", Boolean.toString(permanent)),
+                                addOrGetContentNode("apps").then(
+                                        appsOperations.toArray(new NodeOperation[appsOperations.size()])
+                                )
+                        )
                 )
-            )
         );
     }
 
@@ -179,9 +181,9 @@ public final class StandardTasks {
         List<NodeOperation> setWorkspaceOps = getSetPropertyOps(workspaces);
 
         return selectModuleConfig("Add entries to flushAll policy", "Add flushAll policy for " + ArrayUtils.toString(workspaces), "cache",
-            getNode("config/configurations/default/flushPolicy/policies/flushAll/repositories").then(
-                setWorkspaceOps.toArray(new NodeOperation[setWorkspaceOps.size()])
-            )
+                getNode("config/configurations/default/flushPolicy/policies/flushAll/repositories").then(
+                        setWorkspaceOps.toArray(new NodeOperation[setWorkspaceOps.size()])
+                )
         );
     }
 
@@ -198,14 +200,14 @@ public final class StandardTasks {
         List<NodeOperation> rolesOps = getSetPropertyOps(roles);
 
         return selectModuleConfig("Add app permissions", "Add app permissions for " + appName + " with roles " + ArrayUtils.toString(roles), module,
-            getNode("apps/" + appName).then(
-                addOrGetContentNode(NN_PERMISSIONS).then(
-                    removeOthers ? removeIfExists(PN_ROLES) : noop(),
-                    addOrGetContentNode(PN_ROLES).then(
-                        rolesOps.toArray(new NodeOperation[rolesOps.size()])
-                    )
+                getNode("apps/" + appName).then(
+                        addOrGetContentNode(NN_PERMISSIONS).then(
+                                removeOthers ? removeIfExists(PN_ROLES) : noop(),
+                                addOrGetContentNode(PN_ROLES).then(
+                                        rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                                )
+                        )
                 )
-            )
         );
     }
 
@@ -229,16 +231,16 @@ public final class StandardTasks {
         List<NodeOperation> rolesOps = getSetPropertyOps(roles);
 
         return selectModuleConfig("Add applauncher group permission", "Add app group permission for " + groupName + " with roles " + ArrayUtils.toString(roles), "ui-admincentral",
-            getNode("config/appLauncherLayout/groups").then(
-                addOrGetContentNode(groupName).then(
-                    addOrGetContentNode(NN_PERMISSIONS).then(
-                        removeOthers ? removeIfExists(PN_ROLES) : noop(),
-                        addOrGetContentNode(PN_ROLES).then(
-                            rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                getNode("config/appLauncherLayout/groups").then(
+                        addOrGetContentNode(groupName).then(
+                                addOrGetContentNode(NN_PERMISSIONS).then(
+                                        removeOthers ? removeIfExists(PN_ROLES) : noop(),
+                                        addOrGetContentNode(PN_ROLES).then(
+                                                rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         );
     }
 
@@ -251,21 +253,21 @@ public final class StandardTasks {
      */
     public static Task addCacheExclude(final String name, final String urlStartsWith) {
         return selectModuleConfig("Add cache exclude", "Add cache exclude for " + urlStartsWith, "cache",
-            getNode("config/configurations/default").then(
-                getNode("cachePolicy/voters/urls/excludes").then(
-                    addCacheConfigEntry(name, urlStartsWith)
-                ),
-                getNode("browserCachePolicy/policies/dontCachePages/voters").then(
-                    addCacheConfigEntry(name, urlStartsWith)
+                getNode("config/configurations/default").then(
+                        getNode("cachePolicy/voters/urls/excludes").then(
+                                addCacheConfigEntry(name, urlStartsWith)
+                        ),
+                        getNode("browserCachePolicy/policies/dontCachePages/voters").then(
+                                addCacheConfigEntry(name, urlStartsWith)
+                        )
                 )
-            )
         );
     }
 
     private static NodeOperation addCacheConfigEntry(final String nodeName, final String startsWithPattern) {
         return addOrGetContentNode(nodeName).then(
-            addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-            addOrSetProperty(PN_PATTERN, startsWithPattern)
+                addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
+                addOrSetProperty(PN_PATTERN, startsWithPattern)
         );
     }
 
@@ -276,14 +278,14 @@ public final class StandardTasks {
      */
     public static Task setSimpleWorkflow() {
         return selectModuleConfig("Configure simple workflow", "Set simple workflow for activate and deactivate.", NN_WORKFLOW,
-            getNode("commands/" + NN_WORKFLOW).then(
-                getNode("activate/activate").then(
-                    setProperty(NN_WORKFLOW, "simpleActivate")
-                ),
-                getNode("deactivate/deactivate").then(
-                    setProperty(NN_WORKFLOW, "simpleDeactivate")
+                getNode("commands/" + NN_WORKFLOW).then(
+                        getNode("activate/activate").then(
+                                setProperty(NN_WORKFLOW, "simpleActivate")
+                        ),
+                        getNode("deactivate/deactivate").then(
+                                setProperty(NN_WORKFLOW, "simpleDeactivate")
+                        )
                 )
-            )
         );
     }
 
@@ -324,7 +326,7 @@ public final class StandardTasks {
      * Maps {@code /favicon.ico} to {@code /resources/templating-kit/themes/themeName/favicon.ico}.
      *
      * @param moduleName module to install the mapping
-     * @param themeName theme name to reference the favicon
+     * @param themeName  theme name to reference the favicon
      * @return module version handling task
      */
     @Deprecated
@@ -340,9 +342,9 @@ public final class StandardTasks {
     /**
      * Task to register a javascript or stylesheet file in the theme configuration.
      *
-     * @param themeName name of the stk theme
-     * @param nodeName node name of the styles entry
-     * @param isCss flag to register css or jevascript
+     * @param themeName     name of the stk theme
+     * @param nodeName      node name of the styles entry
+     * @param isCss         flag to register css or jevascript
      * @param propertyItems array of items to set as property of the styles configuration
      * @return Task to execute
      */
@@ -360,8 +362,8 @@ public final class StandardTasks {
         }
 
         // remove before add the node to update possible ordering changes
-        return  selectModuleConfig("Add theme file", "Add file to theme configuration", SITE_MODULE,
-                getNode("config/themes/"  + themeName + filesPath).then(
+        return selectModuleConfig("Add theme file", "Add file to theme configuration", SITE_MODULE,
+                getNode("config/themes/" + themeName + filesPath).then(
                         removeIfExists(nodeName),
                         addNode(nodeName, NodeTypes.ContentNode.NAME).then(propertyOperations)
                 )
@@ -370,11 +372,13 @@ public final class StandardTasks {
 
     /**
      * Registers a custom templating functions class for freemarker rendering.
+     * Use Magnolia task instead {@link info.magnolia.rendering.module.setup.InstallRendererContextAttributeTask}
+     * <p>
+     * i.e: new InstallRendererContextAttributeTask("rendering", "freemarker", name, className)
      *
-     * @param name name of the context attribute
-     * @param className class name of the templating functions class
-     * @return Task to excute
+     * @see info.magnolia.rendering.module.setup.InstallRendererContextAttributeTask
      */
+    @Deprecated
     public static Task registerCustomTemplatingFunctions(final String name, final String className) {
         return selectConfig("Register custom templating", "Register the " + name + " templating functions freemarker",
                 getNode("modules/rendering/renderers/freemarker/contextAttributes").then(
@@ -389,6 +393,7 @@ public final class StandardTasks {
                 addOrSetProperty("componentClass", className)
         );
     }
+
     private StandardTasks() {
         // hidden default constructor
     }
