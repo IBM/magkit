@@ -6,8 +6,10 @@ import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.orderBefore;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
+import static info.magnolia.jcr.nodebuilder.Ops.addNode;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.noop;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
@@ -17,6 +19,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aperto.magkit.utils.Item;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +58,11 @@ public final class StandardTasks {
     public static final String PN_ROLES = "roles";
     public static final String NN_PERMISSIONS = "permissions";
     private static final String NN_WORKFLOW = "workflow";
+
+    @Deprecated
+    public static final String STK_MODULE = "standard-templating-kit";
+    /** Name of the magnolia site module. */
+    public static final String SITE_MODULE = "site";
 
     /**
      * Maps {@code /robots.txt} to {@code /docroot/moduleName/robots.txt}.
@@ -298,6 +306,89 @@ public final class StandardTasks {
         return triggerUpdate;
     }
 
+
+    /**
+     * Deprecated, do not use after 5.4
+     * The theme name is defined in the site configuration odf the site app.
+     */
+    @Deprecated
+    public static Task setupSiteTheme(final String themeName) {
+        return selectModuleConfig("Set theme", "Configurate STK site theme.", STK_MODULE,
+                addOrGetNode("config/site/theme").then(
+                        addOrSetProperty("name", themeName)
+                )
+        );
+    }
+
+    /**
+     * Maps {@code /favicon.ico} to {@code /resources/templating-kit/themes/themeName/favicon.ico}.
+     *
+     * @param moduleName module to install the mapping
+     * @param themeName theme name to reference the favicon
+     * @return module version handling task
+     */
+    @Deprecated
+    public static Task virtualUriMappingOfFavicon(final String moduleName, final String themeName) {
+        return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
+                addOrGetNode(URI_MAPPING).then(
+                        addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
+                                addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                                addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
+                                addOrSetProperty(PN_TO_URI, "forward:/resources/templating-kit/themes/" + themeName + "/favicon.ico"))));
+    }
+
+    /**
+     * Task to register a javascript or stylesheet file in the theme configuration.
+     *
+     * @param themeName name of the stk theme
+     * @param nodeName node name of the styles entry
+     * @param isCss flag to register css or jevascript
+     * @param propertyItems array of items to set as property of the styles configuration
+     * @return Task to execute
+     */
+    public static Task registerThemeFile(final String themeName, final String nodeName, final boolean isCss, final Item... propertyItems) {
+        if (propertyItems == null) {
+            throw new RuntimeException("Properties must not be empty.");
+        }
+
+        String filesPath = isCss ? "/cssFiles" : "/jsFiles";
+
+        NodeOperation[] propertyOperations = new NodeOperation[propertyItems.length];
+        for (int i = 0; i < propertyItems.length; i++) {
+            Item propertyItem = propertyItems[i];
+            propertyOperations[i] = addOrSetProperty(propertyItem.getKey(), propertyItem.getValue());
+        }
+
+        // remove before add the node to update possible ordering changes
+        return  selectModuleConfig("Add theme file", "Add file to theme configuration", SITE_MODULE,
+                getNode("config/themes/"  + themeName + filesPath).then(
+                        removeIfExists(nodeName),
+                        addNode(nodeName, NodeTypes.ContentNode.NAME).then(propertyOperations)
+                )
+        );
+    }
+
+    /**
+     * Registers a custom templating functions class for freemarker rendering.
+     *
+     * @param name name of the context attribute
+     * @param className class name of the templating functions class
+     * @return Task to excute
+     */
+    public static Task registerCustomTemplatingFunctions(final String name, final String className) {
+        return selectConfig("Register custom templating", "Register the " + name + " templating functions freemarker",
+                getNode("modules/rendering/renderers/freemarker/contextAttributes").then(
+                        addContextAttributeConfig(name, className)
+                )
+        );
+    }
+
+    private static NodeOperation addContextAttributeConfig(final String name, final String className) {
+        return addOrGetContentNode(name).then(
+                addOrSetProperty("name", name),
+                addOrSetProperty("componentClass", className)
+        );
+    }
     private StandardTasks() {
         // hidden default constructor
     }

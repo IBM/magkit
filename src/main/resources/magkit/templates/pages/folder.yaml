@@ -1,0 +1,12 @@
+dialog: mte:pages/pageProperties
+class: info.magnolia.rendering.template.configured.ConfiguredTemplateDefinition
+modelClass: com.aperto.magkit.module.templatingkit.templates.FolderModel
+renderType: site
+type: functional
+
+areas:
+  content:
+    templateScript: /magkit/templates/pages/folder.ftl
+
+i18nBasename: mgnl-i18n.magkit-messages
+title: templates.folder.title

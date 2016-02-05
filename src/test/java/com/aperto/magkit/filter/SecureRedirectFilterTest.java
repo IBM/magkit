@@ -59,7 +59,7 @@ public class SecureRedirectFilterTest {
 
     @Test
     public void testStandardHttpRequest() throws IOException, ServletException, RepositoryException {
-        initContext("magkit-stk:pages/folder", null, null);
+        initContext("magkit:pages/folder", null, null);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, times(1)).doFilter(_request, _response);
     }
@@ -74,7 +74,7 @@ public class SecureRedirectFilterTest {
 
     @Test
     public void testStandardHttpsRequest() throws IOException, ServletException, RepositoryException {
-        initContext("magkit-stk:pages/folder", null, null);
+        initContext("magkit:pages/folder", null, null);
         when(_request.isSecure()).thenReturn(true);
         _redirectFilter.doFilter(_request, _response, _chain);
         verify(_chain, never()).doFilter(_request, _response);

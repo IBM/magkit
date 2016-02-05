@@ -15,6 +15,7 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aperto.magkit.module.delta.ReplaceTemplateTask;
 import com.aperto.magkit.security.AuthorFormClientCallback;
 
 import info.magnolia.module.InstallContext;
@@ -73,6 +74,8 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         )
     );
 
+    private final Task _moveFolderTemplate = new ReplaceTemplateTask("magkit-stk:pages/folder", "magkit:pages/folder");
+
     /**
      * Constructor for adding update builder.
      */
@@ -87,6 +90,9 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
 
         DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(_setTemplateLoaderConfig);
         register(update310);
+
+        DeltaBuilder update320 = update("3.2.0", "Update to Magkit 3.2.0.").addTask(_moveFolderTemplate);
+        register(update320);
     }
 
     @Override
@@ -99,6 +105,7 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         installTasks.add(_setTemplateLoaderConfig);
         installTasks.add(_increaseImageQuality);
         installTasks.add(_disableRangeForPdf);
+        installTasks.add(_moveFolderTemplate);
         return installTasks;
     }
 }
