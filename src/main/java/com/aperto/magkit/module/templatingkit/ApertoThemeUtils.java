@@ -40,7 +40,7 @@ public final class ApertoThemeUtils {
             pattern = versionPattern;
         }
         String themeName = getThemeName(installContext);
-        return selectModuleConfig("Virtual URI Mapping", "Maps external image, style and js uris containing version numbers to internal resources.", "magkit-stk",
+        return selectModuleConfig("Virtual URI Mapping", "Maps external image, style and js uris containing version numbers to internal resources.", "magkit",
             addOrGetNode("virtualURIMapping").then(
                 addOrGetNode("mapThemeFiles", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty("class", VersionNumberVirtualUriMapping.class.getName()),
