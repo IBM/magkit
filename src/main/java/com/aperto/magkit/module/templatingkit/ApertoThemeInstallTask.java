@@ -135,7 +135,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
 
             for (ApertoThemeVersionHandler.ThemeFileConfig themeFile : themeFiles) {
                 Item[] propertyItems = new Item[2];
-                propertyItems[0] = new Item("link", themeFile.getLink());
+                propertyItems[0] = new Item("link", themeFile.getLink().replaceAll("\\{module.version\\}", version));
                 propertyItems[1] = new Item("addFingerPrint", String.valueOf(themeFile.isAddFingerPrint()));
                 if (isNotBlank(themeFile.getConditionalComment())) {
                     propertyItems = (Item[]) ArrayUtils.add(propertyItems, new Item("conditionalComment", themeFile.getConditionalComment()));
