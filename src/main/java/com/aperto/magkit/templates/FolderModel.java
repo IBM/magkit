@@ -1,4 +1,4 @@
-package com.aperto.magkit.module.templatingkit.templates;
+package com.aperto.magkit.templates;
 
 import info.magnolia.context.MgnlContext;
 import info.magnolia.context.WebContext;

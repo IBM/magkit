@@ -1,6 +1,6 @@
 dialog: mte:pages/pageProperties
 class: info.magnolia.rendering.template.configured.ConfiguredTemplateDefinition
-modelClass: com.aperto.magkit.module.templatingkit.templates.FolderModel
+modelClass: com.aperto.magkit.templates.FolderModel
 renderType: site
 type: functional
 
