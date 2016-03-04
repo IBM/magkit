@@ -37,10 +37,6 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  */
 public class ApertoThemeInstallTask extends AbstractTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApertoThemeInstallTask.class);
-    /**
-     * Set this property in your theme module to true for supporting the old binary install behaviour (without extension).
-     */
-    private static final String PN_OLD_BINARY_SUPPORT = "useOldBinaryInstall";
 
     private boolean _isInstall;
     private List<ApertoThemeVersionHandler.ThemeFileConfig> _themeFiles;
