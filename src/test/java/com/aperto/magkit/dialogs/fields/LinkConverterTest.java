@@ -49,6 +49,7 @@ public class LinkConverterTest {
 
     @Before
     public void prepareMgnl() throws RepositoryException {
+        cleanContext();
         mockPageNode("/path/to/page", stubIdentifier("123-133"));
     }
 
