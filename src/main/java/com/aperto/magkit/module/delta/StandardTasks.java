@@ -236,8 +236,8 @@ public final class StandardTasks {
      */
     public static Task addCacheExclude(final String name, final String urlStartsWith) {
         return selectModuleConfig("Add cache exclude", "Add cache exclude for " + urlStartsWith, "cache",
-            getNode("config/configurations/default").then(
-                getNode("cachePolicy/voters/urls/excludes").then(
+            getNode("config/contentCaching/defaultPageCache").then(
+                getNode("achePolicy/shouldBypassVoters/urls/excludes").then(
                     addCacheConfigEntry(name, urlStartsWith)
                 ),
                 getNode("browserCachePolicy/policies/dontCachePages/voters").then(
