@@ -6,6 +6,13 @@
     <class>com.aperto.magkit.module.MagkitModule</class>
     <versionHandler>com.aperto.magkit.module.MagkitModuleVersionHandler</versionHandler>
     <version>${project.version}</version>
+    <components>
+        <id>main</id>
+        <component>
+            <type>com.aperto.magkit.i18n.UiTranslator</type>
+            <implementation>com.aperto.magkit.i18n.UiTranslator</implementation>
+        </component>
+    </components>
     <dependencies>
         <dependency>
             <name>ui-admincentral</name>
