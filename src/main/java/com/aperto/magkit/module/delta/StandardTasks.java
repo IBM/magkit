@@ -60,6 +60,7 @@ public final class StandardTasks {
      */
     @Deprecated
     public static final String STK_MODULE = "standard-templating-kit";
+
     /**
      * Name of the magnolia site module.
      */
@@ -152,7 +153,7 @@ public final class StandardTasks {
      * @param appNames  names of the single apps
      */
     public static Task addAppsToLauncher(final String groupName, final String color, final boolean permanent, final String... appNames) {
-        List<NodeOperation> appsOperations = new ArrayList<NodeOperation>();
+        List<NodeOperation> appsOperations = new ArrayList<>();
         for (String appName : appNames) {
             appsOperations.add(addOrGetContentNode(appName));
         }
@@ -292,13 +293,11 @@ public final class StandardTasks {
     }
 
     /**
-     * Deprecated, do not use after 5.4
-     * The theme name is defined in the site configuration odf the site app.
+     * The theme name is defined in the site configuration of the site app.
      */
-    @Deprecated
     public static Task setupSiteTheme(final String themeName) {
-        return selectModuleConfig("Set theme", "Configurate STK site theme.", STK_MODULE,
-            addOrGetNode("config/site/theme").then(
+        return selectModuleConfig("Set theme", "Configure site theme.", SITE_MODULE,
+            addOrGetNode("config/themes").then(
                 addOrSetProperty("name", themeName)
             )
         );
@@ -311,7 +310,6 @@ public final class StandardTasks {
      * @param themeName  theme name to reference the favicon
      * @return module version handling task
      */
-    @Deprecated
     public static Task virtualUriMappingOfFavicon(final String moduleName, final String themeName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
             addOrGetNode(URI_MAPPING).then(

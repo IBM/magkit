@@ -54,13 +54,13 @@ public final class ApertoThemeUtils {
     }
 
     /**
-     * Configurates browser cache policy so that creates expiration fields within the far future (one year)
+     * Configures browser cache policy so that creates expiration fields within the far future (one year)
      * for all resources below the path /resources/templating-kit/themes/[moduleName].
      */
-    public static Task configurateCacheModule(InstallContext installContext) {
+    public static Task configureCacheModule(InstallContext installContext) {
         String themeName = getThemeName(installContext);
-        return selectModuleConfig("Config cache", "Configurate cache module.", "cache",
-            getNode("config/configurations/default/browserCachePolicy/policies/farFuture/voters").then(
+        return selectModuleConfig("Config cache", "Configure cache module.", "cache",
+            getNode("config/contentCaching/defaultPageCache/browserCachePolicy/policies/farFuture/voters").then(
                 addOrGetNode("themeResources", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, URIPatternVoter.class.getName()),
                     addOrSetProperty(PN_PATTERN, "*/.resources/" + themeName + "/*")

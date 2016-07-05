@@ -1,7 +1,6 @@
 package com.aperto.magkit.module.templatingkit;
 
 import com.aperto.magkit.utils.Item;
-
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractTask;
@@ -10,7 +9,6 @@ import info.magnolia.module.delta.Task;
 import info.magnolia.module.delta.TaskExecutionException;
 import info.magnolia.module.model.ModuleDefinition;
 import info.magnolia.module.model.Version;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +23,7 @@ import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContent
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeAllChilds;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
-
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
-
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
@@ -49,7 +45,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
     public ApertoThemeInstallTask(boolean isInstall, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
         this(isInstall, themeFiles, null);
     }
-    
+
     public ApertoThemeInstallTask(boolean isInstall, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles, String version) {
         super("Install theme", "Installs theme resources in resources workspace and register theme css and js files.");
         _isInstall = isInstall;
@@ -86,11 +82,11 @@ public class ApertoThemeInstallTask extends AbstractTask {
         for (Task task : tasks) {
             task.execute(installContext);
         }
-        
+
         if (_isInstall) {
             LOGGER.info("Executes theme install tasks, too.");
             addVirtualUriMapping(installContext).execute(installContext);
-            configurateCacheModule(installContext).execute(installContext);
+            configureCacheModule(installContext).execute(installContext);
         }
     }
 
@@ -101,13 +97,13 @@ public class ApertoThemeInstallTask extends AbstractTask {
     protected Task addVirtualUriMapping(InstallContext installContext) {
         return ApertoThemeUtils.addVirtualUriMapping(installContext, _versionPattern);
     }
-    
+
     /**
-     * This function delegates to {@link ApertoThemeUtils#configurateCacheModule(InstallContext)}. It's main
+     * This function delegates to {@link ApertoThemeUtils#configureCacheModule(InstallContext)}. It's main
      * purpose is to provide a possibility to be overridden.
      */
-    protected Task configurateCacheModule(InstallContext installContext) {
-        return ApertoThemeUtils.configurateCacheModule(installContext);
+    protected Task configureCacheModule(InstallContext installContext) {
+        return ApertoThemeUtils.configureCacheModule(installContext);
     }
 
     /**
