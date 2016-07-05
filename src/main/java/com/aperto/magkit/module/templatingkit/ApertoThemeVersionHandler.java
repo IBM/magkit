@@ -31,10 +31,10 @@ public abstract class ApertoThemeVersionHandler extends DefaultModuleVersionHand
     protected Task createThemeInstallTask(boolean isInstall) {
         return new ApertoThemeInstallTask(isInstall, getThemeFiles());
     }
-  
+
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
-        List<Task> extraTasks = new ArrayList<Task>();
+        List<Task> extraTasks = new ArrayList<>();
         // can not use list from super class :-(
         extraTasks.addAll(super.getExtraInstallTasks(installContext));
         extraTasks.add(createThemeInstallTask(true));
@@ -69,7 +69,7 @@ public abstract class ApertoThemeVersionHandler extends DefaultModuleVersionHand
      */
     @Override
     protected List<Task> getBasicInstallTasks(final InstallContext installContext) {
-        final List<Task> basicInstallTasks = new ArrayList<Task>();
+        final List<Task> basicInstallTasks = new ArrayList<>();
         basicInstallTasks.add(new SetupModuleRepositoriesTask());
         basicInstallTasks.add(new ModuleFilesExtraction());
         basicInstallTasks.add(new RegisterModuleServletsTask());
@@ -80,38 +80,6 @@ public abstract class ApertoThemeVersionHandler extends DefaultModuleVersionHand
     public List<Delta> getDeltas(final InstallContext installContext, final Version from) {
         _themeName = ApertoThemeUtils.getThemeName(installContext);
         return super.getDeltas(installContext, from);
-    }
-
-    /**
-     * @deprecated    This method has been moved to {@link ApertoThemeUtils#addVirtualUriMapping(InstallContext)}.
-     *                It won't be available with version 3.3 anymore. 
-     */
-    @Deprecated
-    protected static Task addVirtualUriMapping(InstallContext installContext) {
-        return ApertoThemeUtils.addVirtualUriMapping(installContext);
-    }
-
-    /**
-     * Configurates browser cache policy so that creates expiration fields within the far future (one year)
-     * for all resources below the path /resources/templating-kit/themes/[moduleName].
-     * 
-     * @deprecated    This method has been moved to {@link ApertoThemeUtils#configurateCacheModule(InstallContext)}.
-     *                It won't be available with version 3.3 anymore. 
-     */
-    @Deprecated
-    protected static Task configurateCacheModule(InstallContext installContext) {
-        return ApertoThemeUtils.configurateCacheModule(installContext);
-    }
-
-    /**
-     * Returns the name of the theme configured within module defintion property section.
-     * 
-     * @deprecated    This method has been moved to {@link ApertoThemeUtils#getThemeName(InstallContext)}.
-     *                It won't be available with version 3.3 anymore. 
-     */
-    @Deprecated
-    protected static String getThemeName(InstallContext installContext) {
-        return ApertoThemeUtils.getThemeName(installContext);
     }
 
     /**
