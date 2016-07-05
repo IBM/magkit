@@ -71,20 +71,11 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
      */
     public MagkitModuleVersionHandler() {
         Task addNew404Config = new BootstrapConditionally("Check config", "Check 404 config in magkit", "/mgnl-bootstrap/install/magkit/config.modules.magkit.config.notFoundConfig.xml");
-
-        DeltaBuilder update314 = update("3.1.4", "Updates for version 3.1.4.").addTask(_disableRangeForPdf);
-        register(update314);
-
         DeltaBuilder update313 = update("3.1.3", "Updates for version 3.1.3.").addTask(addNew404Config);
         register(update313);
 
-        final Task setTemplateLoaderConfig = selectServerConfig("Change FTL loader", "Change template jcr loader for supporting loading templates with extension for inplace editing.",
-            getNode("rendering/freemarker/templateLoaders/jcr").then(
-                removeIfExists("extension")
-            )
-        );
-        DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(setTemplateLoaderConfig);
-        register(update310);
+        DeltaBuilder update314 = update("3.1.4", "Updates for version 3.1.4.").addTask(_disableRangeForPdf);
+        register(update314);
 
         DeltaBuilder update320 = update("3.2.0", "Update to Magkit 3.2.0.").addTask(_moveFolderTemplate);
         register(update320);
