@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
@@ -58,12 +55,6 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         )
     );
 
-    private final Task _setTemplateLoaderConfig = selectServerConfig("Change FTL loader", "Change template jcr loader for supporting loading templates with extension for inplace editing.",
-        getNode("rendering/freemarker/templateLoaders/jcr").then(
-            removeIfExists("extension")
-        )
-    );
-
     private final Task _disableRangeForPdf = selectServerConfig("Disable range for PDF", "Disable range support for PDF - IE (9, 10, 11) cannot handle big PDF > 4 MB sent in chunks",
         getNode("filters/range/bypasses").then(
             addOrGetContentNode("pdf").then(
@@ -87,7 +78,12 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         DeltaBuilder update313 = update("3.1.3", "Updates for version 3.1.3.").addTask(addNew404Config);
         register(update313);
 
-        DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(_setTemplateLoaderConfig);
+        final Task setTemplateLoaderConfig = selectServerConfig("Change FTL loader", "Change template jcr loader for supporting loading templates with extension for inplace editing.",
+            getNode("rendering/freemarker/templateLoaders/jcr").then(
+                removeIfExists("extension")
+            )
+        );
+        DeltaBuilder update310 = update("3.1.0", "Update to Magkit 3.1.0.").addTask(setTemplateLoaderConfig);
         register(update310);
 
         DeltaBuilder update320 = update("3.2.0", "Update to Magkit 3.2.0.").addTask(_moveFolderTemplate);
@@ -96,12 +92,11 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
 
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
-        List<Task> installTasks = new ArrayList<Task>();
+        List<Task> installTasks = new ArrayList<>();
         installTasks.addAll(super.getExtraInstallTasks(installContext));
         installTasks.add(_addBypassForMonitoring);
         installTasks.add(_addSpringByPass);
         installTasks.add(_setSecurityCallback);
-        installTasks.add(_setTemplateLoaderConfig);
         installTasks.add(_increaseImageQuality);
         installTasks.add(_disableRangeForPdf);
         installTasks.add(_moveFolderTemplate);
