@@ -25,7 +25,10 @@ public final class ApertoThemeUtils {
      * Returns what we assume to be the theme module's name in the classpath:
      * "themeName" property in the module's definition, suffixed with "-theme"
      * (according to Aperto's naming conventions).
+     *
+     * @deprecated theme should configured in your own theme module, so we need no theme name property anymore
      */
+    @Deprecated
     public static String getThemeName(InstallContext installContext) {
         // a bit dodgy to rely on the theme Maven module's name to end with "-theme", what would be the alternative?
         return installContext.getCurrentModuleDefinition().getProperty("themeName") + "-theme";
@@ -40,14 +43,14 @@ public final class ApertoThemeUtils {
         if (versionPattern != null) {
             pattern = versionPattern;
         }
-        String themeName = getThemeName(installContext);
+        String themeModuleName = installContext.getCurrentModuleDefinition().getName();
         return selectModuleConfig("Virtual URI Mapping", "Maps external image, style and js uris containing version numbers to internal resources.", "magkit",
             addOrGetNode("virtualURIMapping").then(
                 addOrGetNode("mapThemeFiles", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, VersionNumberVirtualUriMapping.class.getName()),
-                    addOrSetProperty("fromPrefix", "/.resources/" + themeName),
+                    addOrSetProperty("fromPrefix", "/.resources/" + themeModuleName),
                     addOrSetProperty(PN_PATTERN, pattern),
-                    addOrSetProperty("toUri", "forward:/.resources/" + themeName + "/%s")
+                    addOrSetProperty("toUri", "forward:/.resources/" + themeModuleName + "/%s")
                 )
             )
         );
@@ -55,15 +58,15 @@ public final class ApertoThemeUtils {
 
     /**
      * Configures browser cache policy so that creates expiration fields within the far future (one year)
-     * for all resources below the path /resources/templating-kit/themes/[moduleName].
+     * for all resources below the path /.resources/[moduleName].
      */
     public static Task configureCacheModule(InstallContext installContext) {
-        String themeName = getThemeName(installContext);
+        String themeModuleName = installContext.getCurrentModuleDefinition().getName();
         return selectModuleConfig("Config cache", "Configure cache module.", "cache",
             getNode("config/contentCaching/defaultPageCache/browserCachePolicy/policies/farFuture/voters").then(
                 addOrGetNode("themeResources", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, URIPatternVoter.class.getName()),
-                    addOrSetProperty(PN_PATTERN, "*/.resources/" + themeName + "/*")
+                    addOrSetProperty(PN_PATTERN, "*/.resources/" + themeModuleName + "/*")
                 )
             )
         );

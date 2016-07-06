@@ -67,7 +67,7 @@ public final class StandardTasks {
     public static final String SITE_MODULE = "site";
 
     /**
-     * Maps {@code /robots.txt} to {@code /docroot/moduleName/robots.txt}.
+     * Maps {@code /robots.txt} to {@code /.resources/moduleName/robots.txt}.
      */
     public static Task virtualUriMappingOfRobotsTxt(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
@@ -75,14 +75,14 @@ public final class StandardTasks {
                 addOrGetNode("robots", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/robots.txt"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/robots.txt")
+                    addOrSetProperty(PN_TO_URI, "forward:/.resources/" + moduleName + "/robots.txt")
                 )
             )
         );
     }
 
     /**
-     * Maps {@code /favicon.ico} to {@code /docroot/moduleName/favicon.ico}.
+     * Maps {@code /favicon.ico} to {@code /.resources/moduleName/favicon.ico}.
      */
     public static Task virtualUriMappingOfFavicon(final String moduleName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
@@ -90,7 +90,7 @@ public final class StandardTasks {
                 addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/docroot/" + moduleName + "/favicon.ico")
+                    addOrSetProperty(PN_TO_URI, "forward:/.resources/" + moduleName + "/favicon.ico")
                 )
             )
         );
@@ -294,7 +294,9 @@ public final class StandardTasks {
 
     /**
      * The theme name is defined in the site configuration of the site app.
+     * @deprecated register theme in your own module
      */
+    @Deprecated
     public static Task setupSiteTheme(final String themeName) {
         return selectModuleConfig("Set theme", "Configure site theme.", SITE_MODULE,
             addOrGetNode("config/themes").then(
@@ -309,14 +311,17 @@ public final class StandardTasks {
      * @param moduleName module to install the mapping
      * @param themeName  theme name to reference the favicon
      * @return module version handling task
+     *
+     * @deprecated use {@link #virtualUriMappingOfFavicon(String)}
      */
+    @Deprecated
     public static Task virtualUriMappingOfFavicon(final String moduleName, final String themeName) {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
             addOrGetNode(URI_MAPPING).then(
                 addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/resources/templating-kit/themes/" + themeName + "/favicon.ico"))));
+                    addOrSetProperty(PN_TO_URI, "forward:/.resources/templating-kit/themes/" + themeName + "/favicon.ico"))));
     }
 
     /**

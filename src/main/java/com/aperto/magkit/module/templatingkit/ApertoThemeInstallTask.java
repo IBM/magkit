@@ -30,7 +30,9 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * Tasks to install all theme files in resources workspace.
  *
  * @author frank.sommer
+ * @deprecated register theme in your own module without tasks
  */
+@Deprecated
 public class ApertoThemeInstallTask extends AbstractTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApertoThemeInstallTask.class);
 
