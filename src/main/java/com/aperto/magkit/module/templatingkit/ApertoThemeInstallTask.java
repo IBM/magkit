@@ -1,10 +1,8 @@
 package com.aperto.magkit.module.templatingkit;
 
 import com.aperto.magkit.utils.Item;
-import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractTask;
-import info.magnolia.module.delta.ModuleBootstrapTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.delta.TaskExecutionException;
 import info.magnolia.module.model.ModuleDefinition;
@@ -16,11 +14,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.aperto.magkit.module.delta.StandardTasks.SITE_MODULE;
 import static com.aperto.magkit.module.delta.StandardTasks.registerThemeFile;
+import static com.aperto.magkit.module.delta.StandardTasks.setupSiteTheme;
 import static com.aperto.magkit.module.templatingkit.ApertoThemeUtils.getThemeName;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeAllChilds;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
@@ -30,9 +27,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * Tasks to install all theme files in resources workspace.
  *
  * @author frank.sommer
- * @deprecated register theme in your own module without tasks
  */
-@Deprecated
 public class ApertoThemeInstallTask extends AbstractTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApertoThemeInstallTask.class);
 
@@ -59,20 +54,11 @@ public class ApertoThemeInstallTask extends AbstractTask {
     public void execute(final InstallContext installContext) throws TaskExecutionException {
         String themeName = getThemeName(installContext);
         ModuleDefinition moduleDefinition = installContext.getCurrentModuleDefinition();
+        String themeModuleName = moduleDefinition.getName();
 
         if (_isInstall) {
-            selectModuleConfig("Create theme", "Create theme base config in Site module.", SITE_MODULE,
-                addOrGetNode("config/themes", NodeTypes.Content.NAME).then(
-                    addOrGetNode(themeName, NodeTypes.ContentNode.NAME).then(
-                        addOrGetNode("jsFiles", NodeTypes.ContentNode.NAME),
-                        addOrGetNode("cssFiles", NodeTypes.ContentNode.NAME),
-                        addOrGetNode("imaging", NodeTypes.ContentNode.NAME)
-                    )
-                )
-            ).execute(installContext);
+            setupSiteTheme(themeName, themeModuleName).execute(installContext);
         }
-
-        new ModuleBootstrapTask().execute(installContext);
 
         Version currentVersion = moduleDefinition.getVersion();
         if (currentVersion == Version.UNDEFINED_DEVELOPMENT_VERSION) {
@@ -80,7 +66,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
             throw new TaskExecutionException("Deployment issue. The current development version is undefined !");
         }
         String version = currentVersion.toString();
-        List<Task> tasks = registerFiles(themeName, version, _themeFiles);
+        List<Task> tasks = registerFiles(themeName, themeModuleName, version, _themeFiles);
         for (Task task : tasks) {
             task.execute(installContext);
         }
@@ -111,12 +97,23 @@ public class ApertoThemeInstallTask extends AbstractTask {
     /**
      * Builds tasks for theme files registration.
      * {module.version} in link will be replaced by the current version number.
+     *
+     * @deprecated use {@link #registerFiles(String, String, String, List)}
      */
+    @Deprecated
     protected List<Task> registerFiles(String themeName, final String version, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
+        return registerFiles(themeName, themeName + "-theme", version, themeFiles);
+    }
+
+    /**
+     * Builds tasks for theme files registration.
+     * {module.version} in link will be replaced by the current version number.
+     */
+    protected List<Task> registerFiles(String themeName, String themeModuleName, final String version, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
         List<Task> registerTasks = new ArrayList<>();
         if (themeFiles != null) {
-            Task cleanupTask = selectModuleConfig("Clean up theme files", "Clean up files in theme configuration", SITE_MODULE,
-                getNode("config/themes/" + themeName).then(
+            Task cleanupTask = selectModuleConfig("Clean up theme files", "Clean up files in theme configuration", themeModuleName,
+                getNode("themes/" + themeName).then(
                     addOrGetContentNode("cssFiles").then(
                         removeAllChilds()
                     ),
@@ -137,7 +134,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
                 if (isNotBlank(themeFile.getMedia())) {
                     propertyItems = (Item[]) ArrayUtils.add(propertyItems, new Item("media", themeFile.getMedia()));
                 }
-                registerTasks.add(registerThemeFile(themeName, themeFile.getName(), themeFile.isCss(), propertyItems));
+                registerTasks.add(registerThemeFile(themeName, themeModuleName, themeFile.getName(), themeFile.isCss(), propertyItems));
             }
         }
         return registerTasks;

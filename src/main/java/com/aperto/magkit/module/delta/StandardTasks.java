@@ -294,13 +294,29 @@ public final class StandardTasks {
 
     /**
      * The theme name is defined in the site configuration of the site app.
-     * @deprecated register theme in your own module
+     *
+     * @deprecated use {@link #setupSiteTheme(String, String)}
      */
     @Deprecated
     public static Task setupSiteTheme(final String themeName) {
-        return selectModuleConfig("Set theme", "Configure site theme.", SITE_MODULE,
-            addOrGetNode("config/themes").then(
-                addOrSetProperty("name", themeName)
+        return setupSiteTheme(themeName, themeName + "-theme");
+    }
+
+    /**
+     * Initial theme creation.
+     *
+     * @param themeName       name of the theme
+     * @param themeModuleName name of the theme module
+     */
+    public static Task setupSiteTheme(final String themeName, final String themeModuleName) {
+        // don't use selectModuleConfig, because module is not yet available
+        return selectConfig("Create theme", "Create theme base config in theme module.",
+            addOrGetNode("modules/" + themeModuleName + "/themes").then(
+                addOrGetContentNode(themeName).then(
+                    addOrGetContentNode("jsFiles"),
+                    addOrGetContentNode("cssFiles"),
+                    addOrGetContentNode("imaging")
+                )
             )
         );
     }
@@ -311,7 +327,6 @@ public final class StandardTasks {
      * @param moduleName module to install the mapping
      * @param themeName  theme name to reference the favicon
      * @return module version handling task
-     *
      * @deprecated use {@link #virtualUriMappingOfFavicon(String)}, the theme resources should not be in the resources repository
      */
     @Deprecated
@@ -329,11 +344,27 @@ public final class StandardTasks {
      *
      * @param themeName     name of the stk theme
      * @param nodeName      node name of the styles entry
-     * @param isCss         flag to register css or jevascript
+     * @param isCss         flag to register css or javascript
      * @param propertyItems array of items to set as property of the styles configuration
      * @return Task to execute
+     * @deprecated use {@link #registerThemeFile(String, String, String, boolean, Item...)}
      */
+    @Deprecated
     public static Task registerThemeFile(final String themeName, final String nodeName, final boolean isCss, final Item... propertyItems) {
+        return registerThemeFile(themeName, themeName + "-theme", nodeName, isCss, propertyItems);
+    }
+
+    /**
+     * Task to register a javascript or stylesheet file in the theme configuration.
+     *
+     * @param themeName       name of the stk theme
+     * @param themeModuleName name of the theme module
+     * @param nodeName        node name of the styles entry
+     * @param isCss           flag to register css or javascript
+     * @param propertyItems   array of items to set as property of the styles configuration
+     * @return Task to execute
+     */
+    public static Task registerThemeFile(final String themeName, final String themeModuleName, final String nodeName, final boolean isCss, final Item... propertyItems) {
         if (propertyItems == null) {
             throw new RuntimeException("Properties must not be empty.");
         }
@@ -346,9 +377,8 @@ public final class StandardTasks {
             propertyOperations[i] = addOrSetProperty(propertyItem.getKey(), propertyItem.getValue());
         }
 
-        // remove before add the node to update possible ordering changes
-        return selectModuleConfig("Add theme file", "Add file to theme configuration", SITE_MODULE,
-            getNode("config/themes/" + themeName + filesPath).then(
+        return selectModuleConfig("Add theme file", "Add file to theme configuration", themeModuleName,
+            getNode("themes/" + themeName + filesPath).then(
                 removeIfExists(nodeName),
                 addNode(nodeName, NodeTypes.ContentNode.NAME).then(propertyOperations)
             )
