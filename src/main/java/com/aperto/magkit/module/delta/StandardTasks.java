@@ -312,7 +312,7 @@ public final class StandardTasks {
      * @param themeName  theme name to reference the favicon
      * @return module version handling task
      *
-     * @deprecated use {@link #virtualUriMappingOfFavicon(String)}
+     * @deprecated use {@link #virtualUriMappingOfFavicon(String)}, the theme resources should not be in the resources repository
      */
     @Deprecated
     public static Task virtualUriMappingOfFavicon(final String moduleName, final String themeName) {
@@ -321,7 +321,7 @@ public final class StandardTasks {
                 addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/.resources/templating-kit/themes/" + themeName + "/favicon.ico"))));
+                    addOrSetProperty(PN_TO_URI, "forward:/resources/templating-kit/themes/" + themeName + "/favicon.ico"))));
     }
 
     /**
