@@ -95,6 +95,9 @@ public abstract class ApertoThemeVersionHandler extends BootstrapModuleVersionHa
             return this;
         }
 
+        /**
+         * With {module.version} placeholder set no finger print. Otherwise a error message is logged.
+         */
         public ThemeFileConfig noFingerPrint() {
             _addFingerPrint = false;
             return this;
