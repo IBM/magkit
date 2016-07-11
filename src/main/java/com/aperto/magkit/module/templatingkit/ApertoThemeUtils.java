@@ -22,16 +22,10 @@ public final class ApertoThemeUtils {
     }
 
     /**
-     * Returns what we assume to be the theme module's name in the classpath:
-     * "themeName" property in the module's definition, suffixed with "-theme"
-     * (according to Aperto's naming conventions).
-     *
-     * @deprecated theme should configured in your own theme module, so we need no theme name property anymore
+     * Returns the value of the "themeName" property in the module's definition.
      */
-    @Deprecated
     public static String getThemeName(InstallContext installContext) {
-        // a bit dodgy to rely on the theme Maven module's name to end with "-theme", what would be the alternative?
-        return installContext.getCurrentModuleDefinition().getProperty("themeName") + "-theme";
+        return installContext.getCurrentModuleDefinition().getProperty("themeName");
     }
 
     public static Task addVirtualUriMapping(InstallContext installContext) {
