@@ -26,7 +26,7 @@ import info.magnolia.module.site.SiteManager;
 import info.magnolia.objectfactory.Components;
 
 /**
- * Static utility methods for locales (languages).<br>
+ * Static utility methods for locales (languages).
  *
  * @author jfrantzius
  */
@@ -43,7 +43,7 @@ public final class LocaleUtil {
      */
     public static Set<String> getConfiguredLanguages() {
         Collection<Locale> locales = getSiteLocales();
-        Set<String> result = new LinkedHashSet<String>();
+        Set<String> result = new LinkedHashSet<>();
         for (Locale locale : locales) {
             result.add(locale.getLanguage());
         }
@@ -62,8 +62,10 @@ public final class LocaleUtil {
         if (c_locales == null) {
             SiteManager siteManager = Components.getComponent(SiteManager.class);
             I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
-            Collection<Locale> locales = i18n.getLocales();
-            c_locales = new ArrayList<Locale>(locales);
+            if (i18n != null) {
+                Collection<Locale> locales = i18n.getLocales();
+                c_locales = new ArrayList<>(locales);
+            }
         }
         return c_locales;
     }
@@ -140,8 +142,8 @@ public final class LocaleUtil {
      */
     public static Map<String, String> getAvailableCountries() {
         Locale[] locales = Locale.getAvailableLocales();
-        Map<String, String> options = new LinkedHashMap<String, String>();
-        List<String> countryList = new ArrayList<String>();
+        Map<String, String> options = new LinkedHashMap<>();
+        List<String> countryList = new ArrayList<>();
         for (Locale locale : locales) {
             String code = locale.getCountry();
             String name = locale.getDisplayCountry();
