@@ -63,6 +63,10 @@
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-templating</artifactId>
         </dependency>
+        <dependency>
+            <groupId>info.magnolia.workflow</groupId>
+            <artifactId>magnolia-module-workflow-jbpm</artifactId>
+        </dependency>
 
         <!-- jasypt: for reading encrypted passwords from property files -->
         <dependency>

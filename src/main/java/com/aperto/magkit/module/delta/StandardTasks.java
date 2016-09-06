@@ -4,6 +4,7 @@ import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
 import com.aperto.magkit.filter.SecureRedirectFilter;
 import com.aperto.magkit.filter.TemplateNameVoter;
 import com.aperto.magkit.utils.Item;
+import com.aperto.magkit.workflow.AutoApproveHumanTaskWorkItemHandlerDefinition;
 import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.util.NodeTypes;
@@ -19,14 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.orderBefore;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectConfig;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.*;
 import static info.magnolia.jcr.nodebuilder.Ops.addNode;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.noop;
@@ -261,13 +256,15 @@ public final class StandardTasks {
      * @return task to execute
      */
     public static Task setSimpleWorkflow() {
-        return selectModuleConfig("Configure simple workflow", "Set simple workflow for activate and deactivate.", NN_WORKFLOW,
-            getNode("commands/" + NN_WORKFLOW).then(
-                getNode("activate/activate").then(
-                    setProperty(NN_WORKFLOW, "simpleActivate")
-                ),
-                getNode("deactivate/deactivate").then(
-                    setProperty(NN_WORKFLOW, "simpleDeactivate")
+        return new ArrayDelegateTask("Set simple workflow", "Set all configurations simple workflow without approval step.",
+            selectModuleConfig("Set auto approval", "Set auto approval human task handler.", "workflow-jbpm",
+                getNode("workItemHandlers/humanTask").then(
+                    setProperty(PN_CLASS, AutoApproveHumanTaskWorkItemHandlerDefinition.class.getName())
+                )
+            ),
+            selectModuleConfig("Allow retry action", "Allow retry action on failure.", NN_WORKFLOW,
+                getNode("messageViews/publish/actions/retry/availability/rules/CanDeleteTaskRule").then(
+                    setProperty("assignee", false)
                 )
             )
         );
