@@ -1,6 +1,5 @@
 package com.aperto.magkit.utils;
 
-import info.magnolia.jcr.util.PropertyUtil;
 import org.apache.commons.collections15.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public final class PropertyUtils {
      * @param node    containing the multivalue
      * @param relPath relative path to the multi value property
      * @return string values as collection, if not available empty collection and if single value the collection of size one.
-     * @see PropertyUtil
+     * @see info.magnolia.jcr.util.PropertyUtil
      */
     public static Collection<String> getStringValues(final Node node, final String relPath) {
         Collection<String> values = new ArrayList<>();
@@ -144,7 +143,7 @@ public final class PropertyUtils {
      * @param propertyName Property name of the {@link Long} value.
      * @param defaultValue Default value.
      * @return value
-     * @deprecated use {@link PropertyUtil#getLong(Node, String, Long)} instead
+     * @deprecated use {@link info.magnolia.jcr.util.PropertyUtil#getLong(Node, String, Long)} instead
      */
     @Deprecated
     public static Long getLong(Node node, String propertyName, Long defaultValue) {

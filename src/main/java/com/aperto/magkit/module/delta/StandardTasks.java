@@ -20,8 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.*;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.*;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.orderBefore;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectConfig;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
+import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.addNode;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.noop;
