@@ -12,6 +12,7 @@ import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_ANCHOR;
 import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_QUERY;
 import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_SELECTOR;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -84,6 +85,9 @@ public class ExtendedLinkTransformerTest {
         ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(_item, _fieldDefinition, String.class);
         transformer.setExtendedLinkFieldHelper(new ExtendedLinkFieldHelper());
         assertThat(transformer.readFromItem(), equalTo(UUID));
+
+        when(_propUuid.getValue()).thenReturn(null);
+        assertThat(transformer.readFromItem(), nullValue());
     }
     @Test
     public void testReadFromItemExtended() throws Exception {

@@ -98,7 +98,7 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
 
     private String getPropertyValue(final String id) {
         final Property property = relatedFormItem.getItemProperty(id);
-        return property != null ? String.valueOf(property.getValue()) : null;
+        return property != null && property.getValue() != null ? String.valueOf(property.getValue()) : null;
     }
 
     private void setPropertyValue(final String id, final String value) {
