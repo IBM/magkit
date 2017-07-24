@@ -30,23 +30,21 @@ import info.magnolia.ui.vaadin.integration.jcr.DefaultProperty;
  */
 public class ExtendedLinkTransformer extends BasicTransformer<String> {
 
-    private String _baseName;
 
     private ExtendedLinkFieldHelper _extendedLinkFieldHelper;
 
     public ExtendedLinkTransformer(Item relatedFormItem, ConfiguredFieldDefinition definition, Class<String> type) {
         super(relatedFormItem, definition, type);
-        _baseName = definition.getName();
     }
 
     @Override
     public void writeToItem(final String newValue) {
-        Property<String> property = relatedFormItem.getItemProperty(_baseName);
+        Property<String> property = relatedFormItem.getItemProperty(definePropertyName());
         if (isNotBlank(newValue)) {
 
             if (property == null) {
                 property = new DefaultProperty<String>(String.class, null);
-                relatedFormItem.addItemProperty(_baseName, property);
+                relatedFormItem.addItemProperty(definePropertyName(), property);
             }
 
             if (!isExternalLink(newValue)) {
@@ -56,9 +54,9 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
                 final String query = _extendedLinkFieldHelper.getQuery(newValue);
                 final String selector = _extendedLinkFieldHelper.getSelectors(newValue);
 
-                setPropertyValue(_baseName + SUFFIX_ANCHOR, anchor);
-                setPropertyValue(_baseName + SUFFIX_QUERY, query);
-                setPropertyValue(_baseName + SUFFIX_SELECTOR, selector);
+                setPropertyValue(definePropertyName() + SUFFIX_ANCHOR, anchor);
+                setPropertyValue(definePropertyName() + SUFFIX_QUERY, query);
+                setPropertyValue(definePropertyName() + SUFFIX_SELECTOR, selector);
 
                 if (isNotBlank(path)) {
                     property.setValue(path);
@@ -76,10 +74,10 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
     @Override
     public String readFromItem() {
         String result;
-        String base = getPropertyValue(_baseName);
-        final String anchor = getPropertyValue(_baseName + SUFFIX_ANCHOR);
-        final String query = getPropertyValue(_baseName + SUFFIX_QUERY);
-        final String selector = getPropertyValue(_baseName + SUFFIX_SELECTOR);
+        String base = getPropertyValue(definePropertyName());
+        final String anchor = getPropertyValue(definePropertyName() + SUFFIX_ANCHOR);
+        final String query = getPropertyValue(definePropertyName() + SUFFIX_QUERY);
+        final String selector = getPropertyValue(definePropertyName() + SUFFIX_SELECTOR);
 
         if (!isExternalLink(base) && isNotBlank(base)) {
             if (isPath(base)) {
