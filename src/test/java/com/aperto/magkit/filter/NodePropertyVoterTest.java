@@ -1,6 +1,16 @@
 package com.aperto.magkit.filter;
 
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContent;
+import com.aperto.magkit.mockito.jcr.SessionMockUtils;
+import info.magnolia.context.SystemContext;
+import info.magnolia.repository.RepositoryConstants;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
+import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContentNode;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockSystemContext;
@@ -11,18 +21,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.when;
-
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.aperto.magkit.mockito.jcr.SessionMockUtils;
-
-import info.magnolia.context.SystemContext;
-import info.magnolia.repository.RepositoryConstants;
 
 /**
  * Test for node property voter.
@@ -73,7 +71,7 @@ public class NodePropertyVoterTest {
 
     @Test
     public void testNodePropertyMatchWithContext() throws RepositoryException {
-        mockAggregationState(stubCurrentContent("/bs/secure"));
+        mockAggregationState(stubCurrentContentNode("/bs/secure"));
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
