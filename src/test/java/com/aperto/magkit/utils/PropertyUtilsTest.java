@@ -1,22 +1,18 @@
 package com.aperto.magkit.utils;
 
+import org.junit.Test;
+
+import javax.jcr.Node;
+import javax.jcr.Property;
+import java.util.Collection;
+
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
-import static com.aperto.magkit.utils.PropertyUtils.getLong;
 import static com.aperto.magkit.utils.PropertyUtils.retrieveMultiSelectProperties;
 import static com.aperto.magkit.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-
-import java.util.Collection;
-
-import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-
-import org.junit.Test;
 
 /**
  * Test for {@link PropertyUtils}.
@@ -48,19 +44,5 @@ public class PropertyUtilsTest {
             assertThat(value.endsWith(String.valueOf(i)), is(true));
             i++;
         }
-    }
-
-    @Test
-    public void testGetValidLong() throws RepositoryException {
-        Node node = mockNode("/node", stubProperty("test", 12L));
-        Long longValue = getLong(node, "test", 0L);
-        assertThat(longValue, is(12L));
-    }
-
-    @Test
-    public void testGetInValidLong() throws RepositoryException {
-        Node node = mockNode("/node", stubProperty("test", "abc"));
-        Long longValue = getLong(node, "test", 0L);
-        assertThat(longValue, is(0L));
     }
 }

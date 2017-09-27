@@ -84,7 +84,6 @@ public abstract class NodeOperationFactory extends Ops {
     /**
      * Sets the value of an existing property, ignoring its current value.
      * If the property does not exist it will be created. No Exception will be thrown.
-     * This reflects the behaviour of the internaly called method setNodeDate(..) that replaces the deprecated method createNodeData(..).
      *
      * @param name     the name of the node to be moved
      * @param newValue the name of the node sibbing that should be ordered behind the named node

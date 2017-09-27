@@ -136,29 +136,6 @@ public final class PropertyUtils {
         return collect(values, new PropertyStringTransformer());
     }
 
-    /**
-     * Get the {@link Long} value from a node.
-     *
-     * @param node         Node
-     * @param propertyName Property name of the {@link Long} value.
-     * @param defaultValue Default value.
-     * @return value
-     * @deprecated use {@link info.magnolia.jcr.util.PropertyUtil#getLong(Node, String, Long)} instead
-     */
-    @Deprecated
-    public static Long getLong(Node node, String propertyName, Long defaultValue) {
-        Long longValue = defaultValue;
-        try {
-            if (node != null && isNotEmpty(propertyName) && node.hasProperty(propertyName)) {
-                Property property = node.getProperty(propertyName);
-                longValue = property.getLong();
-            }
-        } catch (RepositoryException e) {
-            LOGGER.info("Error message was {}", e.getLocalizedMessage());
-        }
-        return longValue;
-    }
-
     private PropertyUtils() {
     }
 
