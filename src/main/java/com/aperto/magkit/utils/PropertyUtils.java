@@ -1,6 +1,6 @@
 package com.aperto.magkit.utils;
 
-import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections4.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +14,7 @@ import java.util.List;
 
 import static info.magnolia.jcr.util.PropertyUtil.getValuesStringList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.sort;
-import static org.apache.commons.collections15.CollectionUtils.collect;
+import static org.apache.commons.collections4.CollectionUtils.collect;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
@@ -63,7 +62,7 @@ public final class PropertyUtils {
     public static Collection<Property> retrieveMultiSelectProperties(Node multiSelectNode) {
         Collection<Property> properties = null;
         try {
-            final RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<>(new ArrayList<Property>(), "\\d+", false, 1, Property.class);
+            final RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<>(new ArrayList<>(), "\\d+", false, 1, Property.class);
             if (multiSelectNode != null) {
                 multiSelectNode.accept(collector);
                 properties = collector.getCollectedChildren();
@@ -120,7 +119,7 @@ public final class PropertyUtils {
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
         List<Property> values = new ArrayList<>();
         values.addAll(retrieveMultiSelectProperties(multiSelectNode));
-        sort(values, new PropertyComparator());
+        values.sort(new PropertyComparator());
         return collect(values, new PropertyStringTransformer());
     }
 
@@ -132,7 +131,7 @@ public final class PropertyUtils {
     public static Collection<String> retrieveOrderedMultiSelectValues(Node baseNode, String nodeName) {
         List<Property> values = new ArrayList<>();
         values.addAll(retrieveMultiSelectProperties(baseNode, nodeName));
-        sort(values, new PropertyComparator());
+        values.sort(new PropertyComparator());
         return collect(values, new PropertyStringTransformer());
     }
 

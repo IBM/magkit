@@ -1,21 +1,10 @@
 package com.aperto.magkit.utils;
 
-import static info.magnolia.cms.core.MgnlNodeType.NT_COMPONENT;
-import static info.magnolia.cms.util.QueryUtil.search;
-import static info.magnolia.jcr.util.NodeUtil.asIterable;
-import static info.magnolia.jcr.util.NodeUtil.asList;
-import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static javax.jcr.query.Query.JCR_SQL2;
-import static javax.jcr.query.Query.XPATH;
-import static org.apache.commons.collections15.CollectionUtils.collect;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import info.magnolia.context.MgnlContext;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -27,13 +16,22 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.collections15.Transformer;
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import info.magnolia.context.MgnlContext;
+import static info.magnolia.cms.core.MgnlNodeType.NT_COMPONENT;
+import static info.magnolia.cms.util.QueryUtil.search;
+import static info.magnolia.jcr.util.NodeUtil.asIterable;
+import static info.magnolia.jcr.util.NodeUtil.asList;
+import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static javax.jcr.query.Query.JCR_SQL2;
+import static javax.jcr.query.Query.XPATH;
+import static org.apache.commons.collections4.CollectionUtils.collect;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
  * Utility methods for common queries.
@@ -193,8 +191,7 @@ public final class NodeQueryUtil {
      * Find a descendant component node.
      *
      * @param componentsTemplateName component template name
-     * @param searchRoot search root
-     *
+     * @param searchRoot             search root
      * @return component node
      */
     public static Node findDescendantComponent(final String componentsTemplateName, final String searchRoot) {
@@ -210,8 +207,7 @@ public final class NodeQueryUtil {
      * Find descendant component nodes.
      *
      * @param componentsTemplateName component template name
-     * @param searchRoots search roots
-     *
+     * @param searchRoots            search roots
      * @return node iterator
      */
     public static NodeIterator findDescendantComponents(final String componentsTemplateName, final String... searchRoots) {
@@ -295,7 +291,7 @@ public final class NodeQueryUtil {
      * @return a list of nodes or null
      */
     public static List<Node> executeQuery(final Query query, final String selectorName) {
-        final List<Node> resultList = new ArrayList<Node>();
+        final List<Node> resultList = new ArrayList<>();
         try {
             if (query != null) {
                 final QueryResult result = query.execute();
