@@ -1,25 +1,22 @@
 package com.aperto.magkit.dialogs.fields;
 
-import static com.aperto.magkit.utils.LinkTool.isAnchor;
-import static com.aperto.magkit.utils.LinkTool.isExternalLink;
-import static com.aperto.magkit.utils.LinkTool.isPath;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import java.util.Locale;
+import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
+import info.magnolia.context.MgnlContext;
+import info.magnolia.ui.form.field.converter.IdentifierToPathConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
-
-import info.magnolia.context.MgnlContext;
-import info.magnolia.ui.form.field.converter.IdentifierToPathConverter;
+import static com.aperto.magkit.utils.LinkTool.isAnchor;
+import static com.aperto.magkit.utils.LinkTool.isExternalLink;
+import static com.aperto.magkit.utils.LinkTool.isPath;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Handles input of links by urls (external) or absolute paths (internal) with additional components. Use this converter with the {@link ExtendedLinkFieldDefinition}.
@@ -29,7 +26,7 @@ import info.magnolia.ui.form.field.converter.IdentifierToPathConverter;
  */
 public class ExtendedLinkConverter implements IdentifierToPathConverter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LinkConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedLinkConverter.class);
     private static final long serialVersionUID = 4484406102548210913L;
 
     private transient ExtendedLinkFieldHelper _extendedLinkFieldHelper;

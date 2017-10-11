@@ -1,15 +1,17 @@
 package com.aperto.magkit.dialogs.fields;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Item;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-
+import info.magnolia.ui.api.context.UiContext;
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 /**
  * Factory for {@link ExtendedTextField}.
@@ -20,8 +22,9 @@ import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
 public class ExtendedTextFieldFactory extends AbstractFieldFactory<ExtendedTextFieldDefinition, String> {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedTextFieldFactory.class);
 
-    public ExtendedTextFieldFactory(ExtendedTextFieldDefinition definition, Item relatedFieldItem) {
-        super(definition, relatedFieldItem);
+    @Inject
+    public ExtendedTextFieldFactory(ExtendedTextFieldDefinition definition, Item relatedFieldItem, UiContext uiContext, I18NAuthoringSupport i18nAuthoringSupport) {
+        super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport);
     }
 
     /**

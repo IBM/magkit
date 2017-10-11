@@ -38,10 +38,9 @@
             <artifactId>el-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>info.magnolia</groupId>
-            <artifactId>magnolia-module-inplace-templating</artifactId>
+            <groupId>info.magnolia.ui</groupId>
+            <artifactId>magnolia-ui-contentapp</artifactId>
         </dependency>
         <dependency>
             <groupId>info.magnolia.site</groupId>

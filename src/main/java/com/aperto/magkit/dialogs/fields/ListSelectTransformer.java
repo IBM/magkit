@@ -1,11 +1,11 @@
 package com.aperto.magkit.dialogs.fields;
 
-import java.util.Collection;
-
 import com.vaadin.data.Item;
-
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.form.field.transformer.basic.ListToSetTransformer;
+
+import java.util.Collection;
 
 /**
  * Transformer filtered empty selection items.
@@ -16,8 +16,8 @@ import info.magnolia.ui.form.field.transformer.basic.ListToSetTransformer;
  */
 public class ListSelectTransformer<T> extends ListToSetTransformer<T> {
 
-    public ListSelectTransformer(final Item relatedFormItem, final ConfiguredFieldDefinition definition, final Class<T> type) {
-        super(relatedFormItem, definition, type);
+    public ListSelectTransformer(final Item relatedFormItem, final ConfiguredFieldDefinition definition, final Class<T> type, I18NAuthoringSupport i18nAuthoringSupport) {
+        super(relatedFormItem, definition, type, i18nAuthoringSupport);
     }
 
     @Override

@@ -1,16 +1,16 @@
 package com.aperto.magkit.dialogs.fields;
 
-import javax.inject.Inject;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.ui.Field;
-
-import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
+import info.magnolia.ui.api.context.UiContext;
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
 import info.magnolia.ui.form.field.factory.FieldFactoryFactory;
 import info.magnolia.ui.form.field.transformer.Transformer;
+
+import javax.inject.Inject;
 
 /**
  * Copy of Magnolia Class with a small change.
@@ -23,15 +23,15 @@ public class SortableMultiValueFieldFactory extends AbstractFieldFactory<Sortabl
     private final Item _relatedFieldItem;
     private final FieldFactoryFactory _fieldFactoryFactory;
     private final ComponentProvider _componentProvider;
-    private final I18nContentSupport _i18nContentSupport;
+    private final I18NAuthoringSupport _i18nAuthoringSupport;
 
     @Inject
-    public SortableMultiValueFieldFactory(final SortableMultiValueFieldDefinition definition, final Item relatedFieldItem, final FieldFactoryFactory fieldFactoryFactory, final ComponentProvider componentProvider, final I18nContentSupport i18nContentSupport) {
-        super(definition, relatedFieldItem);
+    public SortableMultiValueFieldFactory(final SortableMultiValueFieldDefinition definition, final Item relatedFieldItem, UiContext uiContext, final FieldFactoryFactory fieldFactoryFactory, final ComponentProvider componentProvider, final I18NAuthoringSupport i18nAuthoringSupport) {
+        super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport);
         _relatedFieldItem = relatedFieldItem;
         _fieldFactoryFactory = fieldFactoryFactory;
         _componentProvider = componentProvider;
-        _i18nContentSupport = i18nContentSupport;
+        _i18nAuthoringSupport = i18nAuthoringSupport;
     }
 
 
@@ -41,7 +41,7 @@ public class SortableMultiValueFieldFactory extends AbstractFieldFactory<Sortabl
         SortableMultiValueFieldDefinition fieldDefinition = getFieldDefinition();
         fieldDefinition.setI18nBasename(getMessages().getBasename());
 
-        SortableMultiValueField field = new SortableMultiValueField(fieldDefinition, _fieldFactoryFactory, _componentProvider, item, _i18nContentSupport);
+        SortableMultiValueField field = new SortableMultiValueField(fieldDefinition, _fieldFactoryFactory, _componentProvider, item, _i18nAuthoringSupport);
         // Set Caption
         field.setButtonCaptionAdd(getMessage(fieldDefinition.getButtonSelectAddLabel()));
         field.setButtonCaptionRemove(getMessage(fieldDefinition.getButtonSelectRemoveLabel()));

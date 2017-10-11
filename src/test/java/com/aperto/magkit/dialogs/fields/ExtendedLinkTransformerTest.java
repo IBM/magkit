@@ -5,6 +5,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertysetItem;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
+import info.magnolia.ui.framework.i18n.DefaultI18NAuthoringSupport;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,7 +63,7 @@ public class ExtendedLinkTransformerTest {
     @Test
     public void testWriteToItem() throws Exception {
         PropertysetItem item = new PropertysetItem();
-        ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(item, _fieldDefinition, String.class);
+        ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(item, _fieldDefinition, String.class, new DefaultI18NAuthoringSupport());
         transformer.setExtendedLinkFieldHelper(new ExtendedLinkFieldHelper());
 
         transformer.writeToItem(FULL_PATH);
@@ -82,7 +83,7 @@ public class ExtendedLinkTransformerTest {
     @Test
     public void testReadFromItemSimple() throws Exception {
         when(_item.getItemProperty(PN_TEST)).thenReturn(_propUuid);
-        ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(_item, _fieldDefinition, String.class);
+        ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(_item, _fieldDefinition, String.class, new DefaultI18NAuthoringSupport());
         transformer.setExtendedLinkFieldHelper(new ExtendedLinkFieldHelper());
         assertThat(transformer.readFromItem(), equalTo(UUID));
 
@@ -95,7 +96,7 @@ public class ExtendedLinkTransformerTest {
         when(_item.getItemProperty(PN_TEST + SUFFIX_ANCHOR)).thenReturn(_propAnchor);
         when(_item.getItemProperty(PN_TEST + SUFFIX_SELECTOR)).thenReturn(_propSelector);
         when(_item.getItemProperty(PN_TEST + SUFFIX_QUERY)).thenReturn(_propQuery);
-        ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(_item, _fieldDefinition, String.class);
+        ExtendedLinkTransformer transformer = new ExtendedLinkTransformer(_item, _fieldDefinition, String.class, new DefaultI18NAuthoringSupport());
         transformer.setExtendedLinkFieldHelper(new ExtendedLinkFieldHelper());
         assertThat(transformer.readFromItem(), equalTo(FULL_PATH));
     }

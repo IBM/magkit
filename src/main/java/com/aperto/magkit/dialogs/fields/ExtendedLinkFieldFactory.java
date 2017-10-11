@@ -1,30 +1,30 @@
 package com.aperto.magkit.dialogs.fields;
 
-import static com.aperto.magkit.utils.LinkTool.isExternalLink;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeStart;
+import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
+import com.vaadin.data.Item;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
+import info.magnolia.objectfactory.ComponentProvider;
+import info.magnolia.ui.api.app.AppController;
+import info.magnolia.ui.api.app.ChooseDialogCallback;
+import info.magnolia.ui.api.context.UiContext;
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
+import info.magnolia.ui.form.field.LinkField;
+import info.magnolia.ui.form.field.converter.IdentifierToPathConverter;
+import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
+import info.magnolia.ui.vaadin.integration.jcr.JcrItemId;
+import info.magnolia.ui.vaadin.integration.jcr.JcrItemUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
-import com.vaadin.data.Item;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Field;
-
-import info.magnolia.objectfactory.ComponentProvider;
-import info.magnolia.ui.api.app.AppController;
-import info.magnolia.ui.api.app.ChooseDialogCallback;
-import info.magnolia.ui.api.context.UiContext;
-import info.magnolia.ui.form.field.LinkField;
-import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
-import info.magnolia.ui.vaadin.integration.jcr.JcrItemId;
-import info.magnolia.ui.vaadin.integration.jcr.JcrItemUtil;
+import static com.aperto.magkit.utils.LinkTool.isExternalLink;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * The factory creates a {@link LinkField}. The callback mechanism is overwritten to allow additional link components like fragments, queries and selectors.
@@ -38,27 +38,34 @@ public class ExtendedLinkFieldFactory extends AbstractFieldFactory<ExtendedLinkF
 
     private final AppController _appController;
     private final UiContext _uiContext;
-    private ComponentProvider _componentProvider;
 
     private final ExtendedLinkFieldHelper _extendedLinkFieldHelper = new ExtendedLinkFieldHelper();
     private LinkField _linkField;
 
     @Inject
-    public ExtendedLinkFieldFactory(ExtendedLinkFieldDefinition definition, Item relatedFieldItem, AppController appController, UiContext uiContext, ComponentProvider componentProvider) {
-        super(definition, relatedFieldItem);
+    public ExtendedLinkFieldFactory(ExtendedLinkFieldDefinition definition, Item relatedFieldItem, UiContext uiContext, I18NAuthoringSupport i18nAuthoringSupport, AppController appController, ComponentProvider componentProvider) {
+        super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport);
         _appController = appController;
         _uiContext = uiContext;
-        _componentProvider = componentProvider;
     }
 
     @Override
     protected Field<String> createFieldComponent() {
-        _linkField = new LinkField(getFieldDefinition(), _componentProvider);
+        _linkField = new LinkField();
         // Set Caption
         _linkField.setButtonCaptionNew(getMessage(getFieldDefinition().getButtonSelectNewLabel()));
         _linkField.setButtonCaptionOther(getMessage(getFieldDefinition().getButtonSelectOtherLabel()));
+        _linkField.getSelectButton().setDisableOnClick(true);
         // Add a callback listener on the select button
         _linkField.getSelectButton().addClickListener(createButtonClickListener());
+        _linkField.setFieldEditable(definition.isFieldEditable());
+
+        IdentifierToPathConverter converter = definition.getIdentifierToPathConverter();
+        if (converter != null) {
+            converter.setWorkspaceName(definition.getTargetWorkspace());
+        }
+        _linkField.setTextFieldConverter(converter);
+
         return _linkField;
     }
 
@@ -87,7 +94,7 @@ public class ExtendedLinkFieldFactory extends AbstractFieldFactory<ExtendedLinkF
 
         @Override
         public void onCancel() {
-            // keine Funktionalität
+            _linkField.getSelectButton().setEnabled(true);
         }
 
         @Override
@@ -107,6 +114,7 @@ public class ExtendedLinkFieldFactory extends AbstractFieldFactory<ExtendedLinkF
                 }
             }
             _linkField.setValue(newValue);
+            _linkField.getSelectButton().setEnabled(true);
         }
     }
 

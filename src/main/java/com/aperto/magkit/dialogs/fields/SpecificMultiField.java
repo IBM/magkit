@@ -1,15 +1,5 @@
 package com.aperto.magkit.dialogs.fields;
 
-import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
-import static info.magnolia.jcr.util.PropertyUtil.getLong;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertysetItem;
@@ -17,9 +7,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-
-import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.MultiField;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.form.field.definition.MultiValueFieldDefinition;
@@ -29,6 +18,15 @@ import info.magnolia.ui.form.field.transformer.Transformer;
 import info.magnolia.ui.form.field.transformer.multi.MultiTransformer;
 import info.magnolia.ui.vaadin.integration.jcr.JcrNewNodeAdapter;
 import info.magnolia.ui.vaadin.integration.jcr.JcrNodeAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+
+import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
+import static info.magnolia.jcr.util.PropertyUtil.getLong;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Generic Multi Field.<br>
@@ -46,8 +44,8 @@ public class SpecificMultiField extends MultiField {
 
     private Long _multiValueCount = -1L;
 
-    public SpecificMultiField(MultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, I18nContentSupport i18nContentSupport, ComponentProvider componentProvider, Item relatedFieldItem) {
-        super(definition, fieldFactoryFactory, i18nContentSupport, componentProvider, relatedFieldItem);
+    public SpecificMultiField(MultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, ComponentProvider componentProvider, Item relatedFieldItem, I18NAuthoringSupport i18nAuthoringSupport) {
+        super(definition, fieldFactoryFactory, componentProvider, relatedFieldItem, i18nAuthoringSupport);
         _fieldDefinition = definition.getField();
         initMultiValueCount();
     }

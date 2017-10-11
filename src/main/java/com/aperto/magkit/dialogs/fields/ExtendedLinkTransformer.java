@@ -1,26 +1,27 @@
 package com.aperto.magkit.dialogs.fields;
 
 
+import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
+import com.aperto.magkit.utils.NodeUtils;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.ObjectProperty;
+import info.magnolia.jcr.util.NodeUtil;
+import info.magnolia.repository.RepositoryConstants;
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
+import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
+import info.magnolia.ui.form.field.transformer.basic.BasicTransformer;
+
+import javax.inject.Inject;
+import javax.jcr.Node;
+
 import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_ANCHOR;
 import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_QUERY;
 import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_SELECTOR;
 import static com.aperto.magkit.utils.LinkTool.isExternalLink;
 import static com.aperto.magkit.utils.LinkTool.isPath;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import javax.inject.Inject;
-import javax.jcr.Node;
-
-import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
-import com.aperto.magkit.utils.NodeUtils;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-
-import info.magnolia.jcr.util.NodeUtil;
-import info.magnolia.repository.RepositoryConstants;
-import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
-import info.magnolia.ui.form.field.transformer.basic.BasicTransformer;
-import info.magnolia.ui.vaadin.integration.jcr.DefaultProperty;
 
 /**
  * The Transformer splits the value into single components and stores them in distinct properties on write operation. It merges the distinct property values on read operation into a single value.
@@ -33,8 +34,8 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
 
     private ExtendedLinkFieldHelper _extendedLinkFieldHelper;
 
-    public ExtendedLinkTransformer(Item relatedFormItem, ConfiguredFieldDefinition definition, Class<String> type) {
-        super(relatedFormItem, definition, type);
+    public ExtendedLinkTransformer(Item relatedFormItem, ConfiguredFieldDefinition definition, Class<String> type, I18NAuthoringSupport i18nAuthoringSupport) {
+        super(relatedFormItem, definition, type, i18nAuthoringSupport);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
         if (isNotBlank(newValue)) {
 
             if (property == null) {
-                property = new DefaultProperty<String>(String.class, null);
+                property = new ObjectProperty<>(EMPTY);
                 relatedFormItem.addItemProperty(definePropertyName(), property);
             }
 
@@ -100,7 +101,7 @@ public class ExtendedLinkTransformer extends BasicTransformer<String> {
     }
 
     private void setPropertyValue(final String id, final String value) {
-        relatedFormItem.addItemProperty(id, isNotBlank(value) ? new DefaultProperty<String>(value) : new DefaultProperty<String>(null));
+        relatedFormItem.addItemProperty(id, isNotBlank(value) ? new ObjectProperty<>(value) : new ObjectProperty<>(EMPTY, String.class));
     }
 
     @Inject

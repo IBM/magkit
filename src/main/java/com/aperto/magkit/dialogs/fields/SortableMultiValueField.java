@@ -1,10 +1,5 @@
 package com.aperto.magkit.dialogs.fields;
 
-import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertysetItem;
@@ -15,15 +10,18 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
-
-import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.objectfactory.ComponentProvider;
+import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.AbstractCustomMultiField;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.form.field.factory.FieldFactoryFactory;
 import info.magnolia.ui.form.field.transformer.TransformedProperty;
 import info.magnolia.ui.form.field.transformer.Transformer;
 import info.magnolia.ui.form.field.transformer.multi.MultiTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
 
 /**
  * Sortable MultiValueField based on {@link info.magnolia.ui.form.field.MultiField}.
@@ -47,8 +45,8 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
     private String _buttonCaptionAdd;
     private String _buttonCaptionRemove;
 
-    public SortableMultiValueField(SortableMultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, ComponentProvider componentProvider, Item relatedFieldItem, I18nContentSupport i18nContentSupport) {
-        super(definition, fieldFactoryFactory, i18nContentSupport, componentProvider, relatedFieldItem);
+    public SortableMultiValueField(SortableMultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, ComponentProvider componentProvider, Item relatedFieldItem, I18NAuthoringSupport i18nAuthoringSupport) {
+        super(definition, fieldFactoryFactory, componentProvider, relatedFieldItem, i18nAuthoringSupport);
         _fieldDefinition = definition.getField();
     }
 
