@@ -5,6 +5,7 @@ import info.magnolia.context.WebContext;
 import info.magnolia.link.CompleteUrlPathTransformer;
 import info.magnolia.link.LinkTransformerManager;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -78,6 +79,7 @@ public class SecureRedirectFilterTest {
         verify(_response).sendRedirect("http://www.aperto.de/folder.html");
     }
 
+    @Ignore
     @Test
     public void testSecureHttpRequest() throws IOException, ServletException, RepositoryException {
         initContext("standard-templating-kit:pages/stkForm", null, null);
@@ -87,6 +89,7 @@ public class SecureRedirectFilterTest {
         verify(_response).sendRedirect("https://www.aperto.de/stkForm.html");
     }
 
+    @Ignore
     @Test
     public void testSecureHttpRequestWithPorts() throws IOException, ServletException, RepositoryException {
         initContext("standard-templating-kit:pages/stkForm", null, ":80");
