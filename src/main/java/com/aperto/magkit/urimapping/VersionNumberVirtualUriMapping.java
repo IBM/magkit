@@ -1,11 +1,14 @@
 package com.aperto.magkit.urimapping;
 
-import info.magnolia.cms.beans.config.QueryAwareVirtualURIMapping;
+import info.magnolia.virtualuri.VirtualUriMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.removeEnd;
 
 /**
@@ -13,7 +16,7 @@ import static org.apache.commons.lang.StringUtils.removeEnd;
  *
  * @author daniel.kasmeroglu@aperto.de
  */
-public class VersionNumberVirtualUriMapping implements QueryAwareVirtualURIMapping {
+public class VersionNumberVirtualUriMapping implements VirtualUriMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(VersionNumberVirtualUriMapping.class);
 
     /**
@@ -68,48 +71,41 @@ public class VersionNumberVirtualUriMapping implements QueryAwareVirtualURIMappi
         _toUri = toUri;
     }
 
-    //CHECKSTYLE:OFF
     @Override
-    public MappingResult mapURI(String uri) {
-        return mapURI(uri, null);
-        //CHECKSTYLE:ON
-    }
-
-    //CHECKSTYLE:OFF
-    @Override
-    public MappingResult mapURI(String uri, String queryString) {
-        //CHECKSTYLE:ON
-        MappingResult result = null;
+    public Optional<Result> mapUri(URI uri) {
+        Optional<Result> result = Optional.empty();
+        String url = uri.toString();
         if (_fromPrefix == null) {
             LOGGER.warn("Incomplete configuration. fromPrefix is not set.");
-        } else if (uri.startsWith(_fromPrefix)) {
+        } else if (url.startsWith(_fromPrefix)) {
             // we gotta prefix, so check if we've got a version candidate
-            String suffix = uri.substring(_fromPrefix.length());
+            String suffix = url.substring(_fromPrefix.length());
             int idx = suffix.indexOf('/');
             if (idx > 0) {
                 // we gotta version candidate, so check if it's supported by us
                 String versionPart = suffix.substring(0, idx);
                 if (isValidVersion(versionPart)) {
                     // we support this version pattern, so it can be dropped
-                    result = newResult();
                     String rest = suffix.substring(idx + 1);
-                    String toUri = buildToUri(rest, queryString);
-                    result.setToURI(toUri);
+                    String toUri = buildToUri(rest);
+                    result = Optional.of(new Result(toUri, _level, this));
                 }
             }
         }
         return result;
     }
 
-    private String buildToUri(final String rest, final String queryString) {
+    @Override
+    public boolean isValid() {
+        return isNotBlank(getFromPrefix()) && isNotBlank(getToUri());
+    }
+
+    private String buildToUri(final String rest) {
         String toUri;
         if (_toUri != null) {
             toUri = String.format(_toUri, rest);
         } else {
             toUri = String.format("%s%s", _fromPrefix, rest);
-        }
-        if (queryString != null) {
-            toUri += "?" + queryString;
         }
         return toUri;
     }
@@ -118,15 +114,8 @@ public class VersionNumberVirtualUriMapping implements QueryAwareVirtualURIMappi
         return _regexp.matcher(version).matches();
     }
 
-    private MappingResult newResult() {
-        MappingResult result = new MappingResult();
-        result.setLevel(_level);
-        return result;
-    }
-
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[pattern=" + _pattern + ": " + _fromPrefix + " --> " + buildToUri("...", null) + "]";
+        return getClass().getSimpleName() + "[pattern=" + _pattern + ": " + _fromPrefix + " --> " + buildToUri("...") + "]";
     }
-
 }

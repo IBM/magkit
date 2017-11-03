@@ -1,8 +1,6 @@
 package com.aperto.magkit.filter;
 
-import com.aperto.magkit.mockito.jcr.SessionMockUtils;
 import info.magnolia.context.SystemContext;
-import info.magnolia.repository.RepositoryConstants;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +15,8 @@ import static com.aperto.magkit.mockito.ContextMockUtils.mockSystemContext;
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
 import static com.aperto.magkit.mockito.SystemContextStubbingOperation.stubJcrSession;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
+import static com.aperto.magkit.mockito.jcr.SessionMockUtils.mockSession;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.contains;
@@ -90,10 +90,10 @@ public class NodePropertyVoterTest {
     public void initVoter() throws RepositoryException {
         cleanContext();
         _propertyVoter = new NodePropertyVoter();
-        Session session = SessionMockUtils.mockSession(RepositoryConstants.WEBSITE);
+        Session session = mockSession(WEBSITE);
         when(session.getNode(contains("old"))).thenThrow(new PathNotFoundException());
         mockPageNode("/bs/secure", stubProperty("secure", "true"));
-        SystemContext systemContext = mockSystemContext(stubJcrSession(RepositoryConstants.WEBSITE));
+        SystemContext systemContext = mockSystemContext(stubJcrSession(WEBSITE));
         _propertyVoter.setSystemContext(systemContext);
     }
 }

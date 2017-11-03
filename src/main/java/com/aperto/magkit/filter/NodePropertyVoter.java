@@ -1,24 +1,23 @@
 package com.aperto.magkit.filter;
 
-import static info.magnolia.jcr.util.PropertyUtil.getString;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
-
-import java.util.regex.Pattern;
+import info.magnolia.context.Context;
+import info.magnolia.context.MgnlContext;
+import info.magnolia.context.SystemContext;
+import info.magnolia.voting.voters.BasePatternVoter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import info.magnolia.context.Context;
-import info.magnolia.context.MgnlContext;
-import info.magnolia.context.SystemContext;
-import info.magnolia.voting.voters.BasePatternVoter;
+import static info.magnolia.jcr.util.NodeUtil.getNodePathIfPossible;
+import static info.magnolia.jcr.util.PropertyUtil.getString;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.substringBeforeLast;
 
 /**
  * Voter that matches on a configured property name the configured regex pattern.
@@ -58,15 +57,15 @@ public class NodePropertyVoter extends BasePatternVoter {
                 LOGGER.warn("No website content found on {}. Perhaps use an additional voter.", path);
             }
         } else {
-            LOGGER.warn("Configuration of a {} seems to be incomlete.", getClass().getName());
+            LOGGER.warn("Configuration of a {} seems to be incomplete.", getClass().getName());
         }
         return vote;
     }
 
     private String resolveNodePath(final Object value) {
         String nodePath;
-        if (MgnlContext.hasInstance() && MgnlContext.getAggregationState() != null && MgnlContext.getAggregationState().getCurrentContent() != null) {
-            nodePath = MgnlContext.getAggregationState().getCurrentContent().getHandle();
+        if (MgnlContext.hasInstance() && MgnlContext.getAggregationState() != null && MgnlContext.getAggregationState().getCurrentContentNode() != null) {
+            nodePath = getNodePathIfPossible(MgnlContext.getAggregationState().getCurrentContentNode());
         } else {
             String uri = resolveURIFromValue(value);
             nodePath = substringBeforeLast(uri, ".");

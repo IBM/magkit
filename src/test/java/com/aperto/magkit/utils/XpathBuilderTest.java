@@ -87,8 +87,7 @@ public class XpathBuilderTest {
 
     @Test
     public void testPropertyNull() {
-        String nullString = null;
-        assertEquals(_xpath.property(nullString).build(), JCR_ROOT_PATH + "[" + NULL_STRING + "]");
+        assertEquals(_xpath.property((String) null).build(), JCR_ROOT_PATH + "[" + NULL_STRING + "]");
     }
 
     @Test

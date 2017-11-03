@@ -1,5 +1,24 @@
 package com.aperto.magkit.filter;
 
+import info.magnolia.cms.core.AggregationState;
+import info.magnolia.context.WebContext;
+import info.magnolia.link.CompleteUrlPathTransformer;
+import info.magnolia.link.LinkTransformerManager;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Matchers;
+
+import javax.jcr.Node;
+import javax.jcr.Property;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Workspace;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubExtension;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
@@ -15,28 +34,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-
-import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.Workspace;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Matchers;
-
-import info.magnolia.cms.core.AggregationState;
-import info.magnolia.context.WebContext;
-import info.magnolia.link.CompleteUrlPathTransformer;
-import info.magnolia.link.Link;
-import info.magnolia.link.LinkTransformerManager;
 
 /**
  * Test for secure redirect filter.
@@ -122,7 +119,7 @@ public class SecureRedirectFilterTest {
 
             LinkTransformerManager linkManager = mock(LinkTransformerManager.class);
             CompleteUrlPathTransformer transformer = mock(CompleteUrlPathTransformer.class);
-            when(transformer.transform(Matchers.<Link>any())).thenReturn("http://www.aperto.de" + defaultString(portSuffix) + "/" + nodeName + ".html");
+            when(transformer.transform(Matchers.any())).thenReturn("http://www.aperto.de" + defaultString(portSuffix) + "/" + nodeName + ".html");
             when(linkManager.getCompleteUrl()).thenReturn(transformer);
             _redirectFilter.setLinkTransformer(linkManager);
         } else {

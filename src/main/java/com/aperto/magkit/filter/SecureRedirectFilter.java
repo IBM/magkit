@@ -1,21 +1,5 @@
 package com.aperto.magkit.filter;
 
-import static info.magnolia.context.MgnlContext.getAggregationState;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-
-import java.io.IOException;
-
-import javax.inject.Inject;
-import javax.jcr.Node;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import info.magnolia.cms.core.AggregationState;
 import info.magnolia.cms.filters.AbstractMgnlFilter;
 import info.magnolia.link.CompleteUrlPathTransformer;
@@ -23,15 +7,30 @@ import info.magnolia.link.Link;
 import info.magnolia.link.LinkTransformerManager;
 import info.magnolia.voting.Voter;
 import info.magnolia.voting.Voting;
+import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.jcr.Node;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Filter for switching between HTTP and HTTPS.
  * It switches to HTTPS for configured templates.
- * Put this filter
  *
  * @author frank.sommer
  * @since 17.08.2012
+ * @deprecated Should not used anymore. By security reasons it is recommenced to prevent redirects to unsecured protocol.
  */
+@Deprecated
 public class SecureRedirectFilter extends AbstractMgnlFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecureRedirectFilter.class);
 

@@ -4,14 +4,12 @@ import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.context.MgnlContext;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.aperto.magkit.utils.EncodingUtils.getUrlEncoded;
 import static info.magnolia.cms.util.SelectorUtil.SELECTOR_DELIMITER;
 import static java.lang.Math.max;
-import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
@@ -103,7 +101,7 @@ public final class SelectorUtils {
     public static String updateSelectors(String url, String id, String value, String... notAllowedSelectors) {
         String result = trimToEmpty(url);
         if (isNotEmpty(result)) {
-            String encodedSelectorValue = urlEncode(value);
+            String encodedSelectorValue = getUrlEncoded(value);
             String extensionWithQueryString = substringAfterLast(result, ".");
             String pathWithSelector = substringBeforeLast(result, ".");
             String extension = DEF_EXTENSION;
@@ -135,7 +133,7 @@ public final class SelectorUtils {
     }
 
     private static List<String> createNewSelectors(final String id, final String encodedSelectorValue, final String[] selectors, final String[] notAllowedSelectors) {
-        List<String> newSelectors = new ArrayList<String>();
+        List<String> newSelectors = new ArrayList<>();
         boolean selectorFound = false;
 
         for (String selector : selectors) {
@@ -154,18 +152,6 @@ public final class SelectorUtils {
             newSelectors.add(id + "=" + encodedSelectorValue);
         }
         return newSelectors;
-    }
-
-    private static String urlEncode(final String value) {
-        String encodedSelectorValue = null;
-        if (isNotEmpty(value)) {
-            try {
-                encodedSelectorValue = URLEncoder.encode(value, UTF_8);
-            } catch (UnsupportedEncodingException e) {
-                // should not happen
-            }
-        }
-        return encodedSelectorValue;
     }
 
     private SelectorUtils() {

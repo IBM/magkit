@@ -1,7 +1,7 @@
 package com.aperto.magkit.utils;
 
 import info.magnolia.context.MgnlContext;
-import org.apache.commons.collections4.Transformer;
+import info.magnolia.jcr.util.NodeUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,12 +179,7 @@ public final class NodeQueryUtil {
 
     private static List<String> retrieveChildAreas(final String searchRoot) {
         final List<Node> nodes = executeSqlQuery("select * from [mgnl:area] where ischildnode('" + searchRoot + "')");
-        return (List<String>) collect(nodes, new Transformer<Node, String>() {
-            @Override
-            public String transform(final Node node) {
-                return getPathIfPossible(node);
-            }
-        });
+        return (List<String>) collect(nodes, NodeUtil::getPathIfPossible);
     }
 
     /**

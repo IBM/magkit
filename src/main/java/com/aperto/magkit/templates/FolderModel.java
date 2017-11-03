@@ -22,10 +22,10 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * Model of folder template.
  *
  * @author diana.racho (06.11.2009)
- *
  */
 public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderModel.class);
+
     public static final String PN_HIDE_IN_NAV = "hideInNav";
     public static final String TPL_NAME = "folder";
     public static final String TPL_NAME_SPACE = "magkit";
