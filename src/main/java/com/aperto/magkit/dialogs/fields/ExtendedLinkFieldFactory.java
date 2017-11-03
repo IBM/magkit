@@ -10,8 +10,7 @@ import info.magnolia.ui.api.app.ChooseDialogCallback;
 import info.magnolia.ui.api.context.UiContext;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.LinkField;
-import info.magnolia.ui.form.field.converter.IdentifierToPathConverter;
-import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
+import info.magnolia.ui.form.field.factory.LinkFieldFactory;
 import info.magnolia.ui.vaadin.integration.jcr.JcrItemId;
 import info.magnolia.ui.vaadin.integration.jcr.JcrItemUtil;
 import org.slf4j.Logger;
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import java.util.Collection;
 
 import static com.aperto.magkit.utils.LinkTool.isExternalLink;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -32,8 +32,7 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  * @author Philipp Güttler (Aperto AG)
  * @since 03.06.2015
  */
-public class ExtendedLinkFieldFactory extends AbstractFieldFactory<ExtendedLinkFieldDefinition, String> {
-
+public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkFieldDefinition> {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedLinkFieldFactory.class);
 
     private final AppController _appController;
@@ -44,28 +43,22 @@ public class ExtendedLinkFieldFactory extends AbstractFieldFactory<ExtendedLinkF
 
     @Inject
     public ExtendedLinkFieldFactory(ExtendedLinkFieldDefinition definition, Item relatedFieldItem, UiContext uiContext, I18NAuthoringSupport i18nAuthoringSupport, AppController appController, ComponentProvider componentProvider) {
-        super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport);
+        super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport, appController, componentProvider);
         _appController = appController;
         _uiContext = uiContext;
     }
 
     @Override
     protected Field<String> createFieldComponent() {
-        _linkField = new LinkField();
-        // Set Caption
-        _linkField.setButtonCaptionNew(getMessage(getFieldDefinition().getButtonSelectNewLabel()));
-        _linkField.setButtonCaptionOther(getMessage(getFieldDefinition().getButtonSelectOtherLabel()));
-        _linkField.getSelectButton().setDisableOnClick(true);
-        // Add a callback listener on the select button
-        _linkField.getSelectButton().addClickListener(createButtonClickListener());
-        _linkField.setFieldEditable(definition.isFieldEditable());
-
-        IdentifierToPathConverter converter = definition.getIdentifierToPathConverter();
-        if (converter != null) {
-            converter.setWorkspaceName(definition.getTargetWorkspace());
+        _linkField = (LinkField) super.createFieldComponent();
+        // Change the callback listener on the select button
+        Collection<?> listeners = _linkField.getSelectButton().getListeners(Button.ClickEvent.class);
+        for (Object listener : listeners) {
+            if (listener instanceof Button.ClickListener) {
+                _linkField.getSelectButton().removeClickListener((Button.ClickListener) listener);
+            }
         }
-        _linkField.setTextFieldConverter(converter);
-
+        _linkField.getSelectButton().addClickListener(createButtonClickListener());
         return _linkField;
     }
 
