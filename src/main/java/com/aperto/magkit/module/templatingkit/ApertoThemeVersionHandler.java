@@ -103,8 +103,13 @@ public abstract class ApertoThemeVersionHandler extends BootstrapModuleVersionHa
             return this;
         }
 
+        /**
+         * Just only for css files.
+         *
+         * @return css target media
+         */
         public String getMedia() {
-            return _media;
+            return isCss() ? _media : null;
         }
 
         public ThemeFileConfig withMedia(final String media) {
