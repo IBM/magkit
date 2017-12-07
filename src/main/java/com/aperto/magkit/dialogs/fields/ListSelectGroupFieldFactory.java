@@ -1,8 +1,8 @@
 package com.aperto.magkit.dialogs.fields;
 
-import com.vaadin.data.Item;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.ui.AbstractSelect;
+import com.vaadin.v7.ui.ListSelect;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.api.context.UiContext;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
@@ -19,7 +19,7 @@ import javax.inject.Inject;
 public class ListSelectGroupFieldFactory extends OptionGroupFieldFactory<ListSelectFieldDefinition> {
 
     @Inject
-    public ListSelectGroupFieldFactory(ListSelectFieldDefinition definition, Item relatedFieldItem, UiContext uiContext, I18NAuthoringSupport i18nAuthoringSupport, ComponentProvider componentProvider) {
+    public ListSelectGroupFieldFactory(final ListSelectFieldDefinition definition, final Item relatedFieldItem, final UiContext uiContext, final I18NAuthoringSupport i18nAuthoringSupport, final ComponentProvider componentProvider) {
         super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport, componentProvider);
     }
 

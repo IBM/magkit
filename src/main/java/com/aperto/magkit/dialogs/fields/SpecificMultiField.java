@@ -1,12 +1,12 @@
 package com.aperto.magkit.dialogs.fields;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.PropertysetItem;
+import com.vaadin.v7.ui.Field;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.MultiField;

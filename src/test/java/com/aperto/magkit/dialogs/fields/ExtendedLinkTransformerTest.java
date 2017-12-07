@@ -1,9 +1,9 @@
 package com.aperto.magkit.dialogs.fields;
 
 import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.PropertysetItem;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.PropertysetItem;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.framework.i18n.DefaultI18NAuthoringSupport;
 import org.junit.Before;

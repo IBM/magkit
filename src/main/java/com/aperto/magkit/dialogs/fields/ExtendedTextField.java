@@ -1,15 +1,13 @@
 package com.aperto.magkit.dialogs.fields;
 
-import javax.annotation.Nullable;
-
-import com.vaadin.data.Property;
-import com.vaadin.event.FieldEvents;
+import com.vaadin.annotations.StyleSheet;
 import com.vaadin.server.Sizeable;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomField;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.event.FieldEvents;
+import com.vaadin.v7.ui.AbstractTextField;
+import com.vaadin.v7.ui.CustomField;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.VerticalLayout;
 
 /**
  * Enhance the text field functionality by showing an additional editorial label.
@@ -17,6 +15,7 @@ import com.vaadin.ui.VerticalLayout;
  * @author Stefan Jahn
  * @since 05.12.14
  */
+@StyleSheet("extendedTextField.css")
 public class ExtendedTextField extends CustomField<String> {
     private static final long serialVersionUID = -6599211749794929718L;
     public static final int FULL_WIDTH = 100;
@@ -29,7 +28,6 @@ public class ExtendedTextField extends CustomField<String> {
     public ExtendedTextField(ExtendedTextFieldDefinition definition, AbstractTextField field) {
         _field = field;
         _definition = definition;
-        setImmediate(true);
     }
 
     @Override
@@ -38,10 +36,7 @@ public class ExtendedTextField extends CustomField<String> {
         _rootLayout.setSpacing(true);
         _rootLayout.setPrimaryStyleName("aperto-extended-textfield");
 
-        _field.setImmediate(true);
         _field.setWidth(FULL_WIDTH, Sizeable.Unit.PERCENTAGE);
-        _field.setNullRepresentation("");
-        _field.setNullSettingAllowed(true);
 
         _rootLayout.addComponent(_field);
         configureLabel();
@@ -105,7 +100,7 @@ public class ExtendedTextField extends CustomField<String> {
     /**
      * Update the label.
      */
-    public void updateRemainingLength(@Nullable int inputValue, @Nullable int availableLength) {
+    public void updateRemainingLength(int inputValue, int availableLength) {
         getRemainingLength().setValue(availableLength - inputValue + "/" + availableLength);
     }
 
@@ -115,26 +110,13 @@ public class ExtendedTextField extends CustomField<String> {
     }
 
     @Override
-    public String getValue() {
-        return _field.getValue();
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public void setPropertyDataSource(Property newDataSource) {
-        _field.setPropertyDataSource(newDataSource);
-        super.setPropertyDataSource(newDataSource);
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public Property getPropertyDataSource() {
-        return _field.getPropertyDataSource();
-    }
-
-    @Override
     public Class<? extends String> getType() {
         return String.class;
+    }
+
+    @Override
+    public String getValue() {
+        return _field.getValue();
     }
 
     public Label getRemainingLength() {

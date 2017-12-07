@@ -1,8 +1,8 @@
 package com.aperto.magkit.dialogs.fields;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.util.PropertysetItem;
-import com.vaadin.ui.Field;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.util.PropertysetItem;
+import com.vaadin.v7.ui.Field;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.api.context.UiContext;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
@@ -53,7 +53,7 @@ public class SortableMultiValueFieldFactory extends AbstractFieldFactory<Sortabl
      * Create a new Instance of {@link info.magnolia.ui.form.field.transformer.Transformer}.
      */
     @Override
-    protected Transformer<?> initializeTransformer(Class<? extends Transformer<?>> transformerClass) {
+    protected Transformer<?> initializeTransformer(final Class<? extends Transformer<?>> transformerClass) {
         return _componentProvider.newInstance(transformerClass, getItem(), getFieldDefinition(), PropertysetItem.class);
     }
 

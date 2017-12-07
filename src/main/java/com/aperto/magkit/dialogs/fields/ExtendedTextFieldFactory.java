@@ -1,10 +1,10 @@
 package com.aperto.magkit.dialogs.fields;
 
-import com.vaadin.data.Item;
-import com.vaadin.ui.AbstractTextField;
-import com.vaadin.ui.Field;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.ui.AbstractTextField;
+import com.vaadin.v7.ui.Field;
+import com.vaadin.v7.ui.TextArea;
+import com.vaadin.v7.ui.TextField;
 import info.magnolia.ui.api.context.UiContext;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
@@ -23,7 +23,7 @@ public class ExtendedTextFieldFactory extends AbstractFieldFactory<ExtendedTextF
     public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedTextFieldFactory.class);
 
     @Inject
-    public ExtendedTextFieldFactory(ExtendedTextFieldDefinition definition, Item relatedFieldItem, UiContext uiContext, I18NAuthoringSupport i18nAuthoringSupport) {
+    public ExtendedTextFieldFactory(final ExtendedTextFieldDefinition definition, final Item relatedFieldItem, final UiContext uiContext, final I18NAuthoringSupport i18nAuthoringSupport) {
         super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport);
     }
 

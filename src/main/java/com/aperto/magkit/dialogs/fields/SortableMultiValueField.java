@@ -1,15 +1,16 @@
 package com.aperto.magkit.dialogs.fields;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.PropertysetItem;
+import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.PropertysetItem;
+import com.vaadin.v7.ui.Field;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.AbstractCustomMultiField;
@@ -32,6 +33,7 @@ import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
  * @author Stefan Jahn
  * @since 02.12.14
  */
+@StyleSheet("sortableMultiValueField.css")
 public class SortableMultiValueField extends AbstractCustomMultiField<SortableMultiValueFieldDefinition, PropertysetItem> {
     private static final long serialVersionUID = 5843108445147449041L;
 
@@ -45,7 +47,8 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
     private String _buttonCaptionAdd;
     private String _buttonCaptionRemove;
 
-    public SortableMultiValueField(SortableMultiValueFieldDefinition definition, FieldFactoryFactory fieldFactoryFactory, ComponentProvider componentProvider, Item relatedFieldItem, I18NAuthoringSupport i18nAuthoringSupport) {
+    public SortableMultiValueField(final SortableMultiValueFieldDefinition definition, final FieldFactoryFactory fieldFactoryFactory, final ComponentProvider componentProvider,
+                                   final Item relatedFieldItem, final I18NAuthoringSupport i18nAuthoringSupport) {
         super(definition, fieldFactoryFactory, componentProvider, relatedFieldItem, i18nAuthoringSupport);
         _fieldDefinition = definition.getField();
     }
@@ -66,7 +69,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         _addButton.addStyleName("magnoliabutton");
         _addButton.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(final Button.ClickEvent event) {
                 int newPropertyId;
                 Property<?> property = null;
                 Transformer<?> transformer = ((TransformedProperty<?>) getPropertyDataSource()).getTransformer();
@@ -117,7 +120,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
      * Initialize the MultiField. <br> Create as many configured Field as we have related values already stored.
      */
     @Override
-    protected void initFields(PropertysetItem newValue) {
+    protected void initFields(final PropertysetItem newValue) {
         root.removeAllComponents();
         for (Object propertyId : newValue.getItemPropertyIds()) {
             Property<?> property = newValue.getItemProperty(propertyId);
@@ -131,7 +134,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
      * <p/>
      * Create a single element.<br> This single element is composed of:<br> - a configured field <br> - a remove Button<br>
      */
-    protected Component createEntryComponent(Object propertyId, Property<?> property) {
+    protected Component createEntryComponent(final Object propertyId, final Property<?> property) {
         Property propertyToBind = property;
 
         HorizontalLayout layout = new HorizontalLayout();
@@ -155,9 +158,8 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         return layout;
     }
 
-    protected void initButtons(Layout layout, Property property) {
+    protected void initButtons(final Layout layout, final Property property) {
         boolean isSortable = definition.getSortable();
-        final Property<?> propertyReference = property;
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setPrimaryStyleName("aperto-multi-buttons");
         // Delete Button - inspired by Magnolia
@@ -169,11 +171,11 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         deleteButton.addClickListener(new Button.ClickListener() {
 
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(final Button.ClickEvent event) {
                 Component layout = event.getComponent().getParent().getParent();
                 root.removeComponent(layout);
                 Transformer<?> transformer = ((TransformedProperty<?>) getPropertyDataSource()).getTransformer();
-                Object propertyId = findPropertyId(getValue(), propertyReference);
+                Object propertyId = findPropertyId(getValue(), property);
 
                 if (transformer instanceof MultiTransformer) {
                     ((MultiTransformer) transformer).removeProperty(propertyId);
@@ -202,7 +204,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
      * @param buttonLayout the layout where the buttons will be added
      * @param deleteButton the delete button to be added
      */
-    protected void initializeSortButtons(HorizontalLayout buttonLayout, Button deleteButton) {
+    protected void initializeSortButtons(final HorizontalLayout buttonLayout, final Button deleteButton) {
         // move up Button
         Button moveUpButton = new Button();
         moveUpButton.setHtmlContentAllowed(true);
@@ -212,7 +214,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         moveUpButton.addClickListener(new Button.ClickListener() {
 
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(final Button.ClickEvent event) {
                 VerticalLayout parentLayout = (VerticalLayout) event.getComponent().getParent().getParent().getParent();
                 int currPos = parentLayout.getComponentIndex(event.getComponent().getParent().getParent());
 
@@ -233,7 +235,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
         moveDownButton.addClickListener(new Button.ClickListener() {
 
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(final Button.ClickEvent event) {
                 VerticalLayout parentLayout = (VerticalLayout) event.getComponent().getParent().getParent().getParent();
                 int currPos = parentLayout.getComponentIndex(event.getComponent().getParent().getParent());
                 int numberOfComponents = parentLayout.getComponentCount() - 1;
@@ -256,11 +258,11 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
     /**
      * Caption section.
      */
-    public void setButtonCaptionAdd(String buttonCaptionAdd) {
+    public void setButtonCaptionAdd(final String buttonCaptionAdd) {
         _buttonCaptionAdd = buttonCaptionAdd;
     }
 
-    public void setButtonCaptionRemove(String buttonCaptionRemove) {
+    public void setButtonCaptionRemove(final String buttonCaptionRemove) {
         _buttonCaptionRemove = buttonCaptionRemove;
     }
 
@@ -270,7 +272,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
      * Ensure that id of the {@link PropertysetItem} stay coherent.<br> Assume that we have 3 values 0:a, 1:b, 2:c, and 1 is removed <br> If we just remove 1, the {@link PropertysetItem} will contain 0:a, 2:c,
      * .<br> But we should have : 0:a, 1:c, .
      */
-    protected void removeValueProperty(int toDelete) {
+    protected void removeValueProperty(final int toDelete) {
         getValue().removeItemProperty(toDelete);
         int fromIndex = toDelete;
         int valuesSize = getValue().getItemPropertyIds().size();
@@ -286,7 +288,7 @@ public class SortableMultiValueField extends AbstractCustomMultiField<SortableMu
     }
 
     // switches the values of two properties.
-    protected void switchItemProperties(int first, int second) {
+    protected void switchItemProperties(final int first, final int second) {
         Property propertyFirst = getValue().getItemProperty(first);
         Property propertySecond = getValue().getItemProperty(second);
 

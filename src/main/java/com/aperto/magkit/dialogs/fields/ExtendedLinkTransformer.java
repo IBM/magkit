@@ -3,9 +3,9 @@ package com.aperto.magkit.dialogs.fields;
 
 import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
 import com.aperto.magkit.utils.NodeUtils;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.ObjectProperty;
 import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.repository.RepositoryConstants;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;

@@ -1,9 +1,10 @@
 package com.aperto.magkit.dialogs.fields;
 
 import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
-import com.vaadin.data.Item;
+import com.aperto.magkit.utils.LinkTool;
+import com.vaadin.v7.data.Item;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Field;
+import com.vaadin.v7.ui.Field;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.api.app.AppController;
 import info.magnolia.ui.api.app.ChooseDialogCallback;
@@ -13,6 +14,7 @@ import info.magnolia.ui.form.field.LinkField;
 import info.magnolia.ui.form.field.factory.LinkFieldFactory;
 import info.magnolia.ui.vaadin.integration.jcr.JcrItemId;
 import info.magnolia.ui.vaadin.integration.jcr.JcrItemUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,11 +22,6 @@ import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.Collection;
-
-import static com.aperto.magkit.utils.LinkTool.isExternalLink;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * The factory creates a {@link LinkField}. The callback mechanism is overwritten to allow additional link components like fragments, queries and selectors.
@@ -42,7 +39,8 @@ public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkField
     private LinkField _linkField;
 
     @Inject
-    public ExtendedLinkFieldFactory(ExtendedLinkFieldDefinition definition, Item relatedFieldItem, UiContext uiContext, I18NAuthoringSupport i18nAuthoringSupport, AppController appController, ComponentProvider componentProvider) {
+    public ExtendedLinkFieldFactory(final ExtendedLinkFieldDefinition definition, final Item relatedFieldItem, final UiContext uiContext,
+                                    final I18NAuthoringSupport i18nAuthoringSupport, final AppController appController, final ComponentProvider componentProvider) {
         super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport, appController, componentProvider);
         _appController = appController;
         _uiContext = uiContext;
@@ -78,9 +76,9 @@ public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkField
          * @return the uri components other than path
          */
         private String unstripUriExtension(final String value) {
-            String unStripped = EMPTY;
-            if (!isExternalLink(value) && isNotBlank(value)) {
-                unStripped = removeStart(value, _extendedLinkFieldHelper.getBase(value));
+            String unStripped = StringUtils.EMPTY;
+            if (!LinkTool.isExternalLink(value) && StringUtils.isNotBlank(value)) {
+                unStripped = StringUtils.removeStart(value, _extendedLinkFieldHelper.getBase(value));
             }
             return unStripped;
         }
@@ -91,7 +89,7 @@ public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkField
         }
 
         @Override
-        public void onItemChosen(String actionName, final Object chosenValue) {
+        public void onItemChosen(final String actionName, final Object chosenValue) {
             String propertyName = getFieldDefinition().getTargetPropertyToPopulate();
             String newValue = null;
             if (chosenValue instanceof JcrItemId) {
@@ -99,7 +97,7 @@ public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkField
                     javax.jcr.Item jcrItem = JcrItemUtil.getJcrItem((JcrItemId) chosenValue);
                     if (jcrItem.isNode()) {
                         final Node selected = (Node) jcrItem;
-                        boolean isPropertyExisting = isNotBlank(propertyName) && selected.hasProperty(propertyName);
+                        boolean isPropertyExisting = StringUtils.isNotBlank(propertyName) && selected.hasProperty(propertyName);
                         newValue = (isPropertyExisting ? selected.getProperty(propertyName).getString() : selected.getPath()) + unstripUriExtension(_linkField.getTextField().getValue());
                     }
                 } catch (RepositoryException e) {
@@ -113,11 +111,11 @@ public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkField
 
     private class ExtendedLinkFieldClickListener implements Button.ClickListener {
         @Override
-        public void buttonClick(Button.ClickEvent event) {
+        public void buttonClick(final Button.ClickEvent event) {
             ChooseDialogCallback callback = createChooseDialogCallback();
             ExtendedLinkFieldDefinition def = getFieldDefinition();
             String value = _linkField.getValue();
-            if (isNotBlank(def.getTargetTreeRootPath())) {
+            if (StringUtils.isNotBlank(def.getTargetTreeRootPath())) {
                 _appController.openChooseDialog(def.getAppName(), _uiContext, def.getTargetTreeRootPath(), stripUriExtension(value), callback);
             } else {
                 _appController.openChooseDialog(def.getAppName(), _uiContext, stripUriExtension(value), callback);
@@ -131,8 +129,8 @@ public class ExtendedLinkFieldFactory extends LinkFieldFactory<ExtendedLinkField
          * @return the base path or identifier
          */
         private String stripUriExtension(final String value) {
-            String stripped = EMPTY;
-            if (!isExternalLink(value) && isNotBlank(value)) {
+            String stripped = StringUtils.EMPTY;
+            if (!LinkTool.isExternalLink(value) && StringUtils.isNotBlank(value)) {
                 stripped = _extendedLinkFieldHelper.getBase(value);
             }
             return stripped;

@@ -1,6 +1,6 @@
 package com.aperto.magkit.dialogs.fields;
 
-import com.vaadin.data.Item;
+import com.vaadin.v7.data.Item;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.form.field.transformer.basic.ListToSetTransformer;
