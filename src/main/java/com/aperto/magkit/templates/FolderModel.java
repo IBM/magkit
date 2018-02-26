@@ -13,10 +13,9 @@ import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
-import static info.magnolia.cms.util.RequestDispatchUtil.REDIRECT_PREFIX;
+import static info.magnolia.cms.util.RequestDispatchUtil.PERMANENT_PREFIX;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
 import static info.magnolia.link.LinkUtil.DEFAULT_EXTENSION;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Model of folder template.
@@ -43,7 +42,7 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
     @Override
     public String execute() {
         if (_templatingFunctions.isEditMode()) {
-            setNodeDataBoolean(PN_HIDE_IN_NAV, true);
+            setHideInNav();
         } else {
             sendRedirect();
         }
@@ -61,7 +60,7 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
                     if (!"/".equals(parent.getPath())) {
                         path = path + "." + DEFAULT_EXTENSION;
                     }
-                    dispatch(REDIRECT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
+                    dispatch(PERMANENT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
                 }
             }
         } catch (RepositoryException e) {
@@ -69,14 +68,14 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
         }
     }
 
-    private void setNodeDataBoolean(String propertyName, boolean propertyValue) {
+    private void setHideInNav() {
         try {
-            if (isNotBlank(propertyName) && !content.hasProperty(propertyName)) {
-                content.setProperty(propertyName, propertyValue);
+            if (!content.hasProperty(PN_HIDE_IN_NAV)) {
+                content.setProperty(PN_HIDE_IN_NAV, true);
                 content.getSession().save();
             }
         } catch (RepositoryException e) {
-            LOGGER.info("Can't set property for folder.", e);
+            LOGGER.info("Can't set hideInNav property for folder.", e);
         }
     }
 }
