@@ -17,6 +17,7 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import static org.apache.commons.collections4.CollectionUtils.collect;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.join;
 
 /**
  * Utility methods for common queries.
@@ -212,9 +214,7 @@ public final class NodeQueryUtil {
         statement.append("select * from [mgnl:component] where [mgnl:template] = '").append(componentsTemplateName).append("'");
         if (ArrayUtils.isNotEmpty(searchRoots)) {
             statement.append(" and (");
-            for (String searchRoot : searchRoots) {
-                statement.append("ISDESCENDANTNODE('").append(searchRoot).append("') ");
-            }
+            statement.append(join(Arrays.stream(searchRoots).map(searchRoot -> "ISDESCENDANTNODE('" + searchRoot + "')").toArray(), " or "));
             statement.append(")");
         }
 
