@@ -29,7 +29,7 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
     public static final String PN_HIDE_IN_NAV = "hideInNav";
     public static final String TPL_NAME = "folder";
     public static final String TPL_NAME_SPACE = "magkit";
-    public static final String TPL_REF = TPL_NAME_SPACE + ":" + TPL_NAME;
+    public static final String TPL_REF = TPL_NAME_SPACE + ":pages/" + TPL_NAME;
 
     private final TemplatingFunctions _templatingFunctions;
 
