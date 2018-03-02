@@ -61,7 +61,8 @@ public final class ApertoThemeUtils {
                 addOrGetNode("themeResources", NodeTypes.ContentNode.NAME).then(
                     addOrSetProperty(PN_CLASS, URIPatternVoter.class.getName()),
                     addOrSetProperty(PN_PATTERN, "*/.resources/" + themeModuleName + "/*")
-                )
+                ),
+                addOrSetProperty("op", "OR")
             )
         );
     }
