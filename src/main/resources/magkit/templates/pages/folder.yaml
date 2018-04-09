@@ -8,5 +8,4 @@ areas:
   content:
     templateScript: /magkit/templates/pages/folder.ftl
 
-i18nBasename: mgnl-i18n.magkit-messages
 title: templates.folder.title
