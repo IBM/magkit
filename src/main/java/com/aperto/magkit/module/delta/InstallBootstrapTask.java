@@ -20,6 +20,6 @@ public class InstallBootstrapTask extends BootstrapResourcesTask {
     @Override
     protected boolean acceptResource(InstallContext ctx, String resourceName) {
         final String moduleName = ctx.getCurrentModuleDefinition().getName();
-        return resourceName.startsWith("/mgnl-bootstrap/install/" + moduleName + "/") && resourceName.endsWith(".xml");
+        return resourceName.startsWith("/mgnl-bootstrap/install/" + moduleName + "/") && super.acceptResource(ctx, resourceName);
     }
 }
