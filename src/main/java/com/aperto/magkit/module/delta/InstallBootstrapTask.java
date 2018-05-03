@@ -18,7 +18,7 @@ public class InstallBootstrapTask extends BootstrapResourcesTask {
      * Accepts any resource under "/mgnl-bootstrap/install/moduleName" including any subfolders.
      */
     @Override
-    protected boolean acceptResource(InstallContext ctx, String resourceName) {
+    protected boolean acceptResource(final InstallContext ctx, final String resourceName) {
         final String moduleName = ctx.getCurrentModuleDefinition().getName();
         return resourceName.startsWith("/mgnl-bootstrap/install/" + moduleName + "/") && super.acceptResource(ctx, resourceName);
     }
