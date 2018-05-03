@@ -3,7 +3,6 @@ package com.aperto.magkit.module.delta;
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.importexport.command.JcrExportCommand;
 import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.BootstrapResourcesTask;
 import info.magnolia.module.delta.ModuleBootstrapTask;
 import org.apache.commons.io.FilenameUtils;
 
