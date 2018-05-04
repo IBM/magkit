@@ -20,22 +20,20 @@ public class ModuleInstanceBootstrapTask extends ModuleBootstrapTask {
      */
     protected boolean acceptResource(final InstallContext ctx, final String resourceName) {
         boolean acceptResources = super.acceptResource(ctx, resourceName);
-        final String moduleName = ctx.getCurrentModuleDefinition().getName();
-        if (!acceptResources) {
+
+        if (!acceptResources && acceptExtension(resourceName)) {
+            String moduleName = ctx.getCurrentModuleDefinition().getName();
+
             if (ServerConfiguration.getInstance().isAdmin()) {
-                acceptResources = resourceName.startsWith("/mgnl-bootstrap/author/" + moduleName + "/") && acceptExtension(resourceName);
+                acceptResources = resourceName.startsWith("/mgnl-bootstrap/author/" + moduleName + "/");
             } else {
-                acceptResources = resourceName.startsWith("/mgnl-bootstrap/public/" + moduleName + "/") && acceptExtension(resourceName);
+                acceptResources = resourceName.startsWith("/mgnl-bootstrap/public/" + moduleName + "/");
             }
         }
+
         return acceptResources;
     }
 
-    /**
-     * Test for importable resource extensions.
-     *
-     * @see BootstrapResourcesTask#acceptResource(info.magnolia.module.InstallContext, java.lang.String)
-     */
     protected boolean acceptExtension(final String resourceName) {
         return JcrExportCommand.Format.isSupportedExtension(FilenameUtils.getExtension(resourceName));
     }
