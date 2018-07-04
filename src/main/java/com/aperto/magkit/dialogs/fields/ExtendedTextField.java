@@ -3,6 +3,7 @@ package com.aperto.magkit.dialogs.fields;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Component;
+import com.vaadin.v7.data.Property;
 import com.vaadin.v7.event.FieldEvents;
 import com.vaadin.v7.ui.AbstractTextField;
 import com.vaadin.v7.ui.CustomField;
@@ -117,6 +118,20 @@ public class ExtendedTextField extends CustomField<String> {
     @Override
     public String getValue() {
         return _field.getValue();
+    }
+
+    /**
+     * Set propertyDatasource.
+     */
+    @Override
+    public void setPropertyDataSource(Property newDataSource) {
+        _field.setPropertyDataSource(newDataSource);
+        super.setPropertyDataSource(newDataSource);
+    }
+
+    @Override
+    public Property getPropertyDataSource() {
+        return _field.getPropertyDataSource();
     }
 
     public Label getRemainingLength() {

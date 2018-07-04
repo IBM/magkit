@@ -3,11 +3,9 @@ package com.aperto.magkit.dialogs.fields;
 import com.vaadin.v7.data.Item;
 import com.vaadin.v7.ui.AbstractTextField;
 import com.vaadin.v7.ui.Field;
-import com.vaadin.v7.ui.TextArea;
-import com.vaadin.v7.ui.TextField;
 import info.magnolia.ui.api.context.UiContext;
 import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
-import info.magnolia.ui.form.field.factory.AbstractFieldFactory;
+import info.magnolia.ui.form.field.factory.TextFieldFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +17,7 @@ import javax.inject.Inject;
  * @author Stefan Jahn
  * @since 21.11.14
  */
-public class ExtendedTextFieldFactory extends AbstractFieldFactory<ExtendedTextFieldDefinition, String> {
+public class ExtendedTextFieldFactory extends TextFieldFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedTextFieldFactory.class);
 
     @Inject
@@ -32,19 +30,14 @@ public class ExtendedTextFieldFactory extends AbstractFieldFactory<ExtendedTextF
      */
     @Override
     protected Field<String> createFieldComponent() {
-        // create a text area, if more than one row defined
-        final AbstractTextField textField;
-        if (definition.getRows() > 1) {
-            TextArea area = new TextArea();
-            area.setRows(definition.getRows());
-            textField = area;
-        } else {
-            textField = new TextField();
-        }
-        if (definition.getMaxLength() > 0) {
-            textField.setMaxLength(definition.getMaxLength());
+        Field<String> fieldComponent = super.createFieldComponent();
+
+        if (definition instanceof ExtendedTextFieldDefinition) {
+            if (definition.getMaxLength() < 1 && ((ExtendedTextFieldDefinition) definition).getRecommendedLength() > 0) {
+                fieldComponent = new ExtendedTextField((ExtendedTextFieldDefinition) definition, (AbstractTextField) fieldComponent);
+            }
         }
 
-        return new ExtendedTextField(definition, textField);
+        return fieldComponent;
     }
 }
