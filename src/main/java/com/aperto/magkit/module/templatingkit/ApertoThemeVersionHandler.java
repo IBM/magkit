@@ -14,7 +14,9 @@ import java.util.List;
  * @author frank.sommer
  * @see ApertoThemeInstallTask
  * @since 16.04.2012 (v2.1.2)
+ * @deprecated solved by yaml files in theme archetype
  */
+@Deprecated
 public abstract class ApertoThemeVersionHandler extends BootstrapModuleVersionHandler {
 
     private String _themeName;

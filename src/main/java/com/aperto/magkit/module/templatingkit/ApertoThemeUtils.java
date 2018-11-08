@@ -15,7 +15,9 @@ import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 
 /**
  * @author daniel.kasmeroglu@aperto.de
+ * @deprecated use cases are now configured by yaml in theme archetype
  */
+@Deprecated
 public final class ApertoThemeUtils {
 
     private ApertoThemeUtils() {

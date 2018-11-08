@@ -27,7 +27,9 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * Tasks to install all theme files in resources workspace.
  *
  * @author frank.sommer
+ * @deprecated solved now in yaml by theme archetype
  */
+@Deprecated
 public class ApertoThemeInstallTask extends AbstractTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApertoThemeInstallTask.class);
 
