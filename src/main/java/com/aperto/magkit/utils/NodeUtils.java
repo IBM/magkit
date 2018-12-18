@@ -5,20 +5,14 @@ import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 import javax.validation.constraints.NotNull;
 
 import info.magnolia.config.registry.Registry;
@@ -31,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import info.magnolia.context.MgnlContext;
 import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.util.NodeTypes.Component;
-import info.magnolia.jcr.util.NodeTypes.Page;
 import info.magnolia.jcr.util.NodeUtil;
 
 /**
@@ -63,14 +55,8 @@ public final class NodeUtils {
      * @return Node path
      */
     public static String getPathForIdentifier(String workspace, String identifier) {
-        String path = null;
-        try {
-            Node node = getNodeByIdentifier(workspace, identifier);
-            path = node != null ? node.getPath() : null;
-        } catch (RepositoryException e) {
-            LOGGER.info("Can't get path to node. Error message was {}.", e.getLocalizedMessage());
-        }
-        return path;
+        Node node = getNodeByIdentifier(workspace, identifier);
+        return node != null ? NodeUtil.getPathIfPossible(node) : null;
     }
 
     /**
