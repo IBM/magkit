@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import info.magnolia.context.MgnlContext;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.jcr.util.NodeUtil;
 
@@ -48,7 +47,7 @@ public final class NodeUtils {
     public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals("content", getTemplateType(node));
 
     /**
-     * Determines the path to given workspace and node identifier. Uses the jcr session from {@link MgnlContext}.
+     * Determines the path to given workspace and node identifier.
      *
      * @param workspace  Workspace for node identifier lookup
      * @param identifier Node identifier fka. uuid
