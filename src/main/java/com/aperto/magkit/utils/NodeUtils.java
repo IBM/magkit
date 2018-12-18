@@ -7,14 +7,25 @@ import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.validation.constraints.NotNull;
 
+import info.magnolia.config.registry.Registry;
+import info.magnolia.objectfactory.Components;
+import info.magnolia.rendering.template.TemplateDefinition;
+import info.magnolia.rendering.template.registry.TemplateDefinitionRegistry;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +44,17 @@ import info.magnolia.jcr.util.NodeUtil;
 public final class NodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeUtils.class);
 
+    public static final Predicate<Node> IS_FOLDER = n -> isNodeType(n, NodeTypes.Folder.NAME);
+    public static final Predicate<Node> IS_PAGE = n -> isNodeType(n, NodeTypes.Page.NAME);
+    public static final Predicate<Node> IS_AREA = n -> isNodeType(n, NodeTypes.Area.NAME);
+    public static final Predicate<Node> IS_COMPONENT = n -> isNodeType(n, NodeTypes.Component.NAME);
+    public static final Predicate<Node> IS_CONTENT = n -> isNodeType(n, NodeTypes.Content.NAME);
+    public static final Predicate<Node> IS_CONTENT_NODE = n -> isNodeType(n, NodeTypes.ContentNode.NAME);
+
+    public static final Predicate<Node> HAS_HOME_TEMPLATE = node -> StringUtils.equals("home", getTemplateType(node));
+    public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> StringUtils.equals("feature", getTemplateType(node));
+    public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals("content", getTemplateType(node));
+
     /**
      * Determines the path to given workspace and node identifier. Uses the jcr session from {@link MgnlContext}.
      *
@@ -42,16 +64,11 @@ public final class NodeUtils {
      */
     public static String getPathForIdentifier(String workspace, String identifier) {
         String path = null;
-        if (isNotEmpty(workspace) && isNotEmpty(identifier)) {
-            try {
-                Session jcrSession = MgnlContext.getJCRSession(workspace);
-                if (jcrSession != null) {
-                    Node node = jcrSession.getNodeByIdentifier(identifier);
-                    path = node.getPath();
-                }
-            } catch (RepositoryException e) {
-                LOGGER.info("Can't get path to node. Error message was {}.", e.getLocalizedMessage());
-            }
+        try {
+            Node node = getNodeByIdentifier(workspace, identifier);
+            path = node != null ? node.getPath() : null;
+        } catch (RepositoryException e) {
+            LOGGER.info("Can't get path to node. Error message was {}.", e.getLocalizedMessage());
         }
         return path;
     }
@@ -89,18 +106,7 @@ public final class NodeUtils {
      * @return list of child pages, fallback empty list
      */
     public static List<Node> getChildPages(Node pageNode) {
-        List<Node> childPages = Collections.emptyList();
-
-        if (pageNode != null) {
-            try {
-                childPages = NodeUtil.asList(NodeUtil.getNodes(pageNode, Page.NAME));
-            } catch (RepositoryException e) {
-                LOGGER.info("Error getting child page nodes of page: {}.", getPathIfPossible(pageNode));
-                LOGGER.debug(e.getLocalizedMessage(), e);
-            }
-        }
-
-        return childPages;
+        return NodeUtil.asList(getChildren(pageNode, IS_PAGE));
     }
 
     /**
@@ -111,19 +117,21 @@ public final class NodeUtils {
      * @return true, if the area contains components.
      */
     public static boolean hasSubComponents(Node node, String areaName) {
-        boolean hasSubComponents = false;
-        if (node != null && isNotBlank(areaName)) {
+        Node child = getChildNode(node, areaName);
+        return getChildren(child, IS_COMPONENT).iterator().hasNext();
+    }
+
+    public static Node getChildNode(@Nullable final Node node, @Nullable final String path) {
+        Node result = null;
+        if (node != null && isNotBlank(path)) {
             try {
-                if (node.hasNode(areaName)) {
-                    Node areaNode = node.getNode(areaName);
-                    Iterable<Node> nodes = NodeUtil.getNodes(areaNode, Component.NAME);
-                    hasSubComponents = nodes.iterator().hasNext();
-                }
+                result = node.getNode(path);
             } catch (RepositoryException e) {
-                LOGGER.warn("Error on checking for sub components.", e);
+                LOGGER.warn("Unable to get child of node [{}]", getPathIfPossible(node));
+                LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
-        return hasSubComponents;
+        return result;
     }
 
     /**
@@ -132,7 +140,7 @@ public final class NodeUtils {
      * @param node node to check
      * @return template name or empty string
      */
-    public static String getTemplate(@Nullable Node node) {
+    public static String getTemplate(@Nullable final Node node) {
         String template = EMPTY;
         try {
             if (node != null) {
@@ -144,6 +152,33 @@ public final class NodeUtils {
         return template;
     }
 
+    public static String getTemplateType(@Nullable final Node node) {
+        String templateId = getTemplate(node);
+        TemplateDefinition def = null;
+        try {
+            if (StringUtils.isNotBlank(templateId)) {
+                TemplateDefinitionRegistry registry = Components.getComponent(TemplateDefinitionRegistry.class);
+                def = registry.getProvider(templateId).get();
+            }
+        } catch (Registry.NoSuchDefinitionException e) {
+            LOGGER.debug("No definition found for template id {}.", templateId, e);
+        }
+        return def != null ? def.getType() : null;
+    }
+
+    public static Node getParent(@Nullable final Node node) {
+        Node parent = null;
+        try {
+            if (node != null && node.getDepth() > 0) {
+                parent = node.getParent();
+            }
+        } catch (RepositoryException e) {
+            LOGGER.error("Unable to get parent node from [{}]", getPathIfPossible(node), e);
+        }
+
+        return parent;
+    }
+
     /**
      * Allows {@link Node#isNodeType(String)} in a null-safe manner and catches the {@link RepositoryException}.
      * @param node node to check
@@ -153,12 +188,97 @@ public final class NodeUtils {
     public static boolean isNodeType(@Nullable final Node node, @Nullable final String nodeType) {
         boolean isNodeType = false;
         try {
+            // TODO: Use NodeUtils.isNodeType(..)? -> checks original type of frozen nodes?
             isNodeType = node != null && node.isNodeType(defaultString(nodeType));
         } catch (RepositoryException e) {
             LOGGER.info("Unable to check node type [{}] for node [{}]", nodeType, getPathIfPossible(node));
             LOGGER.debug(e.getLocalizedMessage(), e);
         }
         return isNodeType;
+    }
+
+    // Ancestors:
+
+    /**
+     * Finds the first ancestor of the given Node that matches the Predicate.
+     * The input node is excluded from search.
+     *
+     * @param child the Node to get the ancestor for. May be NULL.
+     * @param nodePredicate the Predicate to be matched. Never NULL.
+     * @return the first matching ancestor node or NULL if the input node is NULL or no such ancestor exists.
+     */
+    public static Node getAncestor(@Nullable final Node child, @NotNull final Predicate<Node> nodePredicate) {
+        return getAncestorOrSelf(getParent(child), nodePredicate);
+    }
+
+    /**
+     * Finds the first ancestor of the given Node that matches the Predicate.
+     * The input node is included into the search.
+     *
+     * @param child the Node to get the ancestor for. May be NULL.
+     * @param nodePredicate the Predicate to be matched. Never NULL.
+     * @return the first matching ancestor node or NULL if the input node is NULL or no such ancestor exists.
+     */
+    public static Node getAncestorOrSelf(@Nullable final Node child, @NotNull final Predicate<Node> nodePredicate) {
+        Node result = null;
+        if (child != null) {
+            result = nodePredicate.test(child) ? child : getAncestorOrSelf(getParent(child), nodePredicate);
+        }
+        return result;
+    }
+
+    /**
+     * Finds the first ancestor of the given Node with the provided template id.
+     * The input node is included into the search.
+     *
+     * @param content the Node to get the ancestor for. May be NULL.
+     * @param templateId the template id required for the ancestor. May be NULL.
+     * @return the first ancestor node with the provided template id or NULL if the input node is NULL or no such ancestor exists.
+     */
+    public static Node getAncestorOrSelfWithTemplate(@Nullable final Node content, @Nullable final String templateId) {
+        return getAncestorOrSelf(content, node -> StringUtils.equals(getTemplate(node), templateId));
+    }
+
+    /**
+     * Finds the first ancestor of the given Node with the provided primary node type.
+     * The input node is excluded from search.
+     *
+     * @param node the Node to get the ancestor for. May be NULL.
+     * @param nodeType the primary node type required for the ancestor. May be NULL.
+     * @return the first ancestor node having the provided primary node type or NULL if the input node is NULL or no such ancestor exists.
+     */
+    public static Node getAncestorWithPrimaryType(@Nullable final Node node, @Nullable final String nodeType) {
+        return getAncestor(node, n -> isNodeType(n, nodeType));
+    }
+
+    /**
+     * Collects all direct children of the given Node that match the provided predicate.
+     *
+     * @param node the Node to get the children for. May be NULL.
+     * @param predicate the filter predicate. Never NULL.
+     * @return an Iterable with all matching child nodes. May be empty but never NULL.
+     */
+    public static Iterable<Node> getChildren(@Nullable final Node node, @NotNull final Predicate<Node> predicate) {
+        Iterable<Node> result = Collections.emptyList();
+        if (node != null) {
+            try {
+                result = NodeUtil.getNodes(node, toJackRabbitPredicate(predicate));
+            } catch (RepositoryException e) {
+                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.debug(e.getLocalizedMessage(), e);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Wraps a java.util.function.Predicate into an org.apache.jackrabbit.commons.predicate.Predicate.
+     *
+     * @param nodePredicate the java.util.function.Predicate to be wrapped. Never NULL.
+     * @return a org.apache.jackrabbit.commons.predicate.Predicate that executes the input Predicate, never NULL.
+     */
+    public static org.apache.jackrabbit.commons.predicate.Predicate toJackRabbitPredicate(@NotNull final Predicate<Node> nodePredicate) {
+        return object -> nodePredicate.test((Node) object);
     }
 
     private NodeUtils() {
