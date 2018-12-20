@@ -1,14 +1,17 @@
 package com.aperto.magkit.utils;
 
 import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -26,6 +29,46 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 public final class PropertyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyUtils.class);
 
+    private static final Transformer<Property, String> PROPERTY_TO_STRING = property -> {
+        String value = null;
+        try {
+            value = property.getString();
+        } catch (RepositoryException e) {
+            LOGGER.warn("Error get string value from property.", e);
+        }
+        return StringUtils.defaultString(value);
+    };
+
+    private static final Comparator<Property> PROPERTY_NAME_COMPARATOR = (p1, p2) -> {
+        int compareValue = 0;
+        try {
+            compareValue = p1.getName().compareTo(p2.getName());
+        } catch (RepositoryException e) {
+            LOGGER.error("Error comparing by name of properties.", e);
+        }
+        return compareValue;
+    };
+
+    /**
+     * Save call on node.getProperty(String).
+     * We skip checking if the Property exists and catch the Exception to avoid fetching the Property twice.
+     *
+     * @param node the node to read the Property from. May be NULL.
+     * @param relPath the path to the Property. May be NULL.
+     * @return the addressed Property or NULL if the Node is NULL, the path is NULL or empty or the property does not exist or is not available.
+     */
+    public static Property getProperty(@Nullable final Node node, @Nullable final String relPath) {
+        Property result = null;
+        if (node != null && isNotEmpty(relPath)) {
+            try {
+                result = node.getProperty(relPath);
+            } catch (RepositoryException e) {
+                LOGGER.debug("Error retrieving property {}.", relPath, e);
+            }
+        }
+        return result;
+    }
+
     /**
      * Add missing util method for retrieving multi value property values.
      *
@@ -35,22 +78,26 @@ public final class PropertyUtils {
      * @see info.magnolia.jcr.util.PropertyUtil
      */
     public static Collection<String> getStringValues(final Node node, final String relPath) {
-        Collection<String> values = new ArrayList<>();
+        Property property = getProperty(node, relPath);
+        return getStringValues(property);
+    }
 
-        try {
-            if (node != null && isNotEmpty(relPath) && node.hasProperty(relPath)) {
-                Property property = node.getProperty(relPath);
+    public static List<String> getStringValues(final Property property) {
+        List<String> result = Collections.emptyList();
+        if (property != null) {
+            try {
                 if (property.isMultiple()) {
-                    values = getValuesStringList(property.getValues());
+                    // TODO: Here we bypass the HtmlEncodingWrapper of Magnolia properties!
+                    result = getValuesStringList(property.getValues());
                 } else {
-                    values.add(property.getString());
+                    result = new ArrayList<>(1);
+                    result.add(property.getString());
                 }
+            } catch (RepositoryException e) {
+                LOGGER.error("Error retrieving property String values.", e);
             }
-        } catch (RepositoryException e) {
-            LOGGER.error("Error retrieving property {}.", relPath, e);
         }
-
-        return values;
+        return result;
     }
 
     /**
@@ -99,7 +146,7 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node multiSelectNode) {
-        return collect(retrieveMultiSelectProperties(multiSelectNode), new PropertyStringTransformer());
+        return collect(retrieveMultiSelectProperties(multiSelectNode), PROPERTY_TO_STRING);
     }
 
     /**
@@ -108,7 +155,7 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectValues(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node baseNode, String nodeName) {
-        return collect(retrieveMultiSelectProperties(baseNode, nodeName), new PropertyStringTransformer());
+        return collect(retrieveMultiSelectProperties(baseNode, nodeName), PROPERTY_TO_STRING);
     }
 
     /**
@@ -119,8 +166,8 @@ public final class PropertyUtils {
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
         List<Property> values = new ArrayList<>();
         values.addAll(retrieveMultiSelectProperties(multiSelectNode));
-        values.sort(new PropertyComparator());
-        return collect(values, new PropertyStringTransformer());
+        values.sort(PROPERTY_NAME_COMPARATOR);
+        return collect(values, PROPERTY_TO_STRING);
     }
 
     /**
@@ -131,36 +178,10 @@ public final class PropertyUtils {
     public static Collection<String> retrieveOrderedMultiSelectValues(Node baseNode, String nodeName) {
         List<Property> values = new ArrayList<>();
         values.addAll(retrieveMultiSelectProperties(baseNode, nodeName));
-        values.sort(new PropertyComparator());
-        return collect(values, new PropertyStringTransformer());
+        values.sort(PROPERTY_NAME_COMPARATOR);
+        return collect(values, PROPERTY_TO_STRING);
     }
 
     private PropertyUtils() {
-    }
-
-    private static class PropertyStringTransformer implements Transformer<Property, String> {
-        @Override
-        public String transform(Property property) {
-            String value = "";
-            try {
-                value = property.getString();
-            } catch (RepositoryException e) {
-                LOGGER.error("Error get string value from property.", e);
-            }
-            return value;
-        }
-    }
-
-    private static class PropertyComparator implements Comparator<Property> {
-        @Override
-        public int compare(Property p1, Property p2) {
-            int compareValue = 0;
-            try {
-                compareValue = p1.getName().compareTo(p2.getName());
-            } catch (RepositoryException e) {
-                LOGGER.error("Error comparing by name of properties.", e);
-            }
-            return compareValue;
-        }
     }
 }
