@@ -141,7 +141,7 @@ public final class NodeUtils {
         String templateId = getTemplate(node);
         TemplateDefinition def = null;
         try {
-            if (StringUtils.isNotBlank(templateId)) {
+            if (isNotBlank(templateId)) {
                 TemplateDefinitionRegistry registry = Components.getComponent(TemplateDefinitionRegistry.class);
                 def = registry.getProvider(templateId).get();
             }
