@@ -33,9 +33,11 @@ public final class CacheUtils {
      * With this headers Magnolia does not cache such responses.
      */
     public static void preventCaching(HttpServletResponse response) {
-        response.setHeader(HEADER_PRAGMA, HEADER_VALUE_NO_CACHE);
-        response.setHeader(HEADER_CACHE_CONTROL, HEADER_CACHE_CONTROL_VALUE_DISABLE_CACHE);
-        response.setDateHeader(HEADER_EXPIRES, 0L);
+        if (response != null) {
+            response.setHeader(HEADER_PRAGMA, HEADER_VALUE_NO_CACHE);
+            response.setHeader(HEADER_CACHE_CONTROL, HEADER_CACHE_CONTROL_VALUE_DISABLE_CACHE);
+            response.setDateHeader(HEADER_EXPIRES, 0L);
+        }
     }
 
     private CacheUtils() {
