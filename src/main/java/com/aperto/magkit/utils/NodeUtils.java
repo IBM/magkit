@@ -138,17 +138,25 @@ public final class NodeUtils {
     }
 
     public static String getTemplateType(@Nullable final Node node) {
-        String templateId = getTemplate(node);
-        TemplateDefinition def = null;
+        TemplateDefinition def = getTemplateDefinition(node);
+        return def != null ? def.getType() : null;
+    }
+
+    public static TemplateDefinition getTemplateDefinition(@Nullable final Node node) {
+        return getTemplateDefinition(getTemplate(node));
+    }
+
+    public static TemplateDefinition getTemplateDefinition(@Nullable final String templateId) {
+        TemplateDefinition result = null;
         try {
             if (isNotBlank(templateId)) {
                 TemplateDefinitionRegistry registry = Components.getComponent(TemplateDefinitionRegistry.class);
-                def = registry.getProvider(templateId).get();
+                result = registry.getProvider(templateId).get();
             }
         } catch (Registry.NoSuchDefinitionException e) {
             LOGGER.debug("No definition found for template id {}.", templateId, e);
         }
-        return def != null ? def.getType() : null;
+        return result;
     }
 
     public static Node getParent(@Nullable final Node node) {
