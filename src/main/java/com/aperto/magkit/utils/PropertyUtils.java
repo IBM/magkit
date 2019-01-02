@@ -3,8 +3,7 @@ package com.aperto.magkit.utils;
 import info.magnolia.jcr.wrapper.DelegatePropertyWrapper;
 import info.magnolia.jcr.wrapper.HTMLEscapingContentDecorator;
 import info.magnolia.jcr.wrapper.HTMLEscapingPropertyWrapper;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.aperto.magkit.utils.ValueUtils.valueToBinary;
@@ -31,8 +31,7 @@ import static com.aperto.magkit.utils.ValueUtils.valueToDouble;
 import static com.aperto.magkit.utils.ValueUtils.valueToLong;
 import static com.aperto.magkit.utils.ValueUtils.valueToString;
 import static java.util.Collections.emptyList;
-import static org.apache.commons.collections4.CollectionUtils.collect;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
@@ -44,15 +43,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 public final class PropertyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyUtils.class);
 
-    private static final Transformer<Property, String> PROPERTY_TO_STRING = property -> {
-        String value = null;
-        try {
-            value = property.getString();
-        } catch (RepositoryException e) {
-            LOGGER.warn("Error get string value from property.", e);
-        }
-        return StringUtils.defaultString(value);
-    };
+    static final Function<Property, String> TO_STRING_VALUE_DEFAULT_EMPTY = p -> StringUtils.defaultString(getStringValue(p));
 
     static final Comparator<Property> PROPERTY_NAME_COMPARATOR = (p1, p2) -> {
         int compareValue = 0;
@@ -232,10 +223,10 @@ public final class PropertyUtils {
      * Retrieves the properties created by Magnolias MultiSelect.
      *
      * @param multiSelectNode node contains the properties
-     * @return collection of properties, null if multiSelectNode is null
+     * @return collection of properties, never null
      */
     public static Collection<Property> retrieveMultiSelectProperties(Node multiSelectNode) {
-        Collection<Property> properties = null;
+        Collection<Property> properties = emptyList();
         try {
             final RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<>(new ArrayList<>(), "\\d+", false, 1, Property.class);
             if (multiSelectNode != null) {
@@ -258,7 +249,7 @@ public final class PropertyUtils {
     public static Collection<Property> retrieveMultiSelectProperties(Node baseNode, String nodeName) {
         Collection<Property> properties = emptyList();
         try {
-            if (baseNode.hasNode(nodeName)) {
+            if (baseNode != null && baseNode.hasNode(nodeName)) {
                 Node multiSelectNode = baseNode.getNode(nodeName);
                 properties = retrieveMultiSelectProperties(multiSelectNode);
             }
@@ -274,7 +265,9 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node multiSelectNode) {
-        return collect(retrieveMultiSelectProperties(multiSelectNode), PROPERTY_TO_STRING);
+        return retrieveMultiSelectProperties(multiSelectNode).stream()
+            .map(TO_STRING_VALUE_DEFAULT_EMPTY)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -283,7 +276,9 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectValues(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node baseNode, String nodeName) {
-        return collect(retrieveMultiSelectProperties(baseNode, nodeName), PROPERTY_TO_STRING);
+        return retrieveMultiSelectProperties(baseNode, nodeName).stream()
+            .map(TO_STRING_VALUE_DEFAULT_EMPTY)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -292,10 +287,11 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
-        List<Property> values = new ArrayList<>();
-        values.addAll(retrieveMultiSelectProperties(multiSelectNode));
-        values.sort(PROPERTY_NAME_COMPARATOR);
-        return collect(values, PROPERTY_TO_STRING);
+        return retrieveMultiSelectProperties(multiSelectNode).stream()
+            .sorted(PROPERTY_NAME_COMPARATOR)
+            .map(TO_STRING_VALUE_DEFAULT_EMPTY)
+            .collect(Collectors.toList());
+
     }
 
     /**
@@ -304,10 +300,10 @@ public final class PropertyUtils {
      * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node baseNode, String nodeName) {
-        List<Property> values = new ArrayList<>();
-        values.addAll(retrieveMultiSelectProperties(baseNode, nodeName));
-        values.sort(PROPERTY_NAME_COMPARATOR);
-        return collect(values, PROPERTY_TO_STRING);
+        return retrieveMultiSelectProperties(baseNode, nodeName).stream()
+            .sorted(PROPERTY_NAME_COMPARATOR)
+            .map(TO_STRING_VALUE_DEFAULT_EMPTY)
+            .collect(Collectors.toList());
     }
 
     public static boolean exists(Property p) {

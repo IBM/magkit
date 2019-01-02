@@ -75,7 +75,7 @@ public class PropertyUtilsTest {
 
     @Test
     public void testRetrieveOrderedMultiSelectValues() throws Exception {
-        assertThat(retrieveMultiSelectProperties(null), nullValue());
+        assertThat(retrieveOrderedMultiSelectValues(null).size(), is(0));
 
         Node node = mockPageNode("/node/subNode",
             stubProperty("jcr:created", "2012"),
@@ -85,6 +85,33 @@ public class PropertyUtilsTest {
             stubProperty("2", "drei2")
         );
         Collection<String> values = retrieveOrderedMultiSelectValues(node);
+        assertThat(values.size(), is(3));
+        int i = 0;
+        for (String value : values) {
+            assertThat(value.endsWith(String.valueOf(i)), is(true));
+            i++;
+        }
+    }
+
+    @Test
+    public void testRetrieveOrderedMultiSelectValuesSubNode() throws Exception {
+        assertThat(retrieveMultiSelectProperties(null, null).size(), is(0));
+
+        Node node = mockPageNode("/node");
+        assertThat(retrieveMultiSelectProperties(node, null).size(), is(0));
+        assertThat(retrieveMultiSelectProperties(node, " ").size(), is(0));
+        assertThat(retrieveMultiSelectProperties(node, "subNode").size(), is(0));
+
+        mockPageNode("/node/subNode",
+            stubProperty("jcr:created", "2012"),
+            stubProperty("1", "zwei1"),
+            stubProperty("0", "eins0"),
+            stubProperty("title", "title"),
+            stubProperty("2", "drei2")
+        );
+        assertThat(retrieveMultiSelectProperties(node, null).size(), is(0));
+        assertThat(retrieveMultiSelectProperties(node, " ").size(), is(0));
+        Collection<String> values = retrieveOrderedMultiSelectValues(node, "subNode");
         assertThat(values.size(), is(3));
         int i = 0;
         for (String value : values) {
