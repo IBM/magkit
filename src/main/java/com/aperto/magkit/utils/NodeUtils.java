@@ -2,9 +2,9 @@ package com.aperto.magkit.utils;
 
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +19,7 @@ import info.magnolia.config.registry.Registry;
 import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
 import info.magnolia.rendering.template.registry.TemplateDefinitionRegistry;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
