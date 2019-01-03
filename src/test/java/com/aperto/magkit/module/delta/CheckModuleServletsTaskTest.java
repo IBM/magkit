@@ -13,7 +13,7 @@ import javax.jcr.Session;
 
 import static com.aperto.magkit.mockito.ComponentsMockUtils.mockComponentInstance;
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Lists.newArrayList;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 import static info.magnolia.test.mock.jcr.SessionTestUtil.createSession;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -59,7 +59,7 @@ public class CheckModuleServletsTaskTest {
 
     @Test
     public void oneNewServlet() throws Exception {
-        _installContext.getCurrentModuleDefinition().setServlets(newHashSet(createServlet("new-servlet")));
+        _installContext.getCurrentModuleDefinition().setServlets(newArrayList(createServlet("new-servlet")));
         _servletsTask.execute(_installContext);
 
         assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
@@ -68,16 +68,16 @@ public class CheckModuleServletsTaskTest {
 
     @Test
     public void newAndExistingServlets() throws Exception {
-        _installContext.getCurrentModuleDefinition().setServlets(newHashSet(createServlet("new-servlet"), createServlet("existing-servlet")));
+        _installContext.getCurrentModuleDefinition().setServlets(newArrayList(createServlet("new-servlet"), createServlet("existing-servlet")));
         _servletsTask.execute(_installContext);
 
         assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
-        assertThat(_servletsTask.toString(), equalTo("[task: Remove servlet configuration, task: Servlet existing-servlet, task: Servlet new-servlet]"));
+        assertThat(_servletsTask.toString(), equalTo("[task: Servlet new-servlet, task: Remove servlet configuration, task: Servlet existing-servlet]"));
     }
 
     @Test
     public void repositoryException() throws Exception {
-        _installContext.getCurrentModuleDefinition().setServlets(newHashSet(createServlet("new-servlet")));
+        _installContext.getCurrentModuleDefinition().setServlets(newArrayList(createServlet("new-servlet")));
         Session session = mock(Session.class);
         when(session.itemExists(anyString())).thenThrow(new RepositoryException("Exception on item exists."));
         when(_installContext.getConfigJCRSession()).thenReturn(session);
