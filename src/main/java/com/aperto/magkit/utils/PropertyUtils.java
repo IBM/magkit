@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -86,19 +85,23 @@ public final class PropertyUtils {
      * @return a List<Value> with all values of this property, never null
      */
     public static List<Value> getValues(@Nullable final Property input) {
-        List<Value> result = Collections.emptyList();
+        Value[] values = getUnwrappedValues(input);
+        if (input instanceof HTMLEscapingPropertyWrapper) {
+            // We are bypassing the magnolia html encoding of nodes if we work on values instead of the node properties.
+            // Here we provide an HTML escaping Value wrapper to overcome this limitation.
+            HTMLEscapingContentDecorator decorator = ((HTMLEscapingPropertyWrapper) input).getContentDecorator();
+            for (int i = 0; i < values.length; i++) {
+                values[i] = new HtmlEscapingValueDecorator(values[i], decorator);
+            }
+        }
+        return Arrays.asList(values);
+    }
+
+    private static Value[] getUnwrappedValues(@Nullable final Property input) {
+        Value[] result = new Value[0];
         if (exists(input)) {
             try {
-                Value[] values = input.isMultiple() ? input.getValues() : new Value[]{input.getValue()};
-                if (input instanceof HTMLEscapingPropertyWrapper) {
-                    // We are bypassing the magnolia html encoding of nodes if we work on values instead of the node properties.
-                    // Here we provide an HTML escaping Value wrapper to overcome this limitation.
-                    HTMLEscapingContentDecorator decorator = ((HTMLEscapingPropertyWrapper) input).getContentDecorator();
-                    for (int i = 0; i < values.length; i++) {
-                        values[i] = new HtmlEscapingValueDecorator(values[i], decorator);
-                    }
-                }
-                result = Arrays.asList(values);
+                result = input.isMultiple() ? input.getValues() : new Value[]{input.getValue()};
             } catch (RepositoryException e) {
                 // ignore and return empty result
                 LOGGER.debug("Cannot access values of property ", e);
@@ -116,16 +119,21 @@ public final class PropertyUtils {
      * @return the value object of the property or NULL if the property is null or has no value
      */
     public static Value getValue(@Nullable final Property input) {
+        Value result = getUnwrappedValue(input);
+        if (input instanceof HTMLEscapingPropertyWrapper) {
+            // We are bypassing the magnolia html encoding of nodes if we work on values instead of the node properties.
+            // Here we provide an HTML escaping Value wrapper to overcome this limitation.
+            HTMLEscapingContentDecorator decorator = ((HTMLEscapingPropertyWrapper) input).getContentDecorator();
+            result = new HtmlEscapingValueDecorator(result, decorator);
+        }
+        return result;
+    }
+
+    private static Value getUnwrappedValue(@Nullable final Property input) {
         Value result = null;
         if (exists(input)) {
             try {
                 result = input.isMultiple() ? input.getValues()[0] : input.getValue();
-                if (input instanceof HTMLEscapingPropertyWrapper) {
-                    // We are bypassing the magnolia html encoding of nodes if we work on values instead of the node properties.
-                    // Here we provide an HTML escaping Value wrapper to overcome this limitation.
-                    HTMLEscapingContentDecorator decorator = ((HTMLEscapingPropertyWrapper) input).getContentDecorator();
-                    result = new HtmlEscapingValueDecorator(result, decorator);
-                }
             } catch (RepositoryException e) {
                 // ignore and return empty result
                 LOGGER.debug("Cannot access value of property ", e);
