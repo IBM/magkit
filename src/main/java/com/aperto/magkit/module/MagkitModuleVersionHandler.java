@@ -66,8 +66,6 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         )
     );
 
-    private final Task _moveFolderTemplate = new ReplaceTemplateTask("magkit-stk:pages/folder", "magkit:pages/folder");
-
     /**
      * Constructor for adding update builder.
      */
@@ -79,20 +77,19 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         DeltaBuilder update314 = update("3.1.4", "Updates for version 3.1.4.").addTask(_disableRangeForPdf);
         register(update314);
 
-        DeltaBuilder update320 = update("3.2.0", "Update to Magkit 3.2.0.").addTask(_moveFolderTemplate);
+        final Task moveFolderTemplate = new ReplaceTemplateTask("magkit-stk:pages/folder", "magkit:pages/folder");
+        DeltaBuilder update320 = update("3.2.0", "Update to Magkit 3.2.0.").addTask(moveFolderTemplate);
         register(update320);
     }
 
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
-        List<Task> installTasks = new ArrayList<>();
-        installTasks.addAll(super.getExtraInstallTasks(installContext));
+        List<Task> installTasks = new ArrayList<>(super.getExtraInstallTasks(installContext));
         installTasks.add(_addBypassForMonitoring);
         installTasks.add(_addSpringByPass);
         installTasks.add(_setSecurityCallback);
         installTasks.add(_increaseImageQuality);
         installTasks.add(_disableRangeForPdf);
-        installTasks.add(_moveFolderTemplate);
         return installTasks;
     }
 }
