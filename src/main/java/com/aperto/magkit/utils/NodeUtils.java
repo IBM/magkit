@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -15,6 +16,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.validation.constraints.NotNull;
 
+import com.google.common.base.Preconditions;
 import info.magnolia.config.registry.Registry;
 import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
@@ -242,6 +244,24 @@ public final class NodeUtils {
      */
     public static Node getAncestorWithPrimaryType(@Nullable final Node node, @Nullable final String nodeType) {
         return getAncestor(node, n -> isNodeType(n, nodeType));
+    }
+
+    /**
+     * A save method to get the depth (level) of a node.
+     *
+     * @param node the node to get the depth for
+     * @return the node level as int or -1 if node is NULL or an exception occurred.
+     */
+    public static int getDepth(final Node node) {
+        int result = -1;
+        if (node != null) {
+            try {
+                result = node.getDepth();
+            } catch (RepositoryException e) {
+                LOGGER.error("Error getting the node depth.", e);
+            }
+        }
+        return result;
     }
 
     /**
