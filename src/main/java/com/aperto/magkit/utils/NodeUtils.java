@@ -168,7 +168,8 @@ public final class NodeUtils {
                 parent = node.getParent();
             }
         } catch (RepositoryException e) {
-            LOGGER.error("Unable to get parent node from [{}]", getPathIfPossible(node), e);
+            LOGGER.info("Unable to get parent node from [{}]", getPathIfPossible(node));
+            LOGGER.debug(e.getLocalizedMessage(), e);
         }
 
         return parent;
@@ -258,7 +259,8 @@ public final class NodeUtils {
             try {
                 result = node.getDepth();
             } catch (RepositoryException e) {
-                LOGGER.error("Error getting the node depth.", e);
+                LOGGER.info("Error getting the node depth.");
+                LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
         return result;

@@ -31,6 +31,7 @@ import info.magnolia.repository.RepositoryConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * Tests for node utils.
@@ -141,6 +142,23 @@ public class NodeUtilsTest {
 
         stubTemplate("test:templateWithType", TemplateDefinitionStubbingOperation.stubType("success")).of(node);
         assertThat(NodeUtils.getTemplateType(node), is("success"));
+    }
+
+    @Test
+    public void getDepthTest() throws RepositoryException {
+        assertThat(NodeUtils.getDepth(null), is(-1));
+
+        Node node = mockNode("root");
+        assertThat(NodeUtils.getDepth(node), is(1));
+
+        node = mockNode("root/home");
+        assertThat(NodeUtils.getDepth(node), is(2));
+
+        node = mockNode("root/home/page");
+        assertThat(NodeUtils.getDepth(node), is(3));
+
+        Mockito.doThrow(RepositoryException.class).when(node).getDepth();
+        assertThat(NodeUtils.getDepth(node), is(-1));
     }
 
     @Before
