@@ -6,7 +6,6 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -16,7 +15,6 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Preconditions;
 import info.magnolia.config.registry.Registry;
 import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
