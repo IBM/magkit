@@ -46,6 +46,8 @@ public final class NodeUtils {
     public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> StringUtils.equals("feature", getTemplateType(node));
     public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals("content", getTemplateType(node));
 
+    public static final Predicate<Node> IS_MAGKIT_FOLDER = node -> StringUtils.equals("magkit:pages/folder", getTemplate(node));
+
     /**
      * Determines the path to given workspace and node identifier.
      *
