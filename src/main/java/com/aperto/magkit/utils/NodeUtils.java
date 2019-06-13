@@ -2,9 +2,11 @@ package com.aperto.magkit.utils;
 
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeStart;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +18,7 @@ import javax.jcr.RepositoryException;
 import javax.validation.constraints.NotNull;
 
 import info.magnolia.config.registry.Registry;
+import info.magnolia.jcr.util.SessionUtil;
 import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
 import info.magnolia.rendering.template.registry.TemplateDefinitionRegistry;
@@ -75,7 +78,7 @@ public final class NodeUtils {
      *
      * @see NodeUtil#getNodeByIdentifier(String, String)
      */
-    public static Node getNodeByIdentifier(String workspace, String identifier) {
+    public static Node getNodeByIdentifier(final String workspace, final String identifier) {
         Node node = null;
         try {
             node = NodeUtil.getNodeByIdentifier(workspace, identifier);
@@ -84,6 +87,26 @@ public final class NodeUtils {
             LOGGER.debug(e.getLocalizedMessage(), e);
         }
         return node;
+    }
+
+    /**
+     * Gets the Node for a given reference in a certain workspace.
+     * Supports uuid and absolute node path (starting with "/").
+     *
+     * @param workspace the workspace name to get the node from
+     * @param reference the UUID or path of the Node
+     * @return a Node or null if reference or workspace name in empty or an exception occurs
+     */
+    public static Node getNodeByReference(final String workspace, final String reference) {
+        // asset node reference values have identifier prefixed with "jcr:"
+        String ref = removeStart(reference, "jcr:");
+        Node result = null;
+        if (LinkTool.isUuid(ref)) {
+            result = NodeUtils.getNodeByIdentifier(workspace, ref);
+        } else if (startsWith(reference, "/")) {
+            result = SessionUtil.getNode(workspace, reference);
+        }
+        return result;
     }
 
     /**
