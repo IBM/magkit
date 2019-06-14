@@ -1,5 +1,14 @@
 package com.aperto.magkit.utils;
 
+import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
+import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockMgnlNode;
+import static com.aperto.magkit.mockito.ServerConfigurationMockUtils.mockServerConfiguration;
+import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
+import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultExtension;
+import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubContextPath;
+import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
+import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubIdentifier;
+import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -12,6 +21,9 @@ import java.net.URI;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 
 /**
  * @author Philipp Güttler (Aperto AG)
@@ -126,5 +138,26 @@ public class ExtendedLinkFieldHelperTest {
         assertThat(_helper.mergeComponents(PATH, null, null, ANCHOR), equalTo(PATH_WITH_ANCHOR));
         assertThat(_helper.mergeComponents(null, null, null, ANCHOR), equalTo("#" + ANCHOR));
         assertThat(_helper.mergeComponents(PATH, SELECTORS, QUERY, ANCHOR), equalTo(PATH_FULL));
+    }
+
+    @Test
+    public void createExtendedLink() throws RepositoryException {
+        assertThat(_helper.createExtendedLink(null, null, null, null), equalTo(null));
+
+        Node source = mockNode("source");
+        mockWebContext(stubContextPath("/aperto"));
+        mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
+        Node target = mockMgnlNode("target", "test", "aperto:test", stubIdentifier(java.util.UUID.randomUUID().toString()));
+        stubProperty("link", target).of(source);
+        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target.html"));
+
+        stubProperty("link_selector", SELECTOR_FOO).of(source);
+        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html"));
+
+        stubProperty("link_anchor", ANCHOR).of(source);
+        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html#anchor"));
+
+        stubProperty("link_query", QUERY).of(source);
+        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html?param=value#anchor"));
     }
 }

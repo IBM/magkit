@@ -3,15 +3,18 @@ package com.aperto.magkit.utils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Singleton;
+import javax.jcr.Node;
 import java.net.URI;
 
 import static com.aperto.magkit.utils.LinkTool.isAnchor;
 import static com.aperto.magkit.utils.LinkTool.isPath;
 import static com.aperto.magkit.utils.LinkTool.isUuid;
 import static info.magnolia.cms.util.SelectorUtil.SELECTOR_DELIMITER;
+import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.lastIndexOf;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeStart;
@@ -115,6 +118,27 @@ public class ExtendedLinkFieldHelper {
         }
 
         return result;
+    }
+
+    /**
+     * Creates a link for the reference provided by the source node as property value.
+     * Handles internal and external links and adds the extended link features (anchor, query string, selector).
+     *
+     * @param source the source node that contains the reference
+     * @param linkPropertyName the name of the link property at source node
+     * @param workspace the workspace name of the target node
+     * @param linkType the LinkTool.LinkType that determines weather an internal, external or redirect URL should be created.
+     * @return the URL for the reference or NULL
+     */
+    public String createExtendedLink(Node source, String linkPropertyName, String workspace, LinkTool.LinkType linkType) {
+        String link = LinkTool.createLinkForReference(source, linkPropertyName, workspace, linkType);
+        if (isNotEmpty(link)) {
+            String anchor = getString(source, linkPropertyName + SUFFIX_ANCHOR);
+            String query = getString(source, linkPropertyName + SUFFIX_QUERY);
+            String selectors = getString(source, linkPropertyName + SUFFIX_SELECTOR);
+            link = mergeComponents(link, selectors, query, anchor);
+        }
+        return link;
     }
 
     /**

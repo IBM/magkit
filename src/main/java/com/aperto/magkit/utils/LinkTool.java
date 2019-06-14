@@ -1,13 +1,22 @@
 package com.aperto.magkit.utils;
 
+import info.magnolia.context.MgnlContext;
+import info.magnolia.link.LinkUtil;
+
+import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.removeStart;
 import static org.apache.commons.lang.StringUtils.startsWith;
 import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
+import javax.jcr.Node;
 
 /**
  * Helper class for links.
@@ -68,6 +77,45 @@ public final class LinkTool {
      */
     public static boolean isAnchor(@Nullable final String value) {
         return startsWith(value, "#");
+    }
+
+    /**
+     * Creates a link for the reference provided by the source node as property value.
+     * Handles internal and external links.
+     *
+     * @param source the source node that contains the reference
+     * @param linkPropertyName the name of the link property at source node
+     * @param workspace the workspace name of the target node
+     * @param linkType the LinkTool.LinkType that determines weather an internal, external or redirect URL should be created.
+     * @return the URL for the reference or NULL
+     */
+    public static String createLinkForReference(Node source, String linkPropertyName, String workspace, LinkType linkType) {
+        String link = isNotBlank(linkPropertyName) ? trimToNull(getString(source, linkPropertyName)) : null;
+        if (isNotBlank(link) && !isExternalLink(link)) {
+            Node target = NodeUtils.getNodeByReference(workspace, link);
+            link = linkType != null ? linkType.toLink(target) : null;
+        }
+        return link;
+    }
+
+    /**
+     * An enumeration of link types to signal whether an internal, external or redirect link should be created.
+     * Serves as a strategy for link creation methods.
+     */
+    public enum LinkType {
+        INTERNAL(LinkUtil::createAbsoluteLink),
+        EXTERNAL(LinkUtil::createExternalLink),
+        REDIRECT(n -> removeStart(LinkUtil.createAbsoluteLink(n), MgnlContext.getContextPath()));
+
+        private final Function<Node, String> _toLinkFunction;
+
+        LinkType(Function<Node, String> toLinkFunction) {
+            _toLinkFunction = toLinkFunction;
+        }
+
+        public String toLink(Node node) {
+            return _toLinkFunction.apply(node);
+        }
     }
 
     private LinkTool() {
