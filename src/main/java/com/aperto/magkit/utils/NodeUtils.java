@@ -22,6 +22,7 @@ import info.magnolia.jcr.util.SessionUtil;
 import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
 import info.magnolia.rendering.template.registry.TemplateDefinitionRegistry;
+import info.magnolia.rendering.template.type.DefaultTemplateTypes;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,10 @@ public final class NodeUtils {
     public static final Predicate<Node> IS_CONTENT = n -> isNodeType(n, NodeTypes.Content.NAME);
     public static final Predicate<Node> IS_CONTENT_NODE = n -> isNodeType(n, NodeTypes.ContentNode.NAME);
 
-    public static final Predicate<Node> HAS_HOME_TEMPLATE = node -> StringUtils.equals("home", getTemplateType(node));
-    public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> StringUtils.equals("feature", getTemplateType(node));
-    public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals("content", getTemplateType(node));
+    public static final Predicate<Node> HAS_HOME_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.HOME, getTemplateType(node));
+    public static final Predicate<Node> HAS_SECTION_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.SECTION, getTemplateType(node));
+    public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.FEATURE, getTemplateType(node));
+    public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.CONTENT, getTemplateType(node));
 
     public static final Predicate<Node> IS_MAGKIT_FOLDER = node -> StringUtils.equals("magkit:pages/folder", getTemplate(node));
 
