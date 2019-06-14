@@ -104,7 +104,7 @@ public final class NodeUtils {
         String ref = removeStart(reference, "jcr:");
         Node result = null;
         if (LinkTool.isUuid(ref)) {
-            result = NodeUtils.getNodeByIdentifier(workspace, ref);
+            result = getNodeByIdentifier(workspace, ref);
         } else if (startsWith(reference, "/")) {
             result = SessionUtil.getNode(workspace, reference);
         }

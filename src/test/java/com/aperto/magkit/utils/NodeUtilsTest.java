@@ -33,6 +33,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.UUID;
+
 /**
  * Tests for node utils.
  *
@@ -159,6 +161,18 @@ public class NodeUtilsTest {
 
         Mockito.doThrow(RepositoryException.class).when(node).getDepth();
         assertThat(NodeUtils.getDepth(node), is(-1));
+    }
+
+    @Test
+    public void getNodeByReference() throws RepositoryException {
+        assertThat(NodeUtils.getNodeByReference(null, null), nullValue());
+        assertThat(NodeUtils.getNodeByReference(" ", " "), nullValue());
+        assertThat(NodeUtils.getNodeByReference("test", ""), nullValue());
+
+        Node node = mockPageNode("root/test/page", stubIdentifier(UUID.randomUUID().toString()));
+        assertThat(NodeUtils.getNodeByReference("website", "just something"), nullValue());
+        assertThat(NodeUtils.getNodeByReference("website", "/root/test/page"), is(node));
+        assertThat(NodeUtils.getNodeByReference("website", node.getIdentifier()), is(node));
     }
 
     @Before
