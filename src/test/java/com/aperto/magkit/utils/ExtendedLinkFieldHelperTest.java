@@ -43,6 +43,11 @@ public class ExtendedLinkFieldHelperTest {
     private static final String PATH_WITH_SELECTOR = PATH + "~" + SELECTOR_FOO + "~";
     private static final String PATH_WITH_QUERY = PATH + "?" + QUERY;
     private static final String PATH_FULL = PATH + "~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR;
+    private static final String EXTERNAL_LINK = "http://test.aperto.de/path/to/node.html";
+    private static final String EXTERNAL_WITH_ANCHOR = EXTERNAL_LINK + "#" + ANCHOR;
+    private static final String EXTERNAL_WITH_SELECTOR = "http://test.aperto.de/path/to/node" + "~" + SELECTORS + "~" + ".html";
+    private static final String EXTERNAL_WITH_QUERY = EXTERNAL_LINK + "?" + QUERY;
+    private static final String EXTERNAL_FULL = EXTERNAL_WITH_SELECTOR + "?" + QUERY + "#" + ANCHOR;
 
     private ExtendedLinkFieldHelper _helper;
 
@@ -130,7 +135,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testMergeComponents() throws Exception {
+    public void testMergeComponentsForPath() throws Exception {
         assertThat(_helper.mergeComponents(null, null, null, null), equalTo(EMPTY));
         assertThat(_helper.mergeComponents(PATH, null, null, null), equalTo(PATH));
         assertThat(_helper.mergeComponents(PATH, SELECTOR_FOO, null, null), equalTo(PATH_WITH_SELECTOR));
@@ -138,6 +143,17 @@ public class ExtendedLinkFieldHelperTest {
         assertThat(_helper.mergeComponents(PATH, null, null, ANCHOR), equalTo(PATH_WITH_ANCHOR));
         assertThat(_helper.mergeComponents(null, null, null, ANCHOR), equalTo("#" + ANCHOR));
         assertThat(_helper.mergeComponents(PATH, SELECTORS, QUERY, ANCHOR), equalTo(PATH_FULL));
+    }
+
+    @Test
+    public void testMergeComponentsForExternalLink() throws Exception {
+        assertThat(_helper.mergeComponents(null, null, null, null), equalTo(EMPTY));
+        assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, null, null), equalTo(EXTERNAL_LINK));
+        assertThat(_helper.mergeComponents(EXTERNAL_LINK, SELECTORS, null, null), equalTo(EXTERNAL_WITH_SELECTOR));
+        assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, QUERY, null), equalTo(EXTERNAL_WITH_QUERY));
+        assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, null, ANCHOR), equalTo(EXTERNAL_WITH_ANCHOR));
+        assertThat(_helper.mergeComponents(null, null, null, ANCHOR), equalTo("#" + ANCHOR));
+        assertThat(_helper.mergeComponents(EXTERNAL_LINK, SELECTORS, QUERY, ANCHOR), equalTo(EXTERNAL_FULL));
     }
 
     @Test

@@ -1,7 +1,5 @@
 package com.aperto.magkit.utils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.inject.Singleton;
 import javax.jcr.Node;
 import java.net.URI;
@@ -92,32 +90,21 @@ public class ExtendedLinkFieldHelper {
     }
 
     public String mergeComponents(final String base, final String selector, final String query, final String anchor) {
-        String result = defaultString(base);
-
+        StringBuilder result = new StringBuilder(defaultString(base));
+        if (isNotBlank(selector)) {
+            int extIndex = lastIndexOf(result, TAG_FILE_EXTENSION);
+            if (extIndex == -1) {
+                extIndex = result.length();
+            }
+            result.insert(extIndex, SELECTOR_DELIMITER + selector + SELECTOR_DELIMITER);
+        }
         if (isNotBlank(query)) {
-            result += "?" + query;
+            result.append('?').append(query);
         }
         if (isNotBlank(anchor)) {
-            result += "#" + anchor;
+            result.append('#').append(anchor);
         }
-
-        if (isNotBlank(selector)) {
-            String baseResult = result;
-            if (isNotBlank(anchor)) {
-                baseResult = substringBefore(baseResult, "#");
-            }
-            if (isNotBlank(query)) {
-                baseResult = substringBefore(baseResult, "?");
-            }
-            int extIndex = lastIndexOf(baseResult, TAG_FILE_EXTENSION);
-            if (extIndex == -1) {
-                extIndex = baseResult.length();
-            }
-
-            result = StringUtils.substring(result, 0, extIndex) + SELECTOR_DELIMITER + selector + SELECTOR_DELIMITER + StringUtils.substring(result, extIndex);
-        }
-
-        return result;
+        return result.toString();
     }
 
     /**
