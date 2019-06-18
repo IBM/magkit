@@ -2,6 +2,16 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.context.MgnlContext;
 import info.magnolia.link.LinkUtil;
+import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import javax.jcr.Node;
+import java.net.URISyntaxException;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
@@ -11,19 +21,14 @@ import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
-import javax.jcr.Node;
-
 /**
  * Helper class for links.
  *
  * @author Frank Sommer (25.10.2007)
  */
 public final class LinkTool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkTool.class);
+
     public static final Pattern UUID_PATTERN = Pattern.compile("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$");
 
     public static final String HTTP = "http";
@@ -37,9 +42,9 @@ public final class LinkTool {
     /**
      * Checks if the given link is a uuid.
      *
-     * @see #UUID_PATTERN
      * @param link to check
      * @return true or false
+     * @see #UUID_PATTERN
      */
     public static boolean isUuid(String link) {
         boolean isUuid = false;
@@ -72,6 +77,7 @@ public final class LinkTool {
 
     /**
      * Null-safe check if value starts with #.
+     *
      * @param value to check
      * @return true for url fragment with starting #
      */
@@ -83,10 +89,10 @@ public final class LinkTool {
      * Creates a link for the reference provided by the source node as property value.
      * Handles internal and external links.
      *
-     * @param source the source node that contains the reference
+     * @param source           the source node that contains the reference
      * @param linkPropertyName the name of the link property at source node
-     * @param workspace the workspace name of the target node
-     * @param linkType the LinkTool.LinkType that determines weather an internal, external or redirect URL should be created.
+     * @param workspace        the workspace name of the target node
+     * @param linkType         the LinkTool.LinkType that determines weather an internal, external or redirect URL should be created.
      * @return the URL for the reference or NULL
      */
     public static String createLinkForReference(Node source, String linkPropertyName, String workspace, LinkType linkType) {
@@ -94,6 +100,28 @@ public final class LinkTool {
         if (isNotBlank(link) && !isExternalLink(link)) {
             Node target = NodeUtils.getNodeByReference(workspace, link);
             link = linkType != null ? linkType.toLink(target) : null;
+        }
+        return link;
+    }
+
+    /**
+     * Creates an external link for a given path. Context path will be added.
+     *
+     * <pre>
+     * LinkTool.createExternalLinkForPath(node, "/resources/test.jpg") = https://www.aperto.de/author/resources/test.jpg
+     * </pre>
+     *
+     * @param node node of the current site
+     * @param path path to a resource
+     * @return external link or empty string
+     */
+    public static String createExternalLinkForPath(final Node node, final String path) {
+        String link = "";
+        try {
+            URIBuilder uriBuilder = new URIBuilder(LinkType.EXTERNAL.toLink(node)).setPath(MgnlContext.getContextPath() + path);
+            link = uriBuilder.toString();
+        } catch (URISyntaxException e) {
+            LOGGER.error("Error creating link.", e);
         }
         return link;
     }
