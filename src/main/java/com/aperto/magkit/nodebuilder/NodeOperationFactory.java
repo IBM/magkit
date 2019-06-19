@@ -1,8 +1,12 @@
 package com.aperto.magkit.nodebuilder;
 
-import static org.apache.commons.lang.StringUtils.removeEnd;
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.strip;
+import info.magnolia.jcr.nodebuilder.AbstractNodeOperation;
+import info.magnolia.jcr.nodebuilder.ErrorHandler;
+import info.magnolia.jcr.nodebuilder.NodeOperation;
+import info.magnolia.jcr.nodebuilder.Ops;
+import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.jcr.util.PropertyUtil;
+import info.magnolia.voting.voters.URIPatternVoter;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -10,12 +14,11 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 
-import info.magnolia.jcr.nodebuilder.AbstractNodeOperation;
-import info.magnolia.jcr.nodebuilder.ErrorHandler;
-import info.magnolia.jcr.nodebuilder.NodeOperation;
-import info.magnolia.jcr.nodebuilder.Ops;
-import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.util.PropertyUtil;
+import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
+import static com.aperto.magkit.module.delta.StandardTasks.PN_PATTERN;
+import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.strip;
 
 /**
  * An Utility class that extends info.magnolia.nodebuilder.Ops.
@@ -132,6 +135,20 @@ public abstract class NodeOperationFactory extends Ops {
                 return context;
             }
         };
+    }
+
+    /**
+     * Creates an uri pattern voter node operation.
+     */
+    public static NodeOperation addUriPatternVoter(final String voterName, final String pattern) {
+        return addPatternVoter(voterName, URIPatternVoter.class.getName(), pattern);
+    }
+
+    /**
+     * Creates an pattern voter node operation with given voter class.
+     */
+    public static NodeOperation addPatternVoter(final String voterName, final String voterClass, final String pattern) {
+        return addOrGetContentNode(voterName).then(addOrSetProperty(PN_CLASS, voterClass), addOrSetProperty(PN_PATTERN, pattern));
     }
 
     private NodeOperationFactory() {
