@@ -26,7 +26,7 @@ import static org.apache.commons.lang.StringUtils.substringBeforeLast;
  * @since 14.01.13
  */
 public class NodePropertyVoter extends BasePatternVoter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecureRedirectFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodePropertyVoter.class);
 
     private Context _systemContext;
     private String _propertyName;

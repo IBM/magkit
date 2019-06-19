@@ -1,16 +1,14 @@
 package com.aperto.magkit.module.delta;
 
 import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
-import com.aperto.magkit.filter.SecureRedirectFilter;
-import com.aperto.magkit.filter.TemplateNameVoter;
 import com.aperto.magkit.utils.Item;
 import com.aperto.magkit.workflow.AutoApproveHumanTaskWorkItemHandlerDefinition;
-import info.magnolia.cms.beans.config.DefaultVirtualURIMapping;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.module.delta.ArrayDelegateTask;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
+import info.magnolia.virtualuri.mapping.DefaultVirtualUriMapping;
 import info.magnolia.voting.voters.URIStartsWithVoter;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -23,7 +21,6 @@ import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MA
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.orderBefore;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
@@ -47,13 +44,14 @@ public final class StandardTasks {
     public static final String PN_CLASS = "class";
     public static final String PN_IMPL_CLASS = "implementationClass";
     public static final String PN_ENABLED = "enabled";
-    public static final String PN_FROM_URI = "fromURI";
-    public static final String PN_TO_URI = "toURI";
+    public static final String PN_FROM_URI = "fromUri";
+    public static final String PN_TO_URI = "toUri";
     public static final String PN_PATTERN = "pattern";
     public static final String PN_EXTENDS = "extends";
     public static final String PN_ICON = "icon";
     public static final String PN_ROLES = "roles";
     public static final String NN_PERMISSIONS = "permissions";
+    public static final String NN_CONFIG = "config";
     private static final String NN_WORKFLOW = "workflow";
 
     /**
@@ -74,7 +72,7 @@ public final class StandardTasks {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for robots.txt.", moduleName,
             addOrGetNode(URI_MAPPING).then(
                 addOrGetNode("robots", NodeTypes.ContentNode.NAME).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                    addOrSetProperty(PN_CLASS, DefaultVirtualUriMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/robots.txt"),
                     addOrSetProperty(PN_TO_URI, "forward:/.resources/" + moduleName + "/robots.txt")
                 )
@@ -89,36 +87,9 @@ public final class StandardTasks {
         return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
             addOrGetNode(URI_MAPPING).then(
                 addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
+                    addOrSetProperty(PN_CLASS, DefaultVirtualUriMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
                     addOrSetProperty(PN_TO_URI, "forward:/.resources/" + moduleName + "/favicon.ico")
-                )
-            )
-        );
-    }
-
-    /**
-     * Task for installing the secure redirect filter in the magnolia filter chain.
-     * Including a default configuration for stkForm template.
-     *
-     * @see SecureRedirectFilter
-     */
-    public static Task secureRedirectFilter() {
-        return new ArrayDelegateTask("Install secure redirect", "Install secure redirect filter in filter chain.",
-            selectServerConfig("Add filter node", "Add filter node to chain.",
-                addOrGetNode("filters/cms/secure-redirect").then(
-                    addOrSetProperty(PN_CLASS, SecureRedirectFilter.class.getName()),
-                    addOrSetProperty(PN_ENABLED, Boolean.TRUE),
-                    addOrGetNode("secure", NodeTypes.ContentNode.NAME).then(
-                        addOrGetNode("template_de", NodeTypes.ContentNode.NAME).then(
-                            addOrGetNode("templates", NodeTypes.ContentNode.NAME).then(
-                                addOrSetProperty("form", "standard-templating-kit:pages/stkForm")
-                            ),
-                            addOrSetProperty(PN_CLASS, TemplateNameVoter.class.getName()),
-                            addOrSetProperty("rootPath", "/de")
-                        )
-                    ),
-                    orderBefore("secure-redirect", "intercept")
                 )
             )
         );
@@ -165,7 +136,7 @@ public final class StandardTasks {
                     isNotEmpty(color) ? addOrSetProperty("color", color) : noop(),
                     addOrSetProperty("permanent", Boolean.toString(permanent)),
                     addOrGetContentNode("apps").then(
-                        appsOperations.toArray(new NodeOperation[appsOperations.size()])
+                        appsOperations.toArray(new NodeOperation[0])
                     )
                 )
             )
@@ -189,7 +160,7 @@ public final class StandardTasks {
                 addOrGetContentNode(NN_PERMISSIONS).then(
                     removeOthers ? removeIfExists(PN_ROLES) : noop(),
                     addOrGetContentNode(PN_ROLES).then(
-                        rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                        rolesOps.toArray(new NodeOperation[0])
                     )
                 )
             )
@@ -215,13 +186,13 @@ public final class StandardTasks {
     public static Task addAppLauncherGroupPermission(final String groupName, final boolean removeOthers, final String... roles) {
         List<NodeOperation> rolesOps = getSetPropertyOps(roles);
 
-        return selectModuleConfig("Add applauncher group permission", "Add app group permission for " + groupName + " with roles " + ArrayUtils.toString(roles), "ui-admincentral",
+        return selectModuleConfig("Add app launcher group permission", "Add app group permission for " + groupName + " with roles " + ArrayUtils.toString(roles), "ui-admincentral",
             getNode("config/appLauncherLayout/groups").then(
                 addOrGetContentNode(groupName).then(
                     addOrGetContentNode(NN_PERMISSIONS).then(
                         removeOthers ? removeIfExists(PN_ROLES) : noop(),
                         addOrGetContentNode(PN_ROLES).then(
-                            rolesOps.toArray(new NodeOperation[rolesOps.size()])
+                            rolesOps.toArray(new NodeOperation[0])
                         )
                     )
                 )
@@ -296,16 +267,6 @@ public final class StandardTasks {
     }
 
     /**
-     * The theme name is defined in the site configuration of the site app.
-     *
-     * @deprecated use {@link #setupSiteTheme(String, String)}
-     */
-    @Deprecated
-    public static Task setupSiteTheme(final String themeName) {
-        return setupSiteTheme(themeName, themeName + "-theme");
-    }
-
-    /**
      * Initial theme creation.
      *
      * @param themeName       name of the theme
@@ -322,39 +283,6 @@ public final class StandardTasks {
                 )
             )
         );
-    }
-
-    /**
-     * Maps {@code /favicon.ico} to {@code /resources/templating-kit/themes/themeName/favicon.ico}.
-     *
-     * @param moduleName module to install the mapping
-     * @param themeName  theme name to reference the favicon
-     * @return module version handling task
-     * @deprecated use {@link #virtualUriMappingOfFavicon(String)}, the theme resources should not be in the resources repository
-     */
-    @Deprecated
-    public static Task virtualUriMappingOfFavicon(final String moduleName, final String themeName) {
-        return selectModuleConfig("Virtual UriMapping", "Add virtual URI mapping for favicon.", moduleName,
-            addOrGetNode(URI_MAPPING).then(
-                addOrGetNode("favicon", NodeTypes.ContentNode.NAME).then(
-                    addOrSetProperty(PN_CLASS, DefaultVirtualURIMapping.class.getName()),
-                    addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
-                    addOrSetProperty(PN_TO_URI, "forward:/resources/templating-kit/themes/" + themeName + "/favicon.ico"))));
-    }
-
-    /**
-     * Task to register a javascript or stylesheet file in the theme configuration.
-     *
-     * @param themeName     name of the stk theme
-     * @param nodeName      node name of the styles entry
-     * @param isCss         flag to register css or javascript
-     * @param propertyItems array of items to set as property of the styles configuration
-     * @return Task to execute
-     * @deprecated use {@link #registerThemeFile(String, String, String, boolean, Item...)}
-     */
-    @Deprecated
-    public static Task registerThemeFile(final String themeName, final String nodeName, final boolean isCss, final Item... propertyItems) {
-        return registerThemeFile(themeName, themeName + "-theme", nodeName, isCss, propertyItems);
     }
 
     /**
@@ -390,12 +318,11 @@ public final class StandardTasks {
 
     /**
      * Registers a custom templating functions class for freemarker rendering.
-     * Use Magnolia task instead {@link info.magnolia.rendering.module.setup.InstallRendererContextAttributeTask}
-     * <p/>
-     * i.e: new InstallRendererContextAttributeTask("rendering", "freemarker", name, className)
      *
      * @see info.magnolia.rendering.module.setup.InstallRendererContextAttributeTask
+     * @deprecated use Magnolia task instead {@link info.magnolia.rendering.module.setup.InstallRendererContextAttributeTask}
      */
+    @Deprecated
     public static Task registerCustomTemplatingFunctions(final String name, final String className) {
         return selectConfig("Register custom templating", "Register the " + name + " templating functions freemarker",
             getNode("modules/rendering/renderers/freemarker/contextAttributes").then(
