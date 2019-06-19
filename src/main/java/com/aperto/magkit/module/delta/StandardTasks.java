@@ -21,6 +21,7 @@ import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MA
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
+import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addPatternVoter;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
@@ -107,10 +108,7 @@ public final class StandardTasks {
                 addOrSetProperty(PN_ENABLED, Boolean.TRUE),
                 addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
                 addOrGetNode("useSystemDefault", NodeTypes.ContentNode.NAME).then(
-                    addOrGetNode("magnoliaUri", NodeTypes.ContentNode.NAME).then(
-                        addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-                        addOrSetProperty(PN_PATTERN, "/.magnolia")
-                    )
+                    addPatternVoter("magnoliaUri", URIStartsWithVoter.class.getName(), "/.magnolia")
                 )
             )
         );
@@ -211,19 +209,12 @@ public final class StandardTasks {
         return selectModuleConfig("Add cache exclude", "Add cache exclude for " + urlStartsWith, "cache",
             getNode("config/contentCaching/defaultPageCache").then(
                 getNode("cachePolicy/shouldBypassVoters/urls/excludes").then(
-                    addCacheConfigEntry(name, urlStartsWith)
+                    addPatternVoter(name, URIStartsWithVoter.class.getName(), urlStartsWith)
                 ),
                 getNode("browserCachePolicy/policies/dontCachePages/voters").then(
-                    addCacheConfigEntry(name, urlStartsWith)
+                    addPatternVoter(name, URIStartsWithVoter.class.getName(), urlStartsWith)
                 )
             )
-        );
-    }
-
-    private static NodeOperation addCacheConfigEntry(final String nodeName, final String startsWithPattern) {
-        return addOrGetContentNode(nodeName).then(
-            addOrSetProperty(PN_CLASS, URIStartsWithVoter.class.getName()),
-            addOrSetProperty(PN_PATTERN, startsWithPattern)
         );
     }
 
