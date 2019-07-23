@@ -128,7 +128,7 @@ public final class NodeUtils {
      * @param parent folder node
      * @return list of child pages, fallback empty list
      */
-    public static List<Node> getChildAssets(Node parent) {
+    public static List<Node> getChildAssetNodes(Node parent) {
         return NodeUtil.asList(getChildren(parent, IS_ASSET));
     }
 
