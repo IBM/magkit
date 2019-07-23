@@ -45,6 +45,7 @@ public final class NodeUtils {
     public static final Predicate<Node> IS_COMPONENT = n -> isNodeType(n, NodeTypes.Component.NAME);
     public static final Predicate<Node> IS_CONTENT = n -> isNodeType(n, NodeTypes.Content.NAME);
     public static final Predicate<Node> IS_CONTENT_NODE = n -> isNodeType(n, NodeTypes.ContentNode.NAME);
+    public static final Predicate<Node> IS_ASSET = n -> isNodeType(n, "mgnl:asset");
 
     public static final Predicate<Node> HAS_HOME_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.HOME, getTemplateType(node));
     public static final Predicate<Node> HAS_SECTION_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.SECTION, getTemplateType(node));
@@ -112,13 +113,23 @@ public final class NodeUtils {
     }
 
     /**
-     * Retrieves from given node the child page nodes.
+     * Retrieves the child page nodes of given node.
      *
      * @param pageNode page node
      * @return list of child pages, fallback empty list
      */
     public static List<Node> getChildPages(Node pageNode) {
         return NodeUtil.asList(getChildren(pageNode, IS_PAGE));
+    }
+
+    /**
+     * Retrieves the child asset nodes of given node.
+     *
+     * @param parent folder node
+     * @return list of child pages, fallback empty list
+     */
+    public static List<Node> getChildAssets(Node parent) {
+        return NodeUtil.asList(getChildren(parent, IS_ASSET));
     }
 
     /**
@@ -203,7 +214,7 @@ public final class NodeUtils {
     /**
      * Allows {@link Node#isNodeType(String)} in a null-safe manner and catches the {@link RepositoryException}.
      * @param node node to check
-     * @param nodeType the type to check
+     * @param nodeType the primary node type to check
      * @return true if node has the given type
      */
     public static boolean isNodeType(@Nullable final Node node, @Nullable final String nodeType) {
