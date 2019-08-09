@@ -80,7 +80,7 @@ public class StubbingProperty implements Property {
         init(values, StringValue::new);
     }
 
-    private<T, R extends BaseValue> void init(T[] values, Function<T, R>toValue) {
+    private <T, R extends BaseValue> void init(T[] values, Function<T, R> toValue) {
         if (values != null && values.length > 0) {
             _value = toValue.apply(values[0]);
             _values = new Value[values.length];
