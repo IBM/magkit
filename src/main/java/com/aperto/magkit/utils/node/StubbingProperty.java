@@ -1,6 +1,7 @@
 package com.aperto.magkit.utils.node;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.jackrabbit.value.BaseValue;
 import org.apache.jackrabbit.value.BooleanValue;
 import org.apache.jackrabbit.value.DateValue;
 import org.apache.jackrabbit.value.DoubleValue;
@@ -22,6 +23,7 @@ import javax.jcr.nodetype.PropertyDefinition;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.function.Function;
 
 /**
  * This property implementation allows to make use of stubbed values in order to change the view of a node.
@@ -55,55 +57,35 @@ public class StubbingProperty implements Property {
 
     public StubbingProperty(Node parent, String name, Boolean... values) {
         this(parent, name);
-        if (values != null && values.length > 0) {
-            _value = new BooleanValue(values[0]);
-            _values = new Value[values.length];
-            for (int i = 0; i < values.length; i++) {
-                _values[i] = new BooleanValue(values[i]);
-            }
-        }
+        init(values, BooleanValue::new);
     }
 
     public StubbingProperty(Node parent, String name, Long... values) {
         this(parent, name);
-        if (values != null && values.length > 0) {
-            _value = new LongValue(values[0]);
-            _values = new Value[values.length];
-            for (int i = 0; i < values.length; i++) {
-                _values[i] = new LongValue(values[i]);
-            }
-        }
+        init(values, LongValue::new);
     }
 
     public StubbingProperty(Node parent, String name, Double... values) {
         this(parent, name);
-        if (values != null && values.length > 0) {
-            _value = new DoubleValue(values[0]);
-            _values = new Value[values.length];
-            for (int i = 0; i < values.length; i++) {
-                _values[i] = new DoubleValue(values[i]);
-            }
-        }
+        init(values, DoubleValue::new);
     }
 
     public StubbingProperty(Node parent, String name, Calendar... values) {
         this(parent, name);
-        if (values != null && values.length > 0) {
-            _value = new DateValue(values[0]);
-            _values = new Value[values.length];
-            for (int i = 0; i < values.length; i++) {
-                _values[i] = new DateValue(values[i]);
-            }
-        }
+        init(values, DateValue::new);
     }
 
     public StubbingProperty(Node parent, String name, String... values) {
         this(parent, name);
+        init(values, StringValue::new);
+    }
+
+    private<T, R extends BaseValue> void init(T[] values, Function<T, R>toValue) {
         if (values != null && values.length > 0) {
-            _value = new StringValue(values[0]);
+            _value = toValue.apply(values[0]);
             _values = new Value[values.length];
             for (int i = 0; i < values.length; i++) {
-                _values[i] = new StringValue(values[i]);
+                _values[i] = toValue.apply(values[i]);
             }
         }
     }

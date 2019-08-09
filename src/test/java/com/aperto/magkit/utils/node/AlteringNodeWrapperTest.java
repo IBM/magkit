@@ -62,6 +62,7 @@ public class AlteringNodeWrapperTest {
 
         nodeWrapper.withProperty("names", "value1", "value2");
         assertThat(getStringValue(nodeWrapper.getProperty("names")), is("value1"));
+        assertThat(nodeWrapper.getProperty("names").isMultiple(), is(true));
 
         List<String> stringValues = getStringValues(nodeWrapper, "names");
         assertThat(stringValues.size(), is(2));
@@ -78,6 +79,7 @@ public class AlteringNodeWrapperTest {
 
         nodeWrapper.withProperty("test", true, false);
         assertThat(getBooleanValue(nodeWrapper.getProperty("test")), is(true));
+        assertThat(nodeWrapper.getProperty("test").isMultiple(), is(true));
 
         List<Boolean> values = getBooleanValues(nodeWrapper.getProperty("test"));
         assertThat(values.size(), is(2));
@@ -94,6 +96,7 @@ public class AlteringNodeWrapperTest {
 
         nodeWrapper.withProperty("test", 3L, 2L);
         assertThat(getLongValue(nodeWrapper.getProperty("test")), is(3L));
+        assertThat(nodeWrapper.getProperty("test").isMultiple(), is(true));
 
         List<Long> values = getLongValues(nodeWrapper.getProperty("test"));
         assertThat(values.size(), is(2));
@@ -113,6 +116,7 @@ public class AlteringNodeWrapperTest {
         assertThat(getCalendarValue(nodeWrapper.getProperty("test")), is(now));
         assertThat(getCalendarValues(nodeWrapper.getProperty("test")).size(), is(1));
         assertThat(getCalendarValues(nodeWrapper.getProperty("test")).get(0), is(now));
+        assertThat(nodeWrapper.getProperty("test").isMultiple(), is(false));
     }
 
     @Test
@@ -123,6 +127,7 @@ public class AlteringNodeWrapperTest {
 
         nodeWrapper.withProperty("test", 3.2D, 2.3D);
         assertThat(getDoubleValue(nodeWrapper.getProperty("test")), is(3.2D));
+        assertThat(nodeWrapper.getProperty("test").isMultiple(), is(true));
 
         List<Double> values = getDoubleValues(nodeWrapper.getProperty("test"));
         assertThat(values.size(), is(2));
@@ -149,15 +154,18 @@ public class AlteringNodeWrapperTest {
 
         stubProperty("p0", "test-value").of(node);
         assertThat(getStringValue(wrapper.getProperty("p0")), is("test-value"));
+        assertThat(wrapper.getProperty("p0").isMultiple(), is(false));
 
         wrapper.withProperty("p0", "wrapped");
         assertThat(getStringValue(wrapper.getProperty("p0")), is("wrapped"));
+        assertThat(wrapper.getProperty("p0").isMultiple(), is(false));
 
         wrapper.withMappedProperty("p0", "mapped");
         assertThat(getStringValue(wrapper.getProperty("p0")), nullValue());
 
         wrapper.withProperty("mapped", "mapped");
         assertThat(getStringValue(wrapper.getProperty("p0")), is("mapped"));
+        assertThat(wrapper.getProperty("p0").isMultiple(), is(false));
     }
 
     @Test
