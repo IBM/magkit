@@ -256,7 +256,7 @@ public class StubbingProperty implements Property {
 
     @Override
     public boolean isMultiple() throws RepositoryException {
-        return _values != null;
+        return _values != null && _values.length > 1;
     }
 
     @Override
