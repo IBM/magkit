@@ -159,6 +159,10 @@ public final class PropertyUtils {
         return valueToString(getValue(property));
     }
 
+    public static String getStringValue(final Node node, final String relPath) {
+        return valueToString(getValue(getProperty(node, relPath)));
+    }
+
     public static List<String> getStringValues(final Property property) {
         return getValues(property)
             .stream()
@@ -171,6 +175,10 @@ public final class PropertyUtils {
         return valueToCalendar(getValue(property));
     }
 
+    public static Calendar getCalendarValue(final Node node, final String relPath) {
+        return getCalendarValue(getProperty(node, relPath));
+    }
+
     public static List<Calendar> getCalendarValues(final Property property) {
         return getValues(property)
             .stream()
@@ -179,8 +187,16 @@ public final class PropertyUtils {
             .collect(Collectors.toList());
     }
 
+    public static List<Calendar> getCalendarValues(final Node node, final String relPath) {
+        return getCalendarValues(getProperty(node, relPath));
+    }
+
     public static Long getLongValue(final Property property) {
         return valueToLong(getValue(property));
+    }
+
+    public static Long getLongValue(final Node node, final String relPath) {
+        return getLongValue(getProperty(node, relPath));
     }
 
     public static List<Long> getLongValues(final Property property) {
@@ -191,8 +207,16 @@ public final class PropertyUtils {
             .collect(Collectors.toList());
     }
 
+    public static List<Long> getLongValues(final Node node, final String relPath) {
+        return getLongValues(getProperty(node, relPath));
+    }
+
     public static Double getDoubleValue(final Property property) {
         return valueToDouble(getValue(property));
+    }
+
+    public static Double getDoubleValue(final Node node, final String relPath) {
+        return getDoubleValue(getProperty(node, relPath));
     }
 
     public static List<Double> getDoubleValues(final Property property) {
@@ -203,8 +227,16 @@ public final class PropertyUtils {
             .collect(Collectors.toList());
     }
 
+    public static List<Double> getDoubleValues(final Node node, final String relPath) {
+        return getDoubleValues(getProperty(node, relPath));
+    }
+
     public static Boolean getBooleanValue(final Property property) {
         return valueToBoolean(getValue(property));
+    }
+
+    public static Boolean getBooleanValue(final Node node, final String relPath) {
+        return getBooleanValue(getProperty(node, relPath));
     }
 
     public static List<Boolean> getBooleanValues(final Property property) {
@@ -215,8 +247,16 @@ public final class PropertyUtils {
             .collect(Collectors.toList());
     }
 
+    public static List<Boolean> getBooleanValues(final Node node, final String relPath) {
+        return getBooleanValues(getProperty(node, relPath));
+    }
+
     public static Binary getBinaryValue(final Property property) {
         return valueToBinary(getValue(property));
+    }
+
+    public static Binary getBinaryValue(final Node node, final String relPath) {
+        return getBinaryValue(getProperty(node, relPath));
     }
 
     public static List<Binary> getBinaryValues(final Property property) {
@@ -225,6 +265,10 @@ public final class PropertyUtils {
             .map(ValueUtils::valueToBinary)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
+    }
+
+    public static List<Binary> getBinaryValues(final Node node, final String relPath) {
+        return getBinaryValues(getProperty(node, relPath));
     }
 
     /**
