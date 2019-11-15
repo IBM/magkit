@@ -39,10 +39,6 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
         new AddFilterBypassTask(PATH_FILTER, "monitoring", URIStartsWithVoter.class, "/monitoring")
     );
 
-    private final Task _addSpringByPass = new NodeExistsDelegateTask("Check spring bypass", "Check spring bypass in server config.", CONFIG, PATH_FILTER + "/cms/bypasses/spring", null,
-        new AddFilterBypassTask(PATH_FILTER + "/cms", "spring", URIStartsWithVoter.class, "/service/")
-    );
-
     private final Task _setSecurityCallback = selectServerConfig("Change callback", "Set the author form client callback.",
         getNode("filters/securityCallback/clientCallbacks/form").then(
             setProperty(PN_CLASS, AuthorFormClientCallback.class.getName())
@@ -86,7 +82,6 @@ public class MagkitModuleVersionHandler extends BootstrapModuleVersionHandler {
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
         List<Task> installTasks = new ArrayList<>(super.getExtraInstallTasks(installContext));
         installTasks.add(_addBypassForMonitoring);
-        installTasks.add(_addSpringByPass);
         installTasks.add(_setSecurityCallback);
         installTasks.add(_increaseImageQuality);
         installTasks.add(_disableRangeForPdf);
