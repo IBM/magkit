@@ -232,7 +232,7 @@ public final class StandardTasks {
             ),
             selectModuleConfig("Allow retry action", "Allow retry action on failure.", NN_WORKFLOW,
                 getNode("messageViews/publish/actions/retry/availability/rules/CanDeleteTaskRule").then(
-                    setProperty("assignee", false)
+                    addOrSetProperty("assignee", false)
                 )
             )
         );
