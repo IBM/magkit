@@ -1,23 +1,8 @@
 package com.aperto.magkit.utils;
 
-import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.startsWith;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.defaultString;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.validation.constraints.NotNull;
-
 import info.magnolia.config.registry.Registry;
+import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.jcr.util.SessionUtil;
 import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
@@ -27,8 +12,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.util.NodeUtil;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * Util class for handling nodes ({@link Node}).
@@ -213,7 +211,8 @@ public final class NodeUtils {
 
     /**
      * Allows {@link Node#isNodeType(String)} in a null-safe manner and catches the {@link RepositoryException}.
-     * @param node node to check
+     *
+     * @param node     node to check
      * @param nodeType the primary node type to check
      * @return true if node has the given type
      */
@@ -235,11 +234,11 @@ public final class NodeUtils {
      * Finds the first ancestor of the given Node that matches the Predicate.
      * The input node is excluded from search.
      *
-     * @param child the Node to get the ancestor for. May be NULL.
+     * @param child         the Node to get the ancestor for. May be NULL.
      * @param nodePredicate the Predicate to be matched. Never NULL.
      * @return the first matching ancestor node or NULL if the input node is NULL or no such ancestor exists.
      */
-    public static Node getAncestor(@Nullable final Node child, @NotNull final Predicate<Node> nodePredicate) {
+    public static Node getAncestor(@Nullable final Node child, @Nonnull final Predicate<Node> nodePredicate) {
         return getAncestorOrSelf(getParent(child), nodePredicate);
     }
 
@@ -247,11 +246,11 @@ public final class NodeUtils {
      * Finds the first ancestor of the given Node that matches the Predicate.
      * The input node is included into the search.
      *
-     * @param child the Node to get the ancestor for. May be NULL.
+     * @param child         the Node to get the ancestor for. May be NULL.
      * @param nodePredicate the Predicate to be matched. Never NULL.
      * @return the first matching ancestor node or NULL if the input node is NULL or no such ancestor exists.
      */
-    public static Node getAncestorOrSelf(@Nullable final Node child, @NotNull final Predicate<Node> nodePredicate) {
+    public static Node getAncestorOrSelf(@Nullable final Node child, @Nonnull final Predicate<Node> nodePredicate) {
         Node result = null;
         if (child != null) {
             result = nodePredicate.test(child) ? child : getAncestorOrSelf(getParent(child), nodePredicate);
@@ -263,7 +262,7 @@ public final class NodeUtils {
      * Finds the first ancestor of the given Node with the provided template id.
      * The input node is included into the search.
      *
-     * @param content the Node to get the ancestor for. May be NULL.
+     * @param content    the Node to get the ancestor for. May be NULL.
      * @param templateId the template id required for the ancestor. May be NULL.
      * @return the first ancestor node with the provided template id or NULL if the input node is NULL or no such ancestor exists.
      */
@@ -275,7 +274,7 @@ public final class NodeUtils {
      * Finds the first ancestor of the given Node with the provided primary node type.
      * The input node is excluded from search.
      *
-     * @param node the Node to get the ancestor for. May be NULL.
+     * @param node     the Node to get the ancestor for. May be NULL.
      * @param nodeType the primary node type required for the ancestor. May be NULL.
      * @return the first ancestor node having the provided primary node type or NULL if the input node is NULL or no such ancestor exists.
      */
@@ -305,11 +304,11 @@ public final class NodeUtils {
     /**
      * Collects all direct children of the given Node that match the provided predicate.
      *
-     * @param node the Node to get the children for. May be NULL.
+     * @param node      the Node to get the children for. May be NULL.
      * @param predicate the filter predicate. Never NULL.
      * @return an Iterable with all matching child nodes. May be empty but never NULL.
      */
-    public static Iterable<Node> getChildren(@Nullable final Node node, @NotNull final Predicate<Node> predicate) {
+    public static Iterable<Node> getChildren(@Nullable final Node node, @Nonnull final Predicate<Node> predicate) {
         Iterable<Node> result = Collections.emptyList();
         if (node != null) {
             try {
@@ -328,7 +327,7 @@ public final class NodeUtils {
      * @param nodePredicate the java.util.function.Predicate to be wrapped. Never NULL.
      * @return a org.apache.jackrabbit.commons.predicate.Predicate that executes the input Predicate, never NULL.
      */
-    public static org.apache.jackrabbit.commons.predicate.Predicate toJackRabbitPredicate(@NotNull final Predicate<Node> nodePredicate) {
+    public static org.apache.jackrabbit.commons.predicate.Predicate toJackRabbitPredicate(@Nonnull final Predicate<Node> nodePredicate) {
         return object -> nodePredicate.test((Node) object);
     }
 

@@ -1,22 +1,22 @@
 package com.aperto.magkit.nodebuilder.task;
 
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-
 import info.magnolia.jcr.nodebuilder.ErrorHandler;
 import info.magnolia.jcr.nodebuilder.NodeBuilder;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
+import info.magnolia.jcr.nodebuilder.NodeOperationException;
 import info.magnolia.jcr.nodebuilder.StrictErrorHandler;
 import info.magnolia.jcr.nodebuilder.task.ErrorHandling;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
 import info.magnolia.module.delta.TaskExecutionException;
-import info.magnolia.nodebuilder.NodeOperationException;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 
 /**
  * A task using the NodeBuilder API, applying operations on a given path.
- * Adaption from Magnolias {@link info.magnolia.nodebuilder.task.NodeBuilderTask} of Content API base.
+ * Adaption from Magnolias {@link info.magnolia.jcr.nodebuilder.task.NodeBuilderTask} of Content API base.
  *
  * @author frank.sommer
  */
@@ -57,12 +57,10 @@ public class NodeBuilderTask extends AbstractRepositoryTask {
 
     protected ErrorHandler newErrorHandler(InstallContext ctx) {
         ErrorHandler errorHandler;
-        switch (_errorHandling) {
-            case logging:
-                errorHandler = new TaskLogErrorHandler(ctx);
-                break;
-            default:
-                errorHandler = new StrictErrorHandler();
+        if (_errorHandling == ErrorHandling.logging) {
+            errorHandler = new TaskLogErrorHandler(ctx);
+        } else {
+            errorHandler = new StrictErrorHandler();
         }
         return errorHandler;
     }

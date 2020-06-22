@@ -1,6 +1,5 @@
 package com.aperto.magkit.module.delta;
 
-import com.aperto.magkit.filter.ExtendedMultipartRequestFilter;
 import com.aperto.magkit.utils.Item;
 import com.aperto.magkit.workflow.AutoApproveHumanTaskWorkItemHandlerDefinition;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.aperto.magkit.filter.ExtendedMultipartRequestFilter.DEFAULT_MAX_SIZE;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetContentNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrGetNode;
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addOrSetProperty;
@@ -25,12 +23,10 @@ import static com.aperto.magkit.nodebuilder.NodeOperationFactory.addPatternVoter
 import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectConfig;
 import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectModuleConfig;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.addNode;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.noop;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 /**
@@ -91,24 +87,6 @@ public final class StandardTasks {
                     addOrSetProperty(PN_CLASS, DefaultVirtualUriMapping.class.getName()),
                     addOrSetProperty(PN_FROM_URI, "/favicon.ico"),
                     addOrSetProperty(PN_TO_URI, "forward:/.resources/" + moduleName + "/favicon.ico")
-                )
-            )
-        );
-    }
-
-    /**
-     * Task for configuring the extended multi part filter.
-     *
-     * @param maxRequestSize set the max request set setting, if empty 50MB will be set
-     */
-    public static Task multiPartFilter(final String maxRequestSize) {
-        return selectServerConfig("Configuring filter", "Configuring Multipart request filter",
-            getNode("filters/multipartRequest").then(
-                addOrSetProperty(PN_CLASS, ExtendedMultipartRequestFilter.class.getName()),
-                addOrSetProperty(PN_ENABLED, Boolean.TRUE),
-                addOrSetProperty("maxRequestSize", isBlank(maxRequestSize) ? DEFAULT_MAX_SIZE : maxRequestSize),
-                addOrGetNode("useSystemDefault", NodeTypes.ContentNode.NAME).then(
-                    addPatternVoter("magnoliaUri", URIStartsWithVoter.class.getName(), "/.magnolia")
                 )
             )
         );

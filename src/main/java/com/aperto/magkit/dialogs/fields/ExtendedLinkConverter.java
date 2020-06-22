@@ -25,7 +25,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * @since 03.06.2015
  */
 public class ExtendedLinkConverter implements IdentifierToPathConverter {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedLinkConverter.class);
     private static final long serialVersionUID = 4484406102548210913L;
 
@@ -88,16 +87,6 @@ public class ExtendedLinkConverter implements IdentifierToPathConverter {
         }
 
         return result;
-    }
-
-    @Override
-    public Class<String> getModelType() {
-        return String.class;
-    }
-
-    @Override
-    public Class<String> getPresentationType() {
-        return String.class;
     }
 
     @Override

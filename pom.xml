@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.aperto.magkit</groupId>
         <artifactId>magkit-multi</artifactId>
-        <version>3.4.7-SNAPSHOT</version>
+        <version>3.5.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>info.magnolia.ui</groupId>
-            <artifactId>magnolia-ui-contentapp</artifactId>
+            <artifactId>magnolia-ui-framework-compatibility</artifactId>
         </dependency>
         <dependency>
             <groupId>info.magnolia.site</groupId>
