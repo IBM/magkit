@@ -1,6 +1,6 @@
-package com.aperto.magkit.query.sql2;
+package com.aperto.magkit.query.sql2.query;
 
-import com.aperto.magkit.query.sql2.jcrwrapper.RowsQuery;
+import com.aperto.magkit.query.sql2.query.jcrwrapper.RowsQuery;
 
 import javax.jcr.query.Row;
 import java.util.List;

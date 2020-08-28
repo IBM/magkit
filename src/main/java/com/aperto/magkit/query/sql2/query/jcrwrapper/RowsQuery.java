@@ -1,17 +1,22 @@
-package com.aperto.magkit.query.sql2.jcrwrapper;
+package com.aperto.magkit.query.sql2.query.jcrwrapper;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 
-public class NodesQuery extends QueryWrapper {
+public class RowsQuery extends QueryWrapper<RowsQuery> {
 
-    public NodesQuery(Query query) {
+    public RowsQuery(Query query) {
         super(query);
     }
 
+    @Override
+    RowsQuery me() {
+        return this;
+    }
+
     /**
-     * Executes this query and returns a <code>{@link NodesResult}</code>
+     * Executes this query and returns a <code>{@link RowsResult}</code>
      * object.
      * <p>
      * If this <code>Query</code> contains a variable (see {@link
@@ -19,11 +24,11 @@ public class NodesQuery extends QueryWrapper {
      * been bound to a value (see {@link Query#bindValue}) then this method
      * throws an <code>InvalidQueryException</code>.
      *
-     * @return a <code>QueryResult</code> object
+     * @return a <code>RowsResult</code> object
      * @throws InvalidQueryException if the query contains an unbound variable.
      * @throws RepositoryException   if another error occurs.
      */
-    public NodesResult execute() throws InvalidQueryException, RepositoryException {
-        return new NodesResult(getQuery().execute());
+    public RowsResult execute() throws InvalidQueryException, RepositoryException {
+        return new RowsResult(getQuery().execute());
     };
 }

@@ -1,9 +1,7 @@
-package com.aperto.magkit.query.sql2;
+package com.aperto.magkit.query.sql2.query;
 
-import com.aperto.magkit.query.sql2.jcrwrapper.NodesQuery;
+import com.aperto.magkit.query.sql2.query.jcrwrapper.NodesQuery;
 import com.aperto.magkit.query.sql2.statement.Sql2Builder;
-import com.aperto.magkit.query.sql2.statement.Sql2From;
-import com.aperto.magkit.query.sql2.statement.Sql2Statement;
 import info.magnolia.repository.RepositoryConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +44,6 @@ public class Sql2NodesQueryBuilder extends Sql2QueryBuilder implements QueryWork
 
     public NodesQueryBuilder withStatement(final String sql2) {
         return withStatement(() -> sql2);
-    }
-
-    public Sql2From selectAll() {
-        Sql2From from = Sql2Statement.selectAll();
-        withStatement(from);
-        return from;
     }
 
     public NodesQuery buildNodesQuery() {

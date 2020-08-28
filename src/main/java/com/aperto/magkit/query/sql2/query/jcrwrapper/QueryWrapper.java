@@ -1,4 +1,4 @@
-package com.aperto.magkit.query.sql2.jcrwrapper;
+package com.aperto.magkit.query.sql2.query.jcrwrapper;
 
 import org.apache.jackrabbit.value.BooleanValue;
 import org.apache.jackrabbit.value.DateValue;
@@ -11,7 +11,7 @@ import javax.jcr.Value;
 import javax.jcr.query.Query;
 import java.util.Calendar;
 
-public abstract class QueryWrapper {
+public abstract class QueryWrapper<T extends QueryWrapper> {
     private final Query _query;
 
     protected QueryWrapper(Query query) {
@@ -33,28 +33,29 @@ public abstract class QueryWrapper {
      * @throws javax.jcr.RepositoryException if an error occurs.
      * @since JCR 2.0
      */
-    public void bindValue(String varName, Value value) throws RepositoryException {
+    public T bindValue(String varName, Value value) throws RepositoryException {
         _query.bindValue(varName, value);
+        return me();
     }
 
-    public void bindString(final String varName, final String value) throws RepositoryException {
-        bindValue(varName, new StringValue(value));
+    public T bindString(final String varName, final String value) throws RepositoryException {
+        return bindValue(varName, new StringValue(value));
     }
 
-    public void bindLong(final String varName, final Long value) throws RepositoryException {
-        bindValue(varName, new LongValue(value));
+    public T bindLong(final String varName, final Long value) throws RepositoryException {
+        return bindValue(varName, new LongValue(value));
     }
 
-    public void bindDouble(final String varName, final Double value) throws RepositoryException {
-        bindValue(varName, new DoubleValue(value));
+    public T bindDouble(final String varName, final Double value) throws RepositoryException {
+        return bindValue(varName, new DoubleValue(value));
     }
 
-    public void bindDate(final String varName, final Calendar value) throws RepositoryException {
-        bindValue(varName, new DateValue(value));
+    public T bindDate(final String varName, final Calendar value) throws RepositoryException {
+        return bindValue(varName, new DateValue(value));
     }
 
-    public void bindBoolean(final String varName, final Boolean value) throws RepositoryException {
-        bindValue(varName, new BooleanValue(value));
+    public T bindBoolean(final String varName, final Boolean value) throws RepositoryException {
+        return bindValue(varName, new BooleanValue(value));
     }
 
     /**
@@ -86,5 +87,7 @@ public abstract class QueryWrapper {
     public String getStatement() {
         return _query.getStatement();
     }
+
+    abstract T me();
 
 }

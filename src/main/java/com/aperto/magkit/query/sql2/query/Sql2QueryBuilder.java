@@ -1,4 +1,4 @@
-package com.aperto.magkit.query.sql2;
+package com.aperto.magkit.query.sql2.query;
 
 import com.aperto.magkit.query.sql2.statement.Sql2Builder;
 import info.magnolia.context.MgnlContext;

@@ -1,4 +1,4 @@
-package com.aperto.magkit.query.sql2;
+package com.aperto.magkit.query.sql2.query;
 
 /**
  * TODO: Comment.

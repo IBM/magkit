@@ -11,6 +11,12 @@ import com.aperto.magkit.query.sql2.condition.Sql2NullCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2PathCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2PathJoinCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2StringCondition;
+import com.aperto.magkit.query.sql2.query.NodesQueryBuilder;
+import com.aperto.magkit.query.sql2.query.QueryNodesStatement;
+import com.aperto.magkit.query.sql2.query.QueryRowsStatement;
+import com.aperto.magkit.query.sql2.query.RowsQueryBuilder;
+import com.aperto.magkit.query.sql2.query.Sql2NodesQueryBuilder;
+import com.aperto.magkit.query.sql2.query.Sql2RowsQueryBuilder;
 import com.aperto.magkit.query.sql2.statement.Sql2From;
 import com.aperto.magkit.query.sql2.statement.Sql2Statement;
 
