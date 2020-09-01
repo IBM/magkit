@@ -2,7 +2,7 @@ package com.aperto.magkit.utils;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Extends Item with a list of sub items.
