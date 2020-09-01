@@ -11,6 +11,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * A wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
+ * Provides methods to access Row results.
+ *
+ * @author wolf.bubenik@aperto.com
+ * @since (21.8.2020)
+ */
 public class RowsResult extends ResultWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(RowsResult.class);
 

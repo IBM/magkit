@@ -8,7 +8,7 @@ import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
  * @author wolf.bubenik@aperto.com
  * @since (26.05.2020)
  */
-public class Sql2NameCondition extends Sql2StringCondition {
+public final class Sql2NameCondition extends Sql2StringCondition {
 
     public static final String METHOD_NAME = "name";
 
@@ -25,6 +25,7 @@ public class Sql2NameCondition extends Sql2StringCondition {
 
     @Override
     public void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames) {
-
+        // sorry, not jet implemented
+        throw new UnsupportedOperationException();
     }
 }

@@ -12,7 +12,7 @@ public interface Sql2Constraint {
     String SQL2_OP_OR = " OR ";
     String SQL2_OP_AND = " AND ";
 
-    void appendTo(StringBuilder sql2, final Sql2SelectorNames selectorNames);
+    void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames);
 
     boolean isNotEmpty();
 

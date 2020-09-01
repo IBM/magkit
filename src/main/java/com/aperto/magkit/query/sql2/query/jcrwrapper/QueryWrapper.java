@@ -11,6 +11,14 @@ import javax.jcr.Value;
 import javax.jcr.query.Query;
 import java.util.Calendar;
 
+/**
+ * Base wrapper wrapper for javax.jcr.query.Query to separate Row and Node queries.
+ * Provides methods to bind values to statement variables.
+ *
+ * @param <T> The type of QueryWrapper to be returned by builder methods
+ * @author wolf.bubenik@aperto.com
+ * @since (21.8.2020)
+ */
 public abstract class QueryWrapper<T extends QueryWrapper> {
     private final Query _query;
 

@@ -11,6 +11,12 @@ import javax.jcr.query.Row;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The builder class for Row queries.
+ *
+ * @author wolf.bubenik@aperto.com
+ * @since (21.8.2020)
+ */
 public class Sql2RowsQueryBuilder extends Sql2QueryBuilder implements QueryWorkspace<QueryRowsStatement<RowsQueryBuilder>>, QueryRowsStatement<RowsQueryBuilder>, RowsQueryBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(Sql2RowsQueryBuilder.class);
 

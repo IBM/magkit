@@ -1,7 +1,5 @@
 package com.aperto.magkit.query.sql2.condition;
 
-import java.util.Calendar;
-
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**

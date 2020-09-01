@@ -8,11 +8,11 @@ import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
  * @author wolf.bubenik@aperto.com
  * @since (18.05.2020)
  */
-public class PropertyJoinCondition implements Sql2JoinCondition {
+public final class PropertyJoinCondition implements Sql2JoinCondition {
 
     private final String _selectedPropertyName;
     private final String _joinedPropertyName;
-    private String _operation;
+    private final String _operation;
 
     private PropertyJoinCondition(final String selectedPropertyName, final String operation, final String joinedPropertyName) {
         _selectedPropertyName = selectedPropertyName;

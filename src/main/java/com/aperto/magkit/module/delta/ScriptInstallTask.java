@@ -80,7 +80,7 @@ public class ScriptInstallTask extends AbstractTask {
                 node.setProperty("script", _script);
                 node.setProperty("text", getText());
             }
-        } catch (RepositoryException |IOException e) {
+        } catch (RepositoryException | IOException e) {
             throw new TaskExecutionException("Failed to add script with " + e.getMessage(), e);
         }
     }

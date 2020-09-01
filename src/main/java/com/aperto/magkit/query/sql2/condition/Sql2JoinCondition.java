@@ -9,5 +9,5 @@ import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
  * @since (18.05.2020)
  */
 public interface Sql2JoinCondition {
-    void appendTo(StringBuilder sql2, final Sql2SelectorNames selectorNames);
+    void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames);
 }

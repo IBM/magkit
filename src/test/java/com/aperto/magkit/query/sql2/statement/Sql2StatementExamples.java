@@ -13,6 +13,9 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Tests showing examples on how to use the Sql2 query facade.
+ *
+ * @author wolf.bubenik@aperto.com
+ * @since (21.8.2020)
  */
 public class Sql2StatementExamples {
     @Before
@@ -92,7 +95,9 @@ public class Sql2StatementExamples {
     @Test
     public void selectComponentsCreatedAfterBindValue() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.created().greaterOrEqualThan().bindVariable("date")).build(),
+            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(
+                Sql2.Condition.created().greaterOrEqualThan().bindVariable("date")
+            ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:created] >= $date")
         );
     }

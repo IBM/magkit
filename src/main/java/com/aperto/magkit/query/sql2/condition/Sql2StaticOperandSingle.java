@@ -3,6 +3,7 @@ package com.aperto.magkit.query.sql2.condition;
 /**
  * TODO: Comment.
  *
+ * @param <V> the type of the value
  * @author wolf.bubenik@aperto.com
  * @since (20.05.20)
  */

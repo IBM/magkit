@@ -11,7 +11,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 /**
- * TODO: Comment.
+ * The base class for row and node query builders.
  *
  * @author wolf.bubenik@aperto.com
  * @since 28.02.2020

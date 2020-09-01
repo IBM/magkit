@@ -8,10 +8,10 @@ import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
  * @author wolf.bubenik@aperto.com
  * @since (18.05.2020)
  */
-public class Sql2PathJoinCondition implements Sql2JoinCondition {
+public final class Sql2PathJoinCondition implements Sql2JoinCondition {
 
-    private String _method;
-    private boolean _isJoinSelectorFirst;
+    private final String _method;
+    private final boolean _isJoinSelectorFirst;
 
     private Sql2PathJoinCondition(final String method, final boolean isJoinSelectorFirst) {
         _method = method;

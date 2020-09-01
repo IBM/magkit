@@ -6,7 +6,7 @@ import javax.jcr.query.Row;
 import java.util.List;
 
 /**
- * TODO: Comment.
+ * The RowsQueryBuilder interface declaring methods for the last building step.
  *
  * @author wolf.bubenik@aperto.com
  * @since (27.04.20)

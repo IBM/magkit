@@ -24,7 +24,6 @@ import static com.aperto.magkit.query.sql2.statement.Sql2Statement.selectAttribu
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 
 /**

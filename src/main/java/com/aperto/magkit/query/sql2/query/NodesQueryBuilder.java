@@ -6,7 +6,7 @@ import javax.jcr.Node;
 import java.util.List;
 
 /**
- * TODO: Comment.
+ * The NodesQueryBuilder interface declaring methods for the last step: building and executing.
  *
  * @author wolf.bubenik@aperto.com
  * @since (27.04.20)

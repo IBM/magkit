@@ -90,16 +90,18 @@ public class Sql2StatementBuilderTest {
     @Test
     public void descending() {
         assertThat(Sql2Statement.selectAll().whereAny(
-            Sql2PathCondition.is().descendant("/some/path")
-        ).orderBy("test")
-        .descending().build(), is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC"));
+                Sql2PathCondition.is().descendant("/some/path")
+            ).orderBy("test").descending().build(),
+            is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC")
+        );
     }
 
     @Test
     public void ascending() {
         assertThat(Sql2Statement.selectAll().whereAny(
-            Sql2PathCondition.is().descendant("/some/path")
-        ).orderBy("test")
-        .ascending().build(), is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] ASC"));
+                Sql2PathCondition.is().descendant("/some/path")
+            ).orderBy("test").ascending().build(),
+            is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] ASC")
+        );
     }
 }

@@ -269,6 +269,12 @@ public final class Sql2 {
         private Condition() {}
     }
 
+    /**
+     * Sql2 join condition builders.
+     *
+     * @author wolf.bubenik@aperto.com
+     * @since (10.08.2020)
+     */
     public static final class JoinOn {
         public static Sql2PathJoinCondition joinedDescendantOfSelected() {
             return Sql2PathJoinCondition.isJoinedDescendantOfSelected();

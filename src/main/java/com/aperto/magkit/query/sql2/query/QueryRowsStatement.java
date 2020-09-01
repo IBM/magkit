@@ -3,12 +3,13 @@ package com.aperto.magkit.query.sql2.query;
 import com.aperto.magkit.query.sql2.statement.Sql2Builder;
 
 /**
- * TODO: Comment.
+ * The RowsQueryBuilder step interface declaring methods for the statement.
  *
+ * @param <T> the type of Sql2QueryBuilder to be returned by methods
  * @author wolf.bubenik@aperto.com
  * @since (28.04.20)
  */
 public interface QueryRowsStatement<T> {
-    public T withStatement(Sql2Builder statementBuilder);
-    public T withStatement(final String sql2);
+    T withStatement(Sql2Builder statementBuilder);
+    T withStatement(String sql2);
 }
