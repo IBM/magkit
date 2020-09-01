@@ -2,7 +2,6 @@ package com.aperto.magkit.query.sql2.condition;
 
 import info.magnolia.jcr.util.NodeTypes;
 
-import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -65,7 +64,7 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
      * @param sql2 the StringBuilder where to add the date string to
      * @throws IllegalArgumentException when one of the parameters is null or the year has more than 4 digits.
      */
-    private void appendIso8601(@NotNull Calendar cal, @NotNull StringBuilder sql2) throws IllegalArgumentException {
+    private void appendIso8601(final Calendar cal, final StringBuilder sql2) throws IllegalArgumentException {
         /*
          * the format of the date/time string is:
          * YYYY-MM-DDThh:mm:ss.SSSTZD
