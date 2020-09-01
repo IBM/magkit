@@ -1,6 +1,6 @@
 package com.aperto.magkit.query.sql2.query.jcrwrapper;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

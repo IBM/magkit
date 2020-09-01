@@ -9,7 +9,7 @@ import info.magnolia.module.delta.Task;
 import info.magnolia.module.model.Version;
 import info.magnolia.virtualuri.mapping.DefaultVirtualUriMapping;
 import info.magnolia.voting.voters.URIStartsWithVoter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ import static info.magnolia.jcr.nodebuilder.Ops.addNode;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.noop;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Collection of standard module version handler tasks.

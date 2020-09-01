@@ -1,7 +1,7 @@
 package com.aperto.magkit.filter;
 
 import info.magnolia.voting.voters.BasePatternVoter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -10,9 +10,9 @@ import javax.jcr.Session;
 import static com.aperto.magkit.utils.NodeUtils.getTemplate;
 import static info.magnolia.context.MgnlContext.getJCRSession;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 /**
  * A custom Voter to exclude the pages with a certain template from caching.
