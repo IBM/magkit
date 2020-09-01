@@ -1,7 +1,6 @@
 package com.aperto.magkit.query.sql2;
 
 import com.aperto.magkit.mockito.ContextMockUtils;
-import com.aperto.magkit.mockito.jcr.QueryMockUtils;
 import com.aperto.magkit.query.sql2.query.jcrwrapper.NodesQuery;
 import com.aperto.magkit.query.sql2.query.NodesQueryBuilder;
 import com.aperto.magkit.query.sql2.statement.Sql2Statement;
@@ -16,6 +15,7 @@ import java.util.UUID;
 
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
 import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubIdentifier;
+import static com.aperto.magkit.mockito.jcr.QueryStubbingOperation.stubbResult;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
@@ -41,7 +41,7 @@ public class Sql2NodesQueryBuilderTest {
     @Test
     public void buildNodesQuery() throws RepositoryException {
         Node result1 = mockPageNode("test1", stubIdentifier(UUID.randomUUID().toString()));
-        QueryMockUtils.mockQuery("website", Query.JCR_SQL2, "SELECT * FROM [nt:base]", result1);
+        ContextMockUtils.mockQuery("website", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubbResult(result1));
 
         NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement(Sql2Statement.selectAll());
         assertThat(builder.buildNodesQuery(), isA(NodesQuery.class));
@@ -54,7 +54,7 @@ public class Sql2NodesQueryBuilderTest {
     public void getResultNodes() throws RepositoryException {
         Node result1 = mockPageNode("test1", stubIdentifier(UUID.randomUUID().toString()));
         Node result2 = mockPageNode("test2", stubIdentifier(UUID.randomUUID().toString()));
-        QueryMockUtils.mockQuery("my-workspace", Query.JCR_SQL2, "SELECT * FROM [nt:base]", result1, result2);
+        ContextMockUtils.mockQuery("my-workspace", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubbResult(result1, result2));
 
         NodesQueryBuilder builder = Sql2.Query.nodesFrom("my-workspace").withStatement(Sql2.Statement.selectAll()).withLimit(10).withOffset(5);
         assertThat(builder.getResultNodes().size(), is(2));
