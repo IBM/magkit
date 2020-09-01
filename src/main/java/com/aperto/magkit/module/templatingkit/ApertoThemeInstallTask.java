@@ -1,5 +1,6 @@
 package com.aperto.magkit.module.templatingkit;
 
+import com.aperto.magkit.module.templatingkit.ApertoThemeVersionHandler.ThemeFileConfig;
 import com.aperto.magkit.utils.Item;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractTask;
@@ -34,18 +35,18 @@ public class ApertoThemeInstallTask extends AbstractTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApertoThemeInstallTask.class);
 
     private boolean _isInstall;
-    private List<ApertoThemeVersionHandler.ThemeFileConfig> _themeFiles;
+    private List<ThemeFileConfig> _themeFiles;
     private String _versionPattern;
 
-    public ApertoThemeInstallTask(List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
+    public ApertoThemeInstallTask(List<ThemeFileConfig> themeFiles) {
         this(false, themeFiles, null);
     }
 
-    public ApertoThemeInstallTask(boolean isInstall, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
+    public ApertoThemeInstallTask(boolean isInstall, List<ThemeFileConfig> themeFiles) {
         this(isInstall, themeFiles, null);
     }
 
-    public ApertoThemeInstallTask(boolean isInstall, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles, String version) {
+    public ApertoThemeInstallTask(boolean isInstall, List<ThemeFileConfig> themeFiles, String version) {
         super("Install theme", "Installs theme resources in resources workspace and register theme css and js files.");
         _isInstall = isInstall;
         _themeFiles = themeFiles;
@@ -103,7 +104,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
      * @deprecated use {@link #registerFiles(String, String, String, List)}
      */
     @Deprecated
-    protected List<Task> registerFiles(String themeName, final String version, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
+    protected List<Task> registerFiles(String themeName, final String version, List<ThemeFileConfig> themeFiles) {
         return registerFiles(themeName, themeName + "-theme", version, themeFiles);
     }
 
@@ -111,7 +112,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
      * Builds tasks for theme files registration.
      * {module.version} in link will be replaced by the current version number.
      */
-    protected List<Task> registerFiles(String themeName, String themeModuleName, final String version, List<ApertoThemeVersionHandler.ThemeFileConfig> themeFiles) {
+    protected List<Task> registerFiles(String themeName, String themeModuleName, final String version, List<ThemeFileConfig> themeFiles) {
         List<Task> registerTasks = new ArrayList<>();
         if (themeFiles != null) {
             Task cleanupTask = selectModuleConfig("Clean up theme files", "Clean up files in theme configuration", themeModuleName,
@@ -126,7 +127,7 @@ public class ApertoThemeInstallTask extends AbstractTask {
             );
             registerTasks.add(cleanupTask);
 
-            for (ApertoThemeVersionHandler.ThemeFileConfig themeFile : themeFiles) {
+            for (ThemeFileConfig themeFile : themeFiles) {
                 Item[] propertyItems = new Item[2];
                 propertyItems[0] = new Item("link", themeFile.getLink().replaceAll("\\{module.version\\}", version));
                 propertyItems[1] = new Item("addFingerPrint", String.valueOf(themeFile.isAddFingerPrint()));

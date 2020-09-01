@@ -4,7 +4,7 @@ import static info.magnolia.cms.core.Path.getValidatedLabel;
 import static info.magnolia.jcr.util.NodeUtil.createPath;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.apache.commons.lang3.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
@@ -80,9 +80,7 @@ public class ScriptInstallTask extends AbstractTask {
                 node.setProperty("script", _script);
                 node.setProperty("text", getText());
             }
-        } catch (RepositoryException e) {
-            throw new TaskExecutionException("Failed to add script with " + e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (RepositoryException |IOException e) {
             throw new TaskExecutionException("Failed to add script with " + e.getMessage(), e);
         }
     }

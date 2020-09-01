@@ -15,7 +15,7 @@ import static java.net.URLEncoder.encode;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.apache.commons.codec.binary.Base64.encodeBase64;
 import static org.apache.commons.codec.binary.StringUtils.newStringUtf8;
-import static org.apache.commons.lang3.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -52,11 +52,7 @@ public final class EncodingUtils {
     public static String getBase64Encoded(String value) {
         String base64Encoded = EMPTY;
         if (isNotBlank(value)) {
-            try {
-                base64Encoded = newStringUtf8(encodeBase64(value.getBytes(UTF_8)));
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Error on base64 encoding [{}].", value, e);
-            }
+            base64Encoded = newStringUtf8(encodeBase64(value.getBytes(UTF_8)));
             LOGGER.debug("Encoded string [{}] to base64 [{}].", value, base64Encoded);
         }
         return base64Encoded;
@@ -71,11 +67,7 @@ public final class EncodingUtils {
     public static String getBase64Decoded(String value) {
         String base64Decoded = EMPTY;
         if (isNotBlank(value)) {
-            try {
-                base64Decoded = newStringUtf8(decodeBase64(value.getBytes(UTF_8)));
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Error on base64 decoding [{}].", value, e);
-            }
+            base64Decoded = newStringUtf8(decodeBase64(value.getBytes(UTF_8)));
             LOGGER.debug("Decoded string [{}] to base64 [{}].", value, base64Decoded);
         }
         return base64Decoded;
@@ -91,7 +83,7 @@ public final class EncodingUtils {
         String parameter = EMPTY;
         try {
             if (isNotEmpty(value)) {
-                parameter = encode(value, UTF_8);
+                parameter = encode(value, UTF_8.name());
                 LOGGER.debug("UrlEncoded string [{}] to [{}].", value, parameter);
             }
         } catch (UnsupportedEncodingException e) {
@@ -109,7 +101,7 @@ public final class EncodingUtils {
     public static String getUrlDecoded(final String value) {
         String urlDecoded = EMPTY;
         try {
-            urlDecoded = decode(value, UTF_8);
+            urlDecoded = decode(value, UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Error on decoding url [{}].", value, e);
         }

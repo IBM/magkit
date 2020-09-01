@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static info.magnolia.cms.core.MgnlNodeType.NT_COMPONENT;
+import static info.magnolia.jcr.util.NodeTypes.Component;
 import static info.magnolia.cms.util.QueryUtil.search;
 import static info.magnolia.jcr.util.NodeUtil.asIterable;
 import static info.magnolia.jcr.util.NodeUtil.asList;
@@ -150,7 +150,7 @@ public final class NodeQueryUtil {
         if (isNotEmpty(searchRoot)) {
             xpathBuilder.path(searchRoot);
         }
-        xpathBuilder.type(NT_COMPONENT);
+        xpathBuilder.type(Component.NAME);
 
         ConstraintBuilder constraintBuilder = new ConstraintBuilder().addTplNameConstraint(templateName);
         if (isNotEmpty(xPathCondition)) {
