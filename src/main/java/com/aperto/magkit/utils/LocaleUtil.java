@@ -1,10 +1,10 @@
 package com.aperto.magkit.utils;
 
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.split;
 
 import java.util.ArrayList;
 import java.util.Collection;

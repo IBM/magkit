@@ -3,9 +3,9 @@ package com.aperto.magkit.error;
 import static com.aperto.magkit.utils.LocaleUtil.determineLocaleFromPath;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.apache.commons.lang.StringUtils.defaultIfBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 import java.io.IOException;
 import java.io.PrintWriter;

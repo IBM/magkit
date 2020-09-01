@@ -4,9 +4,9 @@ import static info.magnolia.cms.core.Path.getValidatedLabel;
 import static info.magnolia.jcr.util.NodeUtil.createPath;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.apache.commons.lang.CharEncoding.UTF_8;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang3.CharEncoding.UTF_8;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 import java.io.IOException;
 import java.io.InputStream;

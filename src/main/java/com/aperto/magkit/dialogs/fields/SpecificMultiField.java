@@ -26,7 +26,7 @@ import javax.jcr.RepositoryException;
 
 import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
 import static info.magnolia.jcr.util.PropertyUtil.getLong;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Generic Multi Field.<br>

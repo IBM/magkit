@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
 import static info.magnolia.jcr.util.NodeUtil.getNodePathIfPossible;
 import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.substringBeforeLast;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 /**
  * Voter that matches on a configured property name the configured regex pattern.

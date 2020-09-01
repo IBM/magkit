@@ -8,8 +8,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
  * This might be a more readable alternative to the original regexp uri mapping. It uses git version numbering as default.

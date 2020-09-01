@@ -15,8 +15,8 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.length;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.length;
 
 /**
  * Task to remove all nodes with a specific template.

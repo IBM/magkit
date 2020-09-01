@@ -18,7 +18,7 @@ import static com.aperto.magkit.mockito.ComponentsMockUtils.mockComponentInstanc
 import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.aperto.magkit.mockito.SiteMockUtils.mockSiteManager;
 import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static org.apache.commons.lang3.CharEncoding.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

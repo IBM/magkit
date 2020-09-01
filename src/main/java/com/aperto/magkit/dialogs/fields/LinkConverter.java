@@ -2,7 +2,7 @@ package com.aperto.magkit.dialogs.fields;
 
 import static com.aperto.magkit.utils.LinkTool.isAnchor;
 import static com.aperto.magkit.utils.LinkTool.isExternalLink;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Locale;
 

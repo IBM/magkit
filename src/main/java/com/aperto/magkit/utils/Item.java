@@ -1,6 +1,6 @@
 package com.aperto.magkit.utils;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * An item class to capsulate key value pairs.

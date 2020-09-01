@@ -12,7 +12,7 @@ import com.vaadin.v7.ui.Table;
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.cms.core.FileSystemHelper;
 import info.magnolia.context.MgnlContext;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;

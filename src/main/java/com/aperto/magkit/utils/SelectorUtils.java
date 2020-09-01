@@ -2,7 +2,7 @@ package com.aperto.magkit.utils;
 
 import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.context.MgnlContext;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.List;
 import static com.aperto.magkit.utils.EncodingUtils.getUrlEncoded;
 import static info.magnolia.cms.util.SelectorUtil.SELECTOR_DELIMITER;
 import static java.lang.Math.max;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.apache.commons.lang.StringUtils.split;
 import static org.apache.commons.lang.StringUtils.substringAfter;

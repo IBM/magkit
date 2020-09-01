@@ -16,9 +16,9 @@ import javax.jcr.Value;
 
 import static com.aperto.magkit.module.delta.StandardTasks.PN_CLASS;
 import static com.aperto.magkit.module.delta.StandardTasks.PN_PATTERN;
-import static org.apache.commons.lang.StringUtils.removeEnd;
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.strip;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.strip;
 
 /**
  * An Utility class that extends info.magnolia.nodebuilder.Ops.
