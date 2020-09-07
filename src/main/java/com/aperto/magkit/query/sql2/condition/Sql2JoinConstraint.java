@@ -1,7 +1,7 @@
 package com.aperto.magkit.query.sql2.condition;
 
 /**
- * Base builder interface for join conditions.
+ * Base builder interface for all conditions allowing to select the selector used for joins.
  *
  * @author wolf.bubenik@aperto.com
  * @since (18.06.2020)

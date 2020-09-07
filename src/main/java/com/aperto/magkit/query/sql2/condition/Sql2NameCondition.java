@@ -4,6 +4,7 @@ import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
 
 /**
  * The builder for a sql2 name condition.
+ * Not yet implemented!
  *
  * @author wolf.bubenik@aperto.com
  * @since (26.05.2020)

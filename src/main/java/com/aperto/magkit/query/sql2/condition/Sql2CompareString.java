@@ -1,7 +1,7 @@
 package com.aperto.magkit.query.sql2.condition;
 
 /**
- * TODO: Comment.
+ * Builder Interface for String conditions that declares methods only available for Strings.
  *
  * @author wolf.bubenik@aperto.com
  * @since (26.05.20)
