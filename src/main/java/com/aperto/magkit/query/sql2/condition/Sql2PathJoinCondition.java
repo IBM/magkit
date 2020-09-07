@@ -3,7 +3,7 @@ package com.aperto.magkit.query.sql2.condition;
 import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
 
 /**
- * TODO: Comment.
+ * Builder for SQL2 join conditions on path. To be used for joins only.
  *
  * @author wolf.bubenik@aperto.com
  * @since (18.05.2020)
