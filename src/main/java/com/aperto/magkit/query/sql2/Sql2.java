@@ -295,6 +295,8 @@ public final class Sql2 {
         public static Sql2PathJoinCondition selectedDescendantOfJoined() {
             return Sql2PathJoinCondition.isSelectedDescendantOfJoined();
         }
+
+        private JoinOn() {}
     }
 
     private Sql2() {}
