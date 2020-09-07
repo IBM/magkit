@@ -16,6 +16,14 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2CalendarCondition, Calendar> {
 
+    private static final int TEN = 10;
+    private static final int DIGITS_TEN = 2;
+    private static final int DIGITS_HUNDRED = 3;
+    private static final int DIGITS_THOUSAND = 4;
+    private static final int MINUTES_HOUR = 60;
+    private static final int MILLISECONDS_MINUTE = 60000;
+    private static final int MAX_YEAR = 9999;
+    private static final int MIN_YEAR = -9999;
     private Sql2CalendarCondition(final String property) {
         super(property);
     }
@@ -64,7 +72,7 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
      * @param sql2 the StringBuilder where to add the date string to
      * @throws IllegalArgumentException when one of the parameters is null or the year has more than 4 digits.
      */
-    private void appendIso8601(final Calendar cal, final StringBuilder sql2) throws IllegalArgumentException {
+    private void appendIso8601(final Calendar cal, final StringBuilder sql2) {
         /*
          * the format of the date/time string is:
          * YYYY-MM-DDThh:mm:ss.SSSTZD
@@ -74,42 +82,42 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
          */
 
         // year ([-]YYYY)
-        appendZeroPaddedInt(sql2, getYear(cal), 4);
+        appendZeroPaddedInt(sql2, getYear(cal), DIGITS_THOUSAND);
         sql2.append('-');
         // month (MM)
-        appendZeroPaddedInt(sql2, cal.get(Calendar.MONTH) + 1, 2);
+        appendZeroPaddedInt(sql2, cal.get(Calendar.MONTH) + 1, DIGITS_TEN);
         sql2.append('-');
         // day (DD)
-        appendZeroPaddedInt(sql2, cal.get(Calendar.DAY_OF_MONTH), 2);
+        appendZeroPaddedInt(sql2, cal.get(Calendar.DAY_OF_MONTH), DIGITS_TEN);
         sql2.append('T');
         // hour (hh)
-        appendZeroPaddedInt(sql2, cal.get(Calendar.HOUR_OF_DAY), 2);
+        appendZeroPaddedInt(sql2, cal.get(Calendar.HOUR_OF_DAY), DIGITS_TEN);
         sql2.append(':');
         // minute (mm)
-        appendZeroPaddedInt(sql2, cal.get(Calendar.MINUTE), 2);
+        appendZeroPaddedInt(sql2, cal.get(Calendar.MINUTE), DIGITS_TEN);
         sql2.append(':');
         // second (ss)
-        appendZeroPaddedInt(sql2, cal.get(Calendar.SECOND), 2);
+        appendZeroPaddedInt(sql2, cal.get(Calendar.SECOND), DIGITS_TEN);
         sql2.append('.');
         // millisecond (SSS)
-        appendZeroPaddedInt(sql2, cal.get(Calendar.MILLISECOND), 3);
+        appendZeroPaddedInt(sql2, cal.get(Calendar.MILLISECOND), DIGITS_HUNDRED);
         // time zone designator (Z or +00:00 or -00:00)
         TimeZone tz = cal.getTimeZone();
         // determine offset of timezone from UTC (incl. daylight saving)
         int offset = tz.getOffset(cal.getTimeInMillis());
         if (offset != 0) {
-            int hours = Math.abs((offset / 60000) / 60);
-            int minutes = Math.abs((offset / 60000) % 60);
+            int hours = Math.abs((offset / MILLISECONDS_MINUTE) / MINUTES_HOUR);
+            int minutes = Math.abs((offset / MILLISECONDS_MINUTE) % MINUTES_HOUR);
             sql2.append(offset < 0 ? '-' : '+');
-            appendZeroPaddedInt(sql2, hours, 2);
+            appendZeroPaddedInt(sql2, hours, DIGITS_TEN);
             sql2.append(':');
-            appendZeroPaddedInt(sql2, minutes, 2);
+            appendZeroPaddedInt(sql2, minutes, DIGITS_TEN);
         } else {
             sql2.append('Z');
         }
     }
 
-    private int getYear(Calendar cal) throws IllegalArgumentException {
+    private int getYear(Calendar cal) {
         // determine era and adjust year if necessary
         int year = cal.get(Calendar.YEAR);
         if (cal.isSet(Calendar.ERA) && cal.get(Calendar.ERA) == GregorianCalendar.BC) {
@@ -121,7 +129,7 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
             year = 1 - year;
         }
 
-        if (year > 9999 || year < -9999) {
+        if (year > MAX_YEAR || year < MIN_YEAR) {
             throw new IllegalArgumentException("Calendar has more than four year digits, cannot be formatted as ISO8601: " + year);
         }
         return year;
@@ -135,7 +143,7 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
         }
 
         for (int exp = precision - 1; exp > 0; exp--) {
-            if (n < Math.pow(10, exp)) {
+            if (n < Math.pow(TEN, exp)) {
                 buf.append('0');
             } else {
                 break;
