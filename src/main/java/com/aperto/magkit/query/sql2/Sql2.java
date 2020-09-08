@@ -116,11 +116,11 @@ public final class Sql2 {
         }
 
         public static Sql2JoinConstraint createdBefore(java.util.Calendar date) {
-            return Sql2CalendarCondition.created().lowerThan().value(date);
+            return created().lowerThan().value(date);
         }
 
         public static Sql2JoinConstraint createdAfter(java.util.Calendar date) {
-            return Sql2CalendarCondition.created().greaterThan().value(date);
+            return created().greaterThan().value(date);
         }
 
         public static Sql2CompareNot<Calendar> lastActivated() {
@@ -128,11 +128,11 @@ public final class Sql2 {
         }
 
         public static Sql2JoinConstraint lastActivatedBefore(java.util.Calendar date) {
-            return Sql2CalendarCondition.lastActivated().lowerThan().value(date);
+            return lastActivated().lowerThan().value(date);
         }
 
         public static Sql2JoinConstraint lastActivatedAfter(java.util.Calendar date) {
-            return Sql2CalendarCondition.lastActivated().greaterThan().value(date);
+            return lastActivated().greaterThan().value(date);
         }
 
         public static Sql2CompareNot<Calendar> lastModified() {

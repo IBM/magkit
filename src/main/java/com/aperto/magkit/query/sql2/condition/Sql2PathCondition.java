@@ -7,7 +7,7 @@ import javax.jcr.Node;
 import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.prependIfMissing;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * The builder for a sql2 path condition.
@@ -45,7 +45,7 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
     }
 
     public Sql2JoinConstraint child(final String path) {
-        _path = path;
+        _path = trim(path);
         _method = SQL2_METHOD_CHILD;
         return this;
     }
@@ -55,7 +55,7 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
     }
 
     public Sql2JoinConstraint descendant(final String path) {
-        _path = path;
+        _path = trim(path);
         _method = SQL2_METHOD_DESCENDANT;
         return this;
     }
@@ -65,7 +65,7 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
     }
 
     public Sql2JoinConstraint same(final String path) {
-        _path = path;
+        _path = trim(path);
         _method = SQL2_METHOD_SAME;
         return this;
     }
@@ -88,7 +88,11 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
             if (isNotBlank(selectorName)) {
                 sql2.append(selectorName).append(',').append(' ');
             }
-            sql2.append('\'').append(prependIfMissing(_path.trim(), "/")).append("')");
+            sql2.append('\'');
+            if (_path.charAt(0) != '/') {
+                sql2.append('/');
+            }
+            sql2.append(_path).append("')");
             if (_not) {
                 sql2.append(')');
             }

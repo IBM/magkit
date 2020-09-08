@@ -4,6 +4,7 @@ import com.aperto.magkit.query.sql2.statement.Sql2SelectorNames;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * Base condition builder class for all value types.
@@ -16,7 +17,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V>, V> implements Sql2CompareNot<V>, Sql2StaticOperandSingle<V>, Sql2StaticOperandMultiple<V>, Sql2JoinConstraint {
 
     public static final String METHOD_NOT = "not";
-    public static final String METHOD_NAME = "name";
 
     public static final String SQL2_OP_EQUALS = " = ";
     public static final String SQL2_OP_NOT_EQUALS = " <> ";
@@ -104,8 +104,8 @@ public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V
     }
 
     public Sql2JoinConstraint bindVariable(String name) {
-        _bindVariableName = name;
-        _hasBindVariable = isNotBlank(name);
+        _bindVariableName = trim(name);
+        _hasBindVariable = isNotBlank(_bindVariableName);
         return me();
     }
 
@@ -126,17 +126,11 @@ public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V
 
             String selectorName = _forJoin ? selectorNames.getJoinSelectorName() : selectorNames.getFromSelectorName();
             if (_hasBindVariable) {
-                if (isNotBlank(selectorName)) {
-                    sql2.append(selectorName).append('.');
-                }
-                sql2.append('[').append(_name).append(']').append(getCompareOperator()).append('$').append(_bindVariableName);
+                appendBindVariable(sql2, selectorName);
+            } else if (_isMultiValue) {
+                appendValues(sql2, selectorName);
             } else {
-                String operator = EMPTY;
-                for (V value : _values) {
-                    sql2.append(operator);
-                    appendValueConstraint(sql2, selectorName, _name, value);
-                    operator = _joinOperator;
-                }
+                appendValueConstraint(sql2, selectorName, _name, _values[0]);
             }
 
             if (_not || _isMultiValue) {
@@ -145,11 +139,31 @@ public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V
         }
     }
 
+    private void appendValues(final StringBuilder sql2, final String selectorName) {
+        String operator = EMPTY;
+        for (V value : _values) {
+            sql2.append(operator);
+            appendValueConstraint(sql2, selectorName, _name, value);
+            operator = _joinOperator;
+        }
+    }
+
+    private void appendBindVariable(final StringBuilder sql2, final String selectorName) {
+        if (isNotBlank(selectorName)) {
+            sql2.append(selectorName).append('.');
+        }
+        sql2.append('[').append(_name).append(']').append(getCompareOperator());
+        if (_bindVariableName.charAt(0) != '$') {
+            sql2.append('$');
+        }
+        sql2.append(_bindVariableName);
+    }
+
     @SafeVarargs
     final void withValues(final V... values) {
         _values = values;
-        _hasValues = values != null && values.length > 0;
-        _isMultiValue = _hasValues && values.length > 1;
+        _hasValues = values != null && values.length > 0 && _values[0] != null;
+        _isMultiValue = _hasValues && values.length > 1 && _values[1] != null;
     }
 
     void withOperator(final String joinOperator) {

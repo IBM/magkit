@@ -27,4 +27,39 @@ public class Sql2LongConditionTest {
         assertThat(Sql2LongCondition.property("test").greaterOrEqualThan().value(123L).asString(), is("[test] >= 123"));
         assertThat(Sql2LongCondition.property("test").greaterThan().value(123L).asString(), is("[test] > 123"));
     }
+
+    @Test
+    public void appendValueConstraint() {
+        StringBuilder result = new StringBuilder();
+        Sql2LongCondition condition = (Sql2LongCondition) Sql2LongCondition.property("test").greaterThan();
+
+        condition.appendValueConstraint(result, null, null, null);
+        assertThat(result.toString(), is(""));
+
+        result = new StringBuilder();
+        condition.appendValueConstraint(result, null, "test", 123L);
+        assertThat(result.toString(), is("[test] > 123"));
+
+        result = new StringBuilder();
+        condition.appendValueConstraint(result, "", "test", 123L);
+        assertThat(result.toString(), is("[test] > 123"));
+
+        result = new StringBuilder();
+        condition.appendValueConstraint(result, "  \t \r ", "test", 123L);
+        assertThat(result.toString(), is("[test] > 123"));
+
+        result = new StringBuilder();
+        condition.appendValueConstraint(result, "selector", "test", 123L);
+        assertThat(result.toString(), is("selector.[test] > 123"));
+    }
+
+    @Test
+    public void values() {
+        assertThat(Sql2LongCondition.property("test").equalsAny().values((Long[]) null).asString(), is(""));
+        assertThat(Sql2LongCondition.property("test").equalsAny().values(null, 2L).asString(), is(""));
+        assertThat(Sql2LongCondition.property("test").equalsAny().values(1L).asString(), is("[test] = 1"));
+        assertThat(Sql2LongCondition.property("test").equalsAny().values(1L, null).asString(), is("[test] = 1"));
+        assertThat(Sql2LongCondition.property("test").equalsAny().values(1L, null, 3L).asString(), is("[test] = 1"));
+        assertThat(Sql2LongCondition.property("test").equalsAny().values(1L, 2L, 3L).asString(), is("([test] = 1 OR [test] = 2 OR [test] = 3)"));
+    }
 }

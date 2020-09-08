@@ -2,6 +2,7 @@ package com.aperto.magkit.query.sql2.condition;
 
 import info.magnolia.jcr.util.NodeTypes;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jackrabbit.JcrConstants;
 
 /**
  * The builder for a sql2 String condition.
@@ -35,7 +36,7 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
     }
 
     public static Sql2DynamicOperand identifier() {
-        return property("jcr:uuid");
+        return property(JcrConstants.JCR_UUID);
     }
 
     // Implement the abstract-me()-trick to have special return types on methods of parent class.

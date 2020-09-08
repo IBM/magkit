@@ -4,9 +4,11 @@ import com.aperto.magkit.query.sql2.condition.Sql2ConstraintGroup;
 import com.aperto.magkit.query.sql2.condition.Sql2JoinCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2JoinConstraint;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.jackrabbit.JcrConstants;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 
 /**
@@ -31,7 +33,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
     private static final String ORDER_BY = " ORDER BY ";
 
     private final String[] _attributes;
-    private String _nodeType = "nt:base";
+    private String _nodeType = JcrConstants.NT_BASE;
     private String _fromSelectorName;
     private String _joinSelectorName;
     private Sql2ConstraintGroup _constraintGroup;
@@ -62,7 +64,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
 
     public Sql2Join selectAs(String selectorName) {
         if (isNotBlank(selectorName)) {
-            _fromSelectorName = selectorName;
+            _fromSelectorName = trim(selectorName);
         }
         return this;
     }
@@ -87,7 +89,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
 
     public Sql2JoinOn joinAs(String selectorName) {
         if (isNotBlank(selectorName)) {
-            _joinSelectorName = selectorName;
+            _joinSelectorName = trim(selectorName);
         }
         return this;
     }
