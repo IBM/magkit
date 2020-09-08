@@ -34,7 +34,7 @@ public class NodesQuery extends QueryWrapper<NodesQuery> {
      * @throws InvalidQueryException if the query contains an unbound variable.
      * @throws RepositoryException   if another error occurs.
      */
-    public NodesResult execute() throws InvalidQueryException, RepositoryException {
+    public NodesResult execute() throws RepositoryException {
         return new NodesResult(getQuery().execute());
-    };
+    }
 }

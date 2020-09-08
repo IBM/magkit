@@ -34,7 +34,7 @@ public class RowsQuery extends QueryWrapper<RowsQuery> {
      * @throws InvalidQueryException if the query contains an unbound variable.
      * @throws RepositoryException   if another error occurs.
      */
-    public RowsResult execute() throws InvalidQueryException, RepositoryException {
+    public RowsResult execute() throws RepositoryException {
         return new RowsResult(getQuery().execute());
-    };
+    }
 }

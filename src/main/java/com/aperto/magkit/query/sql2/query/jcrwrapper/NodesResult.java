@@ -26,10 +26,10 @@ public class NodesResult extends ResultWrapper {
     }
 
     /**
-     * Returns an iterator over the <code>Row</code>s of the result table. The
-     * rows are returned according to the ordering specified in the query.
+     * Returns an iterator over the <code>Node</code>s of the result table. The
+     * nodes are returned according to the ordering specified in the query.
      *
-     * @return a <code>RowIterator</code> or null if an exception occurs.
+     * @return a <code>Iterator<Node></></code> or an empty Iterator if an exception occurs.
      */
     public Iterator<Node> getNodes() {
         Iterator<Node> nodes = Collections.emptyIterator();
@@ -39,7 +39,7 @@ public class NodesResult extends ResultWrapper {
             LOG.warn("Failed to get query result rows.", e);
         }
         return nodes;
-    };
+    }
 
     public List<Node> getNodeList() {
         Iterator<Node> iterator = getNodes();
@@ -48,5 +48,5 @@ public class NodesResult extends ResultWrapper {
             rows.add(iterator.next());
         }
         return rows;
-    };
+    }
 }

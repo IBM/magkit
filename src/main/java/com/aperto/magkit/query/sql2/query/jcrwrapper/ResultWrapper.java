@@ -48,7 +48,7 @@ public abstract class ResultWrapper {
      * that created this result. If the query did not have a selector name then
      * an empty array is returned.
      *
-     * @return a <code>String</code> array holding the selector es or empty array when an exception occurs.
+     * @return a <code>String</code> array holding the selector names or an empty array when an exception occurs.
      */
     public String[] getSelectorNames() {
         String[] names = ArrayUtils.EMPTY_STRING_ARRAY;

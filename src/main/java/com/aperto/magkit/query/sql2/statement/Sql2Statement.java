@@ -8,7 +8,7 @@ import org.apache.jackrabbit.JcrConstants;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.trim;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 
 /**
@@ -63,9 +63,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
     }
 
     public Sql2Join selectAs(String selectorName) {
-        if (isNotBlank(selectorName)) {
-            _fromSelectorName = trim(selectorName);
-        }
+        _fromSelectorName = trimToNull(selectorName);
         return this;
     }
 
@@ -88,9 +86,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
     }
 
     public Sql2JoinOn joinAs(String selectorName) {
-        if (isNotBlank(selectorName)) {
-            _joinSelectorName = trim(selectorName);
-        }
+        _joinSelectorName = trimToNull(selectorName);
         return this;
     }
 
@@ -118,7 +114,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
     }
 
     public Sql2OrderDirection orderByScore() {
-        return orderBy("jcr:score");
+        return orderBy(JcrConstants.JCR_SCORE);
     }
 
     public Sql2Builder descending() {
@@ -143,43 +139,16 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         StringBuilder result = new StringBuilder();
         result.append(SELECT);
         if (ArrayUtils.isEmpty(_attributes)) {
-            boolean hasFromSelector = isNotBlank(_fromSelectorName);
-            if (hasFromSelector) {
-                result.append(_fromSelectorName).append('.');
-                result.append('*');
-            }
-            if (isNotBlank(_joinSelectorName)) {
-                if (hasFromSelector) {
-                    result.append(',');
-                }
-                result.append(_joinSelectorName).append('.');
-                result.append('*');
-            } else if (!hasFromSelector) {
-                result.append('*');
-            }
-
+            appendAllAttributes(result);
         } else {
-            String sep = EMPTY;
-            for (String attribute: _attributes) {
-                result.append(sep);
-                if (isNotBlank(_fromSelectorName)) {
-                    result.append(_fromSelectorName).append('.');
-                }
-                result.append('[').append(attribute).append(']');
-                sep = ",";
-            }
-            if (isNotBlank(_joinSelectorName)) {
-                result.append(sep).append(_joinSelectorName).append('.');
-                // TODO: handle join attribute names
-                result.append('*');
-            }
+            appendAttributes(result);
         }
         result.append(FROM).append('[').append(_nodeType).append(']');
-        if (isNotBlank(_fromSelectorName)) {
+        if (_fromSelectorName != null) {
             result.append(AS).append(_fromSelectorName);
         }
 
-        if (isNotBlank(_joinMethod) && isNotBlank(_joinNodeType)) {
+        if (isNotBlank(_joinMethod) && isNotBlank(_joinNodeType) && _joinSelectorName != null) {
             result.append(_joinMethod).append('[').append(_joinNodeType).append(']').append(AS).append(_joinSelectorName).append(ON);
             _joinCondition.appendTo(result, this);
         }
@@ -192,6 +161,40 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             result.append(ORDER_BY).append('[').append(_orderAttribute).append(']').append(_orderDirection);
         }
         return result.toString();
+    }
+
+    private void appendAttributes(final StringBuilder result) {
+        String sep = EMPTY;
+        for (String attribute: _attributes) {
+            result.append(sep);
+            if (_fromSelectorName != null) {
+                result.append(_fromSelectorName).append('.');
+            }
+            result.append('[').append(attribute).append(']');
+            sep = ",";
+        }
+        if (_joinSelectorName != null) {
+            result.append(sep).append(_joinSelectorName).append('.');
+            // TODO: handle join attribute names
+            result.append('*');
+        }
+    }
+
+    private void appendAllAttributes(final StringBuilder result) {
+        boolean hasFromSelector = _fromSelectorName != null;
+        if (hasFromSelector) {
+            result.append(_fromSelectorName).append('.');
+            result.append('*');
+        }
+        if (_joinSelectorName != null) {
+            if (hasFromSelector) {
+                result.append(',');
+            }
+            result.append(_joinSelectorName).append('.');
+            result.append('*');
+        } else if (!hasFromSelector) {
+            result.append('*');
+        }
     }
 
     @Override

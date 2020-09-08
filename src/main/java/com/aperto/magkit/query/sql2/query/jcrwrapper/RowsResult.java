@@ -39,7 +39,7 @@ public class RowsResult extends ResultWrapper {
             LOG.warn("Failed to get query result rows.", e);
         }
         return rows;
-    };
+    }
 
     public List<Row> getRowList() {
         Iterator<Row> iterator = getRows();
@@ -48,5 +48,5 @@ public class RowsResult extends ResultWrapper {
             rows.add(iterator.next());
         }
         return rows;
-    };
+    }
 }
