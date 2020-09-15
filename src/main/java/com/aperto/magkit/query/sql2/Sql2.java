@@ -17,8 +17,10 @@ import com.aperto.magkit.query.sql2.query.QueryRowsStatement;
 import com.aperto.magkit.query.sql2.query.RowsQueryBuilder;
 import com.aperto.magkit.query.sql2.query.Sql2NodesQueryBuilder;
 import com.aperto.magkit.query.sql2.query.Sql2RowsQueryBuilder;
+import com.aperto.magkit.query.sql2.statement.Sql2As;
 import com.aperto.magkit.query.sql2.statement.Sql2From;
 import com.aperto.magkit.query.sql2.statement.Sql2Statement;
+import info.magnolia.jcr.util.NodeTypes;
 
 import javax.jcr.Node;
 import java.util.Calendar;
@@ -41,11 +43,11 @@ public final class Sql2 {
     public static final class Query {
 
         public static List<Node> nodesByIdentifiers(String workspace, String... ids) {
-            return nodesFrom(workspace).withStatement(Statement.selectAll().whereAny(Condition.identifier(ids))).getResultNodes();
+            return nodesFrom(workspace).withStatement(Statement.select().whereAny(Condition.identifier(ids))).getResultNodes();
         }
 
         public static List<Node> nodesByTemplates(String path, String... templates) {
-            return nodesFromWebsite().withStatement(Statement.selectAll().whereAll(Condition.Path.isDescendant(path), Condition.template(templates))).getResultNodes();
+            return nodesFromWebsite().withStatement(Statement.select().whereAll(Condition.Path.isDescendant(path), Condition.template(templates))).getResultNodes();
         }
 
         public static QueryNodesStatement<NodesQueryBuilder> nodesFrom(String workspace) {
@@ -76,12 +78,28 @@ public final class Sql2 {
      */
     public static final class Statement {
 
-        public static Sql2From selectAll() {
-            return Sql2Statement.selectAll();
+        public static Sql2From select(String... attributes) {
+            return Sql2Statement.select(attributes);
         }
 
-        public static Sql2From selectAttributes(String... attributes) {
-            return Sql2Statement.selectAttributes(attributes);
+        public static Sql2As selectContentNodes(String... attributes) {
+            return Sql2Statement.select(attributes).from(NodeTypes.ContentNode.NAME);
+        }
+
+        public static Sql2As selectContents(String... attributes) {
+            return Sql2Statement.select(attributes).from(NodeTypes.Content.NAME);
+        }
+
+        public static Sql2As selectPages(String... attributes) {
+            return Sql2Statement.select(attributes).from(NodeTypes.Page.NAME);
+        }
+
+        public static Sql2As selectAreas(String... attributes) {
+            return Sql2Statement.select(attributes).from(NodeTypes.Area.NAME);
+        }
+
+        public static Sql2As selectComponents(String... attributes) {
+            return Sql2Statement.select(attributes).from(NodeTypes.Component.NAME);
         }
 
         private Statement() {}

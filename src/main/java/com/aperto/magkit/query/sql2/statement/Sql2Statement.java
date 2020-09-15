@@ -47,11 +47,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         _attributes = attributes;
     }
 
-    public static Sql2From selectAll() {
-        return new Sql2Statement();
-    }
-
-    public static Sql2From selectAttributes(String... attributes) {
+    public static Sql2From select(String... attributes) {
         return new Sql2Statement(attributes);
     }
 

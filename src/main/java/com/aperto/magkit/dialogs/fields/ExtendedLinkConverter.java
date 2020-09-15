@@ -90,6 +90,16 @@ public class ExtendedLinkConverter implements IdentifierToPathConverter {
     }
 
     @Override
+    public Class<String> getModelType() {
+        return null;
+    }
+
+    @Override
+    public Class<String> getPresentationType() {
+        return null;
+    }
+
+    @Override
     public void setWorkspaceName(String workspaceName) {
         _workspaceName = workspaceName;
     }
@@ -98,4 +108,6 @@ public class ExtendedLinkConverter implements IdentifierToPathConverter {
     public void setExtendedLinkFieldHelper(final ExtendedLinkFieldHelper extendedLinkFieldHelper) {
         _extendedLinkFieldHelper = extendedLinkFieldHelper;
     }
+
+
 }

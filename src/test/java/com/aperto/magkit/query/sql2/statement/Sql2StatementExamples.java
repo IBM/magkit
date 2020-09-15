@@ -25,18 +25,18 @@ public class Sql2StatementExamples {
 
     @Test
     public void selectAll() {
-        assertThat(Sql2.Statement.selectAll().build(), is("SELECT * FROM [nt:base]"));
+        assertThat(Sql2.Statement.select().build(), is("SELECT * FROM [nt:base]"));
     }
 
     @Test
     public void selectComponents() {
-        assertThat(Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).build(), is("SELECT * FROM [mgnl:component]"));
+        assertThat(Sql2.Statement.selectComponents().build(), is("SELECT * FROM [mgnl:component]"));
     }
 
     @Test
     public void selectComponentsWithExistingProperty() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.isNotNull("title")).build(),
+            Sql2.Statement.selectComponents().whereAll(Sql2.Condition.isNotNull("title")).build(),
             is("SELECT * FROM [mgnl:component] WHERE [title] IS NOT NULL")
         );
     }
@@ -45,7 +45,9 @@ public class Sql2StatementExamples {
     public void selectComponentsWithMissingProperty() {
         assertThat(
             // TODO: whereAll() allows JoinCondition without having selector names -> should allow simple conditions only!
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.isNull("title")).build(),
+            Sql2.Statement.selectComponents().whereAll(
+                Sql2.Condition.isNull("title")
+            ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [title] IS NULL")
         );
     }
@@ -53,7 +55,9 @@ public class Sql2StatementExamples {
     @Test
     public void selectComponentsWithPropertyValue() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.String.property("title").equalsAny().values("Test")).build(),
+            Sql2.Statement.selectComponents().whereAll(
+                Sql2.Condition.String.property("title").equalsAny().values("Test")
+            ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [title] = 'Test'")
         );
     }
@@ -61,16 +65,20 @@ public class Sql2StatementExamples {
     @Test
     public void selectComponentsWithPropertyContains() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.String.property("title").likeAny().values("Test")).build(),
+            Sql2.Statement.selectComponents().whereAll(
+                Sql2.Condition.String.property("title").likeAny().values("Test")
+            ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [title] LIKE '%Test%'")
         );
     }
 
     @Test
-    public void selectComponentsWithPropertyStartsWith() {
+    public void selectComponentsWithPropertyStartsWithIgnoreCase() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.String.property("title").startsWithAny().values("Test", "Title")).build(),
-            is("SELECT * FROM [mgnl:component] WHERE ([title] LIKE 'Test%' OR [title] LIKE 'Title%')")
+            Sql2.Statement.selectComponents().whereAll(
+                Sql2.Condition.String.property("title").lowerCase().startsWithAny().values("test", "title")
+            ).build(),
+            is("SELECT * FROM [mgnl:component] WHERE (lower([title]) LIKE 'test%' OR lower([title]) LIKE 'title%')")
         );
     }
 
@@ -78,7 +86,9 @@ public class Sql2StatementExamples {
     public void selectComponentsPublishedBeforeDate() {
         Calendar cal = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.lastActivated().lowerThan().value(cal)).build(),
+            Sql2.Statement.selectComponents().whereAll(
+                Sql2.Condition.lastActivated().lowerThan().value(cal)
+            ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:lastActivated] < cast('2020-01-01T00:00:00.000+01:00' as date)")
         );
     }
@@ -87,7 +97,7 @@ public class Sql2StatementExamples {
     public void selectComponentsCreatedAfterDate() {
         Calendar cal = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.createdAfter(cal)).build(),
+            Sql2.Statement.selectComponents().whereAll(Sql2.Condition.createdAfter(cal)).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:created] > cast('2020-01-01T00:00:00.000+01:00' as date)")
         );
     }
@@ -95,7 +105,7 @@ public class Sql2StatementExamples {
     @Test
     public void selectComponentsCreatedAfterBindValue() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(
+            Sql2.Statement.selectComponents().whereAll(
                 Sql2.Condition.created().greaterOrEqualThan().bindVariable("date")
             ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:created] >= $date")
@@ -104,21 +114,20 @@ public class Sql2StatementExamples {
 
     @Test
     public void selectComponentsWithinDateRange() {
-        Calendar from = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
-        Calendar to = getCalendar(2020, Calendar.MARCH, 1, 0, 0, 0);
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(
-                Sql2.Condition.Date.property("date").greaterOrEqualThan().value(from),
-                Sql2.Condition.Date.property("date").lowerThan().value(to)
+            Sql2.Statement.selectComponents().whereAll(
+                Sql2.Condition.Date.property("date").greaterOrEqualThan().bindVariable("from"),
+                Sql2.Condition.Date.property("date").lowerThan().bindVariable("to")
             ).build(),
-            is("SELECT * FROM [mgnl:component] WHERE ([date] >= cast('2020-01-01T00:00:00.000+01:00' as date) AND [date] < cast('2020-03-01T00:00:00.000+01:00' as date))")
+            // TODO: Check if this query really works
+            is("SELECT * FROM [mgnl:component] WHERE ([date] >= $from AND [date] < $to)")
         );
     }
 
     @Test
     public void selectComponentsBelowPath() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
+            Sql2.Statement.selectComponents().whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
             is("SELECT * FROM [mgnl:component] WHERE isdescendantnode('/root/path')")
         );
     }
@@ -126,7 +135,7 @@ public class Sql2StatementExamples {
     @Test
     public void selectNotChildComponents() {
         assertThat(
-            Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).whereAll(Sql2.Condition.Path.is().not().child("/root/path")).build(),
+            Sql2.Statement.selectComponents().whereAll(Sql2.Condition.Path.is().not().child("/root/path")).build(),
             is("SELECT * FROM [mgnl:component] WHERE not(ischildnode('/root/path'))")
         );
     }
@@ -134,14 +143,14 @@ public class Sql2StatementExamples {
     @Test
     public void selectNodeByPath() {
         assertThat(
-            Sql2.Statement.selectAll().whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
+            Sql2.Statement.select().whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
             is("SELECT * FROM [nt:base] WHERE issamenode('/root/path')")
         );
     }
 
     @Test
     public void selectByComplexQuery() {
-        assertThat(Sql2.Statement.selectAll().whereAny(
+        assertThat(Sql2.Statement.select().whereAny(
             Sql2.Condition.and().matches(
                 Sql2.Condition.Path.isChild("migros/de"),
                 Sql2.Condition.template("myModule:my/component-1", "myModule:my/component-2")
@@ -157,7 +166,7 @@ public class Sql2StatementExamples {
 
     @Test
     public void selectOrderedByScore() {
-        assertThat(Sql2.Statement.selectAll().whereAll(
+        assertThat(Sql2.Statement.select().whereAll(
             Sql2.Condition.String.property("title").lowerCase().likeAny().values("test", "toast")
         ).orderByScore().descending().build(),
             is("SELECT * FROM [nt:base] WHERE (lower([title]) LIKE '%test%' OR lower([title]) LIKE '%toast%') ORDER BY [jcr:score] DESC")
@@ -166,7 +175,7 @@ public class Sql2StatementExamples {
 
     @Test
     public void selectUuidsFromPagesOrdered() {
-        assertThat(Sql2.Statement.selectAttributes("title", "date", "jcr:uuid").from(NodeTypes.Page.NAME).whereAll(
+        assertThat(Sql2.Statement.select("title", "date", "jcr:uuid").from(NodeTypes.Page.NAME).whereAll(
             Sql2.Condition.String.property("title").startsWithAny().values("Test", "Toast")
         ).orderBy("date").ascending().build(),
             is("SELECT [title],[date],[jcr:uuid] FROM [mgnl:page] WHERE ([title] LIKE 'Test%' OR [title] LIKE 'Toast%') ORDER BY [date] ASC")
@@ -176,7 +185,7 @@ public class Sql2StatementExamples {
     // Joins only with row queries, because: javax.jcr.RepositoryException: This query result contains more than one selector
     @Test
     public void selectChildrenOfParentWithTemplate() {
-        assertThat(Sql2.Statement.selectAll().from(NodeTypes.Component.NAME).selectAs("teaser")
+        assertThat(Sql2.Statement.selectComponents().selectAs("teaser")
             .innerJoin(NodeTypes.Page.NAME).joinAs("page").on(
                 Sql2.JoinOn.selectedDescendantOfJoined()
             )

@@ -32,6 +32,6 @@ public class Sql2NullConditionTest {
     @Test
     public void testSelectors() {
         Sql2JoinConstraint condition = Sql2NullCondition.isNull("test");
-        assertThat(Sql2Statement.selectAttributes("a", "b").from("aperto:test").whereAny(condition).build(), is("SELECT [a],[b] FROM [aperto:test] WHERE [test] IS NULL"));
+        assertThat(Sql2Statement.select("a", "b").from("aperto:test").whereAny(condition).build(), is("SELECT [a],[b] FROM [aperto:test] WHERE [test] IS NULL"));
     }
 }

@@ -43,7 +43,7 @@ public class Sql2NodesQueryBuilderTest {
         Node result1 = mockPageNode("test1", stubIdentifier(UUID.randomUUID().toString()));
         ContextMockUtils.mockQuery("website", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubbResult(result1));
 
-        NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement(Sql2Statement.selectAll());
+        NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement(Sql2Statement.select());
         assertThat(builder.buildNodesQuery(), isA(NodesQuery.class));
         assertThat(builder.buildNodesQuery().getStatement(), is("SELECT * FROM [nt:base]"));
         assertThat(builder.getResultNodes().size(), is(1));
@@ -56,7 +56,7 @@ public class Sql2NodesQueryBuilderTest {
         Node result2 = mockPageNode("test2", stubIdentifier(UUID.randomUUID().toString()));
         ContextMockUtils.mockQuery("my-workspace", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubbResult(result1, result2));
 
-        NodesQueryBuilder builder = Sql2.Query.nodesFrom("my-workspace").withStatement(Sql2.Statement.selectAll()).withLimit(10).withOffset(5);
+        NodesQueryBuilder builder = Sql2.Query.nodesFrom("my-workspace").withStatement(Sql2.Statement.select()).withLimit(10).withOffset(5);
         assertThat(builder.getResultNodes().size(), is(2));
         assertThat(builder.getResultNodes().get(0), is(result1));
         assertThat(builder.getResultNodes().get(1), is(result2));

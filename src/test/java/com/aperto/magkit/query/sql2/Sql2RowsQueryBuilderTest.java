@@ -20,7 +20,7 @@ import javax.jcr.query.QueryResult;
 
 import static com.aperto.magkit.mockito.ContextMockUtils.mockQuery;
 import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.query.sql2.statement.Sql2Statement.selectAttributes;
+import static com.aperto.magkit.query.sql2.statement.Sql2Statement.select;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
@@ -35,7 +35,7 @@ import static org.mockito.Matchers.anyLong;
 public class Sql2RowsQueryBuilderTest {
 
     private Query _query;
-    private Sql2Builder _statement = selectAttributes("test", "other").from("mgnl:Page").orderByScore();
+    private Sql2Builder _statement = select("test", "other").from("mgnl:Page").orderByScore();
 
     @Before
     public void setUp() throws Exception {
@@ -106,7 +106,7 @@ public class Sql2RowsQueryBuilderTest {
         Node result1 = mockPageNode("test1");
         Node result2 = mockPageNode("test2");
         QueryResult result = QueryMockUtils.mockQueryResult(result1, result2);
-        String statement = selectAttributes("test", "other").from("mgnl:Page").orderByScore().build();
+        String statement = select("test", "other").from("mgnl:Page").orderByScore().build();
         _query = ContextMockUtils.mockQuery("website", Query.JCR_SQL2, statement);
         QueryStubbingOperation.stubbResult(result).of(_query);
         assertThat(Sql2QueryBuilder.forRows()
