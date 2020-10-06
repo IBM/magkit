@@ -19,19 +19,19 @@ public final class Sql2PathJoinCondition implements Sql2JoinCondition {
     }
 
     public static Sql2PathJoinCondition isJoinedDescendantOfSelected() {
-        return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_DESCENDANT, false);
-    }
-
-    public static Sql2PathJoinCondition isSelectedDescendantOfJoined() {
         return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_DESCENDANT, true);
     }
 
+    public static Sql2PathJoinCondition isSelectedDescendantOfJoined() {
+        return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_DESCENDANT, false);
+    }
+
     public static Sql2PathJoinCondition isJoinedChildOfSelected() {
-        return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_CHILD, false);
+        return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_CHILD, true);
     }
 
     public static Sql2PathJoinCondition isSelectedChildOfJoined() {
-        return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_CHILD, true);
+        return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_CHILD, false);
     }
 
     public static Sql2PathJoinCondition isJoinedEqualsSelected() {

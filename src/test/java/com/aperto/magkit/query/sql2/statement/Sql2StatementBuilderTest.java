@@ -53,7 +53,7 @@ public class Sql2StatementBuilderTest {
                 Sql2StringCondition.template().equalsAll().values("selected.template.id"),
                 Sql2StringCondition.template().equalsAll().values("joined.template.id").forJoin()
             ).build(),
-            is("SELECT s.*,j.* FROM [nt:base] AS s INNER JOIN [nt:base] AS j ON isdescendantnode(s,j) WHERE (s.[mgnl:template] = 'selected.template.id' AND j.[mgnl:template] = 'joined.template.id')")
+            is("SELECT s.*,j.* FROM [nt:base] AS s INNER JOIN [nt:base] AS j ON isdescendantnode(j,s) WHERE (s.[mgnl:template] = 'selected.template.id' AND j.[mgnl:template] = 'joined.template.id')")
         );
     }
 

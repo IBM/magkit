@@ -185,15 +185,15 @@ public class Sql2StatementExamples {
     // Joins only with row queries, because: javax.jcr.RepositoryException: This query result contains more than one selector
     @Test
     public void selectChildrenOfParentWithTemplate() {
-        assertThat(Sql2.Statement.selectComponents().selectAs("teaser")
-            .innerJoin(NodeTypes.Page.NAME).joinAs("page").on(
+        assertThat(Sql2.Statement.selectComponents().selectAs("content")
+            .innerJoin(NodeTypes.Component.NAME).joinAs("container").on(
                 Sql2.JoinOn.selectedDescendantOfJoined()
             )
             .whereAll(
                 Sql2.Condition.template("m5-tk-core-components:components/content/standardImageTextTeaser"),
                 Sql2.Condition.template("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
             ).build(),
-            is("SELECT teaser.*,page.* FROM [mgnl:component] AS teaser INNER JOIN [mgnl:page] AS page ON isdescendantnode(page,teaser) WHERE (teaser.[mgnl:template] = 'm5-tk-core-components:components/content/standardImageTextTeaser' AND page.[mgnl:template] = 'm5-relaunch-my-migros:pages/myCumulusPage')")
+            is("SELECT content.*,container.* FROM [mgnl:component] AS content INNER JOIN [mgnl:component] AS container ON isdescendantnode(content,container) WHERE (content.[mgnl:template] = 'm5-tk-core-components:components/content/standardImageTextTeaser' AND container.[mgnl:template] = 'm5-relaunch-my-migros:pages/myCumulusPage')")
         );
     }
 
