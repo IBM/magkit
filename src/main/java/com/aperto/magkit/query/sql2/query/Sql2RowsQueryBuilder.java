@@ -66,6 +66,21 @@ public class Sql2RowsQueryBuilder extends Sql2QueryBuilder implements QueryWorks
         return rows;
     }
 
+    /**
+     * Execute the query and check if the result is not empty.
+     *
+     * @return true, if the query result RowIterator contains rows, false otherwise.
+     */
+    public boolean hasResultRows() {
+        boolean result = false;
+        try {
+            result = buildRowsQuery().execute().getRows().hasNext();
+        } catch (RepositoryException e) {
+            LOG.warn("Failed to get query result rows. Returning empty list.", e);
+        }
+        return result;
+    }
+
     public Sql2RowsQueryBuilder me() {
         return this;
     }

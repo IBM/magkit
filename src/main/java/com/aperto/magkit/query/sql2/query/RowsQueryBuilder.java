@@ -14,4 +14,5 @@ import java.util.List;
 public interface RowsQueryBuilder extends QueryLimit<RowsQueryBuilder> {
     RowsQuery buildRowsQuery();
     List<Row> getResultRows();
+    boolean hasResultRows();
 }
