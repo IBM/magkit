@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test Sql2NameCondition.
