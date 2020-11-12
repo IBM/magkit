@@ -102,14 +102,14 @@ public class Sql2NameCondition implements Sql2NameOperand, Sql2NameCompare, Sql2
         return me();
     }
 
-    private final void withValues(final String... values) {
+    private void withValues(final String... values) {
         _values = values;
         _hasValues = values != null && values.length > 0 && _values[0] != null;
         _isMultiValue = _hasValues && values.length > 1 && _values[1] != null;
     }
 
     @Override
-    public void appendTo(StringBuilder sql2, final Sql2SelectorNames selectorNames) {
+    public void appendTo(final StringBuilder sql2, final Sql2SelectorNames selectorNames) {
         if (isNotEmpty()) {
             if (_isMultiValue) {
                 sql2.append('(');
