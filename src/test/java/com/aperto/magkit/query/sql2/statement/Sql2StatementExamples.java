@@ -39,6 +39,11 @@ public class Sql2StatementExamples {
             Sql2.Statement.selectComponents().whereAll(Sql2.Condition.isNotNull("title")).build(),
             is("SELECT * FROM [mgnl:component] WHERE [title] IS NOT NULL")
         );
+
+        assertThat(
+            Sql2.Statement.selectComponents().selectAs("t").whereAll(Sql2.Condition.isNotNull("title")).build(),
+            is("SELECT t.* FROM [mgnl:component] AS t WHERE t.[title] IS NOT NULL")
+        );
     }
 
     @Test
@@ -130,6 +135,11 @@ public class Sql2StatementExamples {
             Sql2.Statement.selectComponents().whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
             is("SELECT * FROM [mgnl:component] WHERE isdescendantnode('/root/path')")
         );
+
+        assertThat(
+            Sql2.Statement.selectComponents().selectAs("t").whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
+            is("SELECT t.* FROM [mgnl:component] AS t WHERE isdescendantnode(t, '/root/path')")
+        );
     }
 
     @Test
@@ -146,6 +156,11 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
             is("SELECT * FROM [nt:base] WHERE issamenode('/root/path')")
         );
+
+        assertThat(
+            Sql2.Statement.select().selectAs("t").whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
+            is("SELECT t.* FROM [nt:base] AS t WHERE issamenode(t, '/root/path')")
+        );
     }
 
     @Test
@@ -153,11 +168,11 @@ public class Sql2StatementExamples {
         assertThat(Sql2.Statement.select().whereAny(
             Sql2.Condition.and().matches(
                 Sql2.Condition.Path.isChild("migros/de"),
-                Sql2.Condition.template("myModule:my/component-1", "myModule:my/component-2")
+                Sql2.Condition.templateEquals("myModule:my/component-1", "myModule:my/component-2")
             ),
             Sql2.Condition.and().not().matches(
                 Sql2.Condition.Path.isChild("migros/de"),
-                Sql2.Condition.template("myModule:my/other/component")
+                Sql2.Condition.templateEquals("myModule:my/other/component")
             )
         ).build(),
             is("SELECT * FROM [nt:base] WHERE ((ischildnode('/migros/de') AND ([mgnl:template] = 'myModule:my/component-1' OR [mgnl:template] = 'myModule:my/component-2')) OR not(ischildnode('/migros/de') AND [mgnl:template] = 'myModule:my/other/component'))")
@@ -190,10 +205,40 @@ public class Sql2StatementExamples {
                 Sql2.JoinOn.selectedDescendantOfJoined()
             )
             .whereAll(
-                Sql2.Condition.template("m5-tk-core-components:components/content/standardImageTextTeaser"),
-                Sql2.Condition.template("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
+                Sql2.Condition.templateEquals("m5-tk-core-components:components/content/standardImageTextTeaser"),
+                Sql2.Condition.templateEquals("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
             ).build(),
             is("SELECT content.*,container.* FROM [mgnl:component] AS content INNER JOIN [mgnl:component] AS container ON isdescendantnode(content,container) WHERE (content.[mgnl:template] = 'm5-tk-core-components:components/content/standardImageTextTeaser' AND container.[mgnl:template] = 'm5-relaunch-my-migros:pages/myCumulusPage')")
+        );
+    }
+
+    @Test
+    public void selectNodesByName() {
+        assertThat(
+            Sql2.Statement.selectContentNodes().whereAll(Sql2.Condition.nameEquals("00")).build(),
+            is("SELECT * FROM [mgnl:contentNode] WHERE name() = '00'")
+        );
+
+        assertThat(
+            Sql2.Statement.selectContentNodes().selectAs("t").whereAll(Sql2.Condition.nameEquals("00")).build(),
+            is("SELECT t.* FROM [mgnl:contentNode] AS t WHERE name(t) = '00'")
+        );
+    }
+
+    @Test
+    public void selectNodesWithNameNotEqualAnyCaseInsensitive() {
+        assertThat(
+            Sql2.Statement.selectContentNodes().whereAll(
+                Sql2.Condition.name().lowerCase().excludeAny().values("0", "test")
+            ).build(),
+            is("SELECT * FROM [mgnl:contentNode] WHERE (lower(name()) <> '0' OR lower(name()) <> 'test')")
+        );
+
+        assertThat(
+            Sql2.Statement.selectContentNodes().selectAs("t").whereAll(
+                Sql2.Condition.name().lowerCase().excludeAny().values("0", "test")
+            ).build(),
+            is("SELECT t.* FROM [mgnl:contentNode] AS t WHERE (lower(name(t)) <> '0' OR lower(name(t)) <> 'test')")
         );
     }
 

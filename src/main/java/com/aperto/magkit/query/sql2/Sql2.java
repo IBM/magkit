@@ -7,6 +7,8 @@ import com.aperto.magkit.query.sql2.condition.Sql2DoubleCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2DynamicOperand;
 import com.aperto.magkit.query.sql2.condition.Sql2JoinConstraint;
 import com.aperto.magkit.query.sql2.condition.Sql2LongCondition;
+import com.aperto.magkit.query.sql2.condition.Sql2NameCondition;
+import com.aperto.magkit.query.sql2.condition.Sql2NameOperand;
 import com.aperto.magkit.query.sql2.condition.Sql2NullCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2PathCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2PathJoinCondition;
@@ -43,11 +45,18 @@ public final class Sql2 {
     public static final class Query {
 
         public static List<Node> nodesByIdentifiers(String workspace, String... ids) {
-            return nodesFrom(workspace).withStatement(Statement.select().whereAny(Condition.identifier(ids))).getResultNodes();
+            return nodesFrom(workspace).withStatement(
+                Statement.select().whereAny(Condition.identifierEquals(ids))
+            ).getResultNodes();
         }
 
         public static List<Node> nodesByTemplates(String path, String... templates) {
-            return nodesFromWebsite().withStatement(Statement.select().whereAll(Condition.Path.isDescendant(path), Condition.template(templates))).getResultNodes();
+            return nodesFromWebsite().withStatement(
+                Statement.select().whereAll(
+                    Condition.Path.isDescendant(path),
+                    Condition.templateEquals(templates)
+                )
+            ).getResultNodes();
         }
 
         public static QueryNodesStatement<NodesQueryBuilder> nodesFrom(String workspace) {
@@ -158,23 +167,39 @@ public final class Sql2 {
         }
 
         public static Sql2JoinConstraint lastModifiedBefore(java.util.Calendar date) {
-            return Sql2CalendarCondition.lastModified().lowerThan().value(date);
+            return lastModified().lowerThan().value(date);
         }
 
         public static Sql2JoinConstraint lastModifiedAfter(java.util.Calendar date) {
-            return Sql2CalendarCondition.lastModified().greaterThan().value(date);
+            return lastModified().greaterThan().value(date);
         }
 
         public static Sql2CompareNot<Calendar> deleted() {
             return Sql2CalendarCondition.deleted();
         }
 
-        public static Sql2JoinConstraint template(java.lang.String... values) {
-            return Sql2StringCondition.template().equalsAny().values(values);
+        public static Sql2DynamicOperand template() {
+            return Sql2StringCondition.template();
         }
 
-        public static Sql2JoinConstraint identifier(java.lang.String... values) {
-            return Sql2StringCondition.identifier().equalsAny().values(values);
+        public static Sql2JoinConstraint templateEquals(java.lang.String... values) {
+            return template().equalsAny().values(values);
+        }
+
+        public static Sql2DynamicOperand identifier() {
+            return Sql2StringCondition.identifier();
+        }
+
+        public static Sql2JoinConstraint identifierEquals(java.lang.String... values) {
+            return identifier().equalsAny().values(values);
+        }
+
+        public static Sql2NameOperand name() {
+            return new Sql2NameCondition();
+        }
+
+        public static Sql2JoinConstraint nameEquals(java.lang.String... values) {
+            return name().equalsAny().values(values);
         }
 
         public static Sql2JoinConstraint childOf(Node parent) {
