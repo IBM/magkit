@@ -1,6 +1,7 @@
 package com.aperto.magkit.module.delta;
 
 import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
 import info.magnolia.module.delta.TaskExecutionException;
@@ -110,7 +111,12 @@ public class RemoveTemplateNodesTask extends AbstractRepositoryTask {
     }
 
     protected void doNodeOperation(final Node node) throws RepositoryException {
-        node.remove();
+        try {
+            node.remove();
+        } catch (RepositoryException e) {
+            // sometimes happens InvalidItemStateException by already removed items, catch them and proceed
+            LOGGER.warn("Error removing node: {}. Skip this node.", NodeUtil.getPathIfPossible(node), e);
+        }
     }
 
     protected NodeIterator executeQuery(final Session session, final String statement) throws RepositoryException {
