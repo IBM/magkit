@@ -1,7 +1,8 @@
 package com.aperto.magkit.query.sql2.condition;
 
 /**
- * TODO: Comment.
+ * Generic interface for name conditions. Declared methods for the step that provides the value.
+ * Allows providing only one value to be used for comparison. Bind variable names are not supported here.
  *
  * @author wolf.bubenik@aperto.com
  * @since (20.05.20)

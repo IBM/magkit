@@ -1,8 +1,8 @@
 package com.aperto.magkit.query.sql2.condition;
 
 /**
- * Generic interface for all property conditions. Declared methods for the step that declares the value.
- * Allows providing one or more values to be used for comparison or a bind variable name.
+ * Generic interface name conditions. Declares methods for the step that provides the values.
+ * Allows providing one or more values to be used for comparison. Bind variable names are not supported here.
  *
  * @author wolf.bubenik@aperto.com
  * @since (20.05.20)

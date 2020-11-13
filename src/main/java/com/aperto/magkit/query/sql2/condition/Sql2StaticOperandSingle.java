@@ -1,7 +1,8 @@
 package com.aperto.magkit.query.sql2.condition;
 
 /**
- * TODO: Comment.
+ * Generic interface for all property conditions. Declared methods for the step that declares the value.
+ * Allows providing only one value to be used for comparison or a bind variable name.
  *
  * @param <V> the type of the value
  * @author wolf.bubenik@aperto.com
