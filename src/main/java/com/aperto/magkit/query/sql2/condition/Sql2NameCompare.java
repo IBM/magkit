@@ -5,7 +5,7 @@ package com.aperto.magkit.query.sql2.condition;
  * Excluding not(). To be used when not() has been called.
  *
  * @author wolf.bubenik@aperto.com
- * @since 07.04.2020
+ * @since 11.11.2020
  */
 public interface Sql2NameCompare {
     Sql2NameOperandSingle lowerThan();
