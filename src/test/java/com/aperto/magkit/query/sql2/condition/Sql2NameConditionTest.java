@@ -16,13 +16,16 @@ public class Sql2NameConditionTest {
 
     @Test
     public void lowerCase() {
+        assertThat(new Sql2NameCondition().lowerCase().equalsAny().values().asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().lowerCase().equalsAny().values("").asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().lowerCase().equalsAny().values("value'_10%").asString(), is("lower(name()) = 'value''_10%'"));
     }
 
     @Test
     public void upperCase() {
         assertThat(new Sql2NameCondition().upperCase().equalsAny().values().asString(), is(EMPTY));
         assertThat(new Sql2NameCondition().upperCase().equalsAny().values("").asString(), is(EMPTY));
-        assertThat(new Sql2NameCondition().upperCase().equalsAny().values("value'_10%").asString(), is("upper(name()) = 'value''_10%'"));
+        assertThat(new Sql2NameCondition().upperCase().equalsAny().values("VALUE'_10%").asString(), is("upper(name()) = 'VALUE''_10%'"));
     }
 
     @Test
@@ -38,11 +41,14 @@ public class Sql2NameConditionTest {
     public void lowerThan() {
         assertThat(new Sql2NameCondition().lowerThan().value(null).asString(), is(EMPTY));
         assertThat(new Sql2NameCondition().lowerThan().value("").asString(), is(EMPTY));
-        assertThat(new Sql2NameCondition().lowerThan().value("value'_10%").asString(), is("name() < 'value''_10%'"));
+        assertThat(new Sql2NameCondition().lowerThan().value("01").asString(), is("name() < '01'"));
     }
 
     @Test
     public void lowerOrEqualThan() {
+        assertThat(new Sql2NameCondition().lowerOrEqualThan().value(null).asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().lowerOrEqualThan().value("").asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().lowerOrEqualThan().value("01").asString(), is("name() <= '01'"));
     }
 
     @Test
@@ -55,25 +61,23 @@ public class Sql2NameConditionTest {
 
     @Test
     public void greaterOrEqualThan() {
+        assertThat(new Sql2NameCondition().greaterOrEqualThan().value(null).asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().greaterOrEqualThan().value("").asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().greaterOrEqualThan().value("01").asString(), is("name() >= '01'"));
     }
 
     @Test
     public void greaterThan() {
+        assertThat(new Sql2NameCondition().greaterThan().value(null).asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().greaterThan().value("").asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().greaterThan().value("01").asString(), is("name() > '01'"));
     }
 
     @Test
     public void excludeAny() {
-    }
-
-    @Test
-    public void values() {
-    }
-
-    @Test
-    public void value() {
-    }
-
-    @Test
-    public void appendTo() {
+        assertThat(new Sql2NameCondition().excludeAny().values().asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().excludeAny().values("").asString(), is(EMPTY));
+        assertThat(new Sql2NameCondition().excludeAny().values("value'_10%").asString(), is("name() <> 'value''_10%'"));
+        assertThat(new Sql2NameCondition().excludeAny().values("value'_10%", "other").asString(), is("(name() <> 'value''_10%' OR name() <> 'other')"));
     }
 }
