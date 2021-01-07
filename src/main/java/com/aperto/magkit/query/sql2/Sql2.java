@@ -3,6 +3,7 @@ package com.aperto.magkit.query.sql2;
 import com.aperto.magkit.query.sql2.condition.Sql2CalendarCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2CompareNot;
 import com.aperto.magkit.query.sql2.condition.Sql2ConstraintGroup;
+import com.aperto.magkit.query.sql2.condition.Sql2ContainsCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2DoubleCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2DynamicOperand;
 import com.aperto.magkit.query.sql2.condition.Sql2JoinConstraint;
@@ -216,6 +217,26 @@ public final class Sql2 {
 
         public static Sql2JoinConstraint descendantOf(java.lang.String parent) {
             return Path.isDescendant(parent);
+        }
+
+        /**
+         * Get a builder for a fulltext condition for a search in all attributes.
+         * Note that you must define a selector name in your statement.
+         *
+         * @return a Sql2ContainsCondition instance for any property
+         */
+        public static Sql2ContainsCondition contains() {
+            return new Sql2ContainsCondition();
+        }
+
+        /**
+         * Get a builder for a fulltext condition for a search in one named attribute.
+         * Note that you must define a selector name in your statement.
+         *
+         * @return a Sql2ContainsCondition instance for one given property
+         */
+        public static Sql2ContainsCondition contains(java.lang.String property) {
+            return new Sql2ContainsCondition(property);
         }
 
         /**

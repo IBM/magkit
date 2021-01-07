@@ -242,6 +242,59 @@ public class Sql2StatementExamples {
         );
     }
 
+    @Test
+    public void fullTextSearchForMandatoryWordsUsingWildcards() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains().all("te?t", "oth* test")
+            ).orderByScore().build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'te?t \"oth* test\"') ORDER BY [jcr:score]")
+        );
+    }
+
+    @Test
+    public void fullTextSearchForOptionalWordsInTitle() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains("title").any("test", "other text")
+            ).build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, 'test OR \"other text\"')")
+        );
+    }
+
+    @Test
+    public void fullTextSearchForExcludedWords() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains().excludeAny("test", "other test")
+            ).build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '-test OR -\"other test\"')")
+        );
+    }
+
+    @Test
+    public void fuzzyFullTextSearchForWords() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains().all(1, true, "test", "other test")
+            ).build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"~')")
+        );
+    }
+
+    @Test
+    public void complexFullTextSearchWithBoosting() {
+        assertThat(
+            Sql2.Statement.selectComponents().selectAs("s").whereAll(
+                Sql2.Condition.contains()
+                    .all(1, false, "test?")
+                    .all(2, false, "boosted test")
+                    .excludeAll(3, true, "not anything like this")
+            ).build(),
+            is("SELECT s.* FROM [mgnl:component] AS s WHERE contains(s.*, 'test\\? \"boosted test\"^2 -\"not anything like this\"~^3')")
+        );
+    }
+
     private Calendar getCalendar(int year, int month, int date, int hour, int minute, int second) {
         Calendar result = Calendar.getInstance();
         result.set(year, month, date, hour, minute, second);
