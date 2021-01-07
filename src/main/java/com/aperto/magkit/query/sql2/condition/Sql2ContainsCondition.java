@@ -136,7 +136,7 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint, Sql2Constraint
         private final boolean _isFuzzy;
         private final boolean _isPhrase;
 
-        Term (final String term, final int boost, final boolean exclude, final boolean optional, final boolean fuzzy) {
+        Term(final String term, final int boost, final boolean exclude, final boolean optional, final boolean fuzzy) {
             Preconditions.checkArgument(!term.startsWith("?"), "Term may not start with '?'");
             Preconditions.checkArgument(!term.startsWith("*"), "Term may not start with '*'");
             _term = term;
@@ -170,7 +170,7 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint, Sql2Constraint
         }
 
         private void appendEscaped(final String term, final StringBuilder sql2) {
-            int last = term.length() -1;
+            int last = term.length() - 1;
             // escape ' by ''
             for (int i = 0; i < last; i++) {
                 char c = term.charAt(i);
@@ -182,9 +182,11 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint, Sql2Constraint
             // escape XPath search chars in last position
             // code taken from org.apache.jackrabbit.util.Text:escapeIllegalXpathSearchChars() and modified to avoid temp String creation.
             char c = term.charAt(last);
+            // CHECKSTYLE:OFF
             if (c == '!' || c == '(' || c == ':' || c == '^' || c == '[' || c == ']' || c == '{' || c == '}' || c == '?') {
                 sql2.append('\\');
             }
+            // CHECKSTYLE:ON
             sql2.append(c);
         }
     }
