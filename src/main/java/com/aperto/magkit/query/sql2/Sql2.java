@@ -229,6 +229,14 @@ public final class Sql2 {
             return new Sql2ContainsCondition();
         }
 
+        public static Sql2ContainsCondition containsAll(java.lang.String... values) {
+            return new Sql2ContainsCondition().all(values);
+        }
+
+        public static Sql2ContainsCondition containsAny(java.lang.String... values) {
+            return new Sql2ContainsCondition().any(values);
+        }
+
         /**
          * Get a builder for a fulltext condition for a search in one named attribute.
          * Note that you must define a selector name in your statement.
@@ -237,6 +245,14 @@ public final class Sql2 {
          */
         public static Sql2ContainsCondition contains(java.lang.String property) {
             return new Sql2ContainsCondition(property);
+        }
+
+        public static Sql2ContainsCondition containsAll(java.lang.String property, java.lang.String... values) {
+            return new Sql2ContainsCondition(property).all(values);
+        }
+
+        public static Sql2ContainsCondition containsAny(java.lang.String property, java.lang.String... values) {
+            return new Sql2ContainsCondition(property).any(values);
         }
 
         /**

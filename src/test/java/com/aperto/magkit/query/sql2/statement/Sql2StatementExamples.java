@@ -246,9 +246,9 @@ public class Sql2StatementExamples {
     public void fullTextSearchForMandatoryWordsUsingWildcards() {
         assertThat(
             Sql2.Statement.select().selectAs("s").whereAll(
-                Sql2.Condition.contains().all("te?t", "oth* test")
+                Sql2.Condition.contains().all("te?t", "hallo*")
             ).orderByScore().build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'te?t \"oth* test\"') ORDER BY [jcr:score]")
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'te?t hallo*') ORDER BY [jcr:score] DESC")
         );
     }
 
@@ -278,7 +278,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().selectAs("s").whereAll(
                 Sql2.Condition.contains().all(1, true, "test", "other test")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"~')")
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"')")
         );
     }
 
@@ -289,9 +289,39 @@ public class Sql2StatementExamples {
                 Sql2.Condition.contains()
                     .all(1, false, "test?")
                     .all(2, false, "boosted test")
-                    .excludeAll(3, true, "not anything like this")
+                    .excludeAll(3, true, "not this phrase!")
             ).build(),
-            is("SELECT s.* FROM [mgnl:component] AS s WHERE contains(s.*, 'test\\? \"boosted test\"^2 -\"not anything like this\"~^3')")
+            is("SELECT s.* FROM [mgnl:component] AS s WHERE contains(s.*, 'test? \"boosted test\"^2 -\"not this phrase!\"^3')")
+        );
+    }
+
+    @Test
+    public void fullTextProximitySearch() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains().addTerm(2, false, false, false, 5, false, "text within 5 words")
+            ).build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '\"text within 5 words\"~5^2')")
+        );
+    }
+
+    @Test
+    public void fullTextRangeQueryInclusive() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains("title").range(true, "alpha", "omega")
+            ).build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '[alpha TO omega]')")
+        );
+    }
+
+    @Test
+    public void fullTextRangeQueryExclusive() {
+        assertThat(
+            Sql2.Statement.select().selectAs("s").whereAll(
+                Sql2.Condition.contains("title").range(false, "alpha", "omega")
+            ).build(),
+            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '{alpha TO omega}')")
         );
     }
 
