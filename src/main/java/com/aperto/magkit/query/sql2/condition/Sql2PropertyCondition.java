@@ -176,5 +176,5 @@ public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V
 
     abstract T me();
 
-    abstract void appendValueConstraint(final StringBuilder sql2, final String selectorName, final String name, final V value);
+    abstract void appendValueConstraint(StringBuilder sql2, String selectorName, String name, V value);
 }

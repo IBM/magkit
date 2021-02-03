@@ -213,7 +213,7 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
     }
 
     private interface Term {
-        void appendTerm(final StringBuilder sql2, boolean isFirst);
+        void appendTerm(StringBuilder sql2, boolean isFirst);
 
         default void appendEscaped(final String term, final StringBuilder sql2, final boolean isPhrase, final boolean escapeQuestionMark) {
             int last = term.length() - 1;
