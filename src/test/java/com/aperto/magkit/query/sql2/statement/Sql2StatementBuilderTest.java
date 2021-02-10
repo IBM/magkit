@@ -3,7 +3,10 @@ package com.aperto.magkit.query.sql2.statement;
 import com.aperto.magkit.query.sql2.condition.Sql2PathCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2PathJoinCondition;
 import com.aperto.magkit.query.sql2.condition.Sql2StringCondition;
+import org.apache.jackrabbit.JcrConstants;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -15,6 +18,7 @@ import static org.junit.Assert.assertThat;
  * @since 06.04.2020
  */
 public class Sql2StatementBuilderTest {
+    private static final Logger LOG = LoggerFactory.getLogger(Sql2StatementBuilderTest.class);
 
     @Test
     public void selectAll() {
@@ -37,7 +41,7 @@ public class Sql2StatementBuilderTest {
 
     @Test
     public void selectAs() {
-        assertThat(Sql2Statement.select().selectAs("s").whereAll(
+        assertThat(Sql2Statement.select().as("s").whereAll(
             Sql2PathCondition.is().descendant("/some/root/path"),
             Sql2StringCondition.property("title").equalsAny().values("test")
         ).build(),
@@ -47,7 +51,7 @@ public class Sql2StatementBuilderTest {
 
     @Test
     public void innerJoin() {
-        assertThat(Sql2Statement.select().selectAs("s")
+        assertThat(Sql2Statement.select().as("s")
             .innerJoin("nt:base").joinAs("j").on(Sql2PathJoinCondition.isJoinedDescendantOfSelected())
             .whereAll(
                 Sql2StringCondition.template().equalsAll().values("selected.template.id"),
@@ -103,5 +107,38 @@ public class Sql2StatementBuilderTest {
             ).orderBy("test").ascending().build(),
             is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] ASC")
         );
+    }
+
+    @Test
+    public void performance() {
+        String type = JcrConstants.NT_BASE;
+        String path = "/some/path";
+        String property = "test";
+        String value = "value";
+        String result = null;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 100000; i++) {
+            result = Sql2Statement.select().whereAny(
+                Sql2PathCondition.is().descendant(path),
+                Sql2StringCondition.property(property).equalsAny().values(value + i)
+            ).build();
+        }
+        long time = System.currentTimeMillis() - start;
+        LOG.info("Time: " + time + " ms");
+
+        start = System.currentTimeMillis();
+        for (int i = 0; i < 100000; i++) {
+            result = "SELECT * FROM " + '[' + type + ']' + " WHERE (isdescendantnode('" + path + "') OR " + '[' + property + ']' + " = " + '\'' + value + i + '\'' + ")";
+        }
+        time = System.currentTimeMillis() - start;
+        LOG.info("Time: " + time + " ms");
+
+        final String template = "SELECT * FROM [%s] WHERE (isdescendantnode('%s') OR [%s] = '%s')";
+        start = System.currentTimeMillis();
+        for (int i = 0; i < 100000; i++) {
+            result = String.format(template, type, path, property, value + i);
+        }
+        time = System.currentTimeMillis() - start;
+        LOG.info("Time: " + time + " ms");
     }
 }

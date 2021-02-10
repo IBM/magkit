@@ -41,7 +41,7 @@ public class Sql2StatementExamples {
         );
 
         assertThat(
-            Sql2.Statement.selectComponents().selectAs("t").whereAll(Sql2.Condition.isNotNull("title")).build(),
+            Sql2.Statement.selectComponents().as("t").whereAll(Sql2.Condition.isNotNull("title")).build(),
             is("SELECT t.* FROM [mgnl:component] AS t WHERE t.[title] IS NOT NULL")
         );
     }
@@ -137,7 +137,7 @@ public class Sql2StatementExamples {
         );
 
         assertThat(
-            Sql2.Statement.selectComponents().selectAs("t").whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
+            Sql2.Statement.selectComponents().as("t").whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
             is("SELECT t.* FROM [mgnl:component] AS t WHERE isdescendantnode(t, '/root/path')")
         );
     }
@@ -158,7 +158,7 @@ public class Sql2StatementExamples {
         );
 
         assertThat(
-            Sql2.Statement.select().selectAs("t").whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
+            Sql2.Statement.select().as("t").whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
             is("SELECT t.* FROM [nt:base] AS t WHERE issamenode(t, '/root/path')")
         );
     }
@@ -200,7 +200,7 @@ public class Sql2StatementExamples {
     // Joins only with row queries, because: javax.jcr.RepositoryException: This query result contains more than one selector
     @Test
     public void selectChildrenOfParentWithTemplate() {
-        assertThat(Sql2.Statement.selectComponents().selectAs("content")
+        assertThat(Sql2.Statement.selectComponents().as("content")
             .innerJoin(NodeTypes.Component.NAME).joinAs("container").on(
                 Sql2.JoinOn.selectedDescendantOfJoined()
             )
@@ -220,7 +220,7 @@ public class Sql2StatementExamples {
         );
 
         assertThat(
-            Sql2.Statement.selectContentNodes().selectAs("t").whereAll(Sql2.Condition.nameEquals("00")).build(),
+            Sql2.Statement.selectContentNodes().as("t").whereAll(Sql2.Condition.nameEquals("00")).build(),
             is("SELECT t.* FROM [mgnl:contentNode] AS t WHERE name(t) = '00'")
         );
     }
@@ -235,7 +235,7 @@ public class Sql2StatementExamples {
         );
 
         assertThat(
-            Sql2.Statement.selectContentNodes().selectAs("t").whereAll(
+            Sql2.Statement.selectContentNodes().as("t").whereAll(
                 Sql2.Condition.name().lowerCase().excludeAny().values("0", "test")
             ).build(),
             is("SELECT t.* FROM [mgnl:contentNode] AS t WHERE (lower(name(t)) <> '0' OR lower(name(t)) <> 'test')")
@@ -245,7 +245,7 @@ public class Sql2StatementExamples {
     @Test
     public void fullTextSearchForMandatoryWordsUsingWildcards() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains().all("te?t", "hallo*")
             ).orderByScore().build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'te?t hallo*') ORDER BY [jcr:score] DESC")
@@ -255,7 +255,7 @@ public class Sql2StatementExamples {
     @Test
     public void fullTextSearchForOptionalWordsInTitle() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains("title").any("test", "other text")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, 'test OR \"other text\"')")
@@ -265,7 +265,7 @@ public class Sql2StatementExamples {
     @Test
     public void fullTextSearchForExcludedWords() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains().excludeAny("test", "other test")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '-test OR -\"other test\"')")
@@ -275,7 +275,7 @@ public class Sql2StatementExamples {
     @Test
     public void fuzzyFullTextSearchForWords() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains().all(1, true, "test", "other test")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"')")
@@ -285,7 +285,7 @@ public class Sql2StatementExamples {
     @Test
     public void complexFullTextSearchWithBoosting() {
         assertThat(
-            Sql2.Statement.selectComponents().selectAs("s").whereAll(
+            Sql2.Statement.selectComponents().as("s").whereAll(
                 Sql2.Condition.contains()
                     .all(1, false, "test?")
                     .all(2, false, "boosted test")
@@ -298,7 +298,7 @@ public class Sql2StatementExamples {
     @Test
     public void fullTextProximitySearch() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains().addTerm(2, false, false, false, 5, false, "text within 5 words")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '\"text within 5 words\"~5^2')")
@@ -308,7 +308,7 @@ public class Sql2StatementExamples {
     @Test
     public void fullTextRangeQueryInclusive() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains("title").range(true, "alpha", "omega")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '[alpha TO omega]')")
@@ -318,7 +318,7 @@ public class Sql2StatementExamples {
     @Test
     public void fullTextRangeQueryExclusive() {
         assertThat(
-            Sql2.Statement.select().selectAs("s").whereAll(
+            Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.contains("title").range(false, "alpha", "omega")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '{alpha TO omega}')")

@@ -7,5 +7,5 @@ package com.aperto.magkit.query.sql2.statement;
  * @since (15.05.20)
  */
 public interface Sql2As extends Sql2Where {
-    Sql2Join selectAs(String selectorName);
+    Sql2Join as(String selectorName);
 }

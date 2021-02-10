@@ -58,7 +58,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         return this;
     }
 
-    public Sql2Join selectAs(String selectorName) {
+    public Sql2Join as(String selectorName) {
         _fromSelectorName = trimToNull(selectorName);
         return this;
     }
