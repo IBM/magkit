@@ -16,7 +16,9 @@ import javax.inject.Inject;
  *
  * @author Stefan Jahn
  * @since 21.11.14
+ * @deprecated use new ui 6 field {@link com.aperto.magkit.dialogs.m6.fields.ExtendedTextFieldFactory}
  */
+@Deprecated(since = "3.5.2")
 public class ExtendedTextFieldFactory extends TextFieldFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedTextFieldFactory.class);
 

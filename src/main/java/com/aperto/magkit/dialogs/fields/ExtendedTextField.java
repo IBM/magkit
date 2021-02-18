@@ -15,7 +15,9 @@ import com.vaadin.v7.ui.VerticalLayout;
  *
  * @author Stefan Jahn
  * @since 05.12.14
+ * @deprecated use new ui 6 field {@link com.aperto.magkit.dialogs.m6.fields.ExtendedTextField}
  */
+@Deprecated(since = "3.5.2")
 @StyleSheet("extendedTextField.css")
 public class ExtendedTextField extends CustomField<String> {
     private static final long serialVersionUID = -6599211749794929718L;
