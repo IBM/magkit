@@ -101,7 +101,7 @@ public class ExtendedTextField extends CustomField<String> {
 
     @Override
     public String getValue() {
-        return null;
+        return _field.getValue();
     }
 
     @Override
