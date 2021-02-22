@@ -4,8 +4,6 @@ import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.field.factory.TextFieldFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -16,11 +14,13 @@ import javax.inject.Inject;
  * @since 17.02.2021
  */
 public class ExtendedTextFieldFactory extends TextFieldFactory {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedTextFieldFactory.class);
+
+    private final ExtendedTextFieldDefinition _definition;
 
     @Inject
     public ExtendedTextFieldFactory(final ExtendedTextFieldDefinition definition, ComponentProvider componentProvider) {
         super(definition, componentProvider);
+        _definition = definition;
     }
 
     /**
@@ -30,10 +30,8 @@ public class ExtendedTextFieldFactory extends TextFieldFactory {
     public Component createFieldComponent() {
         Component fieldComponent = super.createFieldComponent();
 
-        if (definition instanceof ExtendedTextFieldDefinition) {
-            if (definition.getMaxLength() < 1 && ((ExtendedTextFieldDefinition) definition).getRecommendedLength() > 0) {
-                fieldComponent = new ExtendedTextField((ExtendedTextFieldDefinition) definition, (AbstractTextField) fieldComponent);
-            }
+        if (_definition.getMaxLength() < 1 && _definition.getRecommendedLength() > 0) {
+            fieldComponent = new ExtendedTextField(_definition, (AbstractTextField) fieldComponent);
         }
 
         return fieldComponent;

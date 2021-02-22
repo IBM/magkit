@@ -1,0 +1,15 @@
+/* com.aperto.magkit.dialogs.m6.fields.ExtendedTextField */
+.aperto-extended-textfield-label {
+    color: #666;
+    white-space: nowrap;
+    line-height: 11px;
+    right: 5px;
+    position: absolute;
+    font-size: 11px;
+    top: 5px;
+}
+
+.v-customcomponent-error .aperto-extended-textfield input.v-textfield {
+    /* unable to get this working with magnolia styles */
+    border-color: red !important;
+}

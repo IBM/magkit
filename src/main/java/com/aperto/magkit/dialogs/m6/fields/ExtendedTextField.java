@@ -2,11 +2,15 @@ package com.aperto.magkit.dialogs.m6.fields;
 
 
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.shared.Registration;
+import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+
+import java.util.Optional;
 
 /**
  * Enhance the text field functionality by showing an additional editorial label.
@@ -16,53 +20,18 @@ import com.vaadin.ui.VerticalLayout;
  */
 @StyleSheet("extendedTextField.css")
 public class ExtendedTextField extends CustomField<String> {
+
     private static final long serialVersionUID = -6599211749794929718L;
-    public static final int FULL_WIDTH = 100;
 
     private final ExtendedTextFieldDefinition _definition;
-    private final VerticalLayout _rootLayout = new VerticalLayout();
-    private final AbstractTextField _field;
-    private Label _remainingLength = new Label();
+    private final AbstractTextField _textField;
+    private final Label _remainingLength = new Label();
+    private final int _availableLength;
 
-    public ExtendedTextField(ExtendedTextFieldDefinition definition, AbstractTextField field) {
-        _field = field;
+    public ExtendedTextField(final ExtendedTextFieldDefinition definition, final AbstractTextField innerComponent) {
         _definition = definition;
-    }
-
-    @Override
-    public Component initContent() {
-        _rootLayout.setSizeFull();
-        _rootLayout.setSpacing(true);
-        _rootLayout.setPrimaryStyleName("aperto-extended-textfield");
-        _rootLayout.addComponent(_field);
-        configureLabel();
-
-        return _rootLayout;
-    }
-
-    public void configureLabel() {
-        final int availableLength = determineLabelMaxLength();
-
-        // check the initial value of the text field
-        int textLength = 0;
-        if (_field.getValue() != null) {
-            textLength = _field.getValue().length();
-        }
-
-        // initial editorial length label
-        if (availableLength > 0) {
-            _remainingLength.setValue(availableLength - textLength + "/" + availableLength);
-        }
-
-        // if no length is defined, no additional label will be shown
-        if (availableLength > 0) {
-            _remainingLength.setPrimaryStyleName("aperto-extended-textfield-label");
-            _remainingLength.setWidth(FULL_WIDTH, Unit.PERCENTAGE);
-            _rootLayout.addComponent(_remainingLength);
-
-            // change Listener, der das Label aktualisiert
-            _field.addValueChangeListener(event -> updateRemainingLength(event.getValue().length(), availableLength));
-        }
+        _textField = innerComponent;
+        _availableLength = determineLabelMaxLength();
     }
 
     /**
@@ -70,21 +39,60 @@ public class ExtendedTextField extends CustomField<String> {
      *
      * @return second value of the label
      */
-    protected int determineLabelMaxLength() {
+    private int determineLabelMaxLength() {
+        int max = _definition.getMaxLength();
+        int recommended = _definition.getRecommendedLength();
+        int available;
 
-        final int maxLength = _definition.getMaxLength();
-        final int recommendedLength = _definition.getRecommendedLength();
-        final int availableLength;
-        if (maxLength > 0 && recommendedLength > 0) {
-            availableLength = Math.min(maxLength, recommendedLength);
-        } else if (maxLength > 0) {
-            availableLength = maxLength;
-        } else if (recommendedLength > 0) {
-            availableLength = recommendedLength;
+        if (max > 0 && recommended > 0) {
+            available = Math.min(max, recommended);
+        } else if (max > 0) {
+            available = max;
+        } else if (recommended > 0) {
+            available = recommended;
         } else {
-            availableLength = -1;
+            available = -1;
         }
-        return availableLength;
+
+        return available;
+    }
+
+    @Override
+    public Component initContent() {
+        _textField.setCaption(null);
+        _textField.setPrimaryStyleName("v-textfield");
+        _textField.setRequiredIndicatorVisible(false);
+        _textField.setWidth(100, Unit.PERCENTAGE);
+        _textField.setValueChangeMode(ValueChangeMode.LAZY);
+        _textField.addValueChangeListener(event -> setValue(event.getValue()));
+
+        VerticalLayout root = new VerticalLayout();
+        root.setPrimaryStyleName("aperto-extended-textfield");
+        root.setMargin(false);
+        root.setSizeFull();
+        root.setSpacing(false);
+        root.addComponent(_textField);
+
+        // check the initial value of the text field
+        int textLength = Optional.ofNullable(_textField.getValue())
+            .map(String::length)
+            .orElse(0);
+
+        // initial editorial length label: if no length is defined, no additional label will be shown
+        if (_availableLength > 0) {
+            _remainingLength.setValue(_availableLength - textLength + "/" + _availableLength);
+            _remainingLength.setPrimaryStyleName("aperto-extended-textfield-label");
+            _remainingLength.setCaption(null);
+
+            _textField.addValueChangeListener(event -> updateRemainingLength(event.getValue().length(), _availableLength));
+
+            root.addComponent(_remainingLength);
+        }
+
+        setValue(_textField.getValue());
+        setFocusDelegate(_textField);
+
+        return root;
     }
 
     /**
@@ -95,31 +103,31 @@ public class ExtendedTextField extends CustomField<String> {
     }
 
     @Override
-    public void setValue(String newValue) {
-        _field.setValue(newValue);
+    protected void doSetValue(final String value) {
+        _textField.setValue(value);
     }
 
     @Override
     public String getValue() {
-        return _field.getValue();
+        return _textField.getValue();
     }
 
     @Override
-    protected void doSetValue(String s) {
-        _field.setValue(s);
+    public String getEmptyValue() {
+        return _textField.getEmptyValue();
     }
 
+    @Override
+    public boolean isEmpty() {
+        return _textField.isEmpty();
+    }
 
     public Label getRemainingLength() {
         return _remainingLength;
     }
 
-    public void setRemainingLength(Label remainingLength) {
-        _remainingLength = remainingLength;
+    @Override
+    public Registration addValueChangeListener(final ValueChangeListener<String> listener) {
+        return _textField.addValueChangeListener(listener);
     }
-
-    public AbstractTextField getField() {
-        return _field;
-    }
-
 }

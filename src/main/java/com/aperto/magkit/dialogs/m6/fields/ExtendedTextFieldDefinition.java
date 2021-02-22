@@ -12,11 +12,11 @@ import info.magnolia.ui.field.TextFieldDefinition;
 @FieldType("extendedTextField")
 public class ExtendedTextFieldDefinition extends TextFieldDefinition {
 
+    private int _recommendedLength = -1;
+
     public ExtendedTextFieldDefinition() {
         setFactoryClass(ExtendedTextFieldFactory.class);
     }
-
-    private int _recommendedLength = -1;
 
     public int getRecommendedLength() {
         return _recommendedLength;
