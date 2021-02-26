@@ -17,7 +17,9 @@ import javax.inject.Inject;
  *
  * @author Stefan Jahn
  * @since 02.12.14
+ * @deprecated use new ui 6 field
  */
+@Deprecated(since = "3.5.2")
 public class SortableMultiValueFieldFactory extends AbstractFieldFactory<SortableMultiValueFieldDefinition, PropertysetItem> {
 
     private final Item _relatedFieldItem;

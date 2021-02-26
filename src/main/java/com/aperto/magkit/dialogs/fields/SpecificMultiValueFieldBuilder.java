@@ -7,7 +7,9 @@ import info.magnolia.ui.form.field.definition.MultiValueFieldDefinition;
  * Builder for the {@link SpecificMultiField} instance.
  *
  * @author noreply@aperto.com
+ * @deprecated use new ui 6 field
  */
+@Deprecated(since = "3.5.2")
 public class SpecificMultiValueFieldBuilder extends MultiValueFieldBuilder {
 
     private SpecificMultiFieldDefinition _definition;

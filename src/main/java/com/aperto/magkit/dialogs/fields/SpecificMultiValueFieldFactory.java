@@ -13,7 +13,9 @@ import info.magnolia.ui.form.field.factory.MultiValueFieldFactory;
  * Multi field with specific size.
  *
  * @author diana.racho (Aperto AG)
+ * @deprecated use new ui 6 field
  */
+@Deprecated(since = "3.5.2")
 public class SpecificMultiValueFieldFactory extends MultiValueFieldFactory<SpecificMultiFieldDefinition> {
 
     private FieldFactoryFactory _fieldFactoryFactory;

@@ -15,7 +15,9 @@ import javax.inject.Inject;
  *
  * @author frank.sommer
  * @since 21.10.14
+ * @deprecated use new ui 6 field {@link info.magnolia.ui.field.factory.ListSelectFieldFactory}
  */
+@Deprecated(since = "3.5.2")
 public class ListSelectGroupFieldFactory extends OptionGroupFieldFactory<ListSelectFieldDefinition> {
 
     @Inject

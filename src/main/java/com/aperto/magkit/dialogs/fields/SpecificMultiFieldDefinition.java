@@ -7,7 +7,9 @@ import info.magnolia.ui.form.field.transformer.multi.MultiValueTransformer;
  * Multi field with specific size.
  *
  * @author diana.racho (Aperto AG)
+ * @deprecated use new ui 6 field {@link com.aperto.magkit.dialogs.m6.fields.SpecificMultiFieldDefinition}
  */
+@Deprecated(since = "3.5.2")
 public class SpecificMultiFieldDefinition extends MultiValueFieldDefinition {
 
     private String _parentCountFieldName;

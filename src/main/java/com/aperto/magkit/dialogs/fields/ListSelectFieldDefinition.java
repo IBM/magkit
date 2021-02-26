@@ -13,7 +13,9 @@ import info.magnolia.ui.form.field.transformer.Transformer;
  *
  * @author frank.sommer
  * @since 21.10.14
+ * @deprecated use new ui 6 field {@link info.magnolia.ui.field.ListSelectFieldDefinition}
  */
+@Deprecated(since = "3.5.2")
 public class ListSelectFieldDefinition extends OptionGroupFieldDefinition {
     private static final int DEF_ROWS = 6;
     protected static final String EMPTY_VALUE = "---";

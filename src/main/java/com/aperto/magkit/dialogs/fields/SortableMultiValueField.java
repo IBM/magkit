@@ -32,7 +32,9 @@ import static com.aperto.magkit.dialogs.fields.ExtendedTextField.FULL_WIDTH;
  *
  * @author Stefan Jahn
  * @since 02.12.14
+ * @deprecated use new ui 6 field
  */
+@Deprecated(since = "3.5.2")
 @StyleSheet("sortableMultiValueField.css")
 public class SortableMultiValueField extends AbstractCustomMultiField<SortableMultiValueFieldDefinition, PropertysetItem> {
     private static final long serialVersionUID = 5843108445147449041L;

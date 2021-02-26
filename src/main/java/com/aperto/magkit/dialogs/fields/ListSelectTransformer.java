@@ -13,7 +13,9 @@ import java.util.Collection;
  * @param <T> type of value
  * @author frank.sommer
  * @since 04.11.14
+ * @deprecated use new ui 6 field
  */
+@Deprecated(since = "3.5.2")
 public class ListSelectTransformer<T> extends ListToSetTransformer<T> {
 
     public ListSelectTransformer(final Item relatedFormItem, final ConfiguredFieldDefinition definition, final Class<T> type, I18NAuthoringSupport i18nAuthoringSupport) {

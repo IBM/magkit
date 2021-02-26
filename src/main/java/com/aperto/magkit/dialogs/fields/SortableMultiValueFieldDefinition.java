@@ -9,7 +9,9 @@ import info.magnolia.ui.form.field.transformer.multi.MultiValueTransformer;
  *
  * @author Stefan Jahn
  * @since 02.12.14
+ * @deprecated use new ui 6 field {@link com.aperto.magkit.dialogs.m6.fields.SpecificMultiFieldDefinition}
  */
+@Deprecated(since = "3.5.2")
 public class SortableMultiValueFieldDefinition extends MultiValueFieldDefinition {
 
     private Long _maxComponents = Long.MAX_VALUE;

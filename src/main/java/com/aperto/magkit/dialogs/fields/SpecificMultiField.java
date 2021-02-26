@@ -35,7 +35,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * The Field values are handle by a configured {@link info.magnolia.ui.form.field.transformer.Transformer} dedicated to create/retrieve properties as {@link PropertysetItem}.<br>
  *
  * @author diana.racho (Aperto AG)
+ * @deprecated use new ui 6 field
  */
+@Deprecated(since = "3.5.2")
 public class SpecificMultiField extends MultiField {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecificMultiField.class);
     private static final long DEFAULT_COUNT = 3;
