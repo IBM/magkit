@@ -22,6 +22,8 @@ import javax.inject.Inject;
  */
 public class SpecificMultiFormView<T> extends MultiFormView<T> implements ClientConnector.AttachListener, ClientConnector.DetachListener, HasComponents.ComponentAttachListener, HasComponents.ComponentDetachListener {
 
+    private static final long DEFAULT_MAX = 3;
+
     private final MultiFormDefinition<T> _definition;
     private final SimpleTranslator _i18n;
 
@@ -39,22 +41,24 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
     public void layout() {
         super.layout();
         if (_definition != null) {
-            initMaxComponents(_definition);
+            initMaxComponents();
         }
     }
 
-    private void initMaxComponents(MultiFormDefinition<T> definition) {
-        _maxComponents = ((SpecificMultiFieldDefinition) definition).getMaxComponents();
-        if (_maxComponents != null) {
-            _rootLayout = (VerticalLayout) asVaadinComponent();
-            int componentCount = _rootLayout.getComponentCount();
-            if (componentCount > 1) {
-                _rootLayout.addAttachListener(this);
-                _rootLayout.addDetachListener(this);
-                _rootLayout.addComponentAttachListener(this);
-                _rootLayout.addComponentDetachListener(this);
+    private void initMaxComponents() {
+        _rootLayout = (VerticalLayout) asVaadinComponent();
+        int componentCount = _rootLayout.getComponentCount();
+        if (componentCount > 1) {
+            _maxComponents = ((SpecificMultiFieldDefinition) _definition).getMaxComponents();
+            if (_maxComponents == null) {
+                _maxComponents = DEFAULT_MAX;
             }
+            _rootLayout.addAttachListener(this);
+            _rootLayout.addDetachListener(this);
+            _rootLayout.addComponentAttachListener(this);
+            _rootLayout.addComponentDetachListener(this);
         }
+
     }
 
     @Override

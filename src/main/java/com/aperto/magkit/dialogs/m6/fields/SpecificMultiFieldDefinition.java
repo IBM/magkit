@@ -12,7 +12,7 @@ import info.magnolia.ui.field.JcrMultiFieldDefinition;
 @FieldType("specificMultiField")
 public class SpecificMultiFieldDefinition extends JcrMultiFieldDefinition {
 
-    private Long _maxComponents = 3L;
+    private Long _maxComponents;
 
     public SpecificMultiFieldDefinition() {
         setImplementationClass((Class) SpecificMultiFormView.class);
