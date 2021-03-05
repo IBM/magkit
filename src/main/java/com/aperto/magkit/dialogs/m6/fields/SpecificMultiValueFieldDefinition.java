@@ -12,19 +12,19 @@ import info.magnolia.ui.field.JcrMultiValueFieldDefinition;
 @FieldType("specificMultiValueField")
 public class SpecificMultiValueFieldDefinition extends JcrMultiValueFieldDefinition implements SpecificMultiDefinition {
 
-    private Long _maxCount = DEFAULT_MAX;
+    private Long _maxComponents = DEFAULT_MAX;
     private String _parentCountProperty;
 
     public SpecificMultiValueFieldDefinition() {
         setImplementationClass((Class) SpecificMultiFormView.class);
     }
 
-    public Long getMaxComponent() {
-        return _maxCount;
+    public Long getMaxComponents() {
+        return _maxComponents;
     }
 
-    public void setMaxCount(Long maxCount) {
-        _maxCount = maxCount;
+    public void setMaxComponents(Long maxComponents) {
+        _maxComponents = maxComponents;
     }
 
     public String getParentComponentProperty() {

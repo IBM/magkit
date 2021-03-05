@@ -9,7 +9,7 @@ package com.aperto.magkit.dialogs.m6.fields;
 public interface SpecificMultiDefinition {
     long DEFAULT_MAX = 3;
 
-    Long getMaxComponent();
+    Long getMaxComponents();
 
     String getParentComponentProperty();
 }
