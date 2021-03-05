@@ -42,28 +42,30 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
         super.layout();
         if (_definition != null) {
             initMaxComponents();
+            initContent();
         }
     }
 
     private void initMaxComponents() {
+        _maxComponents = ((SpecificMultiFieldDefinition) _definition).getMaxComponents();
+        if (_maxComponents == null) {
+            _maxComponents = DEFAULT_MAX;
+        }
+    }
+
+    private void initContent() {
         _rootLayout = (VerticalLayout) asVaadinComponent();
         int componentCount = _rootLayout.getComponentCount();
+        _rootLayout.addComponentAttachListener(this);
         if (componentCount > 1) {
-            _maxComponents = ((SpecificMultiFieldDefinition) _definition).getMaxComponents();
-            if (_maxComponents == null) {
-                _maxComponents = DEFAULT_MAX;
-            }
-            _rootLayout.addAttachListener(this);
-            _rootLayout.addDetachListener(this);
-            _rootLayout.addComponentAttachListener(this);
             _rootLayout.addComponentDetachListener(this);
         }
-
+        _rootLayout.addAttachListener(this);
     }
 
     @Override
     public void attach(final ClientConnector.AttachEvent event) {
-        addButtonDisabled();
+        addButtonDisabled(false);
     }
 
     @Override
@@ -73,7 +75,7 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
 
     @Override
     public void componentAttachedToContainer(final HasComponents.ComponentAttachEvent event) {
-        addButtonDisabled();
+        addButtonDisabled(true);
     }
 
     @Override
@@ -88,11 +90,13 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
         }
     }
 
-    private void addButtonDisabled() {
+    private void addButtonDisabled(boolean showNotification) {
         Component component = _rootLayout.getComponent(_rootLayout.getComponentCount() - 1);
         if (_rootLayout.getComponentCount() > _maxComponents) {
             component.setEnabled(false);
-            Notification.show(_i18n.translate("specificMultiField.maxNumber.reached", _maxComponents));
+            if (showNotification) {
+                Notification.show(_i18n.translate("specificMultiField.maxNumber.reached", _maxComponents));
+            }
         }
     }
 
