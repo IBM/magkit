@@ -1,20 +1,21 @@
 package com.aperto.magkit.dialogs.m6.fields;
 
 import info.magnolia.ui.field.FieldType;
-import info.magnolia.ui.field.JcrMultiFieldDefinition;
+import info.magnolia.ui.field.JcrMultiValueFieldDefinition;
 
 /**
- * Multi field with specific size. Used for multi fields containing composite fields.
+ * Multi field with specific size. Used for simple multi fields stored in a multi value property.
  *
  * @author payam.tabrizi
  * @since 22.02.21
  */
-@FieldType("specificMultiField")
-public class SpecificMultiFieldDefinition extends JcrMultiFieldDefinition implements SpecificMultiDefinition {
+@FieldType("specificMultiValueField")
+public class SpecificMultiValueFieldDefinition extends JcrMultiValueFieldDefinition implements SpecificMultiDefinition {
+
     private Long _maxCount = DEFAULT_MAX;
     private String _parentCountProperty;
 
-    public SpecificMultiFieldDefinition() {
+    public SpecificMultiValueFieldDefinition() {
         setImplementationClass((Class) SpecificMultiFormView.class);
     }
 
