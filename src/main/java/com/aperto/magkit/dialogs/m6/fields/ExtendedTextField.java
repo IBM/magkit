@@ -60,7 +60,6 @@ public class ExtendedTextField extends CustomField<String> {
     @Override
     public Component initContent() {
         _textField.setCaption(null);
-        _textField.setPrimaryStyleName("v-textfield");
         _textField.setRequiredIndicatorVisible(false);
         _textField.setWidth(100, Unit.PERCENTAGE);
         _textField.setValueChangeMode(ValueChangeMode.LAZY);
