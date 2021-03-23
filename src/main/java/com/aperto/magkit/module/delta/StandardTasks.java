@@ -27,7 +27,6 @@ import static info.magnolia.jcr.nodebuilder.Ops.addNode;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 import static info.magnolia.jcr.nodebuilder.Ops.noop;
 import static info.magnolia.jcr.nodebuilder.Ops.setProperty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Collection of standard module version handler tasks.
@@ -93,14 +92,26 @@ public final class StandardTasks {
     }
 
     /**
-     * Task to add an apps to the app launcher.
+     * Task to add apps to the app launcher.
      *
      * @param groupName Name of the apps group on app launcher
      * @param color     color value of the group, if empty no color will be set. E.g. #cccccc
      * @param permanent group is permanent (on top) or collapsed (on bottom)
      * @param appNames  names of the single apps
+     * @deprecated use {@link #addAppsToLauncher(String, String...)}
      */
+    @Deprecated
     public static Task addAppsToLauncher(final String groupName, final String color, final boolean permanent, final String... appNames) {
+        return addAppsToLauncher(groupName, appNames);
+    }
+
+    /**
+     * Task to add apps to the app launcher.
+     *
+     * @param groupName Name of the apps group on app launcher
+     * @param appNames  names of the single apps
+     */
+    public static Task addAppsToLauncher(final String groupName, final String... appNames) {
         List<NodeOperation> appsOperations = new ArrayList<>();
         for (String appName : appNames) {
             appsOperations.add(addOrGetContentNode(appName));
@@ -109,8 +120,6 @@ public final class StandardTasks {
         return selectModuleConfig("Add apps to " + groupName, "Add apps to app launcher to group: " + groupName, "ui-admincentral",
             getNode("config/appLauncherLayout/groups").then(
                 addOrGetContentNode(groupName).then(
-                    isNotEmpty(color) ? addOrSetProperty("color", color) : noop(),
-                    addOrSetProperty("permanent", Boolean.toString(permanent)),
                     addOrGetContentNode("apps").then(
                         appsOperations.toArray(new NodeOperation[0])
                     )
