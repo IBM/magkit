@@ -5,6 +5,7 @@ import info.magnolia.jcr.nodebuilder.ErrorHandler;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.nodebuilder.Ops;
 import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.jcr.util.PropertyUtil;
 import info.magnolia.voting.voters.URIPatternVoter;
 
@@ -79,6 +80,23 @@ public abstract class NodeOperationFactory extends Ops {
             @Override
             protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
                 context.getParent().orderBefore(nodeName, orderBeforeNodeName);
+                return context;
+            }
+        };
+    }
+
+    /**
+     * Moves the named node after its sibbling.
+     *
+     * @param nodeName            the name of the node to be moved
+     * @param orderAfterNodeName the name of the node sibbing that should be ordered before the named node
+     * @return the NodeOperation performing the ordering operation
+     */
+    public static NodeOperation orderAfter(final String nodeName, final String orderAfterNodeName) {
+        return new AbstractNodeOperation() {
+            @Override
+            protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
+                NodeUtil.orderAfter(context.getNode(nodeName), orderAfterNodeName);
                 return context;
             }
         };
