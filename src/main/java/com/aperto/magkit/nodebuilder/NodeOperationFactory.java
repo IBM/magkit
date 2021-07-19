@@ -69,11 +69,11 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Moves the named node before its sibbling.
+     * Moves the named node before its sibling.
      * Wrapper for {@link javax.jcr.Node#orderBefore(String, String)}
      *
      * @param nodeName            the name of the node to be moved
-     * @param orderBeforeNodeName the name of the node sibing that should be ordered behind the named node
+     * @param orderBeforeNodeName the name of the node sibling that should be ordered behind the named node
      * @return the NodeOperation performing the ordering operation
      */
     public static NodeOperation orderBefore(final String nodeName, final String orderBeforeNodeName) {
@@ -91,7 +91,7 @@ public abstract class NodeOperationFactory extends Ops {
      * Wrapper for {@link info.magnolia.jcr.util.NodeUtil#orderAfter(Node, String)}
      *
      * @param nodeName            the name of the node to be moved
-     * @param orderAfterNodeName the name of the node sibbing that should be ordered before the named node
+     * @param orderAfterNodeName the name of the node sibling that should be ordered after the named node
      * @return the NodeOperation performing the ordering operation
      */
     public static NodeOperation orderAfter(final String nodeName, final String orderAfterNodeName) {
@@ -109,7 +109,7 @@ public abstract class NodeOperationFactory extends Ops {
      * If the property does not exist it will be created. No Exception will be thrown.
      *
      * @param name     the name of the node to be moved
-     * @param newValue the name of the node sibbing that should be ordered behind the named node
+     * @param newValue the name of the node sibling that should be ordered behind the named node
      * @return the NodeOperation performing the operation
      */
     public static NodeOperation addOrSetProperty(final String name, final Object newValue) {
