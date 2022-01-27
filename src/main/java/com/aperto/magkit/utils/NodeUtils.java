@@ -219,8 +219,7 @@ public final class NodeUtils {
     public static boolean isNodeType(@Nullable final Node node, @Nullable final String nodeType) {
         boolean isNodeType = false;
         try {
-            // TODO: Use NodeUtils.isNodeType(..)? -> checks original type of frozen nodes?
-            isNodeType = node != null && node.isNodeType(defaultString(nodeType));
+            isNodeType = node != null && isNotBlank(nodeType) && NodeUtil.isNodeType(node, nodeType);
         } catch (RepositoryException e) {
             LOGGER.info("Unable to check node type [{}] for node [{}]", nodeType, getPathIfPossible(node));
             LOGGER.debug(e.getLocalizedMessage(), e);

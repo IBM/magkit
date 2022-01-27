@@ -15,6 +15,7 @@ import static com.aperto.magkit.utils.NodeUtils.getPathForIdentifier;
 import static com.aperto.magkit.utils.NodeUtils.hasSubComponents;
 import static com.aperto.magkit.utils.NodeUtils.isNodeType;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -26,8 +27,10 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import com.aperto.magkit.mockito.TemplateDefinitionStubbingOperation;
+import com.google.protobuf.Empty;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.repository.RepositoryConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +86,8 @@ public class NodeUtilsTest {
         assertTrue(isNodeType(testNode, NODE_TYPE));
         assertFalse(isNodeType(testNode, "otherType"));
         assertFalse(isNodeType(testNode, null));
+        assertFalse(isNodeType(testNode, EMPTY));
+        assertFalse(isNodeType(testNode, " \t  "));
         assertFalse(isNodeType(null, NODE_TYPE));
         assertFalse(isNodeType(null, null));
     }
