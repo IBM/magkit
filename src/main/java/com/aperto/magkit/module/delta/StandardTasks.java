@@ -110,7 +110,9 @@ public final class StandardTasks {
      *
      * @param groupName Name of the apps group on app launcher
      * @param appNames  names of the single apps
+     * @deprecated use module decoration of admincentral module instead of JCR config nodes
      */
+    @Deprecated
     public static Task addAppsToLauncher(final String groupName, final String... appNames) {
         List<NodeOperation> appsOperations = new ArrayList<>();
         for (String appName : appNames) {
@@ -136,7 +138,9 @@ public final class StandardTasks {
      * @param removeOthers remove all existing roles
      * @param roles        roles to set
      * @return Task to execute
+     * @deprecated use decoration for app manipulation
      */
+    @Deprecated
     public static Task addAppRolesPermission(final String module, final String appName, final boolean removeOthers, final String... roles) {
         List<NodeOperation> rolesOps = getSetPropertyOps(roles);
 
@@ -167,7 +171,9 @@ public final class StandardTasks {
      * @param removeOthers other roles will remove
      * @param roles        roles to configure
      * @return Task to execute
+     * @deprecated use module decoration of admincentral module instead of JCR config nodes
      */
+    @Deprecated
     public static Task addAppLauncherGroupPermission(final String groupName, final boolean removeOthers, final String... roles) {
         List<NodeOperation> rolesOps = getSetPropertyOps(roles);
 
@@ -249,7 +255,9 @@ public final class StandardTasks {
      *
      * @param themeName       name of the theme
      * @param themeModuleName name of the theme module
+     * @deprecated use yaml for theme config
      */
+    @Deprecated
     public static Task setupSiteTheme(final String themeName, final String themeModuleName) {
         // don't use selectModuleConfig, because module is not yet available
         return selectConfig("Create theme", "Create theme base config in theme module.",
@@ -272,7 +280,9 @@ public final class StandardTasks {
      * @param isCss           flag to register css or javascript
      * @param propertyItems   array of items to set as property of the styles configuration
      * @return Task to execute
+     * @deprecated use yaml for theme config
      */
+    @Deprecated
     public static Task registerThemeFile(final String themeName, final String themeModuleName, final String nodeName, final boolean isCss, final Item... propertyItems) {
         if (propertyItems == null) {
             throw new RuntimeException("Properties must not be empty.");
