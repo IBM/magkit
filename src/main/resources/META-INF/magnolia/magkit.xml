@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <name>ui-admincentral</name>
-            <version>${magnolia.version}/*</version>
+            <version>${magnolia.ui.version}/*</version>
         </dependency>
     </dependencies>
     <servlets>
