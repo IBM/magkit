@@ -92,8 +92,8 @@ public class Sql2RowsQueryBuilderTest {
     @Test
     public void buildRowsQuery() {
         assertThat(Sql2QueryBuilder.forRows()
-                        .fromWebsite()
-                        .withStatement("test-statement")
+                .fromWebsite()
+                .withStatement("test-statement")
                 .buildRowsQuery(),
                 isA(RowsQuery.class)
         );
@@ -110,14 +110,12 @@ public class Sql2RowsQueryBuilderTest {
         _query = ContextMockUtils.mockQuery("website", Query.JCR_SQL2, statement);
         QueryStubbingOperation.stubbResult(result).of(_query);
         assertThat(Sql2QueryBuilder.forRows()
-                        .fromWebsite()
-                        .withStatement(
-                            statement
-                        )
-                        .withLimit(5)
-                        .withOffset(5)
-                        .getResultRows().size(),
-                is(2)
+            .fromWebsite()
+            .withStatement(statement)
+            .withLimit(5)
+            .withOffset(5)
+            .getResultRows().size(),
+            is(2)
         );
         Mockito.verify(_query, Mockito.times(1)).setOffset(5);
         Mockito.verify(_query, Mockito.times(1)).setLimit(5);

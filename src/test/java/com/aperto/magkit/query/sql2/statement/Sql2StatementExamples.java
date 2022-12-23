@@ -92,7 +92,7 @@ public class Sql2StatementExamples {
         Calendar cal = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
         assertThat(
             Sql2.Statement.selectComponents().whereAll(
-                Sql2.Condition.lastActivated().lowerThan().value(cal)
+                Sql2.Condition.Date.lastActivated().lowerThan().value(cal)
             ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:lastActivated] < cast('2020-01-01T00:00:00.000+01:00' as date)")
         );
@@ -102,7 +102,7 @@ public class Sql2StatementExamples {
     public void selectComponentsCreatedAfterDate() {
         Calendar cal = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
         assertThat(
-            Sql2.Statement.selectComponents().whereAll(Sql2.Condition.createdAfter(cal)).build(),
+            Sql2.Statement.selectComponents().whereAll(Sql2.Condition.Date.createdAfter(cal)).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:created] > cast('2020-01-01T00:00:00.000+01:00' as date)")
         );
     }
@@ -111,7 +111,7 @@ public class Sql2StatementExamples {
     public void selectComponentsCreatedAfterBindValue() {
         assertThat(
             Sql2.Statement.selectComponents().whereAll(
-                Sql2.Condition.created().greaterOrEqualThan().bindVariable("date")
+                Sql2.Condition.Date.created().greaterOrEqualThan().bindVariable("date")
             ).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:created] >= $date")
         );
@@ -168,11 +168,11 @@ public class Sql2StatementExamples {
         assertThat(Sql2.Statement.select().whereAny(
             Sql2.Condition.and().matches(
                 Sql2.Condition.Path.isChild("migros/de"),
-                Sql2.Condition.templateEquals("myModule:my/component-1", "myModule:my/component-2")
+                Sql2.Condition.String.templateEquals("myModule:my/component-1", "myModule:my/component-2")
             ),
             Sql2.Condition.and().not().matches(
                 Sql2.Condition.Path.isChild("migros/de"),
-                Sql2.Condition.templateEquals("myModule:my/other/component")
+                Sql2.Condition.String.templateEquals("myModule:my/other/component")
             )
         ).build(),
             is("SELECT * FROM [nt:base] WHERE ((ischildnode('/migros/de') AND ([mgnl:template] = 'myModule:my/component-1' OR [mgnl:template] = 'myModule:my/component-2')) OR not(ischildnode('/migros/de') AND [mgnl:template] = 'myModule:my/other/component'))")
@@ -205,8 +205,8 @@ public class Sql2StatementExamples {
                 Sql2.JoinOn.selectedDescendantOfJoined()
             )
             .whereAll(
-                Sql2.Condition.templateEquals("m5-tk-core-components:components/content/standardImageTextTeaser"),
-                Sql2.Condition.templateEquals("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
+                Sql2.Condition.String.templateEquals("m5-tk-core-components:components/content/standardImageTextTeaser"),
+                Sql2.Condition.String.templateEquals("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
             ).build(),
             is("SELECT content.*,container.* FROM [mgnl:component] AS content INNER JOIN [mgnl:component] AS container ON isdescendantnode(content,container) WHERE (content.[mgnl:template] = 'm5-tk-core-components:components/content/standardImageTextTeaser' AND container.[mgnl:template] = 'm5-relaunch-my-migros:pages/myCumulusPage')")
         );
@@ -246,7 +246,7 @@ public class Sql2StatementExamples {
     public void fullTextSearchForMandatoryWordsUsingWildcards() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains().all("te?t", "hallo*")
+                Sql2.Condition.FullText.contains().all("te?t", "hallo*")
             ).orderByScore().build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'te?t hallo*') ORDER BY [jcr:score] DESC")
         );
@@ -256,7 +256,7 @@ public class Sql2StatementExamples {
     public void fullTextSearchForOptionalWordsInTitle() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains("title").any("test", "other text")
+                Sql2.Condition.FullText.contains("title").any("test", "other text")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, 'test OR \"other text\"')")
         );
@@ -266,7 +266,7 @@ public class Sql2StatementExamples {
     public void fullTextSearchForExcludedWords() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains().excludeAny("test", "other test")
+                Sql2.Condition.FullText.contains().excludeAny("test", "other test")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '-test OR -\"other test\"')")
         );
@@ -276,7 +276,7 @@ public class Sql2StatementExamples {
     public void fuzzyFullTextSearchForWords() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains().all(1, true, "test", "other test")
+                Sql2.Condition.FullText.contains().all(1, true, "test", "other test")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"')")
         );
@@ -286,7 +286,7 @@ public class Sql2StatementExamples {
     public void complexFullTextSearchWithBoosting() {
         assertThat(
             Sql2.Statement.selectComponents().as("s").whereAll(
-                Sql2.Condition.contains()
+                Sql2.Condition.FullText.contains()
                     .all(1, false, "test?")
                     .all(2, false, "boosted test")
                     .excludeAll(3, true, "not this phrase!")
@@ -299,7 +299,7 @@ public class Sql2StatementExamples {
     public void fullTextProximitySearch() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains().addTerm(2, false, false, false, 5, false, "text within 5 words")
+                Sql2.Condition.FullText.contains().addTerm(2, false, false, false, 5, false, "text within 5 words")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '\"text within 5 words\"~5^2')")
         );
@@ -309,7 +309,7 @@ public class Sql2StatementExamples {
     public void fullTextRangeQueryInclusive() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains("title").range(true, "alpha", "omega")
+                Sql2.Condition.FullText.contains("title").range(true, "alpha", "omega")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '[alpha TO omega]')")
         );
@@ -319,7 +319,7 @@ public class Sql2StatementExamples {
     public void fullTextRangeQueryExclusive() {
         assertThat(
             Sql2.Statement.select().as("s").whereAll(
-                Sql2.Condition.contains("title").range(false, "alpha", "omega")
+                Sql2.Condition.FullText.contains("title").range(false, "alpha", "omega")
             ).build(),
             is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '{alpha TO omega}')")
         );

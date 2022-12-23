@@ -47,7 +47,7 @@ public final class Sql2 {
 
         public static List<Node> nodesByIdentifiers(String workspace, String... ids) {
             return nodesFrom(workspace).withStatement(
-                Statement.select().whereAny(Condition.identifierEquals(ids))
+                Statement.select().whereAny(Condition.String.identifierEquals(ids))
             ).getResultNodes();
         }
 
@@ -55,7 +55,7 @@ public final class Sql2 {
             return nodesFromWebsite().withStatement(
                 Statement.select().whereAll(
                     Condition.Path.isDescendant(path),
-                    Condition.templateEquals(templates)
+                    Condition.String.templateEquals(templates)
                 )
             ).getResultNodes();
         }
@@ -139,120 +139,12 @@ public final class Sql2 {
             return Sql2NullCondition.isNotNull(propertyName);
         }
 
-        public static Sql2CompareNot<Calendar> created() {
-            return Sql2CalendarCondition.created();
-        }
-
-        public static Sql2JoinConstraint createdBefore(java.util.Calendar date) {
-            return created().lowerThan().value(date);
-        }
-
-        public static Sql2JoinConstraint createdAfter(java.util.Calendar date) {
-            return created().greaterThan().value(date);
-        }
-
-        public static Sql2CompareNot<Calendar> lastActivated() {
-            return Sql2CalendarCondition.lastActivated();
-        }
-
-        public static Sql2JoinConstraint lastActivatedBefore(java.util.Calendar date) {
-            return lastActivated().lowerThan().value(date);
-        }
-
-        public static Sql2JoinConstraint lastActivatedAfter(java.util.Calendar date) {
-            return lastActivated().greaterThan().value(date);
-        }
-
-        public static Sql2CompareNot<Calendar> lastModified() {
-            return Sql2CalendarCondition.lastModified();
-        }
-
-        public static Sql2JoinConstraint lastModifiedBefore(java.util.Calendar date) {
-            return lastModified().lowerThan().value(date);
-        }
-
-        public static Sql2JoinConstraint lastModifiedAfter(java.util.Calendar date) {
-            return lastModified().greaterThan().value(date);
-        }
-
-        public static Sql2CompareNot<Calendar> deleted() {
-            return Sql2CalendarCondition.deleted();
-        }
-
-        public static Sql2DynamicOperand template() {
-            return Sql2StringCondition.template();
-        }
-
-        public static Sql2JoinConstraint templateEquals(java.lang.String... values) {
-            return template().equalsAny().values(values);
-        }
-
-        public static Sql2DynamicOperand identifier() {
-            return Sql2StringCondition.identifier();
-        }
-
-        public static Sql2JoinConstraint identifierEquals(java.lang.String... values) {
-            return identifier().equalsAny().values(values);
-        }
-
         public static Sql2NameOperand name() {
             return new Sql2NameCondition();
         }
 
         public static Sql2JoinConstraint nameEquals(java.lang.String... values) {
             return name().equalsAny().values(values);
-        }
-
-        public static Sql2JoinConstraint childOf(Node parent) {
-            return Path.isChild(parent);
-        }
-
-        public static Sql2JoinConstraint childOf(java.lang.String parent) {
-            return Path.isChild(parent);
-        }
-
-        public static Sql2JoinConstraint descendantOf(Node parent) {
-            return Path.isDescendant(parent);
-        }
-
-        public static Sql2JoinConstraint descendantOf(java.lang.String parent) {
-            return Path.isDescendant(parent);
-        }
-
-        /**
-         * Get a builder for a fulltext condition for a search in all attributes.
-         * Note that you must define a selector name in your statement.
-         *
-         * @return a Sql2ContainsCondition instance for any property
-         */
-        public static Sql2ContainsCondition contains() {
-            return new Sql2ContainsCondition();
-        }
-
-        public static Sql2ContainsCondition containsAll(java.lang.String... values) {
-            return new Sql2ContainsCondition().all(values);
-        }
-
-        public static Sql2ContainsCondition containsAny(java.lang.String... values) {
-            return new Sql2ContainsCondition().any(values);
-        }
-
-        /**
-         * Get a builder for a fulltext condition for a search in one named attribute.
-         * Note that you must define a selector name in your statement.
-         *
-         * @return a Sql2ContainsCondition instance for one given property
-         */
-        public static Sql2ContainsCondition contains(java.lang.String property) {
-            return new Sql2ContainsCondition(property);
-        }
-
-        public static Sql2ContainsCondition containsAll(java.lang.String property, java.lang.String... values) {
-            return new Sql2ContainsCondition(property).all(values);
-        }
-
-        public static Sql2ContainsCondition containsAny(java.lang.String property, java.lang.String... values) {
-            return new Sql2ContainsCondition(property).any(values);
         }
 
         /**
@@ -265,6 +157,46 @@ public final class Sql2 {
 
             public static Sql2CompareNot<Calendar> property(final java.lang.String name) {
                 return Sql2CalendarCondition.property(name);
+            }
+
+            public static Sql2CompareNot<Calendar> created() {
+                return Sql2CalendarCondition.created();
+            }
+
+            public static Sql2JoinConstraint createdBefore(java.util.Calendar date) {
+                return created().lowerThan().value(date);
+            }
+
+            public static Sql2JoinConstraint createdAfter(java.util.Calendar date) {
+                return created().greaterThan().value(date);
+            }
+
+            public static Sql2CompareNot<Calendar> lastActivated() {
+                return Sql2CalendarCondition.lastActivated();
+            }
+
+            public static Sql2JoinConstraint lastActivatedBefore(java.util.Calendar date) {
+                return lastActivated().lowerThan().value(date);
+            }
+
+            public static Sql2JoinConstraint lastActivatedAfter(java.util.Calendar date) {
+                return lastActivated().greaterThan().value(date);
+            }
+
+            public static Sql2CompareNot<Calendar> lastModified() {
+                return Sql2CalendarCondition.lastModified();
+            }
+
+            public static Sql2JoinConstraint lastModifiedBefore(java.util.Calendar date) {
+                return lastModified().lowerThan().value(date);
+            }
+
+            public static Sql2JoinConstraint lastModifiedAfter(java.util.Calendar date) {
+                return lastModified().greaterThan().value(date);
+            }
+
+            public static Sql2CompareNot<Calendar> deleted() {
+                return Sql2CalendarCondition.deleted();
             }
 
             private Date() {}
@@ -343,7 +275,64 @@ public final class Sql2 {
                 return Sql2StringCondition.property(name);
             }
 
+            public static Sql2DynamicOperand template() {
+                return Sql2StringCondition.template();
+            }
+
+            public static Sql2JoinConstraint templateEquals(java.lang.String... values) {
+                return template().equalsAny().values(values);
+            }
+
+            public static Sql2DynamicOperand identifier() {
+                return Sql2StringCondition.identifier();
+            }
+
+            public static Sql2JoinConstraint identifierEquals(java.lang.String... values) {
+                return identifier().equalsAny().values(values);
+            }
+
             private String() {}
+        }
+
+        public static final class FullText {
+
+            /**
+             * Get a builder for a fulltext condition for a search in all attributes.
+             * Note that you must define a selector name in your statement.
+             *
+             * @return a Sql2ContainsCondition instance for any property
+             */
+            public static Sql2ContainsCondition contains() {
+                return new Sql2ContainsCondition();
+            }
+
+            public static Sql2ContainsCondition containsAll(java.lang.String... values) {
+                return new Sql2ContainsCondition().all(values);
+            }
+
+            public static Sql2ContainsCondition containsAny(java.lang.String... values) {
+                return new Sql2ContainsCondition().any(values);
+            }
+
+            /**
+             * Get a builder for a fulltext condition for a search in one named attribute.
+             * Note that you must define a selector name in your statement.
+             *
+             * @return a Sql2ContainsCondition instance for one given property
+             */
+            public static Sql2ContainsCondition contains(java.lang.String property) {
+                return new Sql2ContainsCondition(property);
+            }
+
+            public static Sql2ContainsCondition containsAll(java.lang.String property, java.lang.String... values) {
+                return new Sql2ContainsCondition(property).all(values);
+            }
+
+            public static Sql2ContainsCondition containsAny(java.lang.String property, java.lang.String... values) {
+                return new Sql2ContainsCondition(property).any(values);
+            }
+
+            private FullText() {}
         }
 
         private Condition() {}
