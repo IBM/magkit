@@ -27,10 +27,8 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import com.aperto.magkit.mockito.TemplateDefinitionStubbingOperation;
-import com.google.protobuf.Empty;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.repository.RepositoryConstants;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
