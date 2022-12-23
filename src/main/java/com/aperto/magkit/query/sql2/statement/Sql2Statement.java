@@ -37,7 +37,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
     private String _fromSelectorName;
     private String _joinSelectorName;
     private Sql2ConstraintGroup _constraintGroup;
-    private String _orderAttribute;
+    private String[] _orderAttributes;
     private String _orderDirection = DESC;
     private Sql2JoinCondition _joinCondition;
     private String _joinNodeType;
@@ -104,8 +104,8 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         return this;
     }
 
-    public Sql2OrderDirection orderBy(String attribute) {
-        _orderAttribute = attribute;
+    public Sql2OrderDirection orderBy(String... attributes) {
+        _orderAttributes = attributes;
         return this;
     }
 
@@ -153,8 +153,14 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             result.append(WHERE);
             _constraintGroup.appendTo(result, this);
         }
-        if (isNotBlank(_orderAttribute)) {
-            result.append(ORDER_BY).append('[').append(_orderAttribute).append(']').append(_orderDirection);
+        if (ArrayUtils.isNotEmpty(_orderAttributes)) {
+            result.append(ORDER_BY);
+            for (String attribute : _orderAttributes) {
+                result.append('[').append(attribute).append(']').append(_orderDirection);
+                if (ArrayUtils.indexOf(_orderAttributes, attribute) < _orderAttributes.length -1) {
+                    result.append(", ");
+                }
+            }
         }
         return result.toString();
     }

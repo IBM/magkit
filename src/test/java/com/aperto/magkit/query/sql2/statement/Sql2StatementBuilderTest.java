@@ -82,6 +82,8 @@ public class Sql2StatementBuilderTest {
         assertThat(Sql2Statement.select().whereAll(
             Sql2PathCondition.is().descendant("/some/path")
         ).orderBy("test").toString(), is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC"));
+
+        assertThat(Sql2Statement.select().orderBy("test1", "test2", "test3").toString(), is("SELECT * FROM [nt:base] ORDER BY [test1] DESC, [test2] DESC, [test3] DESC"));
     }
 
     @Test
@@ -102,10 +104,8 @@ public class Sql2StatementBuilderTest {
 
     @Test
     public void ascending() {
-        assertThat(Sql2Statement.select().whereAny(
-                Sql2PathCondition.is().descendant("/some/path")
-            ).orderBy("test").ascending().build(),
-            is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] ASC")
+        assertThat(Sql2Statement.select().orderBy("test1", "test2").ascending().build(),
+            is("SELECT * FROM [nt:base] ORDER BY [test1] ASC, [test2] ASC")
         );
     }
 
