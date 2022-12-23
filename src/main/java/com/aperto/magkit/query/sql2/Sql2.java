@@ -294,6 +294,12 @@ public final class Sql2 {
             private String() {}
         }
 
+        /**
+         * Sql2fulltext condition builders (contains(..)).
+         *
+         * @author wolf.bubenik@ibmix.de
+         * @since 2022-12-23
+         */
         public static final class FullText {
 
             /**
