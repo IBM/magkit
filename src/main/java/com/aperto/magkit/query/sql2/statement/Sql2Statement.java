@@ -157,7 +157,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             result.append(ORDER_BY);
             for (String attribute : _orderAttributes) {
                 result.append('[').append(attribute).append(']').append(_orderDirection);
-                if (ArrayUtils.indexOf(_orderAttributes, attribute) < _orderAttributes.length -1) {
+                if (ArrayUtils.indexOf(_orderAttributes, attribute) < _orderAttributes.length - 1) {
                     result.append(", ");
                 }
             }
