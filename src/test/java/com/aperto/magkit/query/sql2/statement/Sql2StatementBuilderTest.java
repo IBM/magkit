@@ -105,8 +105,8 @@ public class Sql2StatementBuilderTest {
 
     @Test
     public void ascending() {
-        assertThat(Sql2Statement.select().orderBy("test1", "test2").ascending().build(),
-            is("SELECT * FROM [nt:base] ORDER BY [test1] ASC, [test2] ASC")
+        assertThat(Sql2Statement.select().as("p").orderBy("test1", "test2").ascending().build(),
+            is("SELECT * FROM [nt:base] AS p ORDER BY [test1] ASC, [test2] ASC")
         );
     }
 
