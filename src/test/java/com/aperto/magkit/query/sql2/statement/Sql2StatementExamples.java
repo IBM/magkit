@@ -42,7 +42,7 @@ public class Sql2StatementExamples {
 
         assertThat(
             Sql2.Statement.selectComponents().as("t").whereAll(Sql2.Condition.isNotNull("title")).build(),
-            is("SELECT t.* FROM [mgnl:component] AS t WHERE t.[title] IS NOT NULL")
+            is("SELECT * FROM [mgnl:component] AS t WHERE t.[title] IS NOT NULL")
         );
     }
 
@@ -138,7 +138,7 @@ public class Sql2StatementExamples {
 
         assertThat(
             Sql2.Statement.selectComponents().as("t").whereAll(Sql2.Condition.Path.isDescendant("/root/path")).build(),
-            is("SELECT t.* FROM [mgnl:component] AS t WHERE isdescendantnode(t, '/root/path')")
+            is("SELECT * FROM [mgnl:component] AS t WHERE isdescendantnode(t, '/root/path')")
         );
     }
 
@@ -159,7 +159,7 @@ public class Sql2StatementExamples {
 
         assertThat(
             Sql2.Statement.select().as("t").whereAll(Sql2.Condition.Path.is().same("/root/path")).build(),
-            is("SELECT t.* FROM [nt:base] AS t WHERE issamenode(t, '/root/path')")
+            is("SELECT * FROM [nt:base] AS t WHERE issamenode(t, '/root/path')")
         );
     }
 
@@ -221,7 +221,7 @@ public class Sql2StatementExamples {
 
         assertThat(
             Sql2.Statement.selectContentNodes().as("t").whereAll(Sql2.Condition.nameEquals("00")).build(),
-            is("SELECT t.* FROM [mgnl:contentNode] AS t WHERE name(t) = '00'")
+            is("SELECT * FROM [mgnl:contentNode] AS t WHERE name(t) = '00'")
         );
     }
 
@@ -238,7 +238,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.selectContentNodes().as("t").whereAll(
                 Sql2.Condition.name().lowerCase().excludeAny().values("0", "test")
             ).build(),
-            is("SELECT t.* FROM [mgnl:contentNode] AS t WHERE (lower(name(t)) <> '0' OR lower(name(t)) <> 'test')")
+            is("SELECT * FROM [mgnl:contentNode] AS t WHERE (lower(name(t)) <> '0' OR lower(name(t)) <> 'test')")
         );
     }
 
@@ -248,7 +248,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains().all("te?t", "hallo*")
             ).orderByScore().build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'te?t hallo*') ORDER BY [jcr:score] DESC")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.*, 'te?t hallo*') ORDER BY [jcr:score] DESC")
         );
     }
 
@@ -258,7 +258,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains("title").any("test", "other text")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, 'test OR \"other text\"')")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.title, 'test OR \"other text\"')")
         );
     }
 
@@ -268,7 +268,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains().excludeAny("test", "other test")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '-test OR -\"other test\"')")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.*, '-test OR -\"other test\"')")
         );
     }
 
@@ -278,7 +278,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains().all(1, true, "test", "other test")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"')")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.*, 'test~ \"other test\"')")
         );
     }
 
@@ -291,7 +291,7 @@ public class Sql2StatementExamples {
                     .all(2, false, "boosted test")
                     .excludeAll(3, true, "not this phrase!")
             ).build(),
-            is("SELECT s.* FROM [mgnl:component] AS s WHERE contains(s.*, 'test? \"boosted test\"^2 -\"not this phrase!\"^3')")
+            is("SELECT * FROM [mgnl:component] AS s WHERE contains(s.*, 'test? \"boosted test\"^2 -\"not this phrase!\"^3')")
         );
     }
 
@@ -301,7 +301,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains().addTerm(2, false, false, false, 5, false, "text within 5 words")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.*, '\"text within 5 words\"~5^2')")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.*, '\"text within 5 words\"~5^2')")
         );
     }
 
@@ -311,7 +311,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains("title").range(true, "alpha", "omega")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '[alpha TO omega]')")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.title, '[alpha TO omega]')")
         );
     }
 
@@ -321,7 +321,7 @@ public class Sql2StatementExamples {
             Sql2.Statement.select().as("s").whereAll(
                 Sql2.Condition.FullText.contains("title").range(false, "alpha", "omega")
             ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE contains(s.title, '{alpha TO omega}')")
+            is("SELECT * FROM [nt:base] AS s WHERE contains(s.title, '{alpha TO omega}')")
         );
     }
 

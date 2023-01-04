@@ -131,6 +131,18 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         return _joinSelectorName;
     }
 
+    private boolean hasFromSelector() {
+        return isNotBlank(_fromSelectorName);
+    }
+
+    private boolean hasJoinSelector() {
+        return isNotBlank(_joinSelectorName);
+    }
+
+    private boolean hasTwoSelectors() {
+        return hasFromSelector() && hasJoinSelector();
+    }
+
     public String build() {
         StringBuilder result = new StringBuilder();
         result.append(SELECT);
@@ -140,11 +152,11 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             appendAttributes(result);
         }
         result.append(FROM).append('[').append(_nodeType).append(']');
-        if (_fromSelectorName != null) {
+        if (hasFromSelector()) {
             result.append(AS).append(_fromSelectorName);
         }
 
-        if (isNotBlank(_joinMethod) && isNotBlank(_joinNodeType) && _joinSelectorName != null) {
+        if (isNotBlank(_joinMethod) && isNotBlank(_joinNodeType) && hasJoinSelector()) {
             result.append(_joinMethod).append('[').append(_joinNodeType).append(']').append(AS).append(_joinSelectorName).append(ON);
             _joinCondition.appendTo(result, this);
         }
@@ -156,6 +168,10 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         if (ArrayUtils.isNotEmpty(_orderAttributes)) {
             result.append(ORDER_BY);
             for (String attribute : _orderAttributes) {
+                if (hasTwoSelectors()) {
+                    //TODO: handle ordering on join attributes
+                    result.append(_fromSelectorName).append('.');
+                }
                 result.append('[').append(attribute).append(']').append(_orderDirection);
                 if (ArrayUtils.indexOf(_orderAttributes, attribute) < _orderAttributes.length - 1) {
                     result.append(", ");
@@ -169,13 +185,13 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         String sep = EMPTY;
         for (String attribute: _attributes) {
             result.append(sep);
-            if (_fromSelectorName != null) {
+            if (hasTwoSelectors()) {
                 result.append(_fromSelectorName).append('.');
             }
             result.append('[').append(attribute).append(']');
             sep = ",";
         }
-        if (_joinSelectorName != null) {
+        if (hasTwoSelectors()) {
             result.append(sep).append(_joinSelectorName).append('.');
             // TODO: handle join attribute names
             result.append('*');
@@ -183,18 +199,19 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
     }
 
     private void appendAllAttributes(final StringBuilder result) {
-        boolean hasFromSelector = _fromSelectorName != null;
-        if (hasFromSelector) {
-            result.append(_fromSelectorName).append('.');
+        if (hasFromSelector()) {
+            if (hasTwoSelectors()) {
+                result.append(_fromSelectorName).append('.');
+            }
             result.append('*');
         }
-        if (_joinSelectorName != null) {
-            if (hasFromSelector) {
+        if (hasJoinSelector()) {
+            if (hasFromSelector()) {
                 result.append(',');
             }
             result.append(_joinSelectorName).append('.');
             result.append('*');
-        } else if (!hasFromSelector) {
+        } else if (!hasFromSelector()) {
             result.append('*');
         }
     }

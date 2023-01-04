@@ -41,11 +41,12 @@ public class Sql2StatementBuilderTest {
 
     @Test
     public void selectAs() {
+        // DO not prefix select attributes by selector name if we have only one selector:
         assertThat(Sql2Statement.select().as("s").whereAll(
             Sql2PathCondition.is().descendant("/some/root/path"),
             Sql2StringCondition.property("title").equalsAny().values("test")
         ).build(),
-            is("SELECT s.* FROM [nt:base] AS s WHERE (isdescendantnode(s, '/some/root/path') AND s.[title] = 'test')")
+            is("SELECT * FROM [nt:base] AS s WHERE (isdescendantnode(s, '/some/root/path') AND s.[title] = 'test')")
         );
     }
 
