@@ -14,19 +14,21 @@ public interface Sql2Constraint {
 
     void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames);
 
-    boolean isNotEmpty();
-
     default String asString() {
+        return asString(null, null);
+    }
+
+    default String asString(final String fromSelector, final String joinSelector) {
         StringBuilder result = new StringBuilder();
         appendTo(result, new Sql2SelectorNames() {
             @Override
             public String getFromSelectorName() {
-                return null;
+                return fromSelector;
             }
 
             @Override
             public String getJoinSelectorName() {
-                return null;
+                return joinSelector;
             }
         });
         return result.toString();
