@@ -14,6 +14,8 @@ public interface Sql2Constraint {
 
     void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames);
 
+    boolean isNotEmpty();
+
     default String asString() {
         return asString(null, null);
     }
