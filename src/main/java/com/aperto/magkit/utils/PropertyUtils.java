@@ -156,11 +156,19 @@ public final class PropertyUtils {
     }
 
     public static String getStringValue(final Property property) {
-        return valueToString(getValue(property));
+        return getStringValue(property, null);
+    }
+
+    public static String getStringValue(final Property property, final String fallback) {
+        return valueToString(getValue(property), fallback);
     }
 
     public static String getStringValue(final Node node, final String relPath) {
-        return valueToString(getValue(getProperty(node, relPath)));
+        return getStringValue(node, relPath, null);
+    }
+
+    public static String getStringValue(final Node node, final String relPath, final String fallback) {
+        return getStringValue(getProperty(node, relPath), fallback);
     }
 
     public static List<String> getStringValues(final Property property) {
@@ -172,11 +180,19 @@ public final class PropertyUtils {
     }
 
     public static Calendar getCalendarValue(final Property property) {
-        return valueToCalendar(getValue(property));
+        return getCalendarValue(property, null);
+    }
+
+    public static Calendar getCalendarValue(final Property property, final Calendar fallback) {
+        return valueToCalendar(getValue(property), fallback);
     }
 
     public static Calendar getCalendarValue(final Node node, final String relPath) {
-        return getCalendarValue(getProperty(node, relPath));
+        return getCalendarValue(node, relPath, null);
+    }
+
+    public static Calendar getCalendarValue(final Node node, final String relPath, final Calendar fallback) {
+        return getCalendarValue(getProperty(node, relPath), fallback);
     }
 
     public static List<Calendar> getCalendarValues(final Property property) {
@@ -192,11 +208,19 @@ public final class PropertyUtils {
     }
 
     public static Long getLongValue(final Property property) {
-        return valueToLong(getValue(property));
+        return getLongValue(property, null);
+    }
+
+    public static Long getLongValue(final Property property, final Long fallback) {
+        return valueToLong(getValue(property), fallback);
     }
 
     public static Long getLongValue(final Node node, final String relPath) {
-        return getLongValue(getProperty(node, relPath));
+        return getLongValue(node, relPath, null);
+    }
+
+    public static Long getLongValue(final Node node, final String relPath, final Long fallback) {
+        return getLongValue(getProperty(node, relPath), fallback);
     }
 
     public static List<Long> getLongValues(final Property property) {
@@ -215,8 +239,16 @@ public final class PropertyUtils {
         return valueToDouble(getValue(property));
     }
 
+    public static Double getDoubleValue(final Property property, final Double fallback) {
+        return valueToDouble(getValue(property), fallback);
+    }
+
     public static Double getDoubleValue(final Node node, final String relPath) {
-        return getDoubleValue(getProperty(node, relPath));
+        return getDoubleValue(node, relPath, null);
+    }
+
+    public static Double getDoubleValue(final Node node, final String relPath, final Double fallback) {
+        return getDoubleValue(getProperty(node, relPath), fallback);
     }
 
     public static List<Double> getDoubleValues(final Property property) {
@@ -232,11 +264,19 @@ public final class PropertyUtils {
     }
 
     public static Boolean getBooleanValue(final Property property) {
-        return valueToBoolean(getValue(property));
+        return getBooleanValue(property, null);
+    }
+
+    public static Boolean getBooleanValue(final Property property, final Boolean fallback) {
+        return valueToBoolean(getValue(property), fallback);
     }
 
     public static Boolean getBooleanValue(final Node node, final String relPath) {
-        return getBooleanValue(getProperty(node, relPath));
+        return getBooleanValue(node, relPath, null);
+    }
+
+    public static Boolean getBooleanValue(final Node node, final String relPath, final Boolean fallback) {
+        return getBooleanValue(getProperty(node, relPath), fallback);
     }
 
     public static List<Boolean> getBooleanValues(final Property property) {
@@ -252,11 +292,19 @@ public final class PropertyUtils {
     }
 
     public static Binary getBinaryValue(final Property property) {
-        return valueToBinary(getValue(property));
+        return getBinaryValue(property, null);
+    }
+
+    public static Binary getBinaryValue(final Property property, final Binary fallback) {
+        return valueToBinary(getValue(property), fallback);
     }
 
     public static Binary getBinaryValue(final Node node, final String relPath) {
-        return getBinaryValue(getProperty(node, relPath));
+        return getBinaryValue(node, relPath, null);
+    }
+
+    public static Binary getBinaryValue(final Node node, final String relPath, final Binary fallback) {
+        return getBinaryValue(getProperty(node, relPath), fallback);
     }
 
     public static List<Binary> getBinaryValues(final Property property) {
