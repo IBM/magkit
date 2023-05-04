@@ -146,7 +146,7 @@ public final class NodeUtils {
         Node result = null;
         if (node != null && isNotBlank(path)) {
             try {
-                result = node.getNode(path);
+                result = node.hasNode(path) ? node.getNode(path) : null;
             } catch (RepositoryException e) {
                 LOGGER.warn("Unable to get child of node [{}]", getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
