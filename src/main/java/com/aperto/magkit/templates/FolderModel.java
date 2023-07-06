@@ -1,6 +1,6 @@
 package com.aperto.magkit.templates;
 
-import info.magnolia.context.MgnlContext;
+import com.aperto.magkit.utils.LinkTool;
 import info.magnolia.context.WebContext;
 import info.magnolia.rendering.model.RenderingModel;
 import info.magnolia.rendering.model.RenderingModelImpl;
@@ -15,7 +15,8 @@ import javax.jcr.RepositoryException;
 
 import static info.magnolia.cms.util.RequestDispatchUtil.PERMANENT_PREFIX;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
-import static info.magnolia.link.LinkUtil.DEFAULT_EXTENSION;
+import static info.magnolia.context.MgnlContext.getAggregationState;
+import static info.magnolia.context.MgnlContext.getWebContext;
 
 /**
  * Model of folder template.
@@ -50,15 +51,15 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
     }
 
     private void sendRedirect() {
-        Node pageNode = MgnlContext.getAggregationState().getMainContentNode();
+        Node pageNode = getAggregationState().getMainContentNode();
         try {
             if (pageNode != null && pageNode.getDepth() > 0) {
                 Node parent = pageNode.getParent();
                 if (parent != null) {
-                    WebContext webContext = MgnlContext.getWebContext();
+                    WebContext webContext = getWebContext();
                     String path = parent.getPath();
                     if (!"/".equals(parent.getPath())) {
-                        path = path + "." + DEFAULT_EXTENSION;
+                        path = LinkTool.LinkType.INTERNAL.toLink(parent);
                     }
                     dispatch(PERMANENT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
                 }
