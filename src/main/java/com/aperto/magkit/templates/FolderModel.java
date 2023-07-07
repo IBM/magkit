@@ -59,7 +59,7 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
                     WebContext webContext = getWebContext();
                     String path = parent.getPath();
                     if (!"/".equals(parent.getPath())) {
-                        path = LinkTool.LinkType.INTERNAL.toLink(parent);
+                        path = LinkTool.LinkType.REDIRECT.toLink(parent);
                     }
                     dispatch(PERMANENT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
                 }
