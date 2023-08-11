@@ -1,0 +1,49 @@
+<!-- BEGIN HTML VALIDATOR WARNING -->
+<div id="validator-warning">
+    <script type="text/javascript">
+        //<![CDATA[
+        var headEl = document.getElementsByTagName('head')[0];
+        var linkEl;
+        if (document.createElementNS) {
+            // dealing with application/xhtml+xml
+            linkEl = document.createElementNS('http://www.w3.org/1999/xhtml', 'link');
+        } else {
+            linkEl = document.createElement('link');
+        }
+        linkEl.setAttribute('rel', 'stylesheet');
+        linkEl.setAttribute('href', '${validatorWarningCssUri}');
+        linkEl.setAttribute('media', 'print, projection, screen');
+        headEl.appendChild(linkEl);
+
+        function toggleValidatorWarning(elem) {
+            if (elem) {
+                var parent = elem.parentNode;
+                var sibling = parent.nextSibling;
+                while (sibling != null ) {
+                    if (sibling.nodeType == 1) {
+                        toggleDisplayProperty(sibling, 'block');
+                    }
+                    sibling = sibling.nextSibling;
+                }
+                parent.style.height = (parent.style.height != '11px') ? '11px' : '14px';
+                elem.style.backgroundPosition = (elem.style.backgroundPosition.indexOf('-') != -1) ? '1px 50%': '-39px 50%';
+                elem.blur();
+            }
+        }
+        function toggleDisplayProperty(elem, defaultDisplay) {
+            if (elem) {
+                elem.style.display = (elem.style.display != 'none') ? 'none' : defaultDisplay;
+            }
+        }
+        //]]>
+    </script>
+    <div>
+        <a id="validator-warning-toggle" href="" title="Hide warning" onclick="toggleValidatorWarning(this); return false;">Hide warning</a>
+        <a id="validator-warning-close" href="" title="Close warning" onclick="document.getElementById('validator-warning').style.display = 'none'; return false;">Close warning</a>
+    </div>
+    <h1>This page is <strong>${validationOk}</strong> valid (X)HTML!</h1>
+    <p>
+        <a href="${validationResultUrl}">Please check the results of the validator.</a>
+    </p>
+</div>
+<!-- END HTML VALIDATOR WARNING -->

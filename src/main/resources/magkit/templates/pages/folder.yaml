@@ -1,0 +1,11 @@
+dialog: mtk2:pages/basic
+class: info.magnolia.rendering.template.configured.ConfiguredTemplateDefinition
+modelClass: com.aperto.magkit.templates.FolderModel
+renderType: site
+type: functional
+
+areas:
+  content:
+    templateScript: /magkit/templates/pages/folder.ftl
+
+title: templates.folder.title

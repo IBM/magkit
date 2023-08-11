@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <name>magkit</name>
+    <display-name>magkit</display-name>
+    <description>Aperto Magnolia Module</description>
+    <class>com.aperto.magkit.module.MagkitModule</class>
+    <versionHandler>com.aperto.magkit.module.MagkitModuleVersionHandler</versionHandler>
+    <version>${project.version}</version>
+    <components>
+        <id>main</id>
+        <component>
+            <type>com.aperto.magkit.i18n.UiTranslator</type>
+            <implementation>com.aperto.magkit.i18n.UiTranslator</implementation>
+        </component>
+    </components>
+    <dependencies>
+        <dependency>
+            <name>ui-admincentral</name>
+            <version>${magnolia.ui.version}/*</version>
+        </dependency>
+    </dependencies>
+    <servlets>
+        <servlet>
+            <name>404RedirectServlet</name>
+            <class>com.aperto.magkit.error.NotFoundRedirectServlet</class>
+            <comment>Redirect to error page.</comment>
+            <mappings>
+                <mapping>/notFoundRedirect</mapping>
+            </mappings>
+        </servlet>
+    </servlets>
+</module>
