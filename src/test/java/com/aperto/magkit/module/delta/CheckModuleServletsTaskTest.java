@@ -1,5 +1,25 @@
 package com.aperto.magkit.module.delta;
 
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import info.magnolia.jcr.util.NodeNameHelper;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.model.ModuleDefinition;
@@ -11,20 +31,20 @@ import org.junit.Test;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import static com.aperto.magkit.mockito.ComponentsMockUtils.mockComponentInstance;
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
 import static com.google.common.collect.Lists.newArrayList;
+import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 import static info.magnolia.test.mock.jcr.SessionTestUtil.createSession;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the reinstall of the module servlets.
+ * Test the re-installation of the module servlets.
  *
  * @author frank.sommer
  * @since 03.01.2019

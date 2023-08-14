@@ -1,6 +1,25 @@
 package com.aperto.magkit.rendering;
 
-import com.aperto.magkit.mockito.ContextMockUtils;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import info.magnolia.rendering.engine.RenderException;
 import info.magnolia.rendering.template.AutoGenerationConfiguration;
 import org.junit.After;
@@ -12,8 +31,9 @@ import javax.jcr.RepositoryException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockAreaNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockAreaNode;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -23,8 +43,8 @@ import static org.mockito.Mockito.verify;
 /**
  * Testing OnlyOnceCopyGenerator.
  *
- * @since 2023-06-02
  * @author wolf.bubenik @ibmix.de
+ * @since 2023-06-02
  */
 public class OnlyOnceCopyGeneratorTest {
 
@@ -35,7 +55,6 @@ public class OnlyOnceCopyGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        ContextMockUtils.cleanContext();
         _area = mockAreaNode("stageArea");
         _config = mock(AutoGenerationConfiguration.class);
         _generator = new OnlyOnceCopyGenerator(_area);
@@ -76,6 +95,6 @@ public class OnlyOnceCopyGeneratorTest {
 
     @After
     public void tearDown() throws Exception {
-        ContextMockUtils.cleanContext();
+        cleanContext();
     }
 }

@@ -1,24 +1,44 @@
 package com.aperto.magkit.utils;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockMgnlNode;
-import static com.aperto.magkit.mockito.ServerConfigurationMockUtils.mockServerConfiguration;
-import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
-import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultExtension;
-import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubContextPath;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubIdentifier;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
-import static com.aperto.magkit.utils.LinkTool.isUuid;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 import org.junit.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.UUID;
+
+import static com.aperto.magkit.utils.LinkTool.isUuid;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultExtension;
+import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubContextPath;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
+import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 
 /**
  * Test the LinkTool class.
@@ -29,7 +49,7 @@ import java.util.UUID;
 public class LinkToolTest {
 
     @Test
-    public void testIsUuid() throws Exception {
+    public void testIsUuid() {
         assertThat(isUuid(null), is(false));
         assertThat(isUuid(""), is(false));
         assertThat(isUuid("www.aperto.de"), is(false));

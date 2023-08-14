@@ -1,6 +1,27 @@
 package com.aperto.magkit.filter;
 
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import info.magnolia.context.SystemContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,18 +29,18 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import static com.aperto.magkit.mockito.AggregationStateStubbingOperation.stubCurrentContentNode;
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockAggregationState;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockSystemContext;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.SystemContextStubbingOperation.stubJcrSession;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
-import static com.aperto.magkit.mockito.jcr.SessionMockUtils.mockSession;
+import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubCurrentContentNode;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockAggregationState;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockSystemContext;
+import static de.ibmix.magkit.test.cms.context.SystemContextStubbingOperation.stubJcrSession;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
+import static de.ibmix.magkit.test.jcr.SessionMockUtils.mockSession;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.contains;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
 /**
@@ -88,12 +109,16 @@ public class NodePropertyVoterTest {
 
     @Before
     public void initVoter() throws RepositoryException {
-        cleanContext();
         _propertyVoter = new NodePropertyVoter();
         Session session = mockSession(WEBSITE);
         when(session.getNode(contains("old"))).thenThrow(new PathNotFoundException());
         mockPageNode("/bs/secure", stubProperty("secure", "true"));
         SystemContext systemContext = mockSystemContext(stubJcrSession(WEBSITE));
         _propertyVoter.setSystemContext(systemContext);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        cleanContext();
     }
 }

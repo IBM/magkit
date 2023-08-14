@@ -1,5 +1,26 @@
 package com.aperto.magkit.freemarker;
 
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import de.ibmix.magkit.test.cms.freemarker.FreemarkerTest;
 import info.magnolia.jcr.node2bean.Node2BeanProcessor;
 import info.magnolia.rendering.engine.RenderException;
 import org.apache.commons.io.IOUtils;
@@ -12,15 +33,15 @@ import javax.jcr.RepositoryException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
-import static com.aperto.magkit.mockito.ComponentsMockUtils.mockComponentInstance;
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.SiteMockUtils.mockSiteManager;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static org.apache.commons.lang3.CharEncoding.UTF_8;
+import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSiteManager;
+import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Unit tests for the folder Freemarker script.
@@ -37,7 +58,7 @@ public class FolderTest extends FreemarkerTest {
     }
 
     @After
-    public void cleanUp() throws RepositoryException {
+    public void cleanUp() {
         cleanContext();
     }
 
@@ -48,7 +69,7 @@ public class FolderTest extends FreemarkerTest {
         String renderingResult = getRenderingResult(mockNode("/de"), "/magkit/templates/pages/folder.ftl", null);
 
         final InputStream expectedResultStream = getClass().getResourceAsStream("folder.html");
-        final String expectedResult = IOUtils.toString(new InputStreamReader(expectedResultStream, UTF_8));
+        final String expectedResult = IOUtils.toString(new InputStreamReader(expectedResultStream, StandardCharsets.UTF_8));
     }
 
     @Ignore

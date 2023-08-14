@@ -1,9 +1,27 @@
 package com.aperto.magkit.utils.node;
 
-import com.aperto.magkit.mockito.ContextMockUtils;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import com.aperto.magkit.utils.NodeUtils;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.jcr.Node;
@@ -11,9 +29,6 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.aperto.magkit.mockito.MagnoliaNodeStubbingOperation.stubTemplate;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
 import static com.aperto.magkit.utils.PropertyUtils.getBooleanValue;
 import static com.aperto.magkit.utils.PropertyUtils.getBooleanValues;
 import static com.aperto.magkit.utils.PropertyUtils.getCalendarValue;
@@ -24,9 +39,13 @@ import static com.aperto.magkit.utils.PropertyUtils.getLongValue;
 import static com.aperto.magkit.utils.PropertyUtils.getLongValues;
 import static com.aperto.magkit.utils.PropertyUtils.getStringValue;
 import static com.aperto.magkit.utils.PropertyUtils.getStringValues;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
+import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -37,18 +56,13 @@ import static org.mockito.Mockito.mock;
  */
 public class AlteringNodeWrapperTest {
 
-    @Before
-    public void setUp() throws Exception {
-        ContextMockUtils.cleanContext();
-    }
-
     @After
     public void tearDown() throws Exception {
-        ContextMockUtils.cleanContext();
+        cleanContext();
     }
 
     @Test
-    public void getNodeToWrap() throws Exception {
+    public void getNodeToWrap() {
         Node node = mock(Node.class);
         AlteringNodeWrapper nodeWrapper = new AlteringNodeWrapper(node);
         assertThat(nodeWrapper.getNodeToWrap(), is(node));

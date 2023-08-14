@@ -1,29 +1,50 @@
 package com.aperto.magkit.utils;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockMgnlNode;
-import static com.aperto.magkit.mockito.ServerConfigurationMockUtils.mockServerConfiguration;
-import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
-import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultExtension;
-import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubContextPath;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubIdentifier;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubProperty;
-import static java.util.UUID.randomUUID;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
-import java.net.URI;
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import java.net.URI;
+
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultExtension;
+import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubContextPath;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
+import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
+import static java.util.UUID.randomUUID;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Philipp Güttler (Aperto AG)
@@ -57,7 +78,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testGetBase() throws Exception {
+    public void testGetBase() {
         assertThat(_helper.getBase(null), nullValue());
         assertThat(_helper.getBase(EMPTY), nullValue());
         assertThat(_helper.getBase(PATH), equalTo(PATH));
@@ -71,7 +92,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testGetSelectors() throws Exception {
+    public void testGetSelectors() {
         assertThat(_helper.getSelectors(null), nullValue());
         assertThat(_helper.getSelectors(EMPTY), nullValue());
         assertThat(_helper.getSelectors(PATH), nullValue());
@@ -83,7 +104,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testCreateUriToNull() throws Exception {
+    public void testCreateUriToNull() {
         assertThat(_helper.createUri(null), nullValue());
         assertThat(_helper.createUri(EMPTY), nullValue());
         assertThat(_helper.createUri(SELECTORS), nullValue());
@@ -101,7 +122,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testGetAnchor() throws Exception {
+    public void testGetAnchor() {
         assertThat(_helper.getQuery(null), nullValue());
         assertThat(_helper.getAnchor(PATH), nullValue());
         assertThat(_helper.getAnchor(PATH_WITH_SELECTOR), nullValue());
@@ -112,7 +133,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testGetQuery() throws Exception {
+    public void testGetQuery() {
         assertThat(_helper.getQuery(null), nullValue());
         assertThat(_helper.getQuery(PATH), nullValue());
         assertThat(_helper.getQuery(PATH_WITH_ANCHOR), nullValue());
@@ -123,7 +144,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testContainsMoreSelectors() throws Exception {
+    public void testContainsMoreSelectors() {
         assertFalse(_helper.containsMoreSelectors(null));
         assertFalse(_helper.containsMoreSelectors(EMPTY));
         assertFalse(_helper.containsMoreSelectors(PATH));
@@ -135,7 +156,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testMergeComponentsForPath() throws Exception {
+    public void testMergeComponentsForPath() {
         assertThat(_helper.mergeComponents(null, null, null, null), equalTo(EMPTY));
         assertThat(_helper.mergeComponents(PATH, null, null, null), equalTo(PATH));
         assertThat(_helper.mergeComponents(PATH, SELECTOR_FOO, null, null), equalTo(PATH_WITH_SELECTOR));
@@ -146,7 +167,7 @@ public class ExtendedLinkFieldHelperTest {
     }
 
     @Test
-    public void testMergeComponentsForExternalLink() throws Exception {
+    public void testMergeComponentsForExternalLink() {
         assertThat(_helper.mergeComponents(null, null, null, null), equalTo(EMPTY));
         assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, null, null), equalTo(EXTERNAL_LINK));
         assertThat(_helper.mergeComponents(EXTERNAL_LINK, SELECTORS, null, null), equalTo(EXTERNAL_WITH_SELECTOR));
@@ -175,5 +196,10 @@ public class ExtendedLinkFieldHelperTest {
 
         stubProperty("link_query", QUERY).of(source);
         assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html?param=value#anchor"));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        cleanContext();
     }
 }

@@ -1,30 +1,51 @@
 package com.aperto.magkit.query.sql2;
 
-import com.aperto.magkit.mockito.ContextMockUtils;
-import com.aperto.magkit.mockito.jcr.QueryMockUtils;
-import com.aperto.magkit.mockito.jcr.QueryStubbingOperation;
-import com.aperto.magkit.query.sql2.query.jcrwrapper.RowsQuery;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import com.aperto.magkit.query.sql2.query.QueryRowsStatement;
 import com.aperto.magkit.query.sql2.query.QueryWorkspace;
 import com.aperto.magkit.query.sql2.query.Sql2QueryBuilder;
+import com.aperto.magkit.query.sql2.query.jcrwrapper.RowsQuery;
 import com.aperto.magkit.query.sql2.statement.Sql2Builder;
+import de.ibmix.magkit.test.jcr.QueryMockUtils;
+import de.ibmix.magkit.test.jcr.QueryStubbingOperation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.mockQuery;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
 import static com.aperto.magkit.query.sql2.statement.Sql2Statement.select;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQuery;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Test Sql2RowsQueryBuilder.
@@ -35,17 +56,16 @@ import static org.mockito.Matchers.anyLong;
 public class Sql2RowsQueryBuilderTest {
 
     private Query _query;
-    private Sql2Builder _statement = select("test", "other").from("mgnl:Page").orderByScore();
+    private final Sql2Builder _statement = select("test", "other").from("mgnl:Page").orderByScore();
 
     @Before
     public void setUp() throws Exception {
-        ContextMockUtils.cleanContext();
         _query = mockQuery("website", Query.JCR_SQL2, _statement.build());
     }
 
     @After
     public void tearDown() throws Exception {
-        ContextMockUtils.cleanContext();
+        cleanContext();
     }
 
     @Test
@@ -66,15 +86,15 @@ public class Sql2RowsQueryBuilderTest {
     @Test
     public void withStatement() {
         assertThat(Sql2.Query.rowsFromWebsite().withStatement(_statement).buildRowsQuery(), isA(RowsQuery.class));
-        Mockito.verify(_query, Mockito.times(0)).setLimit(anyLong());
-        Mockito.verify(_query, Mockito.times(0)).setOffset(anyLong());
+        verify(_query, times(0)).setLimit(anyLong());
+        verify(_query, times(0)).setOffset(anyLong());
     }
 
     @Test
     public void withLimit() {
         assertThat(Sql2.Query.rowsFromWebsite().withStatement(_statement).withLimit(5).buildRowsQuery(), isA(RowsQuery.class));
-        Mockito.verify(_query, Mockito.times(1)).setLimit(5L);
-        Mockito.verify(_query, Mockito.times(0)).setOffset(anyLong());
+        verify(_query, times(1)).setLimit(5L);
+        verify(_query, times(0)).setOffset(anyLong());
     }
 
     @Test
@@ -83,10 +103,10 @@ public class Sql2RowsQueryBuilderTest {
                 .withStatement(_statement)
                 .withLimit(5)
                 .withOffset(5).buildRowsQuery(),
-                isA(RowsQuery.class)
+            isA(RowsQuery.class)
         );
-        Mockito.verify(_query, Mockito.times(1)).setLimit(5L);
-        Mockito.verify(_query, Mockito.times(1)).setOffset(5L);
+        verify(_query, times(1)).setLimit(5L);
+        verify(_query, times(1)).setOffset(5L);
     }
 
     @Test
@@ -95,10 +115,10 @@ public class Sql2RowsQueryBuilderTest {
                 .fromWebsite()
                 .withStatement("test-statement")
                 .buildRowsQuery(),
-                isA(RowsQuery.class)
+            isA(RowsQuery.class)
         );
-        Mockito.verify(_query, Mockito.times(0)).setOffset(anyLong());
-        Mockito.verify(_query, Mockito.times(0)).setLimit(anyLong());
+        verify(_query, times(0)).setOffset(anyLong());
+        verify(_query, times(0)).setLimit(anyLong());
     }
 
     @Test
@@ -107,17 +127,17 @@ public class Sql2RowsQueryBuilderTest {
         Node result2 = mockPageNode("test2");
         QueryResult result = QueryMockUtils.mockQueryResult(result1, result2);
         String statement = select("test", "other").from("mgnl:Page").orderByScore().build();
-        _query = ContextMockUtils.mockQuery("website", Query.JCR_SQL2, statement);
-        QueryStubbingOperation.stubbResult(result).of(_query);
+        _query = mockQuery("website", Query.JCR_SQL2, statement);
+        QueryStubbingOperation.stubResult(result).of(_query);
         assertThat(Sql2QueryBuilder.forRows()
-            .fromWebsite()
-            .withStatement(statement)
-            .withLimit(5)
-            .withOffset(5)
-            .getResultRows().size(),
+                .fromWebsite()
+                .withStatement(statement)
+                .withLimit(5)
+                .withOffset(5)
+                .getResultRows().size(),
             is(2)
         );
-        Mockito.verify(_query, Mockito.times(1)).setOffset(5);
-        Mockito.verify(_query, Mockito.times(1)).setLimit(5);
+        verify(_query, times(1)).setOffset(5);
+        verify(_query, times(1)).setLimit(5);
     }
 }

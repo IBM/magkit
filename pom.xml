@@ -1,17 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>com.aperto.magkit</groupId>
-        <artifactId>magkit-multi</artifactId>
-        <version>3.6.4-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <groupId>de.ibmix.magkit</groupId>
+        <artifactId>magkit-pom</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>magkit</artifactId>
-    <name>Aperto Magnolia Kit</name>
+    <name>IBM iX Magnolia Kit</name>
     <packaging>jar</packaging>
+
+    <properties>
+        <!-- keep in sync with corresponding versions from magnolia bundle -->
+        <version.magnolia.workflow>6.0.4</version.magnolia.workflow>
+        <version.poi>4.1.2</version.poi>
+
+        <version.magkit.test>1.0.0-SNAPSHOT</version.magkit.test>
+    </properties>
+
 
     <dependencies>
         <dependency>
@@ -27,10 +33,10 @@
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>javax.servlet.jsp-api</artifactId>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>info.magnolia.ui</groupId>
             <artifactId>magnolia-ui-framework-compatibility</artifactId>
@@ -46,6 +52,7 @@
         <dependency>
             <groupId>info.magnolia.workflow</groupId>
             <artifactId>magnolia-module-workflow-jbpm</artifactId>
+            <version>${version.magnolia.workflow}</version>
         </dependency>
         <dependency>
             <groupId>info.magnolia.cache</groupId>
@@ -64,6 +71,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
+            <version>${version.poi}</version>
         </dependency>
 
         <!-- Test Scope Dependencies -->
@@ -72,16 +80,27 @@
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.aperto.magkit</groupId>
-            <artifactId>magkit-test</artifactId>
-            <version>${project.version}</version>
+            <groupId>de.ibmix.magkit</groupId>
+            <artifactId>magkit-test-cms</artifactId>
+            <version>${version.magkit.test}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.ibmix.magkit</groupId>
+            <artifactId>magkit-test-jcr</artifactId>
+            <version>${version.magkit.test}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.ibmix.magkit</groupId>
+            <artifactId>magkit-test-servlet</artifactId>
+            <version>${version.magkit.test}</version>
             <scope>test</scope>
         </dependency>
         <!-- Magnolia test utils -->
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-core</artifactId>
-            <version>${magnolia.test.version}</version>
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>

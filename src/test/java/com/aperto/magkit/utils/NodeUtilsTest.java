@@ -1,40 +1,58 @@
 package com.aperto.magkit.utils;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockAreaNode;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockComponentNode;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockMgnlNode;
-import static com.aperto.magkit.mockito.MagnoliaNodeMockUtils.mockPageNode;
-import static com.aperto.magkit.mockito.MagnoliaNodeStubbingOperation.stubTemplate;
-import static com.aperto.magkit.mockito.jcr.NodeMockUtils.mockNode;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubIdentifier;
-import static com.aperto.magkit.mockito.jcr.NodeStubbingOperation.stubType;
-import static com.aperto.magkit.utils.NodeUtils.getAncestorWithPrimaryType;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import de.ibmix.magkit.test.cms.templating.TemplateDefinitionStubbingOperation;
+import info.magnolia.jcr.util.NodeTypes;
+import info.magnolia.repository.RepositoryConstants;
+import org.junit.After;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import java.util.UUID;
+
 import static com.aperto.magkit.utils.NodeUtils.getAncestorOrSelfWithTemplate;
+import static com.aperto.magkit.utils.NodeUtils.getAncestorWithPrimaryType;
 import static com.aperto.magkit.utils.NodeUtils.getPathForIdentifier;
 import static com.aperto.magkit.utils.NodeUtils.hasSubComponents;
 import static com.aperto.magkit.utils.NodeUtils.isNodeType;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockAreaNode;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
+import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
+import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubType;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-
-import com.aperto.magkit.mockito.TemplateDefinitionStubbingOperation;
-import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.repository.RepositoryConstants;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.util.UUID;
 
 /**
  * Tests for node utils.
@@ -176,11 +194,6 @@ public class NodeUtilsTest {
         assertThat(NodeUtils.getNodeByReference("website", "just something"), nullValue());
         assertThat(NodeUtils.getNodeByReference("website", "/root/test/page"), is(node));
         assertThat(NodeUtils.getNodeByReference("website", node.getIdentifier()), is(node));
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        cleanContext();
     }
 
     @After

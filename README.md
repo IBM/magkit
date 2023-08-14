@@ -1,15 +1,12 @@
-<!-- This should be the location of the title of the repository, normally the short name -->
-# repo-template
+# Magkit
 
-<!-- Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
-<!-- [![Build Status](https://travis-ci.org/jjasghar/ibm-cloud-cli.svg?branch=master)](https://travis-ci.org/jjasghar/ibm-cloud-cli) -->
+<!-- TODO Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
+<!-- [![Build Status](GitHub Actions) -->
 
-<!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
 ## Scope
 
-The purpose of this project is to provide a template for new open source repositories.
+The purpose of this project is to provide a helper and basic settings for Magnolia project at IBM iX.
 
-<!-- A more detailed Usage or detailed explaination of the repository here -->
 ## Usage
 
 This repository contains some example best practices for open source repositories:
@@ -20,12 +17,6 @@ This repository contains some example best practices for open source repositorie
 * [MAINTAINERS.md](MAINTAINERS.md)
 <!-- A Changelog allows you to track major changes and things that happen, https://github.com/github-changelog-generator/github-changelog-generator can help automate the process -->
 * [CHANGELOG.md](CHANGELOG.md)
-
-> These are optional
-
-<!-- The following are OPTIONAL, but strongly suggested to have in your repository. -->
-* [dco.yml](.github/dco.yml) - This enables DCO bot for you, please take a look https://github.com/probot/dco for more details.
-* [travis.yml](.travis.yml) - This is a example `.travis.yml`, please take a look https://docs.travis-ci.com/user/tutorial/ for more details.
 
 These may be copied into a new or existing project to make it easier for developers not on a project team to collaborate.
 
@@ -74,4 +65,4 @@ GitHub list of contributors.
 
 - Author: New OpenSource IBMer <new-opensource-ibmer@ibm.com>
 
-[issues]: https://github.com/IBM/repo-template/issues/new
+[issues]: https://github.com/IBM/magkit/issues/new

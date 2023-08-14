@@ -1,15 +1,35 @@
 package com.aperto.magkit.query.sql2.statement;
 
-import com.aperto.magkit.mockito.ContextMockUtils;
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import com.aperto.magkit.query.sql2.Sql2;
 import info.magnolia.jcr.util.NodeTypes;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 
 import java.util.Calendar;
 
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests showing examples on how to use the Sql2 query facade.
@@ -17,11 +37,7 @@ import static org.junit.Assert.assertThat;
  * @author wolf.bubenik@aperto.com
  * @since (21.8.2020)
  */
-public class Sql2StatementExamples {
-    @Before
-    public void setUp() throws Exception {
-        ContextMockUtils.cleanContext();
-    }
+public class Sql2StatementExamplesTest {
 
     @Test
     public void selectAll() {
@@ -166,15 +182,15 @@ public class Sql2StatementExamples {
     @Test
     public void selectByComplexQuery() {
         assertThat(Sql2.Statement.select().whereAny(
-            Sql2.Condition.and().matches(
-                Sql2.Condition.Path.isChild("migros/de"),
-                Sql2.Condition.String.templateEquals("myModule:my/component-1", "myModule:my/component-2")
-            ),
-            Sql2.Condition.and().not().matches(
-                Sql2.Condition.Path.isChild("migros/de"),
-                Sql2.Condition.String.templateEquals("myModule:my/other/component")
-            )
-        ).build(),
+                Sql2.Condition.and().matches(
+                    Sql2.Condition.Path.isChild("migros/de"),
+                    Sql2.Condition.String.templateEquals("myModule:my/component-1", "myModule:my/component-2")
+                ),
+                Sql2.Condition.and().not().matches(
+                    Sql2.Condition.Path.isChild("migros/de"),
+                    Sql2.Condition.String.templateEquals("myModule:my/other/component")
+                )
+            ).build(),
             is("SELECT * FROM [nt:base] WHERE ((ischildnode('/migros/de') AND ([mgnl:template] = 'myModule:my/component-1' OR [mgnl:template] = 'myModule:my/component-2')) OR not(ischildnode('/migros/de') AND [mgnl:template] = 'myModule:my/other/component'))")
         );
     }
@@ -182,8 +198,8 @@ public class Sql2StatementExamples {
     @Test
     public void selectOrderedByScore() {
         assertThat(Sql2.Statement.select().whereAll(
-            Sql2.Condition.String.property("title").lowerCase().likeAny().values("test", "toast")
-        ).orderByScore().descending().build(),
+                Sql2.Condition.String.property("title").lowerCase().likeAny().values("test", "toast")
+            ).orderByScore().descending().build(),
             is("SELECT * FROM [nt:base] WHERE (lower([title]) LIKE '%test%' OR lower([title]) LIKE '%toast%') ORDER BY [jcr:score] DESC")
         );
     }
@@ -191,8 +207,8 @@ public class Sql2StatementExamples {
     @Test
     public void selectUuidsFromPagesOrdered() {
         assertThat(Sql2.Statement.select("title", "date", "jcr:uuid").from(NodeTypes.Page.NAME).whereAll(
-            Sql2.Condition.String.property("title").startsWithAny().values("Test", "Toast")
-        ).orderBy("date").ascending().build(),
+                Sql2.Condition.String.property("title").startsWithAny().values("Test", "Toast")
+            ).orderBy("date").ascending().build(),
             is("SELECT [title],[date],[jcr:uuid] FROM [mgnl:page] WHERE ([title] LIKE 'Test%' OR [title] LIKE 'Toast%') ORDER BY [date] ASC")
         );
     }
@@ -201,13 +217,13 @@ public class Sql2StatementExamples {
     @Test
     public void selectChildrenOfParentWithTemplate() {
         assertThat(Sql2.Statement.selectComponents().as("content")
-            .innerJoin(NodeTypes.Component.NAME).joinAs("container").on(
-                Sql2.JoinOn.selectedDescendantOfJoined()
-            )
-            .whereAll(
-                Sql2.Condition.String.templateEquals("m5-tk-core-components:components/content/standardImageTextTeaser"),
-                Sql2.Condition.String.templateEquals("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
-            ).build(),
+                .innerJoin(NodeTypes.Component.NAME).joinAs("container").on(
+                    Sql2.JoinOn.selectedDescendantOfJoined()
+                )
+                .whereAll(
+                    Sql2.Condition.String.templateEquals("m5-tk-core-components:components/content/standardImageTextTeaser"),
+                    Sql2.Condition.String.templateEquals("m5-relaunch-my-migros:pages/myCumulusPage").forJoin()
+                ).build(),
             is("SELECT content.*,container.* FROM [mgnl:component] AS content INNER JOIN [mgnl:component] AS container ON isdescendantnode(content,container) WHERE (content.[mgnl:template] = 'm5-tk-core-components:components/content/standardImageTextTeaser' AND container.[mgnl:template] = 'm5-relaunch-my-migros:pages/myCumulusPage')")
         );
     }
@@ -330,6 +346,11 @@ public class Sql2StatementExamples {
         result.set(year, month, date, hour, minute, second);
         result.set(Calendar.MILLISECOND, 0);
         return result;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        cleanContext();
     }
 
 }

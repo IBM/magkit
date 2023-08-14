@@ -1,5 +1,25 @@
 package com.aperto.magkit.apps.ui.download;
 
+/*-
+ * #%L
+ * IBM iX Magnolia Kit
+ * %%
+ * Copyright (C) 2023 IBM iX
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FileResource;
 import com.vaadin.ui.AbstractComponent;
@@ -24,16 +44,16 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.aperto.magkit.mockito.ContextMockUtils.cleanContext;
-import static com.aperto.magkit.mockito.ContextMockUtils.mockWebContext;
-import static com.aperto.magkit.mockito.ServerConfigurationMockUtils.mockServerConfiguration;
-import static com.aperto.magkit.mockito.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
-import static com.aperto.magkit.mockito.WebContextStubbingOperation.stubContextPath;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
+import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
+import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubContextPath;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -50,9 +70,8 @@ public class TableAsExcelResourceProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        cleanContext();
         _source = mock(Table.class);
-        doReturn(new Object[] {"first", "second"}).when(_source).getVisibleColumns();
+        doReturn(new Object[]{"first", "second"}).when(_source).getVisibleColumns();
         _resourceProvider = new TableAsExcelResourceProvider(_source, "test:base file-name", "test title");
     }
 
@@ -62,11 +81,12 @@ public class TableAsExcelResourceProviderTest {
     }
 
     @Test
-    public void createExcel() throws Exception {
+    public void createExcel() {
+        //TODO: implement test case
     }
 
     @Test
-    public void getHeaderStyle() throws Exception {
+    public void getHeaderStyle() {
         Workbook wb = new XSSFWorkbook();
         CellStyle style = _resourceProvider.getHeaderStyle(wb);
         assertThat(style, notNullValue());
@@ -74,11 +94,12 @@ public class TableAsExcelResourceProviderTest {
     }
 
     @Test
-    public void renderSheet() throws Exception {
+    public void renderSheet() {
+        //TODO: implement test case
     }
 
     @Test
-    public void renderHeader() throws Exception {
+    public void renderHeader() {
         doReturn(Arrays.asList("row1", "row2")).when(_source).getVisibleItemIds();
 
         Item row1 = mock(Item.class);
@@ -104,7 +125,7 @@ public class TableAsExcelResourceProviderTest {
 
     @Test
     public void updateColumnWidthTest() {
-        int[] colWidth = new int[] {0, 0, 0};
+        int[] colWidth = new int[]{0, 0, 0};
         _resourceProvider.updateColumnWidth(colWidth, null, 1);
         assertThat(colWidth[0], is(0));
         assertThat(colWidth[1], is(0));
@@ -208,7 +229,7 @@ public class TableAsExcelResourceProviderTest {
         assertThat(sheet.getRow(3), notNullValue());
         assertThat(sheet.getRow(4), notNullValue());
 
-        mockProperties(rows, new String[] {"first value", "invisible value", "second value"}, new String[] {"first", "invisible", "second"});
+        mockProperties(rows, new String[]{"first value", "invisible value", "second value"}, new String[]{"first", "invisible", "second"});
         _resourceProvider.renderSheet(sheet);
         assertThat(sheet.getRow(2).getCell(0).getStringCellValue(), is("first value"));
         assertThat(sheet.getRow(2).getCell(1).getStringCellValue(), is("second value"));
