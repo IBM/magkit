@@ -33,10 +33,6 @@
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>javax.servlet.jsp-api</artifactId>
         </dependency>
-        <!--dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-        </dependency-->
         <dependency>
             <groupId>info.magnolia.ui</groupId>
             <artifactId>magnolia-ui-framework-compatibility</artifactId>
@@ -115,6 +111,16 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>checkstyle-rules.xml</configLocation>
+                </configuration>
+            </plugin>
+        </plugins>
+
         <resources>
             <!-- Filter magkit.xml file within resources directory and keep other files as they are. -->
             <resource>
