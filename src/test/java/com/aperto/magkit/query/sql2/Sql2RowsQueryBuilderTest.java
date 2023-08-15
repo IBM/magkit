@@ -25,8 +25,6 @@ import com.aperto.magkit.query.sql2.query.QueryWorkspace;
 import com.aperto.magkit.query.sql2.query.Sql2QueryBuilder;
 import com.aperto.magkit.query.sql2.query.jcrwrapper.RowsQuery;
 import com.aperto.magkit.query.sql2.statement.Sql2Builder;
-import de.ibmix.magkit.test.jcr.QueryMockUtils;
-import de.ibmix.magkit.test.jcr.QueryStubbingOperation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,12 +32,12 @@ import org.junit.Test;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.query.Query;
-import javax.jcr.query.QueryResult;
 
 import static com.aperto.magkit.query.sql2.statement.Sql2Statement.select;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQuery;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
+import static de.ibmix.magkit.test.jcr.QueryStubbingOperation.stubbResult;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
@@ -125,10 +123,8 @@ public class Sql2RowsQueryBuilderTest {
     public void getResultRows() throws RepositoryException {
         Node result1 = mockPageNode("test1");
         Node result2 = mockPageNode("test2");
-        QueryResult result = QueryMockUtils.mockQueryResult(result1, result2);
         String statement = select("test", "other").from("mgnl:Page").orderByScore().build();
-        _query = mockQuery("website", Query.JCR_SQL2, statement);
-        QueryStubbingOperation.stubResult(result).of(_query);
+        _query = mockQuery("website", Query.JCR_SQL2, statement, stubbResult(result1, result2));
         assertThat(Sql2QueryBuilder.forRows()
                 .fromWebsite()
                 .withStatement(statement)

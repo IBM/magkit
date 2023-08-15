@@ -35,7 +35,7 @@ import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQuery;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
-import static de.ibmix.magkit.test.jcr.QueryStubbingOperation.stubResult;
+import static de.ibmix.magkit.test.jcr.QueryStubbingOperation.stubbResult;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
@@ -56,7 +56,7 @@ public class Sql2NodesQueryBuilderTest {
     @Test
     public void buildNodesQuery() throws RepositoryException {
         Node result1 = mockPageNode("test1", stubIdentifier(UUID.randomUUID().toString()));
-        mockQuery("website", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubResult(result1));
+        mockQuery("website", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubbResult(result1));
 
         NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement(Sql2Statement.select());
         assertThat(builder.buildNodesQuery(), isA(NodesQuery.class));
@@ -69,7 +69,7 @@ public class Sql2NodesQueryBuilderTest {
     public void getResultNodes() throws RepositoryException {
         Node result1 = mockPageNode("test1", stubIdentifier(UUID.randomUUID().toString()));
         Node result2 = mockPageNode("test2", stubIdentifier(UUID.randomUUID().toString()));
-        mockQuery("my-workspace", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubResult(result1, result2));
+        mockQuery("my-workspace", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubbResult(result1, result2));
 
         NodesQueryBuilder builder = Sql2.Query.nodesFrom("my-workspace").withStatement(Sql2.Statement.select()).withLimit(10).withOffset(5);
         assertThat(builder.getResultNodes().size(), is(2));
