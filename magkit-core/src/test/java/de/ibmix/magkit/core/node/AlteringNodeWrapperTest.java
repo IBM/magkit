@@ -20,7 +20,7 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
-import com.aperto.magkit.utils.NodeUtils;
+import de.ibmix.magkit.core.utils.NodeUtils;
 import org.junit.After;
 import org.junit.Test;
 
@@ -29,16 +29,16 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.aperto.magkit.utils.PropertyUtils.getBooleanValue;
-import static com.aperto.magkit.utils.PropertyUtils.getBooleanValues;
-import static com.aperto.magkit.utils.PropertyUtils.getCalendarValue;
-import static com.aperto.magkit.utils.PropertyUtils.getCalendarValues;
-import static com.aperto.magkit.utils.PropertyUtils.getDoubleValue;
-import static com.aperto.magkit.utils.PropertyUtils.getDoubleValues;
-import static com.aperto.magkit.utils.PropertyUtils.getLongValue;
-import static com.aperto.magkit.utils.PropertyUtils.getLongValues;
-import static com.aperto.magkit.utils.PropertyUtils.getStringValue;
-import static com.aperto.magkit.utils.PropertyUtils.getStringValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValue;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getCalendarValue;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getCalendarValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getDoubleValue;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getDoubleValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValue;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValue;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValues;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;

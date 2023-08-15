@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import static com.aperto.magkit.nodebuilder.NodeOperationFactory.removeIfExists;
-import static com.aperto.magkit.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
+import static de.ibmix.magkit.setup.nodebuilder.NodeOperationFactory.removeIfExists;
+import static de.ibmix.magkit.setup.nodebuilder.task.NodeBuilderTaskFactory.selectServerConfig;
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 
 /**

@@ -31,11 +31,11 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.UUID;
 
-import static com.aperto.magkit.utils.NodeUtils.getAncestorOrSelfWithTemplate;
-import static com.aperto.magkit.utils.NodeUtils.getAncestorWithPrimaryType;
-import static com.aperto.magkit.utils.NodeUtils.getPathForIdentifier;
-import static com.aperto.magkit.utils.NodeUtils.hasSubComponents;
-import static com.aperto.magkit.utils.NodeUtils.isNodeType;
+import static de.ibmix.magkit.core.utils.NodeUtils.getAncestorOrSelfWithTemplate;
+import static de.ibmix.magkit.core.utils.NodeUtils.getAncestorWithPrimaryType;
+import static de.ibmix.magkit.core.utils.NodeUtils.getPathForIdentifier;
+import static de.ibmix.magkit.core.utils.NodeUtils.hasSubComponents;
+import static de.ibmix.magkit.core.utils.NodeUtils.isNodeType;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockAreaNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode;

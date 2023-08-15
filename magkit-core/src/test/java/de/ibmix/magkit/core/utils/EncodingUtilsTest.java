@@ -26,10 +26,10 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.aperto.magkit.utils.EncodingUtils.getBase64Decoded;
-import static com.aperto.magkit.utils.EncodingUtils.getBase64Encoded;
-import static com.aperto.magkit.utils.EncodingUtils.getUrlEncoded;
-import static com.aperto.magkit.utils.EncodingUtils.getUrlEncodedValues;
+import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Decoded;
+import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Encoded;
+import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncoded;
+import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncodedValues;
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;

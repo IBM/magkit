@@ -26,7 +26,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.UUID;
 
-import static com.aperto.magkit.utils.LinkTool.isUuid;
+import static de.ibmix.magkit.core.utils.LinkTool.isUuid;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;

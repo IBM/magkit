@@ -25,9 +25,9 @@ import org.junit.Test;
 
 import javax.jcr.RepositoryException;
 
-import static com.aperto.magkit.utils.SelectorUtils.DEF_PAGE;
-import static com.aperto.magkit.utils.SelectorUtils.SELECTOR_PAGING;
-import static com.aperto.magkit.utils.SelectorUtils.updateSelectors;
+import static de.ibmix.magkit.core.utils.SelectorUtils.DEF_PAGE;
+import static de.ibmix.magkit.core.utils.SelectorUtils.SELECTOR_PAGING;
+import static de.ibmix.magkit.core.utils.SelectorUtils.updateSelectors;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubAttribute;

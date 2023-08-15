@@ -1,4 +1,4 @@
-package de.ibmix.magkit.core.utils;
+package de.ibmix.magkit.query.xpath;
 
 /*-
  * #%L
@@ -20,17 +20,10 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import de.ibmix.magkit.query.xpath.ConstraintBuilder;
-import de.ibmix.magkit.query.xpath.XpathBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.ibmix.magkit.query.xpath.XpathBuilder.JCR_ROOT_PATH;
-import static de.ibmix.magkit.query.xpath.XpathBuilder.SELECTOR_ALL;
-import static de.ibmix.magkit.query.xpath.XpathBuilder.SELECTOR_ORDER_BY;
-import static de.ibmix.magkit.query.xpath.XpathBuilder.SELECTOR_TYPE_ELEMENT;
-import static de.ibmix.magkit.query.xpath.XpathBuilder.SELECTOR_TYPE_EMPTY;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertEquals;
 

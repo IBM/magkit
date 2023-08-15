@@ -1,4 +1,4 @@
-package de.ibmix.magkit.core.utils;
+package de.ibmix.magkit.query;
 
 /*-
  * #%L
@@ -40,7 +40,6 @@ import static de.ibmix.magkit.test.jcr.QueryMockUtils.mockQueryManager;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.jcr.query.Query.JCR_SQL2;
 import static javax.jcr.query.Query.XPATH;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,7 +75,7 @@ public class NodeQueryUtilTest {
 
     @Test
     public void testComponentQueryWithoutRoot() throws RepositoryException {
-        NodeQueryUtil.getComponentsWithTemplate(TEST_TPL_NAME, (Node) null, null);
+        getComponentsWithTemplate(TEST_TPL_NAME, (Node) null, null);
         verify(_queryManager).createQuery("/jcr:root//element(*,mgnl:component)[@mgnl:template='test-case:pages/templateName'] order by @jcr:primaryType", XPATH);
     }
 
@@ -84,7 +83,7 @@ public class NodeQueryUtilTest {
     public void testComponentQueryWithoutConstraint() throws RepositoryException {
         Node node = mock(Node.class);
         when(node.getPath()).thenReturn("/searchRoot");
-        NodeQueryUtil.getComponentsWithTemplate(TEST_TPL_NAME, node, null);
+        getComponentsWithTemplate(TEST_TPL_NAME, node, null);
         verify(_queryManager).createQuery("/jcr:root/searchRoot//element(*,mgnl:component)[@mgnl:template='test-case:pages/templateName'] order by @jcr:primaryType", XPATH);
     }
 
@@ -92,19 +91,19 @@ public class NodeQueryUtilTest {
     public void testComponentQueryWithConstraint() throws RepositoryException {
         Node node = mock(Node.class);
         when(node.getPath()).thenReturn("/searchRoot");
-        NodeQueryUtil.getComponentsWithTemplate(TEST_TPL_NAME, node, "jcr:contains(*,'123-456')");
+        getComponentsWithTemplate(TEST_TPL_NAME, node, "jcr:contains(*,'123-456')");
         verify(_queryManager).createQuery("/jcr:root/searchRoot//element(*,mgnl:component)[@mgnl:template='test-case:pages/templateName' and jcr:contains(*,'123-456')] order by @jcr:primaryType", XPATH);
     }
 
     @Test
     public void findComponentsWithSingleSearchRoot() throws Exception {
-        NodeQueryUtil.findDescendantComponents(TEST_TPL_NAME, TEST_NODE_PATH + "/area1");
+        findDescendantComponents(TEST_TPL_NAME, TEST_NODE_PATH + "/area1");
         verify(_queryManager).createQuery("select * from [mgnl:component] where [mgnl:template] = 'test-case:pages/templateName' and (ISDESCENDANTNODE('/portal/news/node/area1'))", JCR_SQL2);
     }
 
     @Test
     public void findComponentsWithMultipleSearchRoots() throws Exception {
-        NodeQueryUtil.findDescendantComponents(TEST_TPL_NAME, TEST_NODE_PATH + "/area1", TEST_NODE_PATH + "/area2");
+        findDescendantComponents(TEST_TPL_NAME, TEST_NODE_PATH + "/area1", TEST_NODE_PATH + "/area2");
         verify(_queryManager).createQuery("select * from [mgnl:component] where [mgnl:template] = 'test-case:pages/templateName' and (ISDESCENDANTNODE('/portal/news/node/area1') or ISDESCENDANTNODE('/portal/news/node/area2'))", JCR_SQL2);
     }
 

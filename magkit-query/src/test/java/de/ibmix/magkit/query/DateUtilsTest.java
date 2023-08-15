@@ -1,4 +1,4 @@
-package de.ibmix.magkit.core.utils;
+package de.ibmix.magkit.query;
 
 /*-
  * #%L
@@ -39,7 +39,7 @@ public class DateUtilsTest {
     @Test
     public void testCreateQueryDate() throws Exception {
         Date date = new Date(1234567890);
-        String queryDate = DateUtils.createQueryDate(date);
+        String queryDate = createQueryDate(date);
         assertThat(queryDate, equalTo("1970-01-15T07:56:07.890+01:00"));
     }
 }
