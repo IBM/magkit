@@ -33,5 +33,14 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
+        <!-- test deps -->
+        <dependency>
+            <groupId>de.ibmix.magkit</groupId>
+            <artifactId>magkit-test-cms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
     </dependencies>
 </project>

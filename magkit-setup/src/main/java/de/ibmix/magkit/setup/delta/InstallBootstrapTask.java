@@ -24,7 +24,7 @@ import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.BootstrapResourcesTask;
 
 /**
- * A task to bootstrap the install files of a module.
+ * A task to bootstrap the installation files of a module.
  *
  * @author diana.racho (13.01.2011) Aperto AG
  */
@@ -35,7 +35,7 @@ public class InstallBootstrapTask extends BootstrapResourcesTask {
     }
 
     /**
-     * Accepts any resource under "/mgnl-bootstrap/install/moduleName" including any subfolders.
+     * Accepts any resource under "/mgnl-bootstrap/install/moduleName" including any sub folders.
      */
     @Override
     protected boolean acceptResource(final InstallContext ctx, final String resourceName) {

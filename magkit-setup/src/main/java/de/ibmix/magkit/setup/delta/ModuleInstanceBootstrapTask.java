@@ -24,6 +24,7 @@ import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.importexport.command.JcrExportCommand;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.ModuleBootstrapTask;
+import info.magnolia.objectfactory.Components;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -34,7 +35,7 @@ import org.apache.commons.io.FilenameUtils;
 public class ModuleInstanceBootstrapTask extends ModuleBootstrapTask {
 
     /**
-     * Accepts any resource under "/mgnl-bootstrap/moduleName" including any subfolders.
+     * Accepts any resource under "/mgnl-bootstrap/moduleName" including any sub folders.
      * And accepts on author instance any resources under "/mgnl-bootstrap/author/moduleName"
      * and accepts on public instance any resources under "/mgnl-bootstrap/public/moduleName".
      */
@@ -44,7 +45,7 @@ public class ModuleInstanceBootstrapTask extends ModuleBootstrapTask {
         if (!acceptResources && acceptExtension(resourceName)) {
             String moduleName = ctx.getCurrentModuleDefinition().getName();
 
-            if (ServerConfiguration.getInstance().isAdmin()) {
+            if (Components.getComponent(ServerConfiguration.class).isAdmin()) {
                 acceptResources = resourceName.startsWith("/mgnl-bootstrap/author/" + moduleName + "/");
             } else {
                 acceptResources = resourceName.startsWith("/mgnl-bootstrap/public/" + moduleName + "/");

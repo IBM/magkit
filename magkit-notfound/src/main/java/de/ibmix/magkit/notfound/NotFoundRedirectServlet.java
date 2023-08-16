@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +36,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static com.aperto.magkit.utils.LocaleUtil.determineLocaleFromPath;
+import static de.ibmix.magkit.core.utils.LocaleUtil.determineLocaleFromPath;
+import static info.magnolia.cms.util.RequestDispatchUtil.FORWARD_PREFIX;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -60,14 +60,14 @@ public class NotFoundRedirectServlet extends HttpServlet {
     private Provider<SiteManager> _siteManagerProvider;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String handle = getRedirectHandle();
         response.setStatus(SC_NOT_FOUND);
         if (isNotBlank(handle)) {
-            dispatch("forward:" + handle, request, response);
+            dispatch(FORWARD_PREFIX + handle, request, response);
         } else {
             PrintWriter writer = response.getWriter();
-            writer.write("404 redirect handles are not configurated.");
+            writer.write("404 redirect handles are not configured.");
         }
     }
 

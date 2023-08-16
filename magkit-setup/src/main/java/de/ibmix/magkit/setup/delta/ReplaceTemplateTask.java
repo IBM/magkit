@@ -27,8 +27,9 @@ import javax.jcr.RepositoryException;
 
 /**
  * Replaces any occurrence of a given template in pages or components with another template.
+ *
  * <h1>ATTENTION!</h1>
- * This task may result in a heavy load on the repository, depending on the number of nodes with {@link #_currentTemplate}.
+ * This task may result in a heavy load on the repository, depending on the number of nodes with current template of {@link RemoveTemplateNodesTask}.
  * Especially when the project is in an "after go-live"-phase (i.e. is already in production use), think twice before renaming a template.
  *
  * @author lars.gendner

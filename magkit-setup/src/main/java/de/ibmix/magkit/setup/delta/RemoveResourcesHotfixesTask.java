@@ -23,7 +23,6 @@ package de.ibmix.magkit.setup.delta;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractRepositoryTask;
-import info.magnolia.module.delta.TaskExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,7 @@ import javax.jcr.query.QueryResult;
 import static info.magnolia.resourceloader.jcr.JcrResourceOrigin.RESOURCES_WORKSPACE;
 
 /**
- * A update task for removing all hotfixes in module specific resources.
+ * An update task for removing all hotfixes in module specific resources.
  *
  * @author frank.sommer
  * @since 18.08.2016
@@ -57,7 +56,7 @@ public class RemoveResourcesHotfixesTask extends AbstractRepositoryTask {
     }
 
     @Override
-    protected void doExecute(final InstallContext installContext) throws RepositoryException, TaskExecutionException {
+    protected void doExecute(final InstallContext installContext) throws RepositoryException {
         String moduleName = installContext.getCurrentModuleDefinition().getName();
         LOGGER.info("Remove hotfixes for module {} below {}.", moduleName, _basePath);
 

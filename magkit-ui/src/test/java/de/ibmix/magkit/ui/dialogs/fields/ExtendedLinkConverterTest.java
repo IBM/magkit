@@ -20,7 +20,7 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
+import de.ibmix.magkit.core.utils.ExtendedLinkFieldHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

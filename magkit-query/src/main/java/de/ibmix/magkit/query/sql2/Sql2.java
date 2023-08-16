@@ -57,6 +57,9 @@ import java.util.List;
  */
 public final class Sql2 {
 
+    private Sql2() {
+    }
+
     /**
      * Sql2 query builders.
      *
@@ -96,9 +99,9 @@ public final class Sql2 {
             return Sql2RowsQueryBuilder.forRows().fromWebsite();
         }
 
-        private Query() {}
+        private Query() {
+        }
     }
-
 
     /**
      * Sql2 statement builders.
@@ -132,7 +135,8 @@ public final class Sql2 {
             return Sql2Statement.select(attributes).from(NodeTypes.Component.NAME);
         }
 
-        private Statement() {}
+        private Statement() {
+        }
     }
 
     /**
@@ -142,6 +146,9 @@ public final class Sql2 {
      * @since (10.08.2020)
      */
     public static final class Condition {
+
+        private Condition() {
+        }
 
         public static Sql2ConstraintGroup and() {
             return Sql2ConstraintGroup.and();
@@ -219,7 +226,8 @@ public final class Sql2 {
                 return Sql2CalendarCondition.deleted();
             }
 
-            private Date() {}
+            private Date() {
+            }
         }
 
         /**
@@ -234,7 +242,8 @@ public final class Sql2 {
                 return Sql2DoubleCondition.property(name);
             }
 
-            private Double() {}
+            private Double() {
+            }
         }
 
         /**
@@ -249,7 +258,8 @@ public final class Sql2 {
                 return Sql2LongCondition.property(name);
             }
 
-            private Long() {}
+            private Long() {
+            }
         }
 
         /**
@@ -280,7 +290,8 @@ public final class Sql2 {
                 return Sql2PathCondition.is().descendant(ancestor);
             }
 
-            private Path() {}
+            private Path() {
+            }
         }
 
         /**
@@ -311,7 +322,8 @@ public final class Sql2 {
                 return identifier().equalsAny().values(values);
             }
 
-            private String() {}
+            private String() {
+            }
         }
 
         /**
@@ -358,10 +370,9 @@ public final class Sql2 {
                 return new Sql2ContainsCondition(property).any(values);
             }
 
-            private FullText() {}
+            private FullText() {
+            }
         }
-
-        private Condition() {}
     }
 
     /**
@@ -391,8 +402,7 @@ public final class Sql2 {
             return Sql2PathJoinCondition.isSelectedDescendantOfJoined();
         }
 
-        private JoinOn() {}
+        private JoinOn() {
+        }
     }
-
-    private Sql2() {}
 }

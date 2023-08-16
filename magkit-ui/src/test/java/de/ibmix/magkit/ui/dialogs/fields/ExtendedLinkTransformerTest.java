@@ -20,10 +20,10 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import com.aperto.magkit.utils.ExtendedLinkFieldHelper;
 import com.vaadin.v7.data.Item;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.PropertysetItem;
+import de.ibmix.magkit.core.utils.ExtendedLinkFieldHelper;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.ui.form.field.definition.ConfiguredFieldDefinition;
 import info.magnolia.ui.framework.i18n.DefaultI18NAuthoringSupport;
@@ -33,9 +33,9 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_ANCHOR;
-import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_QUERY;
-import static com.aperto.magkit.utils.ExtendedLinkFieldHelper.SUFFIX_SELECTOR;
+import static de.ibmix.magkit.core.utils.ExtendedLinkFieldHelper.SUFFIX_ANCHOR;
+import static de.ibmix.magkit.core.utils.ExtendedLinkFieldHelper.SUFFIX_QUERY;
+import static de.ibmix.magkit.core.utils.ExtendedLinkFieldHelper.SUFFIX_SELECTOR;
 import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static org.hamcrest.CoreMatchers.equalTo;

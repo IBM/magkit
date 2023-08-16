@@ -11,6 +11,22 @@
 
     <artifactId>magkit-notfound</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.ibmix.magkit</groupId>
+            <artifactId>magkit-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>info.magnolia.site</groupId>
+            <artifactId>magnolia-site</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <resources>
             <!-- Filter magkit.xml file within resources directory and keep other files as they are. -->
