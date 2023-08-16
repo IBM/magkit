@@ -1,21 +1,40 @@
-# Magkit
+# Magkit-Query
 
 <!-- TODO Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
 <!-- [![Build Status](GitHub Actions) -->
 
 ## Scope
 
-The purpose of this project is to provide commonly used helper classes for magnolia projects. It contains 5 modules:
-
-* **magkit-core:** A maven module providing utility classes for working with jcr nodes and their properties and values, cache, links... 
-* **magkit-notfound:** A magnolia module that provides improved 404 handling
-* **magkit-query:** A maven module that provides buiders for SQL2 and XPATH query strings
-* **magkit-setup:** A maven module that provides util classes to write magnolia configurations and version handler Tasks.
-* **magkit-ui:** A magnolia module that provides some additional dialog fields and a folder template
+This module provides provides builders for SQL2 and XPATH query strings.
 
 ## Usage
+### Search the JCR repository with SQL2 queries
+The package `de.ibmix.magkit.query.sql2` contains a fluent builder API for building and executing SQL2 queries and statement strings.
+You can execute queries using your handcrafted query string or use the builders to safely create them.
 
-For the purpose of the modules and usage examples please see the module readme.md files.
+The class Sql2 serves a s a facade for all the different builders.
+
+#### Execute handcrafted SQL2 query:
+```
+To read all page nodes from the WEBSITE repository:
+NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement("SELECT * FROM [mgnl:page]");
+// access the search result al List<Node>:
+List<Node> result = builder.getResultNodes();
+```
+#### Use Statement builder to query for Nodes:
+```
+To read 10 page nodes from the "my-workspace" repository below the path /root starting from result node 5:
+List<Node> result = Sql2.Query.nodesFrom("my-workspace")
+            .withStatement(
+                Sql2.Statement.selectPages()
+                    .whereAll(Sql2.Condition.Path.isDescendant("/root"))
+            ).withLimit(10).withOffset(5)
+            .getResultNodes();
+```
+
+For more examples please inspect the tests.
+
+### Search the JCR repository with XPATH queries
 
 <!-- A notes section is useful for anything that isn't covered in the Usage or Scope. Like what we have below. -->
 ## Notes
@@ -38,7 +57,7 @@ example:
 All source files must include a Copyright and License header. The SPDX license header is 
 preferred because it can be easily scanned.
 
-If you would like to see the detailed LICENSE click [here](LICENSE).
+If you would like to see the detailed LICENSE click [here](../LICENSE).
 
 ```text
 #
