@@ -22,11 +22,13 @@ package de.ibmix.magkit.setup.delta;
 
 import info.magnolia.cms.util.ClasspathResourcesUtil;
 import info.magnolia.context.MgnlContext;
+import info.magnolia.jcr.util.NodeNameHelper;
 import info.magnolia.jcr.util.NodeTypes.Content;
 import info.magnolia.jcr.util.NodeTypes.Folder;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.AbstractTask;
 import info.magnolia.module.delta.TaskExecutionException;
+import info.magnolia.objectfactory.Components;
 import org.apache.commons.io.IOUtils;
 
 import javax.jcr.Node;
@@ -35,12 +37,9 @@ import javax.jcr.Session;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static info.magnolia.cms.core.Path.getValidatedLabel;
 import static info.magnolia.jcr.util.NodeUtil.createPath;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
@@ -58,9 +57,9 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 public class ScriptInstallTask extends AbstractTask {
     private static final String SCRIPT_WORKSPACE_NAME = "scripts";
 
-    private String _resource;
-    private String _basePath;
-    private boolean _script;
+    private final String _resource;
+    private final String _basePath;
+    private final boolean _script;
 
     public ScriptInstallTask(final String resource) {
         this(resource, "/");
@@ -83,7 +82,7 @@ public class ScriptInstallTask extends AbstractTask {
 
     @Override
     public void execute(final InstallContext installContext) throws TaskExecutionException {
-        String validNodeName = getValidatedLabel(getBaseName(_resource));
+        String validNodeName = Components.getComponent(NodeNameHelper.class).getValidatedName(getBaseName(_resource));
         try {
             final Session scriptSession = MgnlContext.getJCRSession(SCRIPT_WORKSPACE_NAME);
             String nodePath = removeEnd(_basePath, "/") + "/" + validNodeName;
@@ -104,12 +103,9 @@ public class ScriptInstallTask extends AbstractTask {
     }
 
     protected String getText() throws IOException {
-        String text = EMPTY;
-        InputStream is = ClasspathResourcesUtil.getStream(_resource);
-        try {
+        String text;
+        try (InputStream is = ClasspathResourcesUtil.getStream(_resource)) {
             text = IOUtils.toString(is, UTF_8);
-        } finally {
-            closeQuietly(is);
         }
         return text;
     }

@@ -25,10 +25,7 @@ import com.google.common.escape.Escapers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.net.URLDecoder.decode;
 import static java.net.URLEncoder.encode;
@@ -101,13 +98,9 @@ public final class EncodingUtils {
      */
     public static String getUrlEncoded(String value) {
         String parameter = EMPTY;
-        try {
-            if (isNotEmpty(value)) {
-                parameter = encode(value, UTF_8.name());
-                LOGGER.debug("UrlEncoded string [{}] to [{}].", value, parameter);
-            }
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Error on url encoding [{}].", value, e);
+        if (isNotEmpty(value)) {
+            parameter = encode(value, UTF_8);
+            LOGGER.debug("UrlEncoded string [{}] to [{}].", value, parameter);
         }
         return parameter;
     }
@@ -120,16 +113,13 @@ public final class EncodingUtils {
      */
     public static String getUrlDecoded(final String value) {
         String urlDecoded = EMPTY;
-        try {
-            urlDecoded = decode(value, UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Error on decoding url [{}].", value, e);
+        if (isNotEmpty(value)) {
+            urlDecoded = decode(value, UTF_8);
         }
         return urlDecoded;
     }
 
     public static String[] getUrlEncodedValues(String[] parameters) {
-        List<String> newList = Arrays.stream(parameters).map(EncodingUtils::getUrlEncoded).collect(Collectors.toList());
-        return newList.toArray(new String[newList.size()]);
+        return Arrays.stream(parameters).map(EncodingUtils::getUrlEncoded).toArray(String[]::new);
     }
 }
