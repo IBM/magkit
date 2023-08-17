@@ -20,11 +20,11 @@
   -->
 
 <module>
-    <name>magkit</name>
-    <display-name>magkit</display-name>
-    <description>Aperto Magnolia Module</description>
-    <class>de.ibmix.magkit.notfound.MagkitModule</class>
-    <versionHandler>de.ibmix.magkit.setup.MagkitModuleVersionHandler</versionHandler>
+    <name>${project.artifactId}</name>
+    <display-name>${project.name}</display-name>
+    <description>IBM iX Magnolia Module</description>
+    <class>de.ibmix.magkit.notfound.NotfoundModule</class>
+    <versionHandler>de.ibmix.magkit.setup.BootstrapModuleVersionHandler</versionHandler>
     <version>${project.version}</version>
     <components>
         <id>main</id>
@@ -36,7 +36,6 @@
     <dependencies>
         <dependency>
             <name>ui-admincentral</name>
-            <version>${magnolia.ui.version}/*</version>
         </dependency>
     </dependencies>
     <servlets>

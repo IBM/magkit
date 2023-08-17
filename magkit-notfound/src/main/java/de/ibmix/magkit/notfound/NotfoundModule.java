@@ -26,7 +26,7 @@ package de.ibmix.magkit.notfound;
  * @author frank.sommer
  * @since 12.05.14
  */
-public class MagkitModule {
+public class NotfoundModule {
 
     private NotFoundConfig _notFoundConfig;
 

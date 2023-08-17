@@ -46,7 +46,7 @@ import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 /**
  * 404 error redirect servlet.
- * Configured in {@link MagkitModule}.
+ * Configured in {@link NotfoundModule}.
  *
  * @author diana.racho (Aperto AG)
  * @author frank.sommer
@@ -55,7 +55,7 @@ public class NotFoundRedirectServlet extends HttpServlet {
     private static final long serialVersionUID = -2569111666576917867L;
     private static final Logger LOGGER = LoggerFactory.getLogger(NotFoundRedirectServlet.class);
 
-    private Provider<MagkitModule> _moduleProvider;
+    private Provider<NotfoundModule> _moduleProvider;
     private Provider<AggregationState> _aggregationStateProvider;
     private Provider<SiteManager> _siteManagerProvider;
 
@@ -74,7 +74,7 @@ public class NotFoundRedirectServlet extends HttpServlet {
     protected String getRedirectHandle() {
         String handle = "";
 
-        MagkitModule magkitModule = _moduleProvider.get();
+        NotfoundModule magkitModule = _moduleProvider.get();
         NotFoundConfig notFoundConfig = magkitModule.getNotFoundConfig();
 
         if (notFoundConfig != null) {
@@ -113,7 +113,7 @@ public class NotFoundRedirectServlet extends HttpServlet {
             final SiteManager siteManager = _siteManagerProvider.get();
             final ExtendedAggregationState extendedAggregationState = (ExtendedAggregationState) aggregationState;
             final Site assignedSite = siteManager.getAssignedSite(extendedAggregationState.getDomainName(), extendedAggregationState.getOriginalBrowserURI());
-            if (assignedSite != null) {
+            if (assignedSite != null && !"fallback".equals(assignedSite.getName())) {
                 siteName = assignedSite.getName();
             }
         }
@@ -121,7 +121,7 @@ public class NotFoundRedirectServlet extends HttpServlet {
     }
 
     @Inject
-    public void setModuleProvider(final Provider<MagkitModule> moduleProvider) {
+    public void setModuleProvider(final Provider<NotfoundModule> moduleProvider) {
         _moduleProvider = moduleProvider;
     }
 
