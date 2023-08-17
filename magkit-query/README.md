@@ -12,18 +12,20 @@ This module provides provides builders for SQL2 and XPATH query strings.
 The package `de.ibmix.magkit.query.sql2` contains a fluent builder API for building and executing SQL2 queries and statement strings.
 You can execute queries using your handcrafted query string or use the builders to safely create them.
 
-The class Sql2 serves a s a facade for all the different builders.
+The class Sql2 serves as a facade for all the different builders.
 
 #### Execute handcrafted SQL2 query:
 ```
-To read all page nodes from the WEBSITE repository:
+// To read all page nodes from the WEBSITE repository:
+
 NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement("SELECT * FROM [mgnl:page]");
 // access the search result al List<Node>:
 List<Node> result = builder.getResultNodes();
 ```
 #### Use Statement builder to query for Nodes:
 ```
-To read 10 page nodes from the "my-workspace" repository below the path /root starting from result node 5:
+// To read 10 page nodes from the "my-workspace" repository below the path /root starting from result node 5:
+
 List<Node> result = Sql2.Query.nodesFrom("my-workspace")
             .withStatement(
                 Sql2.Statement.selectPages()

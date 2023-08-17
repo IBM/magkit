@@ -14,8 +14,13 @@ The purpose of this project is to provide commonly used helper classes for magno
 * **magkit-ui:** A magnolia module that provides some additional dialog fields and a folder template
 
 ## Usage
+This project needs 
+* Java 11 or later
+* Magnlia 6.2.19 or later
 
-For the purpose of the modules and usage examples please see the module readme.md files.
+It contains some legacy code for Magnolia 5.x used in old projects but this is deprecated and will be deleted soon. 
+
+For the purpose of the modules and usage examples please see their module readme.md files.
 
 <!-- A notes section is useful for anything that isn't covered in the Usage or Scope. Like what we have below. -->
 ## Notes
