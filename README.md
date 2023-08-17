@@ -9,8 +9,8 @@ The purpose of this project is to provide commonly used helper classes for magno
 
 * **magkit-core:** A maven module providing utility classes for working with jcr nodes and their properties and values, cache, links... 
 * **magkit-notfound:** A magnolia module that provides improved 404 handling
-* **magkit-query:** A maven module that provides buiders for SQL2 and XPATH query strings
-* **magkit-setup:** A maven module that provides util classes to write magnolia configurations and version handler Tasks.
+* **magkit-query:** A maven module that provides builders for SQL2 and XPATH query strings
+* **magkit-setup:** A maven module that provides util classes to write magnolia configurations and version handler tasks.
 * **magkit-ui:** A magnolia module that provides some additional dialog fields and a folder template
 
 ## Usage
