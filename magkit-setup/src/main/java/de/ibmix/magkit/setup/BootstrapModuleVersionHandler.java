@@ -75,8 +75,7 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
 
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
-        List<Task> installTasks = new ArrayList<Task>();
-        installTasks.addAll(super.getExtraInstallTasks(installContext));
+        List<Task> installTasks = new ArrayList<>(super.getExtraInstallTasks(installContext));
         installTasks.add(new InstallBootstrapTask());
         return installTasks;
     }
