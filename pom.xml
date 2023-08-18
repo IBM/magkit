@@ -29,17 +29,20 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- JBPM workflow, dependency is provided by Magnolia in the correct version -->
             <dependency>
                 <groupId>info.magnolia.workflow</groupId>
                 <artifactId>magnolia-module-workflow-jbpm</artifactId>
                 <version>${version.magnolia.workflow}</version>
+                <scope>provided</scope>
             </dependency>
 
-            <!-- excel creation -->
+            <!-- excel creation, dependency is provided by Magnolia in the correct version -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${version.poi}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- Test Scope Dependencies -->
