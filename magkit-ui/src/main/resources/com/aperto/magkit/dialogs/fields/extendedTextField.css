@@ -17,14 +17,18 @@
  * limitations under the License.
  * #L%
  */
+/* com.aperto.magkit.dialogs.m6.fields.ExtendedTextField */
 .aperto-extended-textfield-label {
-    text-align: right;
     color: #666;
     white-space: nowrap;
-    line-height: 25px;
-    right: 2px;
-    position: relative;
-    font-size: 10px;
-    top: -12px;
-    height: 18px;
+    line-height: 11px;
+    right: 5px;
+    position: absolute;
+    font-size: 11px;
+    top: 5px;
+}
+
+.v-customcomponent-error .aperto-extended-textfield input.v-textfield {
+    /* unable to get this working with magnolia styles */
+    border-color: red !important;
 }

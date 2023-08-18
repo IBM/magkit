@@ -20,41 +20,37 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import info.magnolia.ui.form.field.definition.MultiValueFieldDefinition;
-import info.magnolia.ui.form.field.transformer.multi.MultiValueTransformer;
+import info.magnolia.ui.field.FieldType;
+import info.magnolia.ui.field.JcrMultiFieldDefinition;
 
 /**
- * Multi field with specific size.
+ * Multi field with specific size. Used for multi fields containing composite fields.
  *
- * @author diana.racho (Aperto AG)
- * @deprecated use new ui 6 field {@link de.ibmix.magkit.ui.dialogs.m6.fields.SpecificMultiFieldDefinition}
+ * @author payam.tabrizi
+ * @since 22.02.21
  */
-@Deprecated(since = "3.5.2")
-public class SpecificMultiFieldDefinition extends MultiValueFieldDefinition {
+@FieldType("specificMultiField")
+public class SpecificMultiFieldDefinition extends JcrMultiFieldDefinition implements SpecificMultiDefinition {
+    private Long _maxComponents = DEFAULT_MAX;
+    private String _parentCountProperty;
 
-    private String _parentCountFieldName;
-    private Long _count;
-
-    /**
-     * Set default {@link info.magnolia.ui.form.field.transformer.Transformer}.
-     */
     public SpecificMultiFieldDefinition() {
-        setTransformerClass(MultiValueTransformer.class);
+        setImplementationClass((Class) SpecificMultiFormView.class);
     }
 
-    public String getParentCountFieldName() {
-        return _parentCountFieldName;
+    public Long getMaxComponents() {
+        return _maxComponents;
     }
 
-    public void setParentCountFieldName(String parentCountFieldName) {
-        _parentCountFieldName = parentCountFieldName;
+    public void setMaxComponents(Long maxComponents) {
+        _maxComponents = maxComponents;
     }
 
-    public Long getCount() {
-        return _count;
+    public String getParentComponentProperty() {
+        return _parentCountProperty;
     }
 
-    public void setCount(Long count) {
-        _count = count;
+    public void setParentCountProperty(final String parentCountProperty) {
+        _parentCountProperty = parentCountProperty;
     }
 }

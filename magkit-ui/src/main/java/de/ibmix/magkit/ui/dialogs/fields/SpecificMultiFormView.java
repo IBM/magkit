@@ -1,4 +1,4 @@
-package de.ibmix.magkit.ui.dialogs.m6.fields;
+package de.ibmix.magkit.ui.dialogs.fields;
 
 /*-
  * #%L

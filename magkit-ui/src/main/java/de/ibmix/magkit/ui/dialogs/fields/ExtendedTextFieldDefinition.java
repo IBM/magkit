@@ -20,19 +20,23 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import info.magnolia.ui.form.field.definition.TextFieldDefinition;
+import info.magnolia.ui.field.FieldType;
+import info.magnolia.ui.field.TextFieldDefinition;
 
 /**
  * Extends the ordinary {@link TextFieldDefinition}.
  *
- * @author Stefan Jahn
- * @since 21.11.14
- * @deprecated use new ui 6 field {@link de.ibmix.magkit.ui.dialogs.m6.fields.ExtendedTextFieldDefinition}
+ * @author Janine.Kleessen
+ * @since 17.02.2021
  */
-@Deprecated(since = "3.5.2")
+@FieldType("extendedTextField")
 public class ExtendedTextFieldDefinition extends TextFieldDefinition {
 
     private int _recommendedLength = -1;
+
+    public ExtendedTextFieldDefinition() {
+        setFactoryClass(ExtendedTextFieldFactory.class);
+    }
 
     public int getRecommendedLength() {
         return _recommendedLength;
@@ -41,4 +45,5 @@ public class ExtendedTextFieldDefinition extends TextFieldDefinition {
     public void setRecommendedLength(int recommendedLength) {
         _recommendedLength = recommendedLength;
     }
+
 }

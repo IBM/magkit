@@ -20,44 +20,38 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import com.vaadin.v7.data.Item;
-import com.vaadin.v7.ui.AbstractTextField;
-import com.vaadin.v7.ui.Field;
-import info.magnolia.ui.api.context.UiContext;
-import info.magnolia.ui.api.i18n.I18NAuthoringSupport;
-import info.magnolia.ui.form.field.factory.TextFieldFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.ui.AbstractTextField;
+import com.vaadin.ui.Component;
+import info.magnolia.objectfactory.ComponentProvider;
+import info.magnolia.ui.field.factory.TextFieldFactory;
 
 import javax.inject.Inject;
 
 /**
  * Factory for {@link ExtendedTextField}.
  *
- * @author Stefan Jahn
- * @since 21.11.14
- * @deprecated use new ui 6 field {@link de.ibmix.magkit.ui.dialogs.m6.fields.ExtendedTextFieldFactory}
+ * @author Janine.Kleessen
+ * @since 17.02.2021
  */
-@Deprecated(since = "3.5.2")
 public class ExtendedTextFieldFactory extends TextFieldFactory {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedTextFieldFactory.class);
+
+    private final ExtendedTextFieldDefinition _definition;
 
     @Inject
-    public ExtendedTextFieldFactory(final ExtendedTextFieldDefinition definition, final Item relatedFieldItem, final UiContext uiContext, final I18NAuthoringSupport i18nAuthoringSupport) {
-        super(definition, relatedFieldItem, uiContext, i18nAuthoringSupport);
+    public ExtendedTextFieldFactory(final ExtendedTextFieldDefinition definition, ComponentProvider componentProvider) {
+        super(definition, componentProvider);
+        _definition = definition;
     }
 
     /**
      * Wraps the defined text field as extended text field.
      */
     @Override
-    protected Field<String> createFieldComponent() {
-        Field<String> fieldComponent = super.createFieldComponent();
+    public Component createFieldComponent() {
+        Component fieldComponent = super.createFieldComponent();
 
-        if (definition instanceof ExtendedTextFieldDefinition) {
-            if (definition.getMaxLength() < 1 && ((ExtendedTextFieldDefinition) definition).getRecommendedLength() > 0) {
-                fieldComponent = new ExtendedTextField((ExtendedTextFieldDefinition) definition, (AbstractTextField) fieldComponent);
-            }
+        if (_definition.getMaxLength() < 1 && _definition.getRecommendedLength() > 0) {
+            fieldComponent = new ExtendedTextField(_definition, (AbstractTextField) fieldComponent);
         }
 
         return fieldComponent;

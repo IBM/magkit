@@ -33,25 +33,25 @@ import static org.hamcrest.core.Is.is;
 public class ExtendedTextFieldTest {
 
     @Test
-    public void testJustRecommendedLength() throws Exception {
+    public void testJustRecommendedLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(-1, 10), null);
         assertThat(extendedTextField.determineLabelMaxLength(), is(10));
     }
 
     @Test
-    public void testJustMaxLength() throws Exception {
+    public void testJustMaxLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(10, -1), null);
         assertThat(extendedTextField.determineLabelMaxLength(), is(10));
     }
 
     @Test
-    public void testMaxGtRecommendedLength() throws Exception {
+    public void testMaxGtRecommendedLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(10, 20), null);
         assertThat(extendedTextField.determineLabelMaxLength(), is(10));
     }
 
     @Test
-    public void testMaxLtRecommendedLength() throws Exception {
+    public void testMaxLtRecommendedLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(20, 10), null);
         assertThat(extendedTextField.determineLabelMaxLength(), is(10));
     }
