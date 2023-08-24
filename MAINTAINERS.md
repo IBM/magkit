@@ -1,3 +1,4 @@
 # MAINTAINERS
 
-Christopher Ferris - chrisfer@us.ibm.com
+Frank Sommer - frank.sommer@ibmix.de
+Wolf Bubenik - wolf.bubenik@ibmix.de

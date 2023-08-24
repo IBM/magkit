@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>de.ibmix.magkit</groupId>
@@ -8,7 +9,15 @@
     </parent>
     <artifactId>magkit</artifactId>
     <name>IBM iX Magnolia Kit</name>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>magkit-core</module>
+        <module>magkit-query</module>
+        <module>magkit-ui</module>
+        <module>magkit-setup</module>
+        <module>magkit-notfound</module>
+    </modules>
 
     <properties>
         <!-- keep in sync with corresponding versions from magnolia bundle -->
@@ -18,97 +27,45 @@
         <version.magkit.test>1.0.0-SNAPSHOT</version.magkit.test>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- JBPM workflow, dependency is provided by Magnolia in the correct version -->
+            <dependency>
+                <groupId>info.magnolia.workflow</groupId>
+                <artifactId>magnolia-module-workflow-jbpm</artifactId>
+                <version>${version.magnolia.workflow}</version>
+                <scope>provided</scope>
+            </dependency>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
+            <!-- excel creation, dependency is provided by Magnolia in the correct version -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${version.poi}</version>
+                <scope>provided</scope>
+            </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia.ui</groupId>
-            <artifactId>magnolia-ui-framework-compatibility</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia.site</groupId>
-            <artifactId>magnolia-site</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia</groupId>
-            <artifactId>magnolia-templating</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia.workflow</groupId>
-            <artifactId>magnolia-module-workflow-jbpm</artifactId>
-            <version>${version.magnolia.workflow}</version>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia.cache</groupId>
-            <artifactId>magnolia-cache-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.magnolia.core</groupId>
-            <artifactId>magnolia-virtual-uri</artifactId>
-        </dependency>
-
-        <!-- excel creation -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${version.poi}</version>
-        </dependency>
-
-        <!-- Test Scope Dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.ibmix.magkit</groupId>
-            <artifactId>magkit-test-cms</artifactId>
-            <version>${version.magkit.test}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.ibmix.magkit</groupId>
-            <artifactId>magkit-test-jcr</artifactId>
-            <version>${version.magkit.test}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.ibmix.magkit</groupId>
-            <artifactId>magkit-test-servlet</artifactId>
-            <version>${version.magkit.test}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Magnolia test utils -->
-        <dependency>
-            <groupId>info.magnolia</groupId>
-            <artifactId>magnolia-core</artifactId>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-        </dependency>
-    </dependencies>
+            <!-- Test Scope Dependencies -->
+            <dependency>
+                <groupId>de.ibmix.magkit</groupId>
+                <artifactId>magkit-test-cms</artifactId>
+                <version>${version.magkit.test}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>de.ibmix.magkit</groupId>
+                <artifactId>magkit-test-jcr</artifactId>
+                <version>${version.magkit.test}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>de.ibmix.magkit</groupId>
+                <artifactId>magkit-test-servlet</artifactId>
+                <version>${version.magkit.test}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -120,22 +77,5 @@
                 </configuration>
             </plugin>
         </plugins>
-
-        <resources>
-            <!-- Filter magkit.xml file within resources directory and keep other files as they are. -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>**/magkit.xml</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/magkit.xml</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 </project>
