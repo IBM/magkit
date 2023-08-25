@@ -20,7 +20,6 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -30,8 +29,9 @@ import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Decoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Encoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncodedValues;
-import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the Encoding Utils.
@@ -53,7 +53,7 @@ public class EncodingUtilsTest {
     public void encodeDecodeUnterschleissheim() {
         String value = "Unterschlei\u00dfheim";
         String base64Encoded = getBase64Encoded(value);
-        MatcherAssert.assertThat(value, equalTo(getBase64Decoded(base64Encoded)));
+        assertThat(value, equalTo(getBase64Decoded(base64Encoded)));
     }
 
     @Test
@@ -67,8 +67,8 @@ public class EncodingUtilsTest {
     @Test
     public void testEncodeUrlParameters() {
         Map<String, String> testData = createUrlEncodeTestData();
-        String[] keys = testData.keySet().toArray(new String[testData.keySet().size()]);
-        String[] values = testData.values().toArray(new String[testData.keySet().size()]);
+        String[] keys = testData.keySet().toArray(new String[0]);
+        String[] values = testData.values().toArray(new String[0]);
         String[] result = getUrlEncodedValues(keys);
         for (int i = 0; i < keys.length; i++) {
             assertEquals("Testing [" + keys[i] + "] ...", values[i], result[i]);
