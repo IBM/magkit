@@ -31,7 +31,6 @@ import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Encoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncodedValues;
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
