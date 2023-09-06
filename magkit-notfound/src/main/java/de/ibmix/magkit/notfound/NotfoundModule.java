@@ -20,21 +20,24 @@ package de.ibmix.magkit.notfound;
  * #L%
  */
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 /**
  * Module class of the Magkit module.
  *
  * @author frank.sommer
  * @since 12.05.14
  */
+@Getter
+@Setter
 public class NotfoundModule {
-
-    private NotFoundConfig _notFoundConfig;
-
-    public NotFoundConfig getNotFoundConfig() {
-        return _notFoundConfig;
-    }
-
-    public void setNotFoundConfig(final NotFoundConfig notFoundConfig) {
-        _notFoundConfig = notFoundConfig;
-    }
+    public static final String SITE_PARAM_FRAGMENT_LENGTH = "basePathFragmentLength";
+    private String _defaultErrorPath = EMPTY;
+    private String _relativeErrorPath = "error";
+    private Map<String, String> _errorCodeMapping = Map.of();
 }

@@ -27,8 +27,26 @@
             <artifactId>magnolia-site</artifactId>
         </dependency>
         <dependency>
+            <groupId>info.magnolia.rest</groupId>
+            <artifactId>magnolia-rest-services</artifactId>
+        </dependency>
+
+        <!-- provided dependencies -->
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.ibmix.magkit</groupId>
+            <artifactId>magkit-test-cms</artifactId>
         </dependency>
     </dependencies>
 

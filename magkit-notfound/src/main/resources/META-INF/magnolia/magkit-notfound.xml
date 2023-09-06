@@ -35,17 +35,14 @@
     </components>
     <dependencies>
         <dependency>
-            <name>ui-admincentral</name>
+            <name>rest-services</name>
+        </dependency>
+        <dependency>
+            <name>site</name>
+        </dependency>
+        <dependency>
+            <name>multisite</name>
+            <optional>true</optional>
         </dependency>
     </dependencies>
-    <servlets>
-        <servlet>
-            <name>404RedirectServlet</name>
-            <class>de.ibmix.magkit.notfound.NotFoundRedirectServlet</class>
-            <comment>Redirect to error page.</comment>
-            <mappings>
-                <mapping>/notFoundRedirect</mapping>
-            </mappings>
-        </servlet>
-    </servlets>
 </module>

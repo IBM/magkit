@@ -1,0 +1,2 @@
+class: info.magnolia.rest.service.node.definition.ConfiguredNodeEndpointDefinition
+implementationClass: de.ibmix.magkit.notfound.ErrorEndpoint
