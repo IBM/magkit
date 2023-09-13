@@ -26,7 +26,7 @@ import java.util.Date;
 
 import static de.ibmix.magkit.query.DateUtils.createQueryDate;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.StringRegularExpression.matchesRegex;
 
 /**
  * Test for DateUtils.
@@ -37,9 +37,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class DateUtilsTest {
 
     @Test
-    public void testCreateQueryDate() throws Exception {
+    public void testCreateQueryDate() {
         Date date = new Date(1234567890);
         String queryDate = createQueryDate(date);
-        assertThat(queryDate, equalTo("1970-01-15T07:56:07.890+01:00"));
+        // use regex to prevent time zone difference on build server
+        assertThat(queryDate, matchesRegex("1970-01-15T0(6|7):56:07\\.890\\+0(0|1):00"));
     }
 }

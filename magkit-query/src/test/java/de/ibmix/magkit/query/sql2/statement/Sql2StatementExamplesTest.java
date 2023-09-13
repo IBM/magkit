@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -106,6 +107,7 @@ public class Sql2StatementExamplesTest {
     @Test
     public void selectComponentsPublishedBeforeDate() {
         Calendar cal = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         assertThat(
             Sql2.Statement.selectComponents().whereAll(
                 Sql2.Condition.Date.lastActivated().lowerThan().value(cal)
@@ -117,6 +119,7 @@ public class Sql2StatementExamplesTest {
     @Test
     public void selectComponentsCreatedAfterDate() {
         Calendar cal = getCalendar(2020, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         assertThat(
             Sql2.Statement.selectComponents().whereAll(Sql2.Condition.Date.createdAfter(cal)).build(),
             is("SELECT * FROM [mgnl:component] WHERE [mgnl:created] > cast('2020-01-01T00:00:00.000+01:00' as date)")
