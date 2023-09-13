@@ -22,7 +22,9 @@ package de.ibmix.magkit.query;
 
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static de.ibmix.magkit.query.DateUtils.createQueryDate;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,8 +40,10 @@ public class DateUtilsTest {
 
     @Test
     public void testCreateQueryDate() throws Exception {
-        Date date = new Date(1234567890);
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = isoFormat.parse("2010-05-23T09:01:02");
         String queryDate = createQueryDate(date);
-        assertThat(queryDate, equalTo("1970-01-15T07:56:07.890+01:00"));
+        assertThat(queryDate, equalTo("2010-05-23T11:01:02.000+02:00"));
     }
 }
