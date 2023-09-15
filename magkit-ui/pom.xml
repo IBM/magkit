@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>magkit-ui</artifactId>
+    <name>IBM iX Magnolia Kit UI</name>
+    <description>Magkit UI provides some UI extensions for the Magnolia CMS.</description>
 
     <dependencies>
         <dependency>

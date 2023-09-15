@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>magkit-notfound</artifactId>
+    <name>IBM iX Magnolia Kit notfound</name>
+    <description>Magkit notfound provides error page handling by Magnolia CMS.</description>
 
     <dependencies>
         <dependency>
