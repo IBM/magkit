@@ -31,6 +31,7 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.TimeZone;
 
 import static de.ibmix.magkit.core.utils.PropertyUtils.PROPERTY_NAME_COMPARATOR;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBinaryValue;
@@ -211,8 +212,9 @@ public class PropertyUtilsTest {
     public void getStringValuesTestCalendar() throws RepositoryException {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(0);
+        cal.setTimeZone(TimeZone.getTimeZone("UK/London"));
         Property p = mockProperty("test", cal);
-        assertThat(getStringValues(p).get(0), is("1970-01-01T01:00:00.000+01:00"));
+        assertThat(getStringValues(p).get(0), is("1970-01-01T00:00:00.000Z"));
     }
 
     @Test

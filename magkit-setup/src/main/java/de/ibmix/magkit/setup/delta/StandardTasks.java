@@ -53,6 +53,8 @@ public final class StandardTasks {
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardTasks.class);
 
     public static final String PN_CLASS = "class";
+    @SuppressWarnings("unused")
+    public static final String PN_ENABLED = "enabled";
     public static final String PN_PATTERN = "pattern";
     private static final String NN_WORKFLOW = "workflow";
 

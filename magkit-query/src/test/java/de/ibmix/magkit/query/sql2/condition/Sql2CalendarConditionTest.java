@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -39,9 +40,10 @@ public class Sql2CalendarConditionTest {
     private final Calendar _date = Calendar.getInstance();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         _date.set(2020, Calendar.MAY, 4, 15, 30, 0);
         _date.set(Calendar.MILLISECOND, 0);
+        _date.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
     }
 
     @Test

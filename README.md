@@ -1,7 +1,6 @@
 # Magkit
 
-<!-- TODO Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
-<!-- [![Build Status](GitHub Actions) -->
+[![build-module](https://github.com/IBM/magkit/actions/workflows/build.yaml/badge.svg)](https://github.com/IBM/magkit/actions/workflows/build.yaml)
 
 ## Scope
 
@@ -16,16 +15,14 @@ The purpose of this project is to provide commonly used helper classes for magno
 ## Usage
 This project needs 
 * Java 11 or later
-* Magnlia 6.2.19 or later
+* Magnolia 6.2.19 or later
 
 It contains some legacy code for Magnolia 5.x used in old projects but this is deprecated and will be deleted soon. 
 
 For the purpose of the modules and usage examples please see their module readme.md files.
 
-<!-- A notes section is useful for anything that isn't covered in the Usage or Scope. Like what we have below. -->
 ## Notes
 
-<!-- Questions can be useful but optional, this gives you a place to say, "This is how to contact this project maintainers or create PRs -->
 If you have any questions or issues you can create a new [issue here][issues].
 
 Pull requests are very welcome! Make sure your patches are well tested.
@@ -51,11 +48,5 @@ If you would like to see the detailed LICENSE click [here](LICENSE).
 # SPDX-License-Identifier: Apache2.0
 #
 ```
-## Authors
-
-Optionally, you may include a list of authors, though this is redundant with the built-in
-GitHub list of contributors.
-
-- Author: New OpenSource IBMer <new-opensource-ibmer@ibm.com>
 
 [issues]: https://github.com/IBM/magkit/issues/new

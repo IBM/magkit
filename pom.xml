@@ -73,4 +73,19 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <scm>
+        <url>https://github.com/IBM/magkit.git</url>
+        <connection>scm:git:https://github.com/IBM/magkit.git</connection>
+        <developerConnection>scm:git:https://github.com/IBM/magkit.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>magnolia.enterprise</id>
+            <name>Magnolia Enterprise Group</name>
+            <url>https://nexus.magnolia-cms.com/content/groups/enterprise/</url>
+        </repository>
+    </repositories>
 </project>
