@@ -23,26 +23,18 @@
     <name>${project.artifactId}</name>
     <display-name>${project.name}</display-name>
     <description>${project.description}</description>
-    <class>de.ibmix.magkit.notfound.NotfoundModule</class>
     <versionHandler>de.ibmix.magkit.setup.BootstrapModuleVersionHandler</versionHandler>
     <version>${project.version}</version>
     <components>
         <id>main</id>
         <component>
-            <type>de.ibmix.magkit.notfound.ErrorService</type>
-            <implementation>de.ibmix.magkit.notfound.ErrorService</implementation>
+            <type>de.ibmix.magkit.ui.i18n.UiTranslator</type>
+            <implementation>de.ibmix.magkit.ui.i18n.UiTranslator</implementation>
         </component>
     </components>
     <dependencies>
         <dependency>
-            <name>rest-services</name>
-        </dependency>
-        <dependency>
-            <name>site</name>
-        </dependency>
-        <dependency>
-            <name>multisite</name>
-            <optional>true</optional>
+            <name>ui-admincentral</name>
         </dependency>
     </dependencies>
 </module>

@@ -1,0 +1,3 @@
+additionalProviders:
+  restPagesExceptionMapper:
+    providerClass: de.ibmix.magkit.notfound.PageRenderingErrorMapping

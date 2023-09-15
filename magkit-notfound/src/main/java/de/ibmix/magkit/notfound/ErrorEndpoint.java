@@ -20,38 +20,26 @@ package de.ibmix.magkit.notfound;
  * #L%
  */
 
-import info.magnolia.cms.beans.config.URI2RepositoryMapping;
 import info.magnolia.cms.core.AggregationState;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.module.site.ExtendedAggregationState;
-import info.magnolia.module.site.Site;
-import info.magnolia.module.site.SiteManager;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.service.node.definition.ConfiguredNodeEndpointDefinition;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.Optional;
 
-import static de.ibmix.magkit.notfound.NotfoundModule.SITE_PARAM_FRAGMENT_LENGTH;
 import static info.magnolia.cms.util.RequestDispatchUtil.FORWARD_PREFIX;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * Endpoint for rendering http error code handling.
@@ -63,20 +51,21 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
 @Slf4j
 @Path("/error")
 public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefinition> {
-    private Provider<NotfoundModule> _moduleProvider;
-    private Provider<AggregationState> _aggregationStateProvider;
-    private Provider<SiteManager> _siteManagerProvider;
+    private final ErrorService _errorService;
+    private final Provider<AggregationState> _aggregationStateProvider;
 
-    public ErrorEndpoint(ConfiguredNodeEndpointDefinition endpointDefinition) {
+    @Inject
+    public ErrorEndpoint(ConfiguredNodeEndpointDefinition endpointDefinition, ErrorService errorService, Provider<AggregationState> aggregationStateProvider) {
         super(endpointDefinition);
+        _errorService = errorService;
+        _aggregationStateProvider = aggregationStateProvider;
     }
 
     @Path("/default")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
     public Response defaultRendering() {
         Response response = null;
-        String handle = getErrorPagePath();
+        String handle = getErrorPagePath(getErrorStatusCode());
         if (isNotBlank(handle)) {
             dispatch(FORWARD_PREFIX + handle, MgnlContext.getWebContext().getRequest(), MgnlContext.getWebContext().getResponse());
         } else {
@@ -89,90 +78,23 @@ public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefini
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response headlessRendering() {
-        return Response.ok().build();
+        final int statusCode = getErrorStatusCode();
+        return Response.status(statusCode).entity(_errorService.createEntity(statusCode, getErrorPagePath(statusCode))).build();
     }
 
-    protected String getErrorPagePath() {
-        String handle = "";
-
-        NotfoundModule notfoundModule = _moduleProvider.get();
+    protected String getErrorPagePath(int statusCode) {
         AggregationState aggregationState = _aggregationStateProvider.get();
-        String sitePath = determineSitePath(aggregationState, notfoundModule.getDefaultErrorPath());
-        LOGGER.info("Try to find 404 page for {}.", sitePath);
-
-        String relativeErrorPath = notfoundModule.getRelativeErrorPath();
-        if (isNotBlank(relativeErrorPath)) {
-            relativeErrorPath = '/' + relativeErrorPath;
-        }
-
-        final String status = String.valueOf(MgnlContext.getWebContext().getRequest().getAttribute(ERROR_STATUS_CODE));
-
-        String errorPagePath = sitePath + relativeErrorPath + '/' + notfoundModule.getErrorCodeMapping().getOrDefault(status, status);
-        LOGGER.info("Error page path candidate is: {}", errorPagePath);
-        if (errorPageExists(errorPagePath)) {
-            handle = errorPagePath;
-        }
-
-        return handle;
-    }
-
-    private static boolean errorPageExists(String errorPagePath) {
-        boolean pageExists = false;
-        try {
-            Session session = MgnlContext.getJCRSession(WEBSITE);
-            pageExists = session.nodeExists(errorPagePath);
-        } catch (RepositoryException e) {
-            LOGGER.error("Error checking error page exists.", e);
-        }
-        return pageExists;
-    }
-
-    protected String determineSitePath(final AggregationState aggregationState, String defaultErrorPath) {
         // can not use site from aggregation state, because the current request is on the redirect servlet
         // using original uri and domain from aggregation state
         final String domain = aggregationState instanceof ExtendedAggregationState ? ((ExtendedAggregationState) aggregationState).getDomainName() : null;
         final String originalUri = aggregationState.getOriginalBrowserURI();
 
-        final SiteManager siteManager = _siteManagerProvider.get();
-        final Site assignedSite = siteManager.getAssignedSite(domain, originalUri);
-
-        final String sitePath = assignedSite.getMappings().entrySet().stream().filter(entry -> entry.getKey().equals(WEBSITE)).findFirst().map(Map.Entry::getValue).map(URI2RepositoryMapping::getHandlePrefix).orElse(defaultErrorPath);
-        LOGGER.debug("Site path: {}", sitePath);
-        final int fragmentLength = (int) assignedSite.getParameters().getOrDefault(SITE_PARAM_FRAGMENT_LENGTH, 1);
-        final String[] pathFragments = getSiteRelativePathFragments(originalUri, sitePath, fragmentLength);
-
-        String basePath = EMPTY;
-        if (pathFragments.length > 0) {
-            basePath = StringUtils.join(Arrays.copyOf(pathFragments, pathFragments.length - 1), '/');
-            if (isNotBlank(basePath)) {
-                basePath = '/' + basePath;
-            }
-        }
-        LOGGER.debug("Base path: {}", basePath);
-
-        return sitePath + basePath;
+        return _errorService.retrieveErrorPagePath(statusCode, domain, originalUri);
     }
 
-    private static String[] getSiteRelativePathFragments(String originalUri, String sitePath, int fragmentLength) {
-        String siteRoot = "/";
-        if (isNotEmpty(sitePath) && originalUri.startsWith(sitePath)) {
-            siteRoot = sitePath;
-        }
-        return removeStart(originalUri, siteRoot).split("/", fragmentLength + 1);
-    }
-
-    @Inject
-    public void setModuleProvider(final Provider<NotfoundModule> moduleProvider) {
-        _moduleProvider = moduleProvider;
-    }
-
-    @Inject
-    public void setAggregationStateProvider(final Provider<AggregationState> aggregationStateProvider) {
-        _aggregationStateProvider = aggregationStateProvider;
-    }
-
-    @Inject
-    public void setSiteManagerProvider(final Provider<SiteManager> siteManagerProvider) {
-        _siteManagerProvider = siteManagerProvider;
+    private static int getErrorStatusCode() {
+        return Optional.ofNullable(MgnlContext.getWebContext().getRequest().getAttribute(ERROR_STATUS_CODE))
+            .map(obj -> (int) obj)
+            .orElse(Response.Status.NOT_FOUND.getStatusCode());
     }
 }

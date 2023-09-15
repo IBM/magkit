@@ -29,15 +29,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
-import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
-import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubRequest;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
-import static de.ibmix.magkit.test.servlet.ServletMockUtils.mockHttpServletRequest;
-import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
@@ -57,19 +52,12 @@ public class ErrorEndpointTest {
 
     @Before
     public void setUp() throws Exception {
-        _endpoint = new ErrorEndpoint(null);
+        SiteManager siteManager = mock(SiteManager.class);
+        final ErrorService errorService = new ErrorService(() -> _notfoundModule, () -> siteManager);
 
         _aggregationState = mock(AggregationState.class);
-        SiteManager siteManager = mock(SiteManager.class);
+        _endpoint = new ErrorEndpoint(null, errorService, () -> _aggregationState);
 
-        _endpoint.setModuleProvider(() -> _notfoundModule);
-        _endpoint.setAggregationStateProvider(() -> _aggregationState);
-        _endpoint.setSiteManagerProvider(() -> siteManager);
-
-        final HttpServletRequest request = mockHttpServletRequest();
-        when(request.getAttribute(ERROR_STATUS_CODE)).thenReturn(404);
-
-        mockWebContext(stubRequest(request));
         mockPageNode("/de/error/404");
         mockPageNode("/error/404");
         mockPageNode("/tenant/fr/error/404");
@@ -90,21 +78,21 @@ public class ErrorEndpointTest {
     public void topLevelErrorPageExists() {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/notfound");
 
-        assertThat(_endpoint.getErrorPagePath(), equalTo("/error/404"));
+        assertThat(_endpoint.getErrorPagePath(404), equalTo("/error/404"));
     }
 
     @Test
     public void defaultErrorPagePathDoesNotExists() {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/fr/notfound");
 
-        assertThat(_endpoint.getErrorPagePath(), equalTo(""));
+        assertThat(_endpoint.getErrorPagePath(404), equalTo(""));
     }
 
     @Test
     public void existingDefaultErrorPagePath() {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/de/notfound");
 
-        assertThat(_endpoint.getErrorPagePath(), equalTo("/de/error/404"));
+        assertThat(_endpoint.getErrorPagePath(404), equalTo("/de/error/404"));
     }
 
     @Test
@@ -112,7 +100,7 @@ public class ErrorEndpointTest {
         _notfoundModule.setDefaultErrorPath("/de");
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/notfound");
 
-        assertThat(_endpoint.getErrorPagePath(), equalTo("/de/error/404"));
+        assertThat(_endpoint.getErrorPagePath(404), equalTo("/de/error/404"));
     }
 
     @Test
@@ -121,7 +109,7 @@ public class ErrorEndpointTest {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/fr/notfound");
         when(((ExtendedAggregationState) _aggregationState).getDomainName()).thenReturn("tenant.fr");
 
-        assertThat(_endpoint.getErrorPagePath(), equalTo("/tenant/fr/error/404"));
+        assertThat(_endpoint.getErrorPagePath(404), equalTo("/tenant/fr/error/404"));
     }
 
     @After
