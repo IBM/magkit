@@ -1,11 +1,7 @@
-dialog: mtk2:pages/basic
+dialog: magkit:pages/folder
 class: info.magnolia.rendering.template.configured.ConfiguredTemplateDefinition
 modelClass: de.ibmix.magkit.ui.templates.FolderModel
-renderType: site
+renderType: freemarker
 type: functional
-
-areas:
-  content:
-    templateScript: /magkit/templates/pages/folder.ftl
-
+templateScript: /magkit/templates/pages/folder.ftl
 title: templates.folder.title

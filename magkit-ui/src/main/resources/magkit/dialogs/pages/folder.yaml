@@ -1,0 +1,9 @@
+form:
+  properties:
+    - name: redirect
+      $type: pageLinkField
+      textInputAllowed: true
+    - name: hideInNav
+      defaultValue: true
+      $type: hiddenField
+      type: java.lang.Boolean

@@ -1,4 +1,4 @@
-<#--
+[#--
  #%L
  IBM iX Magnolia Kit
  %%
@@ -16,7 +16,18 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  #L%
--->
-[#if cmsfn.editMode]
-    <div class="editor-info-large">${i18n.get('folder.text')!}</div>
-[/#if]
+--]
+<html lang="${cmsfn.language()}">
+    <head>
+        [@cms.page /]
+        <title>${i18n.get('magkit.pages.folder.label')} template</title>
+    </head>
+    <body>
+    [#if cmsfn.editMode]
+        <div class="editor-info-large">${i18n.get('folder.text')}</div>
+        [#if content.redirect?has_content]
+            <p><strong>${i18n.get('magkit.pages.folder.redirect.label')}:</strong> <a href="${cmsfn.link("website", content.redirect)!content.redirect}">link</a></p>
+        [/#if]
+    [/#if]
+    </body>
+</html>

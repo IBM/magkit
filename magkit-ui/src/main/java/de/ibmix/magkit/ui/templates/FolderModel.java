@@ -21,6 +21,7 @@ package de.ibmix.magkit.ui.templates;
  */
 
 import de.ibmix.magkit.core.utils.LinkTool;
+import de.ibmix.magkit.core.utils.NodeUtils;
 import info.magnolia.context.WebContext;
 import info.magnolia.rendering.model.RenderingModel;
 import info.magnolia.rendering.model.RenderingModelImpl;
@@ -35,8 +36,10 @@ import javax.jcr.RepositoryException;
 
 import static info.magnolia.cms.util.RequestDispatchUtil.PERMANENT_PREFIX;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
-import static info.magnolia.context.MgnlContext.getAggregationState;
 import static info.magnolia.context.MgnlContext.getWebContext;
+import static info.magnolia.jcr.util.PropertyUtil.getString;
+import static info.magnolia.repository.RepositoryConstants.WEBSITE;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * Model of folder template.
@@ -50,6 +53,7 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
     public static final String TPL_NAME = "folder";
     public static final String TPL_NAME_SPACE = "magkit";
     public static final String TPL_REF = TPL_NAME_SPACE + ":pages/" + TPL_NAME;
+    public static final String PN_REDIRECT = "redirect";
 
     private final TemplatingFunctions _templatingFunctions;
 
@@ -71,22 +75,45 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
     }
 
     private void sendRedirect() {
-        Node pageNode = getAggregationState().getMainContentNode();
         try {
-            if (pageNode != null && pageNode.getDepth() > 0) {
-                Node parent = pageNode.getParent();
-                if (parent != null) {
-                    WebContext webContext = getWebContext();
-                    String path = parent.getPath();
-                    if (!"/".equals(parent.getPath())) {
-                        path = LinkTool.LinkType.REDIRECT.toLink(parent);
-                    }
-                    dispatch(PERMANENT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
-                }
+            String path = getRedirectTarget();
+            if (path == null) {
+                path = getRedirectPathToParent();
             }
+
+            WebContext webContext = getWebContext();
+            dispatch(PERMANENT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
         } catch (RepositoryException e) {
-            LOGGER.info("Can't get current page node.", e);
+            LOGGER.info("Error on check current page node.", e);
         }
+    }
+
+    private String getRedirectTarget() {
+        String redirectTarget = null;
+
+        final String redirectValue = getString(getNode(), PN_REDIRECT, EMPTY);
+        if (LinkTool.isExternalLink(redirectValue)) {
+            redirectTarget = redirectValue;
+        } else if (LinkTool.isUuid(redirectValue)) {
+            final Node node = NodeUtils.getNodeByIdentifier(WEBSITE, redirectValue);
+            if (node != null) {
+                redirectTarget = LinkTool.LinkType.REDIRECT.toLink(node);
+            }
+        }
+
+        return redirectTarget;
+    }
+
+    private String getRedirectPathToParent() throws RepositoryException {
+        String path = "/";
+        Node parent = getNode().getParent();
+        if (parent != null) {
+            path = parent.getPath();
+            if (!"/".equals(path)) {
+                path = LinkTool.LinkType.REDIRECT.toLink(parent);
+            }
+        }
+        return path;
     }
 
     private void setHideInNav() {
