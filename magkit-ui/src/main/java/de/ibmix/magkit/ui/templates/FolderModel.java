@@ -76,44 +76,13 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
 
     private void sendRedirect() {
         try {
-            String path = getRedirectTarget();
-            if (path == null) {
-                path = getRedirectPathToParent();
-            }
+            String path = retrieveRedirectUri(getNode());
 
             WebContext webContext = getWebContext();
             dispatch(PERMANENT_PREFIX + path, webContext.getRequest(), webContext.getResponse());
         } catch (RepositoryException e) {
             LOGGER.info("Error on check current page node.", e);
         }
-    }
-
-    private String getRedirectTarget() {
-        String redirectTarget = null;
-
-        final String redirectValue = getString(getNode(), PN_REDIRECT, EMPTY);
-        if (LinkTool.isExternalLink(redirectValue)) {
-            redirectTarget = redirectValue;
-        } else if (LinkTool.isUuid(redirectValue)) {
-            final Node node = NodeUtils.getNodeByIdentifier(WEBSITE, redirectValue);
-            if (node != null) {
-                redirectTarget = LinkTool.LinkType.REDIRECT.toLink(node);
-            }
-        }
-
-        return redirectTarget;
-    }
-
-    private String getRedirectPathToParent() throws RepositoryException {
-        String path = "/";
-        Node parent = getNode().getParent();
-        if (parent != null) {
-            path = parent.getPath();
-            if (!"/".equals(path)) {
-                path = LinkTool.LinkType.REDIRECT.toLink(parent);
-            }
-        }
-        return path;
     }
 
     private void setHideInNav() {
@@ -125,5 +94,50 @@ public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition
         } catch (RepositoryException e) {
             LOGGER.info("Can't set hideInNav property for folder.", e);
         }
+    }
+
+    /**
+     * Get the redirect uri from node.
+     *
+     * @param node page node
+     * @return redirect url
+     * @throws RepositoryException repository exception
+     */
+    public static String retrieveRedirectUri(Node node) throws RepositoryException {
+        return retrieveRedirectUri(node, false);
+    }
+
+    /**
+     * Get the redirect uri from node.
+     *
+     * @param node       page node
+     * @param asExternal uri as external or not
+     * @return redirect url
+     * @throws RepositoryException repository exception
+     */
+    public static String retrieveRedirectUri(Node node, boolean asExternal) throws RepositoryException {
+        LinkTool.LinkType linkType = asExternal ? LinkTool.LinkType.EXTERNAL : LinkTool.LinkType.REDIRECT;
+
+        String path = getRedirectTarget(node, linkType);
+        if (path == null) {
+            path = linkType.toLink(node.getParent());
+        }
+        return path;
+    }
+
+    private static String getRedirectTarget(Node node, LinkTool.LinkType linkType) {
+        String redirectTarget = null;
+
+        final String redirectValue = getString(node, PN_REDIRECT, EMPTY);
+        if (LinkTool.isExternalLink(redirectValue)) {
+            redirectTarget = redirectValue;
+        } else if (LinkTool.isUuid(redirectValue)) {
+            final Node redirectNode = NodeUtils.getNodeByIdentifier(WEBSITE, redirectValue);
+            if (redirectNode != null) {
+                redirectTarget = linkType.toLink(redirectNode);
+            }
+        }
+
+        return redirectTarget;
     }
 }

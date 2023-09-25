@@ -1,0 +1,3 @@
+additionalProviders:
+  restRedirectionExceptionMapper:
+    providerClass: de.ibmix.magkit.ui.templates.RedirectionExceptionMapper
