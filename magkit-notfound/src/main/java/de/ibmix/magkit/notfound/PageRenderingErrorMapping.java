@@ -45,7 +45,7 @@ public class PageRenderingErrorMapping implements ExceptionMapper<PageRenderingE
 
     @Override
     public Response toResponse(PageRenderingException exception) {
-        var statusCode = exception.getStatusCode();
+        var statusCode = exception.getResponse().getStatus();
         var failedNodePath = exception.getPath();
 
         return Response.status(statusCode).entity(_errorService.createEntity(statusCode, failedNodePath)).build();
