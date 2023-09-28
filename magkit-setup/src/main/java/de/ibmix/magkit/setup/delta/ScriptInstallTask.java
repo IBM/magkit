@@ -50,10 +50,12 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * new ScriptInstallTask("/täst.groovy", "/folder2", false); = create groovy file (e.g. class) in folder2
  * </pre>
  *
+ * @deprecated use info.magnolia.module.groovy.setup.InstallGroovyFile instead
  * @author diana.racho
  * @author frank.sommer
  * @since version 3.1.2
  */
+@Deprecated
 public class ScriptInstallTask extends AbstractTask {
     private static final String SCRIPT_WORKSPACE_NAME = "scripts";
 
