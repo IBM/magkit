@@ -100,7 +100,7 @@ public class ValueUtilsTest {
         assertThat(ValueUtils.valueToLong(mockValue(false)), nullValue());
         assertThat(ValueUtils.valueToLong(mockValue(0L)), is(0L));
         assertThat(ValueUtils.valueToLong(mockValue(0.0D)), is(0L));
-        assertThat(ValueUtils.valueToLong(mockValue(mockBinary("0123"))), is(0L));
+        assertThat(ValueUtils.valueToLong(mockValue(mockBinary("0123"))), nullValue());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class ValueUtilsTest {
         assertThat(ValueUtils.valueToDouble(mockValue(false)), nullValue());
         assertThat(ValueUtils.valueToDouble(mockValue(23L)), is(23D));
         assertThat(ValueUtils.valueToDouble(mockValue(23.420D)), is(23.42D));
-        assertThat(ValueUtils.valueToDouble(mockValue(mockBinary("0123"))), is(0D));
+        assertThat(ValueUtils.valueToDouble(mockValue(mockBinary("0123"))), nullValue());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class ValueUtilsTest {
         assertThat(ValueUtils.valueToBoolean(mockValue(23L)), is(false));
         assertThat(ValueUtils.valueToBoolean(mockValue(0.0D)), is(false));
         assertThat(ValueUtils.valueToBoolean(mockValue(23.420D)), is(false));
-        assertThat(ValueUtils.valueToBoolean(mockValue(mockBinary("0123"))), is(false));
+        assertThat(ValueUtils.valueToBoolean(mockValue(mockBinary("0123"))), nullValue());
     }
 
     @Test
