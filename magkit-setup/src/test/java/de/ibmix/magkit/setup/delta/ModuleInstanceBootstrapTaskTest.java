@@ -25,13 +25,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.ibmix.magkit.test.cms.context.InstallContextMockUtils.mockInstallContext;
-import static de.ibmix.magkit.test.cms.context.InstallContextStubbingOperation.stubModuleDefinition;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.cleanServerConfiguration;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubIsAdmin;
-import static de.ibmix.magkit.test.cms.module.ModuleDefinitionMockUtils.mockModuleDefinition;
+import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.stubCurrentModuleDefinition;
 import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubName;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -45,9 +45,9 @@ public class ModuleInstanceBootstrapTaskTest {
 
     @Before
     public void setUp() {
-        _task = new ModuleInstanceBootstrapTask();
-        _ctx = mockInstallContext(stubModuleDefinition(mockModuleDefinition(stubName("my-module"))));
         cleanServerConfiguration();
+        _task = new ModuleInstanceBootstrapTask();
+        _ctx = mockInstallContext(stubCurrentModuleDefinition(mockModuleDefinition(stubName("my-module"))));
     }
 
     @Test

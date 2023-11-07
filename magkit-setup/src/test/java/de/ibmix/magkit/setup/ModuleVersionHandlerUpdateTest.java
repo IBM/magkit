@@ -25,14 +25,17 @@ import info.magnolia.module.delta.Delta;
 import info.magnolia.module.model.ModuleDefinition;
 import info.magnolia.module.model.Version;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 
+import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.stubCurrentModuleDefinition;
+import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubName;
+import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubVersion;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
 import static info.magnolia.module.model.Version.parseVersion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
 
 /**
  * Test the module update handling with custom revision classifiers.
@@ -86,12 +89,9 @@ public class ModuleVersionHandlerUpdateTest {
 
     private List<Delta> doTestWithVersions(final String from, final String to) {
         BootstrapModuleVersionHandler handler = new BootstrapModuleVersionHandler();
-        Version toVersion = parseVersion(to);
         Version fromVersion = parseVersion(from);
-
-        InstallContext installContext = Mockito.mock(InstallContext.class);
-        ModuleDefinition definition = new ModuleDefinition("test", toVersion, "", null);
-        when(installContext.getCurrentModuleDefinition()).thenReturn(definition);
+        ModuleDefinition moduleDefinition = mockModuleDefinition(stubName("TestModule"), stubVersion(to));
+        InstallContext installContext = mockInstallContext(stubCurrentModuleDefinition(moduleDefinition));
 
         return handler.getUpdateDeltas(installContext, fromVersion);
     }
