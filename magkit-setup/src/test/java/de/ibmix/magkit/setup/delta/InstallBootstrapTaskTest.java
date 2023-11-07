@@ -20,14 +20,15 @@ package de.ibmix.magkit.setup.delta;
  * #L%
  */
 
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import info.magnolia.module.InstallContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.ibmix.magkit.test.cms.context.InstallContextMockUtils.mockInstallContext;
-import static de.ibmix.magkit.test.cms.context.InstallContextStubbingOperation.stubModuleDefinition;
-import static de.ibmix.magkit.test.cms.module.ModuleDefinitionMockUtils.mockModuleDefinition;
+import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.stubCurrentModuleDefinition;
 import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubName;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -42,8 +43,9 @@ public class InstallBootstrapTaskTest {
 
     @Before
     public void setUp() {
+        ContextMockUtils.cleanContext();
         _task = new InstallBootstrapTask();
-        _ctx = mockInstallContext(stubModuleDefinition(mockModuleDefinition(stubName("my-module"))));
+        _ctx = mockInstallContext(stubCurrentModuleDefinition(mockModuleDefinition(stubName("my-module"))));
     }
 
     @Test
