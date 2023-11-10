@@ -123,7 +123,7 @@ public class NodeUtilsTest {
     @Test
     public void ancestorWithType() throws RepositoryException {
         assertThat(getAncestorWithPrimaryType(null, null), nullValue());
-        Node folder = mockMgnlNode("/folder", RepositoryConstants.WEBSITE, NodeTypes.Folder.NAME);
+        Node folder = mockMgnlNode(RepositoryConstants.WEBSITE, "/folder", NodeTypes.Folder.NAME);
         assertThat(getAncestorWithPrimaryType(folder, null), nullValue());
 
         Node page = mockPageNode("/folder/page");

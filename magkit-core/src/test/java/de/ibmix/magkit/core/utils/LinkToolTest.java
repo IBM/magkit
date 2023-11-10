@@ -112,7 +112,7 @@ public class LinkToolTest {
 
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
-        Node target = mockMgnlNode("target", "test", "aperto:test", stubIdentifier(UUID.randomUUID().toString()));
+        Node target = mockMgnlNode("test", "target", "aperto:test", stubIdentifier(UUID.randomUUID().toString()));
         stubProperty("link", target).of(source);
         assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
         assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.INTERNAL), is("/aperto/target.html"));
