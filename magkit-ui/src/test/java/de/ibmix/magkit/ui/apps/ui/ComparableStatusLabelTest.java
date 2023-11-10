@@ -21,9 +21,9 @@ package de.ibmix.magkit.ui.apps.ui;
  */
 
 import com.vaadin.ui.Label;
-import org.junit.After;
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.jcr.Node;
@@ -52,17 +52,16 @@ public class ComparableStatusLabelTest {
 
     @Before
     public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
         _node = mockNode("test");
         _label = new ComparableStatusLabel(_node);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         cleanContext();
     }
 
-    // TODO: mock the type of the root node
-    @Ignore
     @Test
     public void constructorTest() throws RepositoryException {
         ComparableStatusLabel label = new ComparableStatusLabel(_node);
@@ -90,8 +89,6 @@ public class ComparableStatusLabelTest {
         _label.getActivationStatus(null);
     }
 
-    // TODO: mock the type of the root node
-    @Ignore
     @Test
     public void getActivationStatus() throws Exception {
         assertThat(_label.getActivationStatus(_node), is(0));
