@@ -20,7 +20,8 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import org.junit.After;
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,6 +74,7 @@ public class ExtendedLinkFieldHelperTest {
 
     @Before
     public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
         _helper = new ExtendedLinkFieldHelper();
     }
 
@@ -197,8 +199,8 @@ public class ExtendedLinkFieldHelperTest {
         assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html?param=value#anchor"));
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         cleanContext();
     }
 }

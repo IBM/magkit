@@ -20,10 +20,12 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import de.ibmix.magkit.test.cms.templating.TemplateDefinitionStubbingOperation;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.repository.RepositoryConstants;
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -63,6 +65,11 @@ import static org.junit.Assert.assertTrue;
 public class NodeUtilsTest {
 
     public static final String NODE_TYPE = "test:type";
+
+    @Before
+    public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
+    }
 
     @Test
     public void hasSubComponentsTest() throws RepositoryException {
@@ -196,8 +203,8 @@ public class NodeUtilsTest {
         assertThat(NodeUtils.getNodeByReference("website", node.getIdentifier()), is(node));
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         cleanContext();
     }
 }
