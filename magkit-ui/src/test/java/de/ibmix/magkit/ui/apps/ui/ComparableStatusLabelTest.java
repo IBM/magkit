@@ -31,8 +31,10 @@ import javax.jcr.RepositoryException;
 import java.util.Calendar;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubActivationStatus;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubLastActivated;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubLastModified;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
-import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.Activated;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.Modified;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.NotActivated;
@@ -68,7 +70,7 @@ public class ComparableStatusLabelTest {
         assertThat(label.getPrimaryStyleName(), is(NotActivated.getStyleName()));
         assertThat(label.getCaption(), is("not published"));
 
-        stubProperty("mgnl:activationStatus", true).of(_node);
+        stubActivationStatus(true).of(_node);
         label = new ComparableStatusLabel(_node);
         assertThat(label.getPrimaryStyleName(), is(Activated.getStyleName()));
         assertThat(label.getCaption(), is("published"));
@@ -76,8 +78,8 @@ public class ComparableStatusLabelTest {
         Calendar lastModified = Calendar.getInstance();
         Calendar lastActivated = Calendar.getInstance();
         lastActivated.add(Calendar.YEAR, -1);
-        stubProperty("mgnl:lastModified", lastModified).of(_node);
-        stubProperty("mgnl:lastActivated", lastActivated).of(_node);
+        stubLastModified(lastModified).of(_node);
+        stubLastActivated(lastActivated).of(_node);
 
         label = new ComparableStatusLabel(_node);
         assertThat(label.getPrimaryStyleName(), is(Modified.getStyleName()));
@@ -92,7 +94,7 @@ public class ComparableStatusLabelTest {
     @Test
     public void getActivationStatus() throws Exception {
         assertThat(_label.getActivationStatus(_node), is(0));
-        stubProperty("mgnl:activationStatus", true).of(_node);
+        stubActivationStatus(true).of(_node);
         assertThat(_label.getActivationStatus(_node), is(2));
     }
 

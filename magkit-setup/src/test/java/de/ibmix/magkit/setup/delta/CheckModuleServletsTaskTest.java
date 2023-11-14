@@ -21,11 +21,9 @@ package de.ibmix.magkit.setup.delta;
  */
 
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
-import de.ibmix.magkit.test.jcr.SessionMockUtils;
 import info.magnolia.jcr.util.NodeNameHelper;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.model.ModuleDefinition;
-import info.magnolia.module.model.ServletDefinition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,18 +31,18 @@ import org.junit.Test;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.stubConfigJCRSession;
 import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.stubCurrentModuleDefinition;
 import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubName;
+import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubServlet;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
-import static info.magnolia.repository.RepositoryConstants.CONFIG;
+import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockServletDefinition;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,11 +62,10 @@ public class CheckModuleServletsTaskTest {
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         _moduleDefinition = mockModuleDefinition(stubName("TestModule"));
-        _installContext = mockInstallContext(stubCurrentModuleDefinition(_moduleDefinition));
-
-        Session configSession = SessionMockUtils.mockSession(CONFIG);
-        when(_installContext.getConfigJCRSession()).thenReturn(configSession);
-        when(_installContext.getJCRSession(CONFIG)).thenReturn(configSession);
+        _installContext = mockInstallContext(
+            stubCurrentModuleDefinition(_moduleDefinition),
+            stubConfigJCRSession()
+        );
 
         mockComponentInstance(NodeNameHelper.class);
         _servletsTask = new CheckModuleServletsTask();
@@ -84,7 +81,7 @@ public class CheckModuleServletsTaskTest {
 
     @Test
     public void oneNewServlet() throws Exception {
-        doReturn(newArrayList(createServlet("new-servlet"))).when(_moduleDefinition).getServlets();
+        stubServlet(mockServletDefinition("new-servlet")).of(_moduleDefinition);
         _servletsTask.execute(_installContext);
 
         assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
@@ -93,11 +90,11 @@ public class CheckModuleServletsTaskTest {
 
     @Test
     public void newAndExistingServlets() throws Exception {
-        doReturn(newArrayList(createServlet("new-servlet"))).when(_moduleDefinition).getServlets();
+        stubServlet(mockServletDefinition("new-servlet")).of(_moduleDefinition);
         _servletsTask.execute(_installContext);
 
         _servletsTask = new CheckModuleServletsTask();
-        doReturn(newArrayList(newArrayList(createServlet("new-servlet"), createServlet("existing-servlet")))).when(_moduleDefinition).getServlets();
+        stubServlet(mockServletDefinition("existing-servlet")).of(_moduleDefinition);
         _servletsTask.execute(_installContext);
 
         assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
@@ -106,7 +103,7 @@ public class CheckModuleServletsTaskTest {
 
     @Test
     public void repositoryException() throws Exception {
-        doReturn(newArrayList(createServlet("new-servlet"))).when(_moduleDefinition).getServlets();
+        stubServlet(mockServletDefinition("new-servlet")).of(_moduleDefinition);
         Session session = _installContext.getConfigJCRSession();
         when(session.itemExists(anyString())).thenThrow(new RepositoryException("Exception on item exists."));
         _servletsTask.execute(_installContext);
@@ -114,12 +111,6 @@ public class CheckModuleServletsTaskTest {
         assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
         assertThat(_servletsTask.toString(), equalTo("[]"));
         verify(_installContext).warn("Unable to access workspace config to check on servlet definitions for module 'TestModule'.");
-    }
-
-    private ServletDefinition createServlet(final String servletName) {
-        ServletDefinition servletDefinition = new ServletDefinition();
-        servletDefinition.setName(servletName);
-        return servletDefinition;
     }
 
     @After
