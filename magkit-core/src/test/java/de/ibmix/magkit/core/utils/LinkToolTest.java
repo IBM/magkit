@@ -20,13 +20,16 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-import java.util.UUID;
 
 import static de.ibmix.magkit.core.utils.LinkTool.isUuid;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
@@ -34,7 +37,6 @@ import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperat
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubContextPath;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
-import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -47,6 +49,16 @@ import static org.hamcrest.core.IsNull.nullValue;
  * @since 17.01.13
  */
 public class LinkToolTest {
+
+    @Before
+    public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        cleanContext();
+    }
 
     @Test
     public void testIsUuid() {
@@ -112,7 +124,7 @@ public class LinkToolTest {
 
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
-        Node target = mockMgnlNode("target", "test", "aperto:test", stubIdentifier(UUID.randomUUID().toString()));
+        Node target = mockMgnlNode("test", "target", "aperto:test");
         stubProperty("link", target).of(source);
         assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
         assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.INTERNAL), is("/aperto/target.html"));

@@ -20,7 +20,8 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import org.junit.After;
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,7 +37,6 @@ import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperat
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubContextPath;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
-import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -74,6 +74,7 @@ public class ExtendedLinkFieldHelperTest {
 
     @Before
     public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
         _helper = new ExtendedLinkFieldHelper();
     }
 
@@ -184,7 +185,7 @@ public class ExtendedLinkFieldHelperTest {
         Node source = mockNode("source");
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
-        Node target = mockMgnlNode("target", "test", "aperto:test", stubIdentifier(java.util.UUID.randomUUID().toString()));
+        Node target = mockMgnlNode("test", "target", "aperto:test");
         stubProperty("link", target).of(source);
         assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target.html"));
 
@@ -198,8 +199,8 @@ public class ExtendedLinkFieldHelperTest {
         assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html?param=value#anchor"));
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         cleanContext();
     }
 }

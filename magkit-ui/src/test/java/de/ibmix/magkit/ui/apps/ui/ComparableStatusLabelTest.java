@@ -21,9 +21,9 @@ package de.ibmix.magkit.ui.apps.ui;
  */
 
 import com.vaadin.ui.Label;
-import org.junit.After;
+import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.jcr.Node;
@@ -31,8 +31,10 @@ import javax.jcr.RepositoryException;
 import java.util.Calendar;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubActivationStatus;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubLastActivated;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubLastModified;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
-import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.Activated;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.Modified;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.NotActivated;
@@ -52,24 +54,23 @@ public class ComparableStatusLabelTest {
 
     @Before
     public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
         _node = mockNode("test");
         _label = new ComparableStatusLabel(_node);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         cleanContext();
     }
 
-    // TODO: mock the type of the root node
-    @Ignore
     @Test
     public void constructorTest() throws RepositoryException {
         ComparableStatusLabel label = new ComparableStatusLabel(_node);
         assertThat(label.getPrimaryStyleName(), is(NotActivated.getStyleName()));
         assertThat(label.getCaption(), is("not published"));
 
-        stubProperty("mgnl:activationStatus", true).of(_node);
+        stubActivationStatus(true).of(_node);
         label = new ComparableStatusLabel(_node);
         assertThat(label.getPrimaryStyleName(), is(Activated.getStyleName()));
         assertThat(label.getCaption(), is("published"));
@@ -77,8 +78,8 @@ public class ComparableStatusLabelTest {
         Calendar lastModified = Calendar.getInstance();
         Calendar lastActivated = Calendar.getInstance();
         lastActivated.add(Calendar.YEAR, -1);
-        stubProperty("mgnl:lastModified", lastModified).of(_node);
-        stubProperty("mgnl:lastActivated", lastActivated).of(_node);
+        stubLastModified(lastModified).of(_node);
+        stubLastActivated(lastActivated).of(_node);
 
         label = new ComparableStatusLabel(_node);
         assertThat(label.getPrimaryStyleName(), is(Modified.getStyleName()));
@@ -90,12 +91,10 @@ public class ComparableStatusLabelTest {
         _label.getActivationStatus(null);
     }
 
-    // TODO: mock the type of the root node
-    @Ignore
     @Test
     public void getActivationStatus() throws Exception {
         assertThat(_label.getActivationStatus(_node), is(0));
-        stubProperty("mgnl:activationStatus", true).of(_node);
+        stubActivationStatus(true).of(_node);
         assertThat(_label.getActivationStatus(_node), is(2));
     }
 
