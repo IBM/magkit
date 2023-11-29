@@ -20,36 +20,46 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import info.magnolia.ui.form.field.converter.BaseIdentifierToPathConverter;
+import com.vaadin.data.Result;
+import com.vaadin.data.ValueContext;
+import info.magnolia.ui.datasource.jcr.JcrDatasource;
+import info.magnolia.ui.editor.converter.JcrPathToIdentifierConverter;
 
-import java.util.Locale;
+import javax.inject.Inject;
 
 import static de.ibmix.magkit.core.utils.LinkTool.isAnchor;
 import static de.ibmix.magkit.core.utils.LinkTool.isExternalLink;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Handles input of links by urls (external) or absolute paths (internal).
  *
- * @author philipp.guettler
- * @since 06.03.14
+ * @author frank.sommer
+ * @since 28.11.2023
  */
-public class LinkConverter extends BaseIdentifierToPathConverter {
+public class LinkConverter extends JcrPathToIdentifierConverter {
+    private static final long serialVersionUID = 4484406162548230911L;
+
+    @Inject
+    public LinkConverter(JcrDatasource datasource) {
+        super(datasource);
+    }
 
     @Override
-    public String convertToModel(final String path, final Class<? extends String> targetType, final Locale locale) {
-        String result = path;
-        if (isNotBlank(path) && !isExternalLink(path) && !isAnchor(path)) {
-            result = super.convertToModel(path, targetType, locale);
+    public Result<String> convertToModel(String path, ValueContext context) {
+        Result<String> result;
+        if (!isExternalLink(path) && !isAnchor(path)) {
+            result = super.convertToModel(path, context);
+        } else {
+            result = Result.of(() -> path, Throwable::getMessage);
         }
         return result;
     }
 
     @Override
-    public String convertToPresentation(final String uuid, final Class<? extends String> targetType, final Locale locale) {
+    public String convertToPresentation(String uuid, ValueContext context) {
         String result = uuid;
-        if (isNotBlank(uuid) && !isExternalLink(uuid) && !isAnchor(uuid)) {
-            result = super.convertToPresentation(uuid, targetType, locale);
+        if (!isExternalLink(uuid) && !isAnchor(uuid)) {
+            result = super.convertToPresentation(uuid, context);
         }
         return result;
     }
