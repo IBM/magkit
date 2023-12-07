@@ -111,9 +111,9 @@ public class NodePropertyVoterTest {
     public void initVoter() throws RepositoryException {
         _propertyVoter = new NodePropertyVoter();
         Session session = mockSession(WEBSITE);
+        SystemContext systemContext = mockSystemContext(stubJcrSession(WEBSITE));
         when(session.getNode(contains("old"))).thenThrow(new PathNotFoundException());
         mockPageNode("/bs/secure", stubProperty("secure", "true"));
-        SystemContext systemContext = mockSystemContext(stubJcrSession(WEBSITE));
         _propertyVoter.setSystemContext(systemContext);
     }
 
