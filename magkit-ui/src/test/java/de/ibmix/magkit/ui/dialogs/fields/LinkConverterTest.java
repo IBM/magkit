@@ -20,19 +20,23 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
+import info.magnolia.ui.datasource.jcr.JcrDatasource;
+import info.magnolia.ui.datasource.jcr.JcrSessionWrapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
-import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the {@link LinkConverter}.
@@ -42,38 +46,41 @@ import static org.hamcrest.core.IsNull.nullValue;
  */
 public class LinkConverterTest {
 
+    private LinkConverter _linkConverter;
+
     @Test
     public void testConvertToModel() {
-        final LinkConverter linkConverter = new LinkConverter();
-        linkConverter.setWorkspaceName(WEBSITE);
-        assertThat(linkConverter.convertToModel(null, null, null), nullValue());
-        assertThat(linkConverter.convertToModel("", null, null), equalTo(""));
-        assertThat(linkConverter.convertToModel("#test", null, null), equalTo("#test"));
-        assertThat(linkConverter.convertToModel("http://www.aperto.de", null, null), equalTo("http://www.aperto.de"));
-        assertThat(linkConverter.convertToModel("https://www.aperto.de", null, null), equalTo("https://www.aperto.de"));
-        assertThat(linkConverter.convertToModel("/path/to/page", null, null), equalTo("123-133"));
+        _linkConverter.convertToModel(null, null).ifOk(value -> assertThat(value, nullValue()));
+        _linkConverter.convertToModel("", null).ifOk(value -> assertThat(value, nullValue()));
+        _linkConverter.convertToModel("#test", null).ifOk(value -> assertThat(value, equalTo("#test")));
+        _linkConverter.convertToModel("http://www.aperto.de", null).ifOk(value -> assertThat(value, equalTo("http://www.aperto.de")));
+        _linkConverter.convertToModel("https://www.aperto.de", null).ifOk(value -> assertThat(value, equalTo("https://www.aperto.de")));
+        _linkConverter.convertToModel("/path/to/page", null).ifOk(value -> assertThat(value, equalTo("123-133")));
     }
 
     @Test
     public void testConvertToPresentation() {
-        final LinkConverter linkConverter = new LinkConverter();
-        linkConverter.setWorkspaceName(WEBSITE);
-        assertThat(linkConverter.convertToPresentation(null, null, null), nullValue());
-        assertThat(linkConverter.convertToPresentation("", null, null), equalTo(""));
-        assertThat(linkConverter.convertToPresentation("#test", null, null), equalTo("#test"));
-        assertThat(linkConverter.convertToPresentation("http://www.aperto.de", null, null), equalTo("http://www.aperto.de"));
-        assertThat(linkConverter.convertToPresentation("https://www.aperto.de", null, null), equalTo("https://www.aperto.de"));
-        assertThat(linkConverter.convertToPresentation("123-133", null, null), equalTo("/path/to/page"));
-
+        assertThat(_linkConverter.convertToPresentation(null, null), nullValue());
+        assertThat(_linkConverter.convertToPresentation("", null), nullValue());
+        assertThat(_linkConverter.convertToPresentation("#test", null), equalTo("#test"));
+        assertThat(_linkConverter.convertToPresentation("http://www.aperto.de", null), equalTo("http://www.aperto.de"));
+        assertThat(_linkConverter.convertToPresentation("https://www.aperto.de", null), equalTo("https://www.aperto.de"));
+        assertThat(_linkConverter.convertToPresentation("123-133", null), equalTo("/path/to/page"));
     }
 
     @Before
     public void prepareMgnl() throws RepositoryException {
-        mockPageNode("/path/to/page", stubIdentifier("123-133"));
+        final JcrDatasource jcrDatasource = mock(JcrDatasource.class);
+        final JcrSessionWrapper jcrSessionWrapper = mock(JcrSessionWrapper.class);
+        final Node pageNode = mockPageNode("/path/to/page", stubIdentifier("123-133"));
+        when(jcrSessionWrapper.getNode("/path/to/page")).thenReturn(pageNode);
+        when(jcrSessionWrapper.getNodeByIdentifier("123-133")).thenReturn(pageNode);
+        when(jcrDatasource.getJCRSession()).thenReturn(jcrSessionWrapper);
+        _linkConverter = new LinkConverter(jcrDatasource);
     }
 
     @After
-    public void cleanMgnl() throws RepositoryException {
+    public void cleanMgnl() {
         cleanContext();
     }
 }

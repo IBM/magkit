@@ -20,103 +20,104 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import de.ibmix.magkit.core.utils.ExtendedLinkFieldHelper;
-import info.magnolia.context.MgnlContext;
-import info.magnolia.ui.form.field.converter.IdentifierToPathConverter;
+import com.machinezoo.noexception.Exceptions;
+import com.vaadin.data.Result;
+import com.vaadin.data.ValueContext;
+import info.magnolia.cms.util.SelectorUtil;
+import info.magnolia.ui.datasource.jcr.JcrDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import java.util.Locale;
 
 import static de.ibmix.magkit.core.utils.LinkTool.isAnchor;
 import static de.ibmix.magkit.core.utils.LinkTool.isExternalLink;
 import static de.ibmix.magkit.core.utils.LinkTool.isPath;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.containsAny;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 /**
- * Handles input of links by urls (external) or absolute paths (internal) with additional components. Use this converter with the {@link ExtendedLinkFieldDefinition}.
+ * Handles input of links by urls (external) or absolute paths (internal) with additional selector, anchor or parameters.<br/>
+ * Used in your page link fields:<br/>
+ * <code>
+ * $type: pageLinkField<br/>
+ * textInputAllowed: true<br/>
+ * converterClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkConverter<br/>
+ * fieldBinderClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkBinder<br/>
+ * </code>
  *
- * @author Philipp Güttler (Aperto AG)
- * @since 03.06.2015
+ * @author frank.sommer
+ * @since 28.11.2023
  */
-public class ExtendedLinkConverter implements IdentifierToPathConverter {
+public class ExtendedLinkConverter extends LinkConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedLinkConverter.class);
     private static final long serialVersionUID = 4484406102548210913L;
 
-    private transient ExtendedLinkFieldHelper _extendedLinkFieldHelper;
-    private String _workspaceName;
-
-    @Override
-    public String convertToModel(final String value, final Class<? extends String> targetType, final Locale locale) {
-
-        // Null is required for the property to be removed if path is empty
-        String result = null;
-
-        if (isExternalLink(value) || isAnchor(value)) {
-            result = value;
-        } else if (isPath(value)) {
-            String nodePath = _extendedLinkFieldHelper.getBase(value);
-            try {
-                final Session jcr = MgnlContext.getJCRSession(_workspaceName);
-                final Node node = jcr.getNode(nodePath);
-                if (node != null) {
-                    result = node.getIdentifier();
-                }
-            } catch (RepositoryException e) {
-                LOGGER.error("Unable to convert Path to UUID", e);
-            }
-            if (isNotBlank(result)) {
-                result += _extendedLinkFieldHelper.stripBase(value);
-            } else {
-                result = value;
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public String convertToPresentation(final String value, final Class<? extends String> targetType, final Locale locale) {
-
-        String result = EMPTY;
-
-        if (isExternalLink(value) || isAnchor(value)) {
-            result = value;
-        } else if (isNotBlank(value)) {
-            String stripped = _extendedLinkFieldHelper.stripBase(value);
-            String identifier = _extendedLinkFieldHelper.getBase(value);
-            try {
-                final Session jcr = MgnlContext.getJCRSession(_workspaceName);
-                final Node node = jcr.getNodeByIdentifier(identifier);
-                if (node != null) {
-                    result = node.getPath();
-                }
-            } catch (RepositoryException e) {
-                LOGGER.error("Unable to convert UUID to Path", e);
-            }
-            if (isNotBlank(result)) {
-                result += stripped;
-            } else {
-                result = value;
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public void setWorkspaceName(String workspaceName) {
-        _workspaceName = workspaceName;
-    }
+    public static final String TAG_ANCHOR = "#";
+    public static final String TAG_QUERY = "?";
+    public static final String TAG_SELECTOR = SelectorUtil.SELECTOR_DELIMITER;
 
     @Inject
-    public void setExtendedLinkFieldHelper(final ExtendedLinkFieldHelper extendedLinkFieldHelper) {
-        _extendedLinkFieldHelper = extendedLinkFieldHelper;
+    public ExtendedLinkConverter(JcrDatasource datasource) {
+        super(datasource);
+    }
+
+    @Override
+    public Result<String> convertToModel(String path, ValueContext context) {
+        Result<String> result = null;
+
+        if (isCoveredBySuperConverter(path)) {
+            result = super.convertToModel(path, context);
+        } else if (isPath(path)) {
+            result = Result.of(() -> Exceptions.wrap().get(() -> convertToIdentifier(path)), Throwable::getMessage);
+        }
+
+        return result;
+    }
+
+    @Override
+    public String convertToPresentation(String uuid, ValueContext context) {
+        String result;
+
+        if (isCoveredBySuperConverter(uuid)) {
+            result = super.convertToPresentation(uuid, context);
+        } else {
+            result = convertToPath(uuid);
+        }
+
+        return result;
+    }
+
+    private String convertToIdentifier(final String pathWithSuffix) throws RepositoryException {
+        String path = getNodePart(pathWithSuffix);
+        String query = pathWithSuffix.replace(path, EMPTY);
+        Node node = getNodeByPath(path);
+        return node != null ? node.getIdentifier() + query : EMPTY;
+    }
+
+    protected String convertToPath(final String value) {
+        String result = null;
+        try {
+            String identifier = getNodePart(value);
+            String query = value.replace(identifier, EMPTY);
+            Node node = getNodeByIdentifier(identifier);
+            result = node != null ? node.getPath() + query : null;
+        } catch (RepositoryException e) {
+            LOGGER.error("Could not convert entry {} to path.", value, e);
+        }
+        return result;
+    }
+
+    private static String getNodePart(String value) {
+        return substringBefore(substringBefore(substringBefore(value, TAG_SELECTOR), TAG_QUERY), TAG_ANCHOR);
+    }
+
+    private static boolean isCoveredBySuperConverter(String path) {
+        return isBlank(path) || isExternalLink(path) || isAnchor(path) || !containsAny(path, TAG_ANCHOR, TAG_QUERY, TAG_SELECTOR);
     }
 
 }
