@@ -36,7 +36,7 @@ import static de.ibmix.magkit.query.NodeQueryUtil.getComponentsWithTemplate;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubJcrSession;
-import static de.ibmix.magkit.test.jcr.QueryMockUtils.mockQueryManager;
+import static de.ibmix.magkit.test.jcr.query.QueryMockUtils.mockQueryManager;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.jcr.query.Query.JCR_SQL2;
 import static javax.jcr.query.Query.XPATH;
