@@ -321,6 +321,55 @@ public final class NodeUtils {
     }
 
     /**
+     * Null safe call of {@link Node#getName()}.
+     */
+    public static String getName(@Nullable final Node node) {
+        String name = null;
+
+        if (node != null) {
+            try {
+                name = node.getName();
+            } catch (RepositoryException e) {
+                LOGGER.error("Unable to get name from node [{}]", node, e);
+            }
+        }
+
+        return name;
+    }
+
+    /**
+     * Null safe call of {@link Node#getIdentifier()}.
+     */
+    public static String getIdentifier(@Nullable final Node node) {
+        String identifier = null;
+
+        if (node != null) {
+            try {
+                identifier = node.getIdentifier();
+            } catch (RepositoryException e) {
+                LOGGER.error("Unable to get identifier from node [{}]", node, e);
+            }
+        }
+
+        return identifier;
+    }
+
+    /**
+     * Null safe call of {@link Node#getPath()}.
+     */
+    public static String getPath(@Nullable final Node node) {
+        String path = null;
+        if (node != null) {
+            try {
+                path = node.getPath();
+            } catch (RepositoryException e) {
+                LOGGER.error("Failed to get path from [{}]", node, e);
+            }
+        }
+        return path;
+    }
+
+    /**
      * Collects all direct children of the given Node that match the provided predicate.
      *
      * @param node      the Node to get the children for. May be NULL.

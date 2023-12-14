@@ -20,12 +20,10 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import de.ibmix.magkit.test.cms.templating.TemplateDefinitionStubbingOperation;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.repository.RepositoryConstants;
-import org.junit.AfterClass;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -64,12 +62,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class NodeUtilsTest {
 
-    public static final String NODE_TYPE = "test:type";
-
-    @Before
-    public void setUp() throws Exception {
-        ContextMockUtils.cleanContext();
-    }
+    private static final String NODE_TYPE = "test:type";
 
     @Test
     public void hasSubComponentsTest() throws RepositoryException {
@@ -203,8 +196,29 @@ public class NodeUtilsTest {
         assertThat(NodeUtils.getNodeByReference("website", node.getIdentifier()), is(node));
     }
 
-    @AfterClass
-    public static void tearDown() throws Exception {
+    @Test
+    public void getIdentifier() throws RepositoryException {
+        assertThat(NodeUtils.getIdentifier(null), nullValue());
+        final Node node = mockNode(stubIdentifier("1234"));
+        assertThat(NodeUtils.getIdentifier(node), equalTo("1234"));
+    }
+
+    @Test
+    public void getPath() throws RepositoryException {
+        assertThat(NodeUtils.getPath(null), nullValue());
+        final Node node = mockNode("node");
+        assertThat(NodeUtils.getPath(node), equalTo("/node"));
+    }
+
+    @Test
+    public void getName() throws RepositoryException {
+        assertThat(NodeUtils.getName(null), nullValue());
+        final Node node = mockNode("node");
+        assertThat(NodeUtils.getName(node), equalTo("node"));
+    }
+
+    @After
+    public void tearDown() throws Exception {
         cleanContext();
     }
 }
