@@ -20,6 +20,8 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
+import de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation;
+import info.magnolia.cms.core.AggregationState;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +30,9 @@ import javax.jcr.RepositoryException;
 import static de.ibmix.magkit.core.utils.SelectorUtils.DEF_PAGE;
 import static de.ibmix.magkit.core.utils.SelectorUtils.SELECTOR_PAGING;
 import static de.ibmix.magkit.core.utils.SelectorUtils.updateSelectors;
+import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubSelector;
+import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubSelectors;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.*;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubAttribute;
@@ -42,6 +47,56 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * @see SelectorUtils
  */
 public class SelectorUtilsTest {
+
+    @Test
+    public void isPagingView() throws RepositoryException {
+        AggregationState aggregationState = mockAggregationState();
+        assertThat(SelectorUtils.isPagingView(), is(false));
+
+        stubSelector("pid").of(aggregationState);
+        assertThat(SelectorUtils.isPagingView(), is(true));
+
+        stubSelector("pid=3").of(aggregationState);
+        assertThat(SelectorUtils.isPagingView(), is(true));
+
+        stubSelector("test=pid").of(aggregationState);
+        assertThat(SelectorUtils.isPagingView(), is(false));
+    }
+
+    @Test
+    public void isPrintView() throws RepositoryException {
+        AggregationState aggregationState = mockAggregationState();
+        assertThat(SelectorUtils.isPrintView(), is(false));
+
+        stubSelector("print").of(aggregationState);
+        assertThat(SelectorUtils.isPrintView(), is(true));
+
+        stubSelector("print=true").of(aggregationState);
+        assertThat(SelectorUtils.isPrintView(), is(false));
+    }
+
+    @Test
+    public void selectorContains() throws RepositoryException {
+        AggregationState aggregationState = mockAggregationState();
+        assertThat(SelectorUtils.selectorContains("test", true), is(false));
+
+        stubSelector("key=value~other").of(aggregationState);
+        assertThat(SelectorUtils.selectorContains("test", true), is(false));
+        assertThat(SelectorUtils.selectorContains("test", false), is(false));
+
+        stubSelector("key=value~other~test=true").of(aggregationState);
+        assertThat(SelectorUtils.selectorContains("test", true), is(true));
+        assertThat(SelectorUtils.selectorContains("test", false), is(false));
+
+        stubSelector("key=value~other~test").of(aggregationState);
+        assertThat(SelectorUtils.selectorContains("test", true), is(true));
+        assertThat(SelectorUtils.selectorContains("test", false), is(true));
+
+        stubSelector("key=value~other~issue=test").of(aggregationState);
+        assertThat(SelectorUtils.selectorContains("test", true), is(false));
+        assertThat(SelectorUtils.selectorContains("test", false), is(false));
+    }
+
     @Test
     public void retrieveActivePageWithNoValue() throws RepositoryException {
         mockWebContext(stubAttribute(SELECTOR_PAGING, null));
