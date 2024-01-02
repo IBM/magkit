@@ -71,21 +71,21 @@ public final class LocaleUtil {
     /**
      * Cache result of querying Magnolia config (in case Magnolia doesn't).
      */
-    private static List<Locale> c_locales;
+    private static List<Locale> DEFAULT_SITE_LOCALES;
 
     /**
      * Return the default site's locales as configured in STK or ETK.
      */
     public static List<Locale> getSiteLocales() {
-        if (c_locales == null) {
+        if (DEFAULT_SITE_LOCALES == null) {
             SiteManager siteManager = Components.getComponent(SiteManager.class);
             I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
             if (i18n != null) {
                 Collection<Locale> locales = i18n.getLocales();
-                c_locales = new ArrayList<>(locales);
+                DEFAULT_SITE_LOCALES = new ArrayList<>(locales);
             }
         }
-        return c_locales;
+        return DEFAULT_SITE_LOCALES;
     }
 
     /**
@@ -94,7 +94,7 @@ public final class LocaleUtil {
     public static Locale getDefaultSiteLocale() {
         SiteManager siteManager = Components.getComponent(SiteManager.class);
         I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
-        return i18n.getFallbackLocale();
+        return i18n != null ? i18n.getFallbackLocale() : Locale.ENGLISH;
     }
 
     /**
@@ -156,7 +156,7 @@ public final class LocaleUtil {
     /**
      * List of all available countries, sorted by name.
      *
-     * @return list of countries (countryCode, countryName)
+     * @return Map of countries and their names (countryName, countryCode)
      */
     public static Map<String, String> getAvailableCountries() {
         Locale[] locales = Locale.getAvailableLocales();
