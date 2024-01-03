@@ -46,6 +46,7 @@ import static org.apache.commons.lang3.StringUtils.split;
  * Static utility methods for locales (languages).
  *
  * @author jfrantzius
+ * @since 2014-05-14
  */
 public final class LocaleUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocaleUtil.class);
@@ -73,7 +74,11 @@ public final class LocaleUtil {
     private static List<Locale> DEFAULT_SITE_LOCALES;
 
     /**
-     * Return the default site's locales as configured in STK or ETK.
+     * Return the default site's locales as configured.
+     * ! Note that this list is cached as static class constant.
+     * All changes of site configuration after first call of this method will not take effect here.
+     *
+     * @return the list of all configured locals, never null
      */
     public static List<Locale> getSiteLocales() {
         if (DEFAULT_SITE_LOCALES == null) {
@@ -93,7 +98,9 @@ public final class LocaleUtil {
     }
 
     /**
-     * Return the default site's default locale.
+     * Return the default site's fallback locale.
+     *
+     * @return the site fallback local or Locale.ENGLISH if non has been configured
      */
     public static Locale getDefaultSiteLocale() {
         SiteManager siteManager = Components.getComponent(SiteManager.class);
@@ -102,7 +109,10 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the locale string from content.
+     * Determines the ISO language code from content node path.
+     * Fallback to the default site fallback locale.
+     *
+     * @return the configured language code from node path or the default site language code if non has been found in path
      */
     public static String determineLocaleFromContent(Node node) {
         String handle = node != null ? getPathIfPossible(node) : EMPTY;
@@ -111,9 +121,9 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the locale string from path.
+     * Determines the ISO language code from the node path.
      *
-     * @return null if no locale found in path.
+     * @return the language code or null if no configured locale found in path.
      */
     public static String determineLocaleFromPath(String path) {
         Set<String> configuredLocales = getConfiguredLanguages();
@@ -121,9 +131,9 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the locale label from page node.
+     * Determines the locale label from page node path.
      *
-     * @return empty string if no locale is found for path.
+     * @return the language name or empty string if no locale is found for path.
      */
     public static String determineLocaleLabelFromNodePath(Node page) {
         String label = EMPTY;
@@ -136,8 +146,9 @@ public final class LocaleUtil {
     }
 
     /**
-     * Allow for parallel usage of {MbcContentLanguages} as source of configured locales (languages).
-     * See class comment.
+     * Extract the first ISO language code from the path string, that is a configured site language.
+     *
+     * @return the first language code from the string or null if not found
      */
     public static String determineLanguage(String handle, Collection<String> configuredLocales) {
         String localeString = null;
