@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
-import javax.jcr.RepositoryException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -88,27 +87,27 @@ public final class LocaleUtil {
         return DEFAULT_SITE_LOCALES;
     }
 
+    // introduced for testing. However, caching the locales in a static class field may not be a good idea at all.
+    static void resetDefaultSiteLocals() {
+        DEFAULT_SITE_LOCALES = null;
+    }
+
     /**
      * Return the default site's default locale.
      */
     public static Locale getDefaultSiteLocale() {
         SiteManager siteManager = Components.getComponent(SiteManager.class);
         I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
-        return i18n != null ? i18n.getFallbackLocale() : Locale.ENGLISH;
+        return i18n != null && i18n.getFallbackLocale() != null ? i18n.getFallbackLocale() : Locale.ENGLISH;
     }
 
     /**
      * Determines the locale string from content.
      */
     public static String determineLocaleFromContent(Node node) {
-        String locale = "en";
-        try {
-            String handle = node.getPath();
-            locale = determineLocaleFromPath(handle);
-        } catch (RepositoryException e) {
-            LOGGER.error("Error message.", e);
-        }
-        return locale;
+        String handle = node != null ? getPathIfPossible(node) : EMPTY;
+        String locale = determineLocaleFromPath(handle);
+        return isNotBlank(locale) ? locale : getDefaultSiteLocale().getLanguage();
     }
 
     /**
