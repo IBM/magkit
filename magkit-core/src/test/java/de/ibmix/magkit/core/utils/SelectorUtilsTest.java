@@ -20,7 +20,6 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation;
 import info.magnolia.cms.core.AggregationState;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +30,6 @@ import static de.ibmix.magkit.core.utils.SelectorUtils.DEF_PAGE;
 import static de.ibmix.magkit.core.utils.SelectorUtils.SELECTOR_PAGING;
 import static de.ibmix.magkit.core.utils.SelectorUtils.updateSelectors;
 import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubSelector;
-import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubSelectors;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.*;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;

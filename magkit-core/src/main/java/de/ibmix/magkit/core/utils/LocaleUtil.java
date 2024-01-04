@@ -71,7 +71,7 @@ public final class LocaleUtil {
     /**
      * Cache result of querying Magnolia config (in case Magnolia doesn't).
      */
-    private static List<Locale> DEFAULT_SITE_LOCALES;
+    private static List<Locale> c_defaultSiteLocals;
 
     /**
      * Return the default site's locales as configured.
@@ -81,20 +81,20 @@ public final class LocaleUtil {
      * @return the list of all configured locals, never null
      */
     public static List<Locale> getSiteLocales() {
-        if (DEFAULT_SITE_LOCALES == null) {
+        if (c_defaultSiteLocals == null) {
             SiteManager siteManager = Components.getComponent(SiteManager.class);
             I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
             if (i18n != null) {
                 Collection<Locale> locales = i18n.getLocales();
-                DEFAULT_SITE_LOCALES = new ArrayList<>(locales);
+                c_defaultSiteLocals = new ArrayList<>(locales);
             }
         }
-        return DEFAULT_SITE_LOCALES;
+        return c_defaultSiteLocals;
     }
 
     // introduced for testing. However, caching the locales in a static class field may not be a good idea at all.
     static void resetDefaultSiteLocals() {
-        DEFAULT_SITE_LOCALES = null;
+        c_defaultSiteLocals = null;
     }
 
     /**

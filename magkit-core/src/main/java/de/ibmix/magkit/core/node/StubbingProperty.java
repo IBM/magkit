@@ -295,15 +295,15 @@ public class StubbingProperty implements Property {
 
     @Override
     public Item getAncestor(int depth) throws RepositoryException {
+        Item result = null;
         if (depth > getDepth()) {
-            return null;
+            result = null;
         } else if (depth == getDepth()) {
-            return this;
+            result = this;
         } else if (depth >= 0) {
-            return _parent.getAncestor(depth);
-        } else {
-            return null;
+            result = _parent.getAncestor(depth);
         }
+        return result;
     }
 
     @Override
