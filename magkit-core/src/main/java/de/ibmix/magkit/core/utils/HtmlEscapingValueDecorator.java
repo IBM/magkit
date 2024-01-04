@@ -36,13 +36,13 @@ import java.util.Calendar;
  * This util class fixes the issue for our PropertySupport classes.
  * It provides HTML encoding for values that is missing in magnolia implementation.
  *
- * @author wolf.bubenik
- * @since 21.12.18.
+ * @author wolf.bubenik@ibmix.de
+ * @since 2021-12-18
  */
 public class HtmlEscapingValueDecorator implements Value {
 
-    private Value _wrapped;
-    private HTMLEscapingContentDecorator _decorator;
+    private final Value _wrapped;
+    private final HTMLEscapingContentDecorator _decorator;
 
     public HtmlEscapingValueDecorator(Value wrapped, HTMLEscapingContentDecorator decorator) {
         Preconditions.checkArgument(wrapped != null, "The Value to be wrapped must not be null.");
