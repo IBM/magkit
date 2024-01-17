@@ -68,13 +68,13 @@ public final class Sql2 {
      */
     public static final class Query {
 
-        public static List<Node> nodesByIdentifiers(String workspace, String... ids) {
+        public static List<Node> nodesByIdentifiers(final String workspace, final String... ids) {
             return nodesFrom(workspace).withStatement(
                 Statement.select().whereAny(Condition.String.identifierEquals(ids))
             ).getResultNodes();
         }
 
-        public static List<Node> nodesByTemplates(String path, String... templates) {
+        public static List<Node> nodesByTemplates(final String path, final String... templates) {
             return nodesFromWebsite().withStatement(
                 Statement.select().whereAll(
                     Condition.Path.isDescendant(path),
@@ -83,7 +83,15 @@ public final class Sql2 {
             ).getResultNodes();
         }
 
-        public static QueryNodesStatement<NodesQueryBuilder> nodesFrom(String workspace) {
+        public static List<Node> nodesFrom(final String workspace, final String nodeType, Sql2JoinConstraint... conditions) {
+            return nodesFrom(workspace).withStatement(
+                Sql2.Statement.select().from(nodeType).whereAll(
+                    conditions
+                )
+            ).getResultNodes();
+        }
+
+        public static QueryNodesStatement<NodesQueryBuilder> nodesFrom(final String workspace) {
             return Sql2NodesQueryBuilder.forNodes().fromWorkspace(workspace);
         }
 
@@ -91,7 +99,7 @@ public final class Sql2 {
             return Sql2NodesQueryBuilder.forNodes().fromWebsite();
         }
 
-        public static QueryRowsStatement<RowsQueryBuilder> rowsFrom(String workspace) {
+        public static QueryRowsStatement<RowsQueryBuilder> rowsFrom(final String workspace) {
             return Sql2RowsQueryBuilder.forRows().fromWorkspace(workspace);
         }
 
