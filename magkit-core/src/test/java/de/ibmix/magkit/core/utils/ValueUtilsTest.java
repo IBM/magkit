@@ -20,7 +20,6 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import de.ibmix.magkit.test.jcr.ValueMockUtils;
 import org.junit.After;
 import org.junit.Test;
 
