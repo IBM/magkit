@@ -20,6 +20,7 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
+import de.ibmix.magkit.test.jcr.ValueMockUtils;
 import org.junit.After;
 import org.junit.Test;
 
@@ -164,6 +165,15 @@ public class ValueUtilsTest {
         Binary b = mockBinary("test");
         assertThat(ValueUtils.valueToBinary(null, a), is(a));
         assertThat(ValueUtils.valueToBinary(mockValue(b), a), is(b));
+    }
+
+    @Test
+    public void valueToBinary1() throws Exception {
+        assertThat(ValueUtils.valueToBinary(null), nullValue());
+        assertThat(ValueUtils.valueToBinary(mockValue((Binary) null)), nullValue());
+
+        Binary b = mockBinary("test");
+        assertThat(ValueUtils.valueToBinary(mockValue(b)), is(b));
     }
 
     @Test
