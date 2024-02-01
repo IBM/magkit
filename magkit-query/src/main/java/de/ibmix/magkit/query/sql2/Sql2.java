@@ -44,9 +44,11 @@ import de.ibmix.magkit.query.sql2.statement.Sql2As;
 import de.ibmix.magkit.query.sql2.statement.Sql2From;
 import de.ibmix.magkit.query.sql2.statement.Sql2Statement;
 import info.magnolia.jcr.util.NodeTypes;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.jcr.Node;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -69,18 +71,18 @@ public final class Sql2 {
     public static final class Query {
 
         public static List<Node> nodesByIdentifiers(final String workspace, final String... ids) {
-            return nodesFrom(workspace).withStatement(
+            return ArrayUtils.isNotEmpty(ids) ? nodesFrom(workspace).withStatement(
                 Statement.select().whereAny(Condition.String.identifierEquals(ids))
-            ).getResultNodes();
+            ).getResultNodes() : Collections.emptyList();
         }
 
         public static List<Node> nodesByTemplates(final String path, final String... templates) {
-            return nodesFromWebsite().withStatement(
+            return ArrayUtils.isNotEmpty(templates) ? nodesFromWebsite().withStatement(
                 Statement.select().whereAll(
                     Condition.Path.isDescendant(path),
                     Condition.String.templateEquals(templates)
                 )
-            ).getResultNodes();
+            ).getResultNodes() : Collections.emptyList();
         }
 
         public static List<Node> nodesFrom(final String workspace, final String nodeType, Sql2JoinConstraint... conditions) {
@@ -198,11 +200,11 @@ public final class Sql2 {
                 return Sql2CalendarCondition.created();
             }
 
-            public static Sql2JoinConstraint createdBefore(java.util.Calendar date) {
+            public static Sql2JoinConstraint createdBefore(Calendar date) {
                 return created().lowerThan().value(date);
             }
 
-            public static Sql2JoinConstraint createdAfter(java.util.Calendar date) {
+            public static Sql2JoinConstraint createdAfter(Calendar date) {
                 return created().greaterThan().value(date);
             }
 
@@ -210,11 +212,11 @@ public final class Sql2 {
                 return Sql2CalendarCondition.lastActivated();
             }
 
-            public static Sql2JoinConstraint lastActivatedBefore(java.util.Calendar date) {
+            public static Sql2JoinConstraint lastActivatedBefore(Calendar date) {
                 return lastActivated().lowerThan().value(date);
             }
 
-            public static Sql2JoinConstraint lastActivatedAfter(java.util.Calendar date) {
+            public static Sql2JoinConstraint lastActivatedAfter(Calendar date) {
                 return lastActivated().greaterThan().value(date);
             }
 
@@ -222,16 +224,24 @@ public final class Sql2 {
                 return Sql2CalendarCondition.lastModified();
             }
 
-            public static Sql2JoinConstraint lastModifiedBefore(java.util.Calendar date) {
+            public static Sql2JoinConstraint lastModifiedBefore(Calendar date) {
                 return lastModified().lowerThan().value(date);
             }
 
-            public static Sql2JoinConstraint lastModifiedAfter(java.util.Calendar date) {
+            public static Sql2JoinConstraint lastModifiedAfter(Calendar date) {
                 return lastModified().greaterThan().value(date);
             }
 
             public static Sql2CompareNot<Calendar> deleted() {
                 return Sql2CalendarCondition.deleted();
+            }
+
+            public static Sql2JoinConstraint deletedBefore(final Calendar date) {
+                return deleted().lowerThan().value(date);
+            }
+
+            public static Sql2JoinConstraint deletedAfter(final Calendar date) {
+                return deleted().greaterThan().value(date);
             }
 
             private Date() {
@@ -250,6 +260,26 @@ public final class Sql2 {
                 return Sql2DoubleCondition.property(name);
             }
 
+            public static Sql2JoinConstraint propertyLowerThan(final java.lang.String name, double value) {
+                return property(name).lowerThan().value(value);
+            }
+
+            public static Sql2JoinConstraint propertyEqualsAny(final java.lang.String name, java.lang.Double... values) {
+                return property(name).equalsAny().values(values);
+            }
+
+            public static Sql2JoinConstraint propertyGraterOrEqualThan(final java.lang.String name, double value) {
+                return property(name).greaterOrEqualThan().value(value);
+            }
+
+            public static Sql2JoinConstraint propertyGraterThan(final java.lang.String name, double value) {
+                return property(name).greaterThan().value(value);
+            }
+
+            public static Sql2JoinConstraint propertyBetween(final java.lang.String name, double from, double to) {
+                return and().matches(propertyGraterOrEqualThan(name, from), propertyLowerThan(name, to));
+            }
+
             private Double() {
             }
         }
@@ -264,6 +294,26 @@ public final class Sql2 {
 
             public static Sql2CompareNot<java.lang.Long> property(final java.lang.String name) {
                 return Sql2LongCondition.property(name);
+            }
+
+            public static Sql2JoinConstraint propertyLowerThan(final java.lang.String name, long value) {
+                return property(name).lowerThan().value(value);
+            }
+
+            public static Sql2JoinConstraint propertyEqualsAny(final java.lang.String name, java.lang.Long... values) {
+                return property(name).equalsAny().values(values);
+            }
+
+            public static Sql2JoinConstraint propertyGraterOrEqualThan(final java.lang.String name, long value) {
+                return property(name).greaterOrEqualThan().value(value);
+            }
+
+            public static Sql2JoinConstraint propertyGraterThan(final java.lang.String name, long value) {
+                return property(name).greaterThan().value(value);
+            }
+
+            public static Sql2JoinConstraint propertyBetween(final java.lang.String name, long from, long to) {
+                return and().matches(propertyGraterOrEqualThan(name, from), propertyLowerThan(name, to));
             }
 
             private Long() {
@@ -283,19 +333,19 @@ public final class Sql2 {
             }
 
             public static Sql2JoinConstraint isChild(final java.lang.String path) {
-                return Sql2PathCondition.is().child(path);
+                return is().child(path);
             }
 
             public static Sql2JoinConstraint isChild(final Node parent) {
-                return Sql2PathCondition.is().child(parent);
+                return is().child(parent);
             }
 
             public static Sql2JoinConstraint isDescendant(final java.lang.String path) {
-                return Sql2PathCondition.is().descendant(path);
+                return is().descendant(path);
             }
 
             public static Sql2JoinConstraint isDescendant(final Node ancestor) {
-                return Sql2PathCondition.is().descendant(ancestor);
+                return is().descendant(ancestor);
             }
 
             private Path() {
@@ -353,11 +403,11 @@ public final class Sql2 {
             }
 
             public static Sql2ContainsCondition containsAll(java.lang.String... values) {
-                return new Sql2ContainsCondition().all(values);
+                return contains().all(values);
             }
 
             public static Sql2ContainsCondition containsAny(java.lang.String... values) {
-                return new Sql2ContainsCondition().any(values);
+                return contains().any(values);
             }
 
             /**
@@ -370,12 +420,12 @@ public final class Sql2 {
                 return new Sql2ContainsCondition(property);
             }
 
-            public static Sql2ContainsCondition containsAll(java.lang.String property, java.lang.String... values) {
-                return new Sql2ContainsCondition(property).all(values);
+            public static Sql2ContainsCondition propertyContainsAll(java.lang.String property, java.lang.String... values) {
+                return contains(property).all(values);
             }
 
-            public static Sql2ContainsCondition containsAny(java.lang.String property, java.lang.String... values) {
-                return new Sql2ContainsCondition(property).any(values);
+            public static Sql2ContainsCondition propertyContainsAny(java.lang.String property, java.lang.String... values) {
+                return contains(property).any(values);
             }
 
             private FullText() {

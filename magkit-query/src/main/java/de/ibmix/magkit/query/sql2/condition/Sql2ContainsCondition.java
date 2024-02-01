@@ -22,6 +22,7 @@ package de.ibmix.magkit.query.sql2.condition;
 
 import com.google.common.base.Preconditions;
 import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -105,7 +106,9 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
     }
 
     public Sql2ContainsCondition addTerm(final int boost, final boolean exclude, final boolean optional, final boolean isFuzzy, final int distance, final boolean escapeQuestionMark, final String... terms) {
-        _terms.addAll(Arrays.stream(terms).map(StringUtils::trim).filter(StringUtils::isNotEmpty).map(t -> new DefaultTerm(t, boost, exclude, optional, isFuzzy, distance, escapeQuestionMark)).collect(Collectors.toList()));
+        if (ArrayUtils.isNotEmpty(terms)) {
+            _terms.addAll(Arrays.stream(terms).map(StringUtils::trim).filter(StringUtils::isNotEmpty).map(t -> new DefaultTerm(t, boost, exclude, optional, isFuzzy, distance, escapeQuestionMark)).collect(Collectors.toList()));
+        }
         return me();
     }
 
