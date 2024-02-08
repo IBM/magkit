@@ -23,8 +23,8 @@ package de.ibmix.magkit.query.sql2.condition;
 /**
  * Builder Interface for String conditions that declares methods only available for Strings.
  *
- * @author wolf.bubenik@aperto.com
- * @since (26.05.20)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-05-26
  */
 public interface Sql2CompareString extends Sql2Compare<String> {
     Sql2StaticOperandMultiple<String> startsWithAny();

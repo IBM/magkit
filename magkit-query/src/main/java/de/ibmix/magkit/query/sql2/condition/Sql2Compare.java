@@ -25,8 +25,8 @@ package de.ibmix.magkit.query.sql2.condition;
  * Excluding not(). To be used when not() has been called.
  *
  * @param <V> the type of the property (String, Long, Double, Calendar)
- * @author wolf.bubenik@aperto.com
- * @since 07.04.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-07
  */
 public interface Sql2Compare<V> {
     Sql2StaticOperandSingle<V> lowerThan();

@@ -38,8 +38,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * A wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
  * Provides methods to access Row results.
  *
- * @author wolf.bubenik@aperto.com
- * @since (21.8.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-08-21
  */
 public class RowsResult extends ResultWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(RowsResult.class);

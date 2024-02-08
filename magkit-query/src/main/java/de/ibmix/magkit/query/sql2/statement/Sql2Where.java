@@ -25,8 +25,8 @@ import de.ibmix.magkit.query.sql2.condition.Sql2JoinConstraint;
 /**
  * SQL2 statement builder interface for fluent API: Optional where step.
  *
- * @author wolf.bubenik@aperto.com
- * @since 15.04.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-15
  */
 public interface Sql2Where extends Sql2Order {
     Sql2Order whereAll(Sql2JoinConstraint... constraints);

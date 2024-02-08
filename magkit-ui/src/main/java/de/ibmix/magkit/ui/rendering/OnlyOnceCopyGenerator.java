@@ -34,7 +34,7 @@ import javax.jcr.RepositoryException;
 /**
  * A CopyGenerator extension that executes autogeneration only once a parent node.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since 14.08.2019
  */
 public class OnlyOnceCopyGenerator extends CopyGenerator {

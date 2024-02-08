@@ -49,7 +49,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Test Sql2RowsQueryBuilder.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since (29.04.2020)
  */
 public class Sql2RowsQueryBuilderTest {

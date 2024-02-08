@@ -27,8 +27,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 /**
  * The builder for a sql2 null condition.
  *
- * @author wolf.bubenik@aperto.com
- * @since (18.05.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-05-18
  */
 public final class Sql2NullCondition implements Sql2JoinConstraint {
 

@@ -23,8 +23,8 @@ package de.ibmix.magkit.query.sql2.statement;
 /**
  * SQL2 statement builder interface for fluent API: Optional order direction step.
  *
- * @author wolf.bubenik@aperto.com
- * @since 15.04.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-15
  */
 public interface Sql2OrderDirection extends Sql2Builder {
     Sql2Builder descending();

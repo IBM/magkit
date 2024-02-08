@@ -35,7 +35,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Tests showing examples on how to use the Sql2 query facade.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since (21.8.2020)
  */
 public class Sql2StatementExamplesTest {

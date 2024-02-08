@@ -35,8 +35,8 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
  * The builder for a SQL2 query statement.
  * Note: DISTINCT, IN are not supported by jackrabbit JCR
  *
- * @author wolf.bubenik@aperto.com
- * @since 28.02.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-02-28
  **/
 public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2JoinAs, Sql2JoinOn, Sql2Where, Sql2Order, Sql2OrderDirection, Sql2Builder, Sql2SelectorNames {
 

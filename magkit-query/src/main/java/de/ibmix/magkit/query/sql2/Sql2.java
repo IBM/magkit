@@ -54,8 +54,8 @@ import java.util.List;
 /**
  * A facade class for all sql2 query builders.
  *
- * @author wolf.bubenik@aperto.com
- * @since (10.08.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-08-10
  */
 public final class Sql2 {
 
@@ -65,8 +65,8 @@ public final class Sql2 {
     /**
      * Sql2 query builders.
      *
-     * @author wolf.bubenik@aperto.com
-     * @since (10.08.2020)
+     * @author wolf.bubenik@ibmix.de
+     * @since 2020-08-10
      */
     public static final class Query {
 
@@ -116,8 +116,8 @@ public final class Sql2 {
     /**
      * Sql2 statement builders.
      *
-     * @author wolf.bubenik@aperto.com
-     * @since (10.08.2020)
+     * @author wolf.bubenik@ibmix.de
+     * @since 2020-08-10
      */
     public static final class Statement {
 
@@ -152,8 +152,8 @@ public final class Sql2 {
     /**
      * Sql2 condition builders.
      *
-     * @author wolf.bubenik@aperto.com
-     * @since (10.08.2020)
+     * @author wolf.bubenik@ibmix.de
+     * @since 2020-08-10
      */
     public static final class Condition {
 
@@ -187,8 +187,8 @@ public final class Sql2 {
         /**
          * Sql2 date condition builders.
          *
-         * @author wolf.bubenik@aperto.com
-         * @since (10.08.2020)
+         * @author wolf.bubenik@ibmix.de
+         * @since 2020-08-10
          */
         public static final class Date {
 
@@ -251,8 +251,8 @@ public final class Sql2 {
         /**
          * Sql2 date condition builders.
          *
-         * @author wolf.bubenik@aperto.com
-         * @since (10.08.2020)
+         * @author wolf.bubenik@ibmix.de
+         * @since 2020-08-10
          */
         public static final class Double {
 
@@ -287,8 +287,8 @@ public final class Sql2 {
         /**
          * Sql2 date condition builders.
          *
-         * @author wolf.bubenik@aperto.com
-         * @since (10.08.2020)
+         * @author wolf.bubenik@ibmix.de
+         * @since 2020-08-10
          */
         public static final class Long {
 
@@ -323,8 +323,8 @@ public final class Sql2 {
         /**
          * Sql2 path condition builders.
          *
-         * @author wolf.bubenik@aperto.com
-         * @since (10.08.2020)
+         * @author wolf.bubenik@ibmix.de
+         * @since 2020-08-10
          */
         public static final class Path {
 
@@ -355,8 +355,8 @@ public final class Sql2 {
         /**
          * Sql2 string condition builders.
          *
-         * @author wolf.bubenik@aperto.com
-         * @since (10.08.2020)
+         * @author wolf.bubenik@ibmix.de
+         * @since 2020-08-10
          */
         public static final class String {
 
@@ -436,8 +436,8 @@ public final class Sql2 {
     /**
      * Sql2 join condition builders.
      *
-     * @author wolf.bubenik@aperto.com
-     * @since (10.08.2020)
+     * @author wolf.bubenik@ibmix.de
+     * @since 2020-08-10
      */
     public static final class JoinOn {
         public static Sql2PathJoinCondition joinedDescendantOfSelected() {

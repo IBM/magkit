@@ -30,7 +30,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Test Sql2NullCondition.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since (17.06.20)
  */
 public class Sql2NullConditionTest {

@@ -30,8 +30,8 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * Note that it is very similar to a StringCondition but supports less operations.
  * Jackrabbit does not allow to combine name() with not(), length() and LIKE.
  *
- * @author wolf.bubenik@aperto.com
- * @since (11.11.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-11-11
  */
 public class Sql2NameCondition implements Sql2NameOperand, Sql2NameCompare, Sql2NameOperandSingle, Sql2NameOperandMultiple, Sql2JoinConstraint {
 

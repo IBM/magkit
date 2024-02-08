@@ -33,8 +33,8 @@ import javax.jcr.query.QueryManager;
 /**
  * The base class for row and node query builders.
  *
- * @author wolf.bubenik@aperto.com
- * @since 28.02.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-02-28
  **/
 public abstract class Sql2QueryBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(Sql2QueryBuilder.class);

@@ -23,8 +23,8 @@ package de.ibmix.magkit.query.sql2.condition;
 /**
  * Builder Interface for String conditions that declares usage of jcr methods for strings.
  *
- * @author wolf.bubenik@aperto.com
- * @since (20.05.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-05-20
  */
 public interface Sql2DynamicOperand extends Sql2CompareStringNot {
     Sql2CompareStringNot lowerCase();

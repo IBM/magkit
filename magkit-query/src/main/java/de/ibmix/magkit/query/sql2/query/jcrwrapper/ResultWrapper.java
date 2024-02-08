@@ -28,11 +28,11 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 
 /**
- * Base wrapper wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
- * Provides methods to methods to access column and selector names.
+ * Base wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
+ * Provides methods to access column and selector names.
  *
- * @author wolf.bubenik@aperto.com
- * @since (21.8.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-08-21
  */
 public abstract class ResultWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(RowsResult.class);

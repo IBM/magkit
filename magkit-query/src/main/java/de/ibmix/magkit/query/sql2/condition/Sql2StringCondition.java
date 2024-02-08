@@ -27,8 +27,8 @@ import org.apache.jackrabbit.JcrConstants;
 /**
  * The builder for a sql2 String condition.
  *
- * @author wolf.bubenik@aperto.com
- * @since 01.04.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-01
  **/
 public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringCondition, String> implements Sql2DynamicOperand {
 

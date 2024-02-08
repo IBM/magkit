@@ -41,6 +41,7 @@ import static de.ibmix.magkit.query.sql2.statement.Sql2Statement.select;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQuery;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQueryManager;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQueryResult;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static de.ibmix.magkit.test.jcr.query.QueryStubbingOperation.stubResult;
@@ -100,7 +101,6 @@ public class Sql2QueryTest {
 
     @Test
     public void nodesByIdentifiers() throws RepositoryException {
-//        Query query = mockQuery("test", Query.JCR_SQL2, "SELECT * FROM [nt:base] WHERE ", stubResult());
         mockQueryManager("test");
         List<Node> result = Sql2.Query.nodesByIdentifiers("test");
         // don't execute query when no ids are given
@@ -109,7 +109,42 @@ public class Sql2QueryTest {
         assertThat(result.isEmpty(), is(true));
 
         result = Sql2.Query.nodesByIdentifiers("test", "123");
+        verify(MgnlContext.getJCRSession("test").getWorkspace().getQueryManager(), times(1))
+            .createQuery("SELECT * FROM [nt:base] WHERE [jcr:uuid] = '123'", Query.JCR_SQL2);
+        assertThat(result.size(), is(0));
 
+        mockQueryResult("test", Query.JCR_SQL2,
+            "SELECT * FROM [nt:base] WHERE ([jcr:uuid] = '123' OR [jcr:uuid] = '456')",
+            mockPageNode("first"), mockPageNode("second")
+        );
+        result = Sql2.Query.nodesByIdentifiers("test", "123", "456");
+        verify(MgnlContext.getJCRSession("test").getWorkspace().getQueryManager(), times(1))
+            .createQuery("SELECT * FROM [nt:base] WHERE ([jcr:uuid] = '123' OR [jcr:uuid] = '456')", Query.JCR_SQL2);
+        assertThat(result.size(), is(2));
+    }
+
+    @Test
+    public void nodesByTemplates() throws RepositoryException {
+        mockQueryManager("website");
+        List<Node> result = Sql2.Query.nodesByTemplates("/root");
+        // don't execute query when no ids are given
+        verify(MgnlContext.getJCRSession("website").getWorkspace().getQueryManager(), never()).createQuery(anyString(), anyString());
+        // just return empty result
+        assertThat(result.isEmpty(), is(true));
+
+        result = Sql2.Query.nodesByTemplates("/root", "temp1");
+        verify(MgnlContext.getJCRSession("website").getWorkspace().getQueryManager(), times(1))
+            .createQuery("SELECT * FROM [nt:base] WHERE (isdescendantnode('/root') AND [mgnl:template] = 'temp1')", Query.JCR_SQL2);
+        assertThat(result.size(), is(0));
+
+        mockQueryResult("website", Query.JCR_SQL2,
+            "SELECT * FROM [nt:base] WHERE (isdescendantnode('/root') AND ([mgnl:template] = 'temp1' OR [mgnl:template] = 'temp2'))",
+            mockPageNode("first"), mockPageNode("second")
+        );
+        result = Sql2.Query.nodesByTemplates("/root", "temp1", "temp2");
+        verify(MgnlContext.getJCRSession("website").getWorkspace().getQueryManager(), times(1))
+            .createQuery("SELECT * FROM [nt:base] WHERE (isdescendantnode('/root') AND ([mgnl:template] = 'temp1' OR [mgnl:template] = 'temp2'))", Query.JCR_SQL2);
+        assertThat(result.size(), is(2));
     }
 
     @Test

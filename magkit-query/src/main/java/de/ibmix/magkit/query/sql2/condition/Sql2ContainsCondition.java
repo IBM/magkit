@@ -49,8 +49,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  *     <li>or: multiple optional terms will be concatenated by OR</li>
  * </ul>
  *
- * @author wolf.bubenik@aperto.com
- * @since 3.5.2 (04.01.2021)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2021-01-04
  */
 public class Sql2ContainsCondition implements Sql2JoinConstraint {
 

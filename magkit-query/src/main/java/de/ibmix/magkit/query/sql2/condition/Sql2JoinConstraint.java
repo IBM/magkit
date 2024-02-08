@@ -23,8 +23,8 @@ package de.ibmix.magkit.query.sql2.condition;
 /**
  * Base builder interface for all conditions allowing to select the selector used for joins.
  *
- * @author wolf.bubenik@aperto.com
- * @since (18.06.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-06-18
  */
 public interface Sql2JoinConstraint extends Sql2Constraint {
     Sql2JoinConstraint forJoin();

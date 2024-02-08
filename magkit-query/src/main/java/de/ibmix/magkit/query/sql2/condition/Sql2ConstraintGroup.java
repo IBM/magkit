@@ -27,8 +27,8 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 /**
  * The builder for a sql2 condition group.
  *
- * @author wolf.bubenik@aperto.com
- * @since 28.02.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-02-28
  **/
 public final class Sql2ConstraintGroup implements Sql2JoinConstraint {
 

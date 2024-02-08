@@ -27,8 +27,8 @@ import javax.jcr.query.Query;
 /**
  * A wrapper for javax.jcr.query.Query to separate Row and Node queries.
  *
- * @author wolf.bubenik@aperto.com
- * @since (21.8.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-08-21
  */
 public class RowsQuery extends QueryWrapper<RowsQuery> {
 

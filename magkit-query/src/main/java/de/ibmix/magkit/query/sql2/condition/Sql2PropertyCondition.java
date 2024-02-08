@@ -31,8 +31,9 @@ import static org.apache.commons.lang3.StringUtils.trim;
  *
  * @param <T> the implementing type of this
  * @param <V> the type of the property (String, Long, Double, Calendar)
- * @author wolf.bubenik@aperto.com
- * @since 02.04.2020
+ *
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-02
  **/
 public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V>, V> implements Sql2CompareNot<V>, Sql2StaticOperandSingle<V>, Sql2StaticOperandMultiple<V>, Sql2JoinConstraint {
 
