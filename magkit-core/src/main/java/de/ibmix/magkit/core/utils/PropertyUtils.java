@@ -27,10 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import java.util.ArrayList;
@@ -91,6 +93,42 @@ public final class PropertyUtils {
                 result = node.getProperty(relPath);
             } catch (RepositoryException e) {
                 LOGGER.debug("Error retrieving property {}.", relPath, e);
+            }
+        }
+        return result;
+    }
+
+    public static PropertyIterator getProperties(@Nullable final Node node) {
+        PropertyIterator result = null;
+        if (node != null) {
+            try {
+                result = node.getProperties();
+            } catch (RepositoryException e) {
+                LOGGER.debug("Error retrieving properties from node {}.", NodeUtils.getPath(node), e);
+            }
+        }
+        return result;
+    }
+
+    public static PropertyIterator getProperties(@Nullable final Node node, @Nonnull final String namePattern) {
+        PropertyIterator result = null;
+        if (node != null) {
+            try {
+                result = node.getProperties(namePattern);
+            } catch (RepositoryException e) {
+                LOGGER.debug("Error retrieving properties from node {}.", NodeUtils.getPath(node), e);
+            }
+        }
+        return result;
+    }
+
+    public static PropertyIterator getProperties(@Nullable final Node node, @Nonnull final String[] nameGlobs) {
+        PropertyIterator result = null;
+        if (node != null) {
+            try {
+                result = node.getProperties(nameGlobs);
+            } catch (RepositoryException e) {
+                LOGGER.debug("Error retrieving properties from node {}.", NodeUtils.getPath(node), e);
             }
         }
         return result;

@@ -26,105 +26,136 @@ import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 /**
- * A read-only NodeWrapper that allows to override properties as desired by the user.
+ * A NodeWrapper that allows to override properties and child nodes as desired by the user.
  *
- * @author wolf
+ * @author wolf.bubenik@ibmix.de
+ * @since 2019-05-19
  */
 public class AlteringNodeWrapper extends DelegateNodeWrapper {
-    private Map<String, Property> _overrides;
-    private Map<String, String> _mapped;
-    private Node _nodeToWrap;
+    private final Map<String, Property> _properties;
+    private final Map<String, Node> _childNodes;
+    private final Set<String> _hiddenProperties;
+    private final Set<String> _hiddenChildNodes;
 
     public AlteringNodeWrapper(Node nodeToWrap) {
         super(nodeToWrap);
         notNull(nodeToWrap, "The wrapped node must not be null, please.");
-        _overrides = new HashMap<>();
-        _mapped = new HashMap<>();
-        _nodeToWrap = nodeToWrap;
+        _properties = new HashMap<>();
+        _childNodes = new HashMap<>();
+        _hiddenProperties = new HashSet<>();
+        _hiddenChildNodes = new HashSet<>();
     }
 
-    protected Node getNodeToWrap() {
-        return _nodeToWrap;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withMappedProperty(String destName, String sourceName) {
-        notEmpty(destName);
-        notEmpty(sourceName);
-        _mapped.put(destName, sourceName);
-        return (R) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, String... value) {
+    public AlteringNodeWrapper withProperty(String name, String... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Boolean... value) {
+    public AlteringNodeWrapper withProperty(String name, Boolean... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Long... value) {
+    public AlteringNodeWrapper withProperty(String name, Long... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Double... value) {
+    public AlteringNodeWrapper withProperty(String name, Double... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Calendar... value) {
+    public AlteringNodeWrapper withProperty(String name, Calendar... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    public <R extends AlteringNodeWrapper> R withTemplate(String templateId) {
+    public AlteringNodeWrapper withTemplate(String templateId) {
         notEmpty(templateId);
         return withProperty(NodeTypes.Renderable.TEMPLATE, templateId);
+    }
+    public AlteringNodeWrapper withHiddenProperty(String... names) {
+        notEmpty(names);
+        Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenProperties::add);
+        return this;
+    }
+
+    public AlteringNodeWrapper withChildNode(String name, Node childNode) {
+        notEmpty(name);
+        // TODO: How to handle null node?
+        _childNodes.put(name, new DefineParentNodeWrapper(this, childNode));
+        return this;
+    }
+
+    public AlteringNodeWrapper withHiddenNode(String... names) {
+        notEmpty(names);
+        Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenChildNodes::add);
+        return this;
+    }
+
+    public FallbackNodeWrapper withFallbacks() {
+        // TODO: How to handle null wrapped node?
+        FallbackNodeWrapper result = new FallbackNodeWrapper(getWrappedNode());
+        setWrappedNode(result);
+        return result;
+    }
+
+    public AlteringNodeWrapper immutable() {
+        // TODO: How to handle null wrapped node?
+        setWrappedNode(new ImmutableNodeWrapper(getWrappedNode()));
+        return this;
     }
 
     @Override
     public Property getProperty(String relPath) throws RepositoryException {
-        String key = getKey(relPath);
-        Property result = _overrides.get(key);
-        if (result == null) {
-            result = super.getProperty(key);
+        Property result = null;
+        if (!_hiddenProperties.contains(relPath)) {
+            result = _properties.getOrDefault(relPath, super.getProperty(relPath));
         }
         return result;
     }
 
     @Override
     public boolean hasProperty(String relPath) throws RepositoryException {
-        String key = getKey(relPath);
-        return _overrides.containsKey(key) || super.hasProperty(key);
+        return _properties.containsKey(relPath) || super.hasProperty(relPath);
     }
 
-    private String getKey(String relPath) {
-        return _mapped.getOrDefault(relPath, relPath);
+    @Override
+    public boolean hasNode(String relPath) throws RepositoryException {
+        return _childNodes.containsKey(relPath) || super.hasProperty(relPath);
     }
+
+    @Override
+    public Node getNode(String relPath) throws RepositoryException {
+        Node result = null;
+        if (!_hiddenChildNodes.contains(relPath)) {
+            result = _childNodes.getOrDefault(relPath, super.getNode(relPath));
+        }
+        return result;
+    }
+
+    // TODO: Implement node/property getter for name patterns that merge wrapper results with wrapped node results.
 }

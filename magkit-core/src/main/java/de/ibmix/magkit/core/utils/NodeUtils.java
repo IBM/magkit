@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import java.util.Collections;
 import java.util.List;
@@ -381,6 +382,45 @@ public final class NodeUtils {
         if (node != null) {
             try {
                 result = NodeUtil.getNodes(node, toJackRabbitPredicate(predicate));
+            } catch (RepositoryException e) {
+                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.debug(e.getLocalizedMessage(), e);
+            }
+        }
+        return result;
+    }
+
+    public static NodeIterator getNodes(@Nullable final Node node) {
+        NodeIterator result = null;
+        if (node != null) {
+            try {
+                result = node.getNodes();
+            } catch (RepositoryException e) {
+                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.debug(e.getLocalizedMessage(), e);
+            }
+        }
+        return result;
+    }
+
+    public static NodeIterator getNodes(@Nullable final Node node, @Nonnull final String namePattern) {
+        NodeIterator result = null;
+        if (node != null) {
+            try {
+                result = node.getNodes(namePattern);
+            } catch (RepositoryException e) {
+                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.debug(e.getLocalizedMessage(), e);
+            }
+        }
+        return result;
+    }
+
+    public static NodeIterator getNodes(@Nullable final Node node, @Nonnull final String[] nameGlobs) {
+        NodeIterator result = null;
+        if (node != null) {
+            try {
+                result = node.getNodes(nameGlobs);
             } catch (RepositoryException e) {
                 LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);

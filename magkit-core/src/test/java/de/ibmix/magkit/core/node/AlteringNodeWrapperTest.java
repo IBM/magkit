@@ -65,7 +65,7 @@ public class AlteringNodeWrapperTest {
     public void getNodeToWrap() {
         Node node = mock(Node.class);
         AlteringNodeWrapper nodeWrapper = new AlteringNodeWrapper(node);
-        assertThat(nodeWrapper.getNodeToWrap(), is(node));
+        assertThat(nodeWrapper.getWrappedNode(), is(node));
     }
 
     @Test
@@ -173,13 +173,6 @@ public class AlteringNodeWrapperTest {
         wrapper.withProperty("p0", "wrapped");
         assertThat(getStringValue(wrapper.getProperty("p0")), is("wrapped"));
         assertThat(wrapper.getProperty("p0").isMultiple(), is(false));
-
-        wrapper.withMappedProperty("p0", "mapped");
-        assertThat(getStringValue(wrapper.getProperty("p0")), nullValue());
-
-        wrapper.withProperty("mapped", "mapped");
-        assertThat(getStringValue(wrapper.getProperty("p0")), is("mapped"));
-        assertThat(wrapper.getProperty("p0").isMultiple(), is(false));
     }
 
     @Test
@@ -192,9 +185,5 @@ public class AlteringNodeWrapperTest {
         stubProperty("test", "test-value").of(node);
         assertThat(wrapper.hasProperty("test"), is(true));
         assertThat(wrapper.hasProperty("mapped"), is(false));
-
-        wrapper.withMappedProperty("mapped", "test");
-        assertThat(wrapper.hasProperty("test"), is(true));
-        assertThat(wrapper.hasProperty("mapped"), is(true));
     }
 }
