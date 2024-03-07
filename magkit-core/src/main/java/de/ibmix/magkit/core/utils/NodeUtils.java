@@ -70,6 +70,7 @@ public final class NodeUtils {
     public static final Predicate<Node> HAS_SECTION_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.SECTION, getTemplateType(node));
     public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.FEATURE, getTemplateType(node));
     public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.CONTENT, getTemplateType(node));
+    public static final Predicate<Node> HAS_FUNCTIONAL_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.FUNCTIONAL, getTemplateType(node));
 
     public static final Predicate<Node> IS_MAGKIT_FOLDER = node -> StringUtils.equals("magkit:pages/folder", getTemplate(node));
 
