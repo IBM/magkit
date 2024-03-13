@@ -97,6 +97,7 @@ public class AlteringNodeWrapper extends DelegateNodeWrapper {
         notEmpty(templateId);
         return withProperty(NodeTypes.Renderable.TEMPLATE, templateId);
     }
+
     public AlteringNodeWrapper withHiddenProperty(String... names) {
         notEmpty(names);
         Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenProperties::add);
@@ -140,12 +141,12 @@ public class AlteringNodeWrapper extends DelegateNodeWrapper {
 
     @Override
     public boolean hasProperty(String relPath) throws RepositoryException {
-        return _properties.containsKey(relPath) || super.hasProperty(relPath);
+        return !_hiddenProperties.contains(relPath) && (_properties.containsKey(relPath) || super.hasProperty(relPath));
     }
 
     @Override
     public boolean hasNode(String relPath) throws RepositoryException {
-        return _childNodes.containsKey(relPath) || super.hasProperty(relPath);
+        return !_hiddenChildNodes.contains(relPath) && (_childNodes.containsKey(relPath) || super.hasNode(relPath));
     }
 
     @Override

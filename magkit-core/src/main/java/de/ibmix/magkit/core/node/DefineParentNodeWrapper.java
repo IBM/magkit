@@ -20,6 +20,7 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
+import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
@@ -83,6 +84,9 @@ public class DefineParentNodeWrapper extends DelegateNodeWrapper {
     }
 
     private NodeIterator toWrappedNodesIterator(NodeIterator nodes) {
-        return new NodeIteratorAdapter((Collection) IteratorUtils.toList(nodes).stream().map(n -> new DefineParentNodeWrapper(this, (Node) n)).collect(Collectors.toList()));
+        return new NodeIteratorAdapter((Collection) IteratorUtils.toList(nodes)
+            .stream()
+            .map(n -> isWrapping((Node) n) ? n : new DefineParentNodeWrapper(this, (Node) n))
+            .collect(Collectors.toList()));
     }
 }
