@@ -1,11 +1,5 @@
 package de.ibmix.magkit.core.node;
 
-import de.ibmix.magkit.core.utils.NodeUtils;
-import de.ibmix.magkit.core.utils.PropertyUtils;
-import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-
 /*-
  * #%L
  * IBM iX Magnolia Kit
@@ -26,6 +20,11 @@ import org.apache.commons.lang3.Validate;
  * #L%
  */
 
+import de.ibmix.magkit.core.utils.NodeUtils;
+import de.ibmix.magkit.core.utils.PropertyUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
@@ -41,7 +40,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class FallbackNodeWrapper extends DelegateNodeWrapper {
+public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
 
     private List<Node> _fallbackNodes;
     private Predicate<Property> _propertyCondition;
@@ -54,6 +53,13 @@ public class FallbackNodeWrapper extends DelegateNodeWrapper {
 
     public FallbackNodeWrapper(final Node wrapped) {
         super(wrapped);
+        _propertyCondition = property -> StringUtils.isNotEmpty(PropertyUtils.getStringValue(property));
+        _iteratorCondition = iterator -> Objects.nonNull(iterator) && iterator.hasNext();
+        _propertyNameFallbacks = new HashMap<>();
+    }
+
+    public FallbackNodeWrapper(String name, String primaryNodeType) {
+        super(name, primaryNodeType);
         _propertyCondition = property -> StringUtils.isNotEmpty(PropertyUtils.getStringValue(property));
         _iteratorCondition = iterator -> Objects.nonNull(iterator) && iterator.hasNext();
         _propertyNameFallbacks = new HashMap<>();

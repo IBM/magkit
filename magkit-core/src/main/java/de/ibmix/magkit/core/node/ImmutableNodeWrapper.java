@@ -20,8 +20,6 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
-import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
-
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -33,7 +31,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
-public class ImmutableNodeWrapper extends DelegateNodeWrapper {
+public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
 
     private static final String UNSUPPORTED_METHOD_MESSAGE = "Changing of states are not supported by this implementation.";
 

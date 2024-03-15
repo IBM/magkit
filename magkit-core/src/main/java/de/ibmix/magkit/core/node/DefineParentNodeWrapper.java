@@ -20,8 +20,6 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
-import info.magnolia.jcr.util.NodeUtil;
-import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
 
@@ -32,6 +30,8 @@ import javax.jcr.RepositoryException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 /**
  * A DelegateNodeWrapper that allows building an arbitrary node hierarchy and keeping the hierarchy data in sync (path, depth, parent).
  * Introduced for the content-hub.
@@ -39,12 +39,13 @@ import java.util.stream.Collectors;
  * @author wolf.bubenik@ibmix.de
  * @since 2024-02-16
  */
-public class DefineParentNodeWrapper extends DelegateNodeWrapper {
+public class DefineParentNodeWrapper extends NullableDelegateNodeWrapper {
 
     private Node _parent;
 
     public DefineParentNodeWrapper(final Node parent, final Node node) {
         super(node);
+        notNull(parent);
         _parent = parent;
     }
 

@@ -21,10 +21,13 @@ package de.ibmix.magkit.core.node;
  */
 
 import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
+import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
+import org.apache.jackrabbit.commons.iterator.PropertyIteratorAdapter;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -43,15 +46,25 @@ import static org.apache.commons.lang3.Validate.notNull;
  * @author wolf.bubenik@ibmix.de
  * @since 2019-05-19
  */
-public class AlteringNodeWrapper extends DelegateNodeWrapper {
+public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     private final Map<String, Property> _properties;
     private final Map<String, Node> _childNodes;
     private final Set<String> _hiddenProperties;
     private final Set<String> _hiddenChildNodes;
 
+
+
     public AlteringNodeWrapper(Node nodeToWrap) {
         super(nodeToWrap);
-        notNull(nodeToWrap, "The wrapped node must not be null, please.");
+        notNull(nodeToWrap);
+        _properties = new HashMap<>();
+        _childNodes = new HashMap<>();
+        _hiddenProperties = new HashSet<>();
+        _hiddenChildNodes = new HashSet<>();
+    }
+
+    public AlteringNodeWrapper(String name, String primaryNodeType) {
+        super(name, primaryNodeType);
         _properties = new HashMap<>();
         _childNodes = new HashMap<>();
         _hiddenProperties = new HashSet<>();
@@ -106,7 +119,7 @@ public class AlteringNodeWrapper extends DelegateNodeWrapper {
 
     public AlteringNodeWrapper withChildNode(String name, Node childNode) {
         notEmpty(name);
-        // TODO: How to handle null node?
+        notNull(childNode);
         _childNodes.put(name, new DefineParentNodeWrapper(this, childNode));
         return this;
     }
@@ -118,14 +131,12 @@ public class AlteringNodeWrapper extends DelegateNodeWrapper {
     }
 
     public FallbackNodeWrapper withFallbacks() {
-        // TODO: How to handle null wrapped node?
         FallbackNodeWrapper result = new FallbackNodeWrapper(getWrappedNode());
         setWrappedNode(result);
         return result;
     }
 
     public AlteringNodeWrapper immutable() {
-        // TODO: How to handle null wrapped node?
         setWrappedNode(new ImmutableNodeWrapper(getWrappedNode()));
         return this;
     }
@@ -158,5 +169,59 @@ public class AlteringNodeWrapper extends DelegateNodeWrapper {
         return result;
     }
 
-    // TODO: Implement node/property getter for name patterns that merge wrapper results with wrapped node results.
+    @Override
+    public PropertyIterator getProperties() throws RepositoryException {
+        return mergeAndFilterProperties(super.getProperties());
+    }
+
+    @Override
+    public PropertyIterator getProperties(String namePattern) throws RepositoryException {
+        return mergeAndFilterProperties(super.getProperties(namePattern));
+    }
+
+    @Override
+    public PropertyIterator getProperties(String[] nameGlobs) throws RepositoryException {
+        return mergeAndFilterProperties(super.getProperties(nameGlobs));
+    }
+
+    @Override
+    public NodeIterator getNodes() throws RepositoryException {
+        return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes()));
+    }
+
+    @Override
+    public NodeIterator getNodes(String namePattern) throws RepositoryException {
+        return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes(namePattern)));
+    }
+
+    @Override
+    public NodeIterator getNodes(String[] nameGlobs) throws RepositoryException {
+        return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes(nameGlobs)));
+    }
+
+    private NodeIterator mergeAndFilterNodes(NodeIterator nodes) throws RepositoryException {
+        Map<String, Node> mergedNodes = new HashMap<>();
+        while (nodes.hasNext()) {
+            Node n = nodes.nextNode();
+            if (!_hiddenChildNodes.contains(n.getName())) {
+                mergedNodes.put(n.getName(), n);
+            }
+        }
+
+        mergedNodes.putAll(_childNodes);
+        return new NodeIteratorAdapter(mergedNodes.values());
+    }
+
+    private PropertyIterator mergeAndFilterProperties(final PropertyIterator properties) throws RepositoryException {
+        Map<String, Property> nodeProperties = new HashMap<>();
+        while (properties.hasNext()) {
+            Property property = properties.nextProperty();
+            if (!_hiddenProperties.contains(property.getName())) {
+                nodeProperties.put(property.getName(), property);
+            }
+        }
+        nodeProperties.putAll(_properties);
+        return new PropertyIteratorAdapter(nodeProperties.values());
+    }
+
 }
