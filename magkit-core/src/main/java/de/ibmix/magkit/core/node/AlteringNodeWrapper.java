@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -57,16 +58,16 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     public AlteringNodeWrapper(Node nodeToWrap) {
         super(nodeToWrap);
         notNull(nodeToWrap);
-        _properties = new HashMap<>();
-        _childNodes = new HashMap<>();
+        _properties = new LinkedHashMap<>();
+        _childNodes = new LinkedHashMap<>();
         _hiddenProperties = new HashSet<>();
         _hiddenChildNodes = new HashSet<>();
     }
 
     public AlteringNodeWrapper(String name, String primaryNodeType) {
         super(name, primaryNodeType);
-        _properties = new HashMap<>();
-        _childNodes = new HashMap<>();
+        _properties = new LinkedHashMap<>();
+        _childNodes = new LinkedHashMap<>();
         _hiddenProperties = new HashSet<>();
         _hiddenChildNodes = new HashSet<>();
     }
@@ -199,8 +200,9 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes(nameGlobs)));
     }
 
+    // TODO: add filter predicate to method (name patterns) and filter custom nodes accordingly
     private NodeIterator mergeAndFilterNodes(NodeIterator nodes) throws RepositoryException {
-        Map<String, Node> mergedNodes = new HashMap<>();
+        Map<String, Node> mergedNodes = new LinkedHashMap<>();
         while (nodes.hasNext()) {
             Node n = nodes.nextNode();
             if (!_hiddenChildNodes.contains(n.getName())) {
@@ -212,8 +214,9 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return new NodeIteratorAdapter(mergedNodes.values());
     }
 
+    // TODO: add filter predicate to method (name patterns) and filter custom properties accordingly
     private PropertyIterator mergeAndFilterProperties(final PropertyIterator properties) throws RepositoryException {
-        Map<String, Property> nodeProperties = new HashMap<>();
+        Map<String, Property> nodeProperties = new LinkedHashMap<>();
         while (properties.hasNext()) {
             Property property = properties.nextProperty();
             if (!_hiddenProperties.contains(property.getName())) {
