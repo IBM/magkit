@@ -31,7 +31,6 @@ import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
