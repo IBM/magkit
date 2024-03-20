@@ -9,6 +9,7 @@
     </parent>
     <artifactId>magkit</artifactId>
     <name>IBM iX Magnolia Kit</name>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -29,6 +30,23 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- sub modules-->
+            <dependency>
+                <groupId>de.ibmix.magkit</groupId>
+                <artifactId>magkit-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.ibmix.magkit</groupId>
+                <artifactId>magkit-setup</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.ibmix.magkit</groupId>
+                <artifactId>magkit-query</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- JBPM workflow, dependency is provided by Magnolia in the correct version -->
             <dependency>
                 <groupId>info.magnolia.workflow</groupId>
