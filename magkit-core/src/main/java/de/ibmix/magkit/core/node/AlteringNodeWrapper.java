@@ -20,6 +20,8 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
+import de.ibmix.magkit.core.utils.NodeUtils;
+import de.ibmix.magkit.core.utils.PropertyUtils;
 import info.magnolia.jcr.util.NodeTypes;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
 import org.apache.jackrabbit.commons.iterator.PropertyIteratorAdapter;
@@ -36,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
@@ -130,10 +133,24 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
-    public FallbackNodeWrapper withFallbacks() {
+    public FallbackNodeWrapper withFallback() {
         FallbackNodeWrapper result = new FallbackNodeWrapper(getWrappedNode());
         setWrappedNode(result);
         return result;
+    }
+
+    public FallbackNodeWrapper withFallbackToPage() {
+        return withFallbackToAncestor(NodeUtils.IS_PAGE);
+    }
+
+    public FallbackNodeWrapper withFallbackToAncestor(final Predicate<Node> ancestorPredicate) {
+        Node fallbackNode = NodeUtils.getAncestorOrSelf(getWrappedNode(), ancestorPredicate);
+        return withFallback().withFallbackNodes(fallbackNode);
+    }
+
+    public FallbackNodeWrapper withFallbackToReference(final String workspace, final String linkPropertyName) {
+        String nodeId = PropertyUtils.getStringValue(getWrappedNode(), linkPropertyName);
+        return withFallback().withFallbackNodes(NodeUtils.getNodeByReference(workspace, nodeId));
     }
 
     public AlteringNodeWrapper immutable() {
@@ -186,17 +203,17 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
 
     @Override
     public NodeIterator getNodes() throws RepositoryException {
-        return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes()));
+        return mergeAndFilterNodes(super.getNodes());
     }
 
     @Override
     public NodeIterator getNodes(String namePattern) throws RepositoryException {
-        return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes(namePattern)));
+        return mergeAndFilterNodes(super.getNodes(namePattern));
     }
 
     @Override
     public NodeIterator getNodes(String[] nameGlobs) throws RepositoryException {
-        return new NodeIteratorAdapter(mergeAndFilterNodes(super.getNodes(nameGlobs)));
+        return mergeAndFilterNodes(super.getNodes(nameGlobs));
     }
 
     // TODO: add filter predicate to method (name patterns) and filter custom nodes accordingly
