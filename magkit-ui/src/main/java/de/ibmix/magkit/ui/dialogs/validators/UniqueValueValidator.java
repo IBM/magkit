@@ -24,11 +24,12 @@ import com.vaadin.data.ValidationResult;
 import com.vaadin.data.ValueContext;
 import com.vaadin.data.validator.AbstractValidator;
 import de.ibmix.magkit.core.utils.NodeUtils;
-import de.ibmix.magkit.query.NodeByQuery;
+import de.ibmix.magkit.query.NodesByQuery;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.jcr.Item;
 import javax.jcr.Node;
+import java.util.List;
 
 /**
  * Unique value validator.
@@ -59,9 +60,10 @@ public class UniqueValueValidator extends AbstractValidator<String> {
         final String nodeType = _definition.getNodeType();
         final String propertyName = _definition.getPropertyName();
         if (workspace != null && nodeType != null && propertyName != null) {
-            final Node foundNode = new NodeByQuery(workspace, nodeType, propertyName).apply(value);
             LOGGER.debug("Validate for unique value {} by query [{},{},{}].", value, workspace, nodeType, propertyName);
-            valid = foundNode == null || NodeUtils.getIdentifier(foundNode).equals(NodeUtils.getIdentifier((Node) _itemContext.getSingle().orElse(null)));
+            final List<Node> foundNodes = new NodesByQuery(workspace, nodeType, propertyName).apply(value);
+            final String currentNodeId = NodeUtils.getIdentifier((Node) _itemContext.getSingle().orElse(null));
+            valid = foundNodes.stream().anyMatch(node -> !NodeUtils.getIdentifier(node).equals(currentNodeId));
         }
         return valid;
     }

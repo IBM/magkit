@@ -20,31 +20,39 @@ package de.ibmix.magkit.query;
  * #L%
  */
 
+import de.ibmix.magkit.query.sql2.Sql2;
+import de.ibmix.magkit.query.sql2.condition.Sql2StringCondition;
+import de.ibmix.magkit.query.sql2.statement.Sql2Builder;
+import de.ibmix.magkit.query.sql2.statement.Sql2Statement;
+import info.magnolia.jcr.util.NodeTypes;
+
 import javax.jcr.Node;
 import java.util.List;
 import java.util.function.Function;
 
 /**
- * Retrieves node by query for a property.
+ * Retrieves nodes by query for a property.
  *
  * @author frank.sommer
  * @since 02.02.2024
  */
-public class NodeByQuery implements Function<String, Node> {
+public class NodesByQuery implements Function<String, List<Node>> {
 
     private final String _workspaceName;
     private final String _nodeType;
     private final String _propertyName;
 
-    public NodeByQuery(String workspaceName, String nodeType, String propertyName) {
+    public NodesByQuery(String workspaceName, String nodeType, String propertyName) {
         _workspaceName = workspaceName;
         _nodeType = nodeType;
         _propertyName = propertyName;
     }
 
     @Override
-    public Node apply(String value) {
-        final List<Node> resultNodes = new NodesByQuery(_workspaceName, _nodeType, _propertyName).apply(value);
-        return resultNodes.isEmpty() ? null : resultNodes.get(0);
+    public List<Node> apply(String value) {
+        final Sql2Builder sql2Builder = Sql2Statement.select().from(_nodeType)
+            .whereAll(Sql2StringCondition.property(_propertyName).equalsAny().values(value))
+            .orderBy(NodeTypes.LastModified.NAME);
+        return Sql2.Query.nodesFrom(_workspaceName).withStatement(sql2Builder).withLimit(1).getResultNodes();
     }
 }
