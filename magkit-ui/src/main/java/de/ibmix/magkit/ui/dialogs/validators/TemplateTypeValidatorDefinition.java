@@ -9,9 +9,9 @@ package de.ibmix.magkit.ui.dialogs.validators;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,24 +20,19 @@ package de.ibmix.magkit.ui.dialogs.validators;
  * #L%
  */
 
-import com.vaadin.data.Validator;
-import info.magnolia.ui.field.AbstractFieldValidatorFactory;
-
-import javax.jcr.Node;
+import info.magnolia.ui.field.ValidatorType;
 
 /**
- * Node type validator factory.
+ * Definition for the TemplateTypeValidator.
  *
- * @author ngoc.tran
+ * @author wolf.bubenik@ibmix.de
+ * @since 2024-03-22
  */
-public class NodeTypeValidatorFactory extends AbstractFieldValidatorFactory<NodeTypeValidatorDefinition, Node> {
+@ValidatorType("templateTypeValidator")
+public class TemplateTypeValidatorDefinition extends StringValuesValidatorDefinition {
 
-    public NodeTypeValidatorFactory(NodeTypeValidatorDefinition definition) {
-        super(definition);
-    }
-
-    @Override
-    public Validator<Node> createValidator() {
-        return new NodeTypeValidator(definition);
+    public TemplateTypeValidatorDefinition() {
+        super();
+        setFactoryClass(TemplateTypeValidatorFactory.class);
     }
 }

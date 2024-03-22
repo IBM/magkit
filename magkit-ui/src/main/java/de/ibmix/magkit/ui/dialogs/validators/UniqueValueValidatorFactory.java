@@ -32,17 +32,15 @@ import javax.jcr.Item;
  * @author frank.sommer
  */
 public class UniqueValueValidatorFactory extends AbstractFieldValidatorFactory<UniqueValueValidatorDefinition, String> {
-    private final UniqueValueValidatorDefinition _definition;
     private final ValueContext<Item> _valueContext;
 
     public UniqueValueValidatorFactory(UniqueValueValidatorDefinition definition, ValueContext<Item> valueContext) {
         super(definition);
-        _definition = definition;
         _valueContext = valueContext;
     }
 
     @Override
     public Validator<String> createValidator() {
-        return new UniqueValueValidator(_definition, _valueContext);
+        return new UniqueValueValidator(definition, _valueContext);
     }
 }

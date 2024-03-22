@@ -30,15 +30,13 @@ import info.magnolia.ui.field.AbstractFieldValidatorFactory;
  * @author frank.sommer
  */
 public class MimeTypeValidatorFactory extends AbstractFieldValidatorFactory<MimeTypeValidatorDefinition, Item> {
-    private final MimeTypeValidatorDefinition _definition;
 
     public MimeTypeValidatorFactory(MimeTypeValidatorDefinition definition) {
         super(definition);
-        _definition = definition;
     }
 
     @Override
     public Validator<Item> createValidator() {
-        return new MimeTypeValidator(_definition);
+        return new MimeTypeValidator(definition);
     }
 }
