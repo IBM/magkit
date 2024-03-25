@@ -63,7 +63,7 @@ public class UniqueValueValidator extends AbstractValidator<String> {
             LOGGER.debug("Validate for unique value {} by query [{},{},{}].", value, workspace, nodeType, propertyName);
             final List<Node> foundNodes = new NodesByQuery(workspace, nodeType, propertyName).apply(value);
             final String currentNodeId = NodeUtils.getIdentifier((Node) _itemContext.getSingle().orElse(null));
-            valid = foundNodes.stream().anyMatch(node -> !NodeUtils.getIdentifier(node).equals(currentNodeId));
+            valid = foundNodes.isEmpty() || foundNodes.size() == 1 && currentNodeId.equals(NodeUtils.getIdentifier(foundNodes.get(0)));
         }
         return valid;
     }
