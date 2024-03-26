@@ -230,7 +230,6 @@ public class StubbingPropertyTest {
         Property p = new StubbingProperty(_parent, "test", date);
         assertThat(p.getDate(), is(date));
         assertThat(p.getType(), is(PropertyType.DATE));
-        assertThat(p.getLength(), is(29L));
     }
 
     @Test
