@@ -117,7 +117,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
 
     @Override
     public Version checkin() throws VersionException, UnsupportedRepositoryOperationException, InvalidItemStateException, LockException, RepositoryException {
-        return hasWrappedNode() ? getWrappedNode().checkin(): null;
+        return hasWrappedNode() ? getWrappedNode().checkin() : null;
     }
 
     @Override
@@ -527,16 +527,15 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
 
     @Override
     public boolean isSame(Item otherItem) throws RepositoryException {
-
+        boolean result = false;
         if (this == otherItem) {
-            return true;
-        }
-        if (otherItem instanceof Node) {
-            return hasWrappedNode() 
+            result = true;
+        } else if (otherItem instanceof Node) {
+            result = hasWrappedNode()
                 && getIdentifier().equals(((Node) otherItem).getIdentifier())
                 && getSession().getWorkspace().getName().equals(otherItem.getSession().getWorkspace().getName());
         }
-        return false;
+        return result;
     }
 
     @Override
