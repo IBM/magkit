@@ -58,7 +58,7 @@ public class Sql2ConditionTest {
     @Test
     public void dateCreatedBefore() {
         assertThat(Sql2.Condition.Date.createdBefore(null).asString(), is(""));
-//        assertTrue(Sql2.Condition.Date.createdBefore(getDateZero()).asString().startsWith("[mgnl:created] < cast('1970-01-01T01:00:00"));
+        assertTrue(Sql2.Condition.Date.createdBefore(getDateZero()).asString().startsWith("[mgnl:created] < cast('1970-01-01"));
         assertTrue(Sql2.Condition.Date.createdBefore(getDateZero()).asString().endsWith("' as date)"));
     }
 
