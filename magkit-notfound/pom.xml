@@ -17,12 +17,10 @@
         <dependency>
             <groupId>de.ibmix.magkit</groupId>
             <artifactId>magkit-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>de.ibmix.magkit</groupId>
             <artifactId>magkit-setup</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>info.magnolia.site</groupId>

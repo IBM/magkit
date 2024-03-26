@@ -194,7 +194,7 @@ public final class NodeQueryUtil {
     public static Node findComponentOnPage(final String componentsTemplateName, final String searchRoot) {
         Node componentNode = null;
         List<String> areaRoots = retrieveChildAreas(searchRoot);
-        final NodeIterator componentsIterator = findDescendantComponents(componentsTemplateName, areaRoots.toArray(new String[areaRoots.size()]));
+        final NodeIterator componentsIterator = findDescendantComponents(componentsTemplateName, areaRoots.toArray(new String[0]));
         if (componentsIterator != null && componentsIterator.hasNext()) {
             componentNode = componentsIterator.nextNode();
         }
