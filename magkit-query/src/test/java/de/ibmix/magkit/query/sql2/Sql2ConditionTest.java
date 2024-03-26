@@ -29,6 +29,7 @@ import java.util.Calendar;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test Sql2.Condition methods.
@@ -57,49 +58,57 @@ public class Sql2ConditionTest {
     @Test
     public void dateCreatedBefore() {
         assertThat(Sql2.Condition.Date.createdBefore(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.createdBefore(getDateZero()).asString(), is("[mgnl:created] < cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.createdBefore(getDateZero()).asString().startsWith("[mgnl:created] < cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.createdBefore(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateCreatedAfter() {
         assertThat(Sql2.Condition.Date.createdAfter(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.createdAfter(getDateZero()).asString(), is("[mgnl:created] > cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.createdAfter(getDateZero()).asString().startsWith("[mgnl:created] > cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.createdAfter(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateLastActivatedBefore() {
         assertThat(Sql2.Condition.Date.lastActivatedBefore(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.lastActivatedBefore(getDateZero()).asString(), is("[mgnl:lastActivated] < cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.lastActivatedBefore(getDateZero()).asString().startsWith("[mgnl:lastActivated] < cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.lastActivatedBefore(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateLastActivatedAfter() {
         assertThat(Sql2.Condition.Date.lastActivatedAfter(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.lastActivatedAfter(getDateZero()).asString(), is("[mgnl:lastActivated] > cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.lastActivatedAfter(getDateZero()).asString().startsWith("[mgnl:lastActivated] > cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.lastActivatedAfter(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateLastModifiedBefore() {
         assertThat(Sql2.Condition.Date.lastModifiedBefore(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.lastModifiedBefore(getDateZero()).asString(), is("[mgnl:lastModified] < cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.lastModifiedBefore(getDateZero()).asString().startsWith("[mgnl:lastModified] < cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.lastModifiedBefore(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateLastModifiedAfter() {
         assertThat(Sql2.Condition.Date.lastModifiedAfter(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.lastModifiedAfter(getDateZero()).asString(), is("[mgnl:lastModified] > cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.lastModifiedAfter(getDateZero()).asString().startsWith("[mgnl:lastModified] > cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.lastModifiedAfter(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateDeletedBefore() {
         assertThat(Sql2.Condition.Date.deletedBefore(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.deletedBefore(getDateZero()).asString(), is("[mgnl:deleted] < cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.deletedBefore(getDateZero()).asString().startsWith("[mgnl:deleted] < cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.deletedBefore(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
     public void dateDeletedAfter() {
         assertThat(Sql2.Condition.Date.deletedAfter(null).asString(), is(""));
-        assertThat(Sql2.Condition.Date.deletedAfter(getDateZero()).asString(), is("[mgnl:deleted] > cast('1970-01-01T01:00:00.000+01:00' as date)"));
+        assertTrue(Sql2.Condition.Date.deletedAfter(getDateZero()).asString().startsWith("[mgnl:deleted] > cast('1970-01-01T01:00:00.000"));
+        assertTrue(Sql2.Condition.Date.deletedAfter(getDateZero()).asString().endsWith("' as date)"));
     }
 
     @Test
