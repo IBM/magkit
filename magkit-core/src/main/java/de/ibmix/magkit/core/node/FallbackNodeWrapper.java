@@ -24,6 +24,8 @@ import de.ibmix.magkit.core.utils.NodeUtils;
 import de.ibmix.magkit.core.utils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
+import org.apache.jackrabbit.commons.iterator.PropertyIteratorAdapter;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -31,6 +33,7 @@ import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +44,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
+
+    private static final NodeIterator EMPTY_NODE_ITERATOR = new NodeIteratorAdapter(Collections.emptyList());
+    private static final PropertyIterator EMPTY_PROPERTY_ITERATOR = new PropertyIteratorAdapter(Collections.emptyList());
 
     private List<Node> _fallbackNodes;
     private Predicate<Property> _propertyCondition;
@@ -93,8 +99,8 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
     @Override
     public Node getNode(String relPath) throws RepositoryException {
         Node result = super.getNode(relPath);
-        if (result != null) {
-            result = _fallbackNodes.stream().map(n -> NodeUtils.getChildNode(n, relPath)).filter(Objects::nonNull).findFirst().get();
+        if (result == null) {
+            result = _fallbackNodes.stream().map(n -> NodeUtils.getChildNode(n, relPath)).filter(Objects::nonNull).findFirst().orElse(null);
         }
         return result;
     }
@@ -118,7 +124,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
         NodeIterator result = iteratorFunction.apply(getWrappedNode());
         if (!_iteratorCondition.test(result)) {
             // TODO: Support filtering out hidden nodes by their name
-            result = _fallbackNodes.stream().map(iteratorFunction).filter(_iteratorCondition).findFirst().get();
+            result = _fallbackNodes.stream().map(iteratorFunction).filter(_iteratorCondition).findFirst().orElse(EMPTY_NODE_ITERATOR);
         }
         return result;
     }
@@ -127,7 +133,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
     public Property getProperty(String relPath) throws RepositoryException {
         Property result = getPropertyWithNameFallbacks(getWrappedNode(), relPath);
         if (!_propertyCondition.test(result)) {
-            result = _fallbackNodes.stream().map(n -> getPropertyWithNameFallbacks(n, relPath)).filter(_propertyCondition).findFirst().get();
+            result = _fallbackNodes.stream().map(n -> getPropertyWithNameFallbacks(n, relPath)).filter(_propertyCondition).findFirst().orElse(null);
         }
         return result;
     }
@@ -136,7 +142,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
         Property result = PropertyUtils.getProperty(node, relPath);
         if (!_propertyCondition.test(result) && _propertyNameFallbacks.containsKey(relPath)) {
             String[] fallbackNames = _propertyNameFallbacks.get(relPath);
-            result = Arrays.stream(fallbackNames).map(name -> PropertyUtils.getProperty(node, name)).filter(_propertyCondition).findFirst().get();
+            result = Arrays.stream(fallbackNames).map(name -> PropertyUtils.getProperty(node, name)).filter(_propertyCondition).findFirst().orElse(null);
         }
         return result;
     }
@@ -160,7 +166,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
         PropertyIterator result = iteratorFunction.apply(getWrappedNode());
         if (!_iteratorCondition.test(result)) {
             // TODO: Support filtering out hidden properties by their name
-            result = _fallbackNodes.stream().map(iteratorFunction).filter(_iteratorCondition).findFirst().get();
+            result = _fallbackNodes.stream().map(iteratorFunction).filter(_iteratorCondition).findFirst().orElse(EMPTY_PROPERTY_ITERATOR);
         }
         return result;
     }
