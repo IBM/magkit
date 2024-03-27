@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
-import javax.jcr.RepositoryException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -47,6 +46,7 @@ import static org.apache.commons.lang3.StringUtils.split;
  * Static utility methods for locales (languages).
  *
  * @author jfrantzius
+ * @since 2014-05-14
  */
 public final class LocaleUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocaleUtil.class);
@@ -71,50 +71,59 @@ public final class LocaleUtil {
     /**
      * Cache result of querying Magnolia config (in case Magnolia doesn't).
      */
-    private static List<Locale> c_locales;
+    private static List<Locale> c_defaultSiteLocals;
 
     /**
-     * Return the default site's locales as configured in STK or ETK.
+     * Return the default site's locales as configured.
+     * ! Note that this list is cached as static class constant.
+     * All changes of site configuration after first call of this method will not take effect here.
+     *
+     * @return the list of all configured locals, never null
      */
     public static List<Locale> getSiteLocales() {
-        if (c_locales == null) {
+        if (c_defaultSiteLocals == null) {
             SiteManager siteManager = Components.getComponent(SiteManager.class);
             I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
             if (i18n != null) {
                 Collection<Locale> locales = i18n.getLocales();
-                c_locales = new ArrayList<>(locales);
+                c_defaultSiteLocals = new ArrayList<>(locales);
             }
         }
-        return c_locales;
+        return c_defaultSiteLocals;
+    }
+
+    // introduced for testing. However, caching the locales in a static class field may not be a good idea at all.
+    static void resetDefaultSiteLocals() {
+        c_defaultSiteLocals = null;
     }
 
     /**
-     * Return the default site's default locale.
+     * Return the default site's fallback locale.
+     *
+     * @return the site fallback local or Locale.ENGLISH if non has been configured
      */
     public static Locale getDefaultSiteLocale() {
         SiteManager siteManager = Components.getComponent(SiteManager.class);
         I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
-        return i18n.getFallbackLocale();
+        return i18n != null && i18n.getFallbackLocale() != null ? i18n.getFallbackLocale() : Locale.ENGLISH;
     }
 
     /**
-     * Determines the locale string from content.
+     * Determines the ISO language code from content node path.
+     * Fallback to the default site fallback locale.
+     *
+     * @return the configured language code from node path or the default site language code if non has been found in path
      */
     public static String determineLocaleFromContent(Node node) {
-        String locale = "en";
-        try {
-            String handle = node.getPath();
-            locale = determineLocaleFromPath(handle);
-        } catch (RepositoryException e) {
-            LOGGER.error("Error message.", e);
-        }
-        return locale;
+        String handle = node != null ? getPathIfPossible(node) : EMPTY;
+        String locale = determineLocaleFromPath(handle);
+        return isNotBlank(locale) ? locale : getDefaultSiteLocale().getLanguage();
     }
 
     /**
-     * Determines the locale string from path.
+     * Determines the ISO language code from the node path.
      *
-     * @return null if no locale found in path.
+     * @return the language code or null if no configured locale found in path.
      */
     public static String determineLocaleFromPath(String path) {
         Set<String> configuredLocales = getConfiguredLanguages();
@@ -122,9 +131,9 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the locale label from page node.
+     * Determines the locale label from page node path.
      *
-     * @return empty string if no locale is found for path.
+     * @return the language name or empty string if no locale is found for path.
      */
     public static String determineLocaleLabelFromNodePath(Node page) {
         String label = EMPTY;
@@ -137,8 +146,9 @@ public final class LocaleUtil {
     }
 
     /**
-     * Allow for parallel usage of {MbcContentLanguages} as source of configured locales (languages).
-     * See class comment.
+     * Extract the first ISO language code from the path string, that is a configured site language.
+     *
+     * @return the first language code from the string or null if not found
      */
     public static String determineLanguage(String handle, Collection<String> configuredLocales) {
         String localeString = null;
@@ -156,7 +166,7 @@ public final class LocaleUtil {
     /**
      * List of all available countries, sorted by name.
      *
-     * @return list of countries (countryCode, countryName)
+     * @return Map of countries and their names (countryName, countryCode)
      */
     public static Map<String, String> getAvailableCountries() {
         Locale[] locales = Locale.getAvailableLocales();

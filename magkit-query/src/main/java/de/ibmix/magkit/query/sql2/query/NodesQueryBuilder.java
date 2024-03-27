@@ -28,8 +28,8 @@ import java.util.List;
 /**
  * The NodesQueryBuilder interface declaring methods for the last step: building and executing.
  *
- * @author wolf.bubenik@aperto.com
- * @since (27.04.20)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-27
  */
 public interface NodesQueryBuilder extends QueryLimit<NodesQueryBuilder> {
     NodesQuery buildNodesQuery();

@@ -46,7 +46,7 @@ import static org.apache.commons.lang3.math.NumberUtils.toInt;
  *
  * @author frank.sommer (29.05.2008)
  */
-public final class SelectorUtils {
+public abstract class SelectorUtils {
     public static final int DEF_PAGE = 1;
     public static final String SELECTOR_PRINT = "print";
     public static final String SELECTOR_PAGING = "pid";
@@ -143,7 +143,7 @@ public final class SelectorUtils {
             String[] selectors = split(selectorString, SELECTOR_DELIMITER);
             List<String> newSelectors = createNewSelectors(id, encodedSelectorValue, selectors, notAllowedSelectors);
 
-            result = join(new String[]{path, SELECTOR_DELIMITER, join(newSelectors, SELECTOR_DELIMITER), SELECTOR_DELIMITER, ".", extension});
+            result = join(path, SELECTOR_DELIMITER, join(newSelectors, SELECTOR_DELIMITER), SELECTOR_DELIMITER, ".", extension);
             if (isNotEmpty(query)) {
                 result += "?" + query;
             }
@@ -171,8 +171,5 @@ public final class SelectorUtils {
             newSelectors.add(id + "=" + encodedSelectorValue);
         }
         return newSelectors;
-    }
-
-    private SelectorUtils() {
     }
 }

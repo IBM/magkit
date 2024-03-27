@@ -25,8 +25,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 /**
  * Builder class for long property conditions.
  *
- * @author wolf.bubenik@aperto.com
- * @since 08.04.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-08
  */
 public final class Sql2LongCondition extends Sql2PropertyCondition<Sql2LongCondition, Long> {
 

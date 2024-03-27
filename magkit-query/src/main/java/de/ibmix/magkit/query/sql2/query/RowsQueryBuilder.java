@@ -28,8 +28,8 @@ import java.util.List;
 /**
  * The RowsQueryBuilder interface declaring methods for the last building step.
  *
- * @author wolf.bubenik@aperto.com
- * @since (27.04.20)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-27
  */
 public interface RowsQueryBuilder extends QueryLimit<RowsQueryBuilder> {
     RowsQuery buildRowsQuery();

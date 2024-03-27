@@ -25,8 +25,8 @@ import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 /**
  * Base builder interface for all constraints.
  *
- * @author wolf.bubenik@aperto.com
- * @since 28.02.20
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-02-28
  **/
 public interface Sql2Constraint {
     String SQL2_OP_OR = " OR ";

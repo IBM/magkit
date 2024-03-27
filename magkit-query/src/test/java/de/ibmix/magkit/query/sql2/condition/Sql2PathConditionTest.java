@@ -34,7 +34,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Test Sql2PathCondition.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since 01.04.2020
  */
 public class Sql2PathConditionTest {

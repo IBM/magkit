@@ -24,8 +24,8 @@ package de.ibmix.magkit.query.sql2.condition;
  * The generic interface for property constraints.
  * Excluding not(). To be used when not() has been called.
  *
- * @author wolf.bubenik@aperto.com
- * @since 11.11.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-11-11
  */
 public interface Sql2NameCompare {
     Sql2NameOperandSingle lowerThan();

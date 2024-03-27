@@ -25,8 +25,8 @@ import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 /**
  * Builder for SQL2 join conditions on path. To be used for joins only.
  *
- * @author wolf.bubenik@aperto.com
- * @since (18.05.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-05-18
  */
 public final class Sql2PathJoinCondition implements Sql2JoinCondition {
 

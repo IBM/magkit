@@ -32,8 +32,8 @@ import static org.apache.commons.lang3.StringUtils.trim;
 /**
  * The builder for a sql2 path condition.
  *
- * @author wolf.bubenik@aperto.com
- * @since 01.04.2020
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-04-01
  **/
 public final class Sql2PathCondition implements Sql2JoinConstraint {
 

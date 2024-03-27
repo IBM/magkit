@@ -20,111 +20,227 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
+import de.ibmix.magkit.core.utils.NodeUtils;
+import de.ibmix.magkit.core.utils.PropertyUtils;
 import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
+import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
+import org.apache.jackrabbit.commons.iterator.PropertyIteratorAdapter;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 /**
- * A read-only NodeWrapper that allows to override properties as desired by the user.
+ * A NodeWrapper that allows to override properties and child nodes as desired by the user.
  *
- * @author wolf
+ * @author wolf.bubenik@ibmix.de
+ * @since 2019-05-19
  */
-public class AlteringNodeWrapper extends DelegateNodeWrapper {
-    private Map<String, Property> _overrides;
-    private Map<String, String> _mapped;
-    private Node _nodeToWrap;
+public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
+    private final Map<String, Property> _properties;
+    private final Map<String, Node> _childNodes;
+    private final Set<String> _hiddenProperties;
+    private final Set<String> _hiddenChildNodes;
+
+
 
     public AlteringNodeWrapper(Node nodeToWrap) {
         super(nodeToWrap);
-        notNull(nodeToWrap, "The wrapped node must not be null, please.");
-        _overrides = new HashMap<>();
-        _mapped = new HashMap<>();
-        _nodeToWrap = nodeToWrap;
+        notNull(nodeToWrap);
+        _properties = new LinkedHashMap<>();
+        _childNodes = new LinkedHashMap<>();
+        _hiddenProperties = new HashSet<>();
+        _hiddenChildNodes = new HashSet<>();
     }
 
-    protected Node getNodeToWrap() {
-        return _nodeToWrap;
+    public AlteringNodeWrapper(String name, String primaryNodeType) {
+        super(name, primaryNodeType);
+        _properties = new LinkedHashMap<>();
+        _childNodes = new LinkedHashMap<>();
+        _hiddenProperties = new HashSet<>();
+        _hiddenChildNodes = new HashSet<>();
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withMappedProperty(String destName, String sourceName) {
-        notEmpty(destName);
-        notEmpty(sourceName);
-        _mapped.put(destName, sourceName);
-        return (R) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, String... value) {
+    public AlteringNodeWrapper withProperty(String name, String... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Boolean... value) {
+    public AlteringNodeWrapper withProperty(String name, Boolean... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Long... value) {
+    public AlteringNodeWrapper withProperty(String name, Long... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Double... value) {
+    public AlteringNodeWrapper withProperty(String name, Double... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <R extends AlteringNodeWrapper> R withProperty(String name, Calendar... value) {
+    public AlteringNodeWrapper withProperty(String name, Calendar... value) {
         notEmpty(name);
-        StubbingProperty property = new StubbingProperty(_nodeToWrap, name, value);
-        _overrides.put(name, property);
-        return (R) this;
+        StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
+        _properties.put(name, property);
+        return this;
     }
 
-    public <R extends AlteringNodeWrapper> R withTemplate(String templateId) {
+    public AlteringNodeWrapper withTemplate(String templateId) {
         notEmpty(templateId);
         return withProperty(NodeTypes.Renderable.TEMPLATE, templateId);
     }
 
+    public AlteringNodeWrapper withHiddenProperty(String... names) {
+        notEmpty(names);
+        Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenProperties::add);
+        return this;
+    }
+
+    public AlteringNodeWrapper withChildNode(String name, Node childNode) {
+        notEmpty(name);
+        notNull(childNode);
+        _childNodes.put(name, new DefineParentNodeWrapper(this, childNode));
+        return this;
+    }
+
+    public AlteringNodeWrapper withHiddenNode(String... names) {
+        notEmpty(names);
+        Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenChildNodes::add);
+        return this;
+    }
+
+    public FallbackNodeWrapper withFallback() {
+        FallbackNodeWrapper result = new FallbackNodeWrapper(getWrappedNode());
+        setWrappedNode(result);
+        return result;
+    }
+
+    public FallbackNodeWrapper withFallbackToPage() {
+        return withFallbackToAncestor(NodeUtils.IS_PAGE);
+    }
+
+    public FallbackNodeWrapper withFallbackToAncestor(final Predicate<Node> ancestorPredicate) {
+        Node fallbackNode = NodeUtils.getAncestorOrSelf(getWrappedNode(), ancestorPredicate);
+        return withFallback().withFallbackNodes(fallbackNode);
+    }
+
+    public FallbackNodeWrapper withFallbackToReference(final String workspace, final String linkPropertyName) {
+        String nodeId = PropertyUtils.getStringValue(getWrappedNode(), linkPropertyName);
+        return withFallback().withFallbackNodes(NodeUtils.getNodeByReference(workspace, nodeId));
+    }
+
+    public AlteringNodeWrapper immutable() {
+        setWrappedNode(new ImmutableNodeWrapper(getWrappedNode()));
+        return this;
+    }
+
     @Override
     public Property getProperty(String relPath) throws RepositoryException {
-        String key = getKey(relPath);
-        Property result = _overrides.get(key);
-        if (result == null) {
-            result = super.getProperty(key);
+        Property result = null;
+        if (!_hiddenProperties.contains(relPath)) {
+            result = _properties.getOrDefault(relPath, super.getProperty(relPath));
         }
         return result;
     }
 
     @Override
     public boolean hasProperty(String relPath) throws RepositoryException {
-        String key = getKey(relPath);
-        return _overrides.containsKey(key) || super.hasProperty(key);
+        return !_hiddenProperties.contains(relPath) && (_properties.containsKey(relPath) || super.hasProperty(relPath));
     }
 
-    private String getKey(String relPath) {
-        return _mapped.getOrDefault(relPath, relPath);
+    @Override
+    public boolean hasNode(String relPath) throws RepositoryException {
+        return !_hiddenChildNodes.contains(relPath) && (_childNodes.containsKey(relPath) || super.hasNode(relPath));
     }
+
+    @Override
+    public Node getNode(String relPath) throws RepositoryException {
+        Node result = null;
+        if (!_hiddenChildNodes.contains(relPath)) {
+            result = _childNodes.getOrDefault(relPath, super.getNode(relPath));
+        }
+        return result;
+    }
+
+    @Override
+    public PropertyIterator getProperties() throws RepositoryException {
+        return mergeAndFilterProperties(super.getProperties());
+    }
+
+    @Override
+    public PropertyIterator getProperties(String namePattern) throws RepositoryException {
+        return mergeAndFilterProperties(super.getProperties(namePattern));
+    }
+
+    @Override
+    public PropertyIterator getProperties(String[] nameGlobs) throws RepositoryException {
+        return mergeAndFilterProperties(super.getProperties(nameGlobs));
+    }
+
+    @Override
+    public NodeIterator getNodes() throws RepositoryException {
+        return mergeAndFilterNodes(super.getNodes());
+    }
+
+    @Override
+    public NodeIterator getNodes(String namePattern) throws RepositoryException {
+        return mergeAndFilterNodes(super.getNodes(namePattern));
+    }
+
+    @Override
+    public NodeIterator getNodes(String[] nameGlobs) throws RepositoryException {
+        return mergeAndFilterNodes(super.getNodes(nameGlobs));
+    }
+
+    // TODO: add filter predicate to method (name patterns) and filter custom nodes accordingly
+    private NodeIterator mergeAndFilterNodes(NodeIterator nodes) throws RepositoryException {
+        Map<String, Node> mergedNodes = new LinkedHashMap<>();
+        while (nodes.hasNext()) {
+            Node n = nodes.nextNode();
+            if (!_hiddenChildNodes.contains(n.getName())) {
+                mergedNodes.put(n.getName(), n);
+            }
+        }
+
+        mergedNodes.putAll(_childNodes);
+        return new NodeIteratorAdapter(mergedNodes.values());
+    }
+
+    // TODO: add filter predicate to method (name patterns) and filter custom properties accordingly
+    private PropertyIterator mergeAndFilterProperties(final PropertyIterator properties) throws RepositoryException {
+        Map<String, Property> nodeProperties = new LinkedHashMap<>();
+        while (properties.hasNext()) {
+            Property property = properties.nextProperty();
+            if (!_hiddenProperties.contains(property.getName())) {
+                nodeProperties.put(property.getName(), property);
+            }
+        }
+        nodeProperties.putAll(_properties);
+        return new PropertyIteratorAdapter(nodeProperties.values());
+    }
+
 }

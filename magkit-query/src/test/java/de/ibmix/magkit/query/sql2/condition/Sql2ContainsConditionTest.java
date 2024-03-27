@@ -30,7 +30,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Test Sql2ContainsCondition.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since 3.5.2 (05.01.21)
  */
 public class Sql2ContainsConditionTest {

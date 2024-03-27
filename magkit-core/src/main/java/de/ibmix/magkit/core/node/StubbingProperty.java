@@ -20,10 +20,13 @@ package de.ibmix.magkit.core.node;
  * #L%
  */
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.jackrabbit.value.BaseValue;
+import org.apache.jackrabbit.value.BinaryValue;
 import org.apache.jackrabbit.value.BooleanValue;
 import org.apache.jackrabbit.value.DateValue;
+import org.apache.jackrabbit.value.DecimalValue;
 import org.apache.jackrabbit.value.DoubleValue;
 import org.apache.jackrabbit.value.LongValue;
 import org.apache.jackrabbit.value.ReferenceValue;
@@ -36,6 +39,7 @@ import javax.jcr.Item;
 import javax.jcr.ItemVisitor;
 import javax.jcr.Node;
 import javax.jcr.Property;
+import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
@@ -57,14 +61,18 @@ public class StubbingProperty implements Property {
 
     private Value _value;
     private Value[] _values;
-    private String _name;
-    private Node _parent;
+    private Node _nodeValue;
+    private Node[] _nodeValues;
+    private final String _name;
+    private final Node _parent;
 
     public StubbingProperty(Node parent, String name, Node... values) {
         this(parent, name);
         try {
             if (values != null && values.length > 0) {
                 _value = new ReferenceValue(values[0]);
+                _nodeValue = values[0];
+                _nodeValues = values;
                 _values = new Value[values.length];
                 for (int i = 0; i < values.length; i++) {
                     _values[i] = new ReferenceValue(values[i]);
@@ -98,6 +106,16 @@ public class StubbingProperty implements Property {
     public StubbingProperty(Node parent, String name, String... values) {
         this(parent, name);
         init(values, StringValue::new);
+    }
+
+    public StubbingProperty(Node parent, String name, Binary... values) {
+        this(parent, name);
+        init(values, BinaryValue::new);
+    }
+
+    public StubbingProperty(Node parent, String name, BigDecimal... values) {
+        this(parent, name);
+        init(values, DecimalValue::new);
     }
 
     private <T, R extends BaseValue> void init(T[] values, Function<T, R> toValue) {
@@ -228,22 +246,26 @@ public class StubbingProperty implements Property {
 
     @Override
     public Node getNode() throws RepositoryException {
-        return null;
+        return _nodeValue;
+    }
+
+    public Node[] getNodes() {
+        return _nodeValues;
     }
 
     @Override
     public Property getProperty() throws RepositoryException {
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public long getLength() throws RepositoryException {
-        return 0L;
+        return getType() == PropertyType.BINARY ? getBinary().getSize() : getString().length();
     }
 
     @Override
     public long[] getLengths() throws RepositoryException {
-        return new long[0];
+        throw new NotImplementedException();
     }
 
     @Override
@@ -273,7 +295,15 @@ public class StubbingProperty implements Property {
 
     @Override
     public Item getAncestor(int depth) throws RepositoryException {
-        return null;
+        Item result = null;
+        if (depth > getDepth()) {
+            result = null;
+        } else if (depth == getDepth()) {
+            result = this;
+        } else if (depth >= 0) {
+            result = _parent.getAncestor(depth);
+        }
+        return result;
     }
 
     @Override
@@ -308,7 +338,7 @@ public class StubbingProperty implements Property {
 
     @Override
     public boolean isSame(Item otherItem) throws RepositoryException {
-        return false;
+        return otherItem instanceof StubbingProperty && getValue().equals(((StubbingProperty) otherItem).getValue());
     }
 
     @Override

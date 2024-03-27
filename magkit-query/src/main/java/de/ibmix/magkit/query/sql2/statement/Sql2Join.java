@@ -23,8 +23,8 @@ package de.ibmix.magkit.query.sql2.statement;
 /**
  * TODO: Comment.
  *
- * @author wolf.bubenik@aperto.com
- * @since (15.05.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-05-15
  */
 public interface Sql2Join extends Sql2Where {
     Sql2JoinAs innerJoin(String nodeType);

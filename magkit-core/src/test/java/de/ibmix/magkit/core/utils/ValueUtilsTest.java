@@ -167,6 +167,15 @@ public class ValueUtilsTest {
     }
 
     @Test
+    public void valueToBinary1() throws Exception {
+        assertThat(ValueUtils.valueToBinary(null), nullValue());
+        assertThat(ValueUtils.valueToBinary(mockValue((Binary) null)), nullValue());
+
+        Binary b = mockBinary("test");
+        assertThat(ValueUtils.valueToBinary(mockValue(b)), is(b));
+    }
+
+    @Test
     public void valueToBigDecimal() throws Exception {
         assertThat(ValueUtils.valueToBigDecimal(null, BigDecimal.TEN), is(BigDecimal.TEN));
         assertThat(ValueUtils.valueToBigDecimal(mockValue(0L), BigDecimal.TEN), is(BigDecimal.ZERO));

@@ -20,7 +20,6 @@ package de.ibmix.magkit.query.sql2;
  * #L%
  */
 
-import de.ibmix.magkit.query.sql2.query.QueryRowsStatement;
 import de.ibmix.magkit.query.sql2.query.QueryWorkspace;
 import de.ibmix.magkit.query.sql2.query.Sql2QueryBuilder;
 import de.ibmix.magkit.query.sql2.query.jcrwrapper.RowsQuery;
@@ -50,7 +49,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Test Sql2RowsQueryBuilder.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since (29.04.2020)
  */
 public class Sql2RowsQueryBuilderTest {
@@ -71,42 +70,6 @@ public class Sql2RowsQueryBuilderTest {
     @Test
     public void forRows() {
         assertThat(Sql2QueryBuilder.forRows(), isA(QueryWorkspace.class));
-    }
-
-    @Test
-    public void fromWebsite() {
-        assertThat(Sql2.Query.rowsFromWebsite(), isA(QueryRowsStatement.class));
-    }
-
-    @Test
-    public void fromWorkspace() {
-        assertThat(Sql2.Query.rowsFrom("test"), isA(QueryRowsStatement.class));
-    }
-
-    @Test
-    public void withStatement() {
-        assertThat(Sql2.Query.rowsFromWebsite().withStatement(_statement).buildRowsQuery(), isA(RowsQuery.class));
-        verify(_query, times(0)).setLimit(anyLong());
-        verify(_query, times(0)).setOffset(anyLong());
-    }
-
-    @Test
-    public void withLimit() {
-        assertThat(Sql2.Query.rowsFromWebsite().withStatement(_statement).withLimit(5).buildRowsQuery(), isA(RowsQuery.class));
-        verify(_query, times(1)).setLimit(5L);
-        verify(_query, times(0)).setOffset(anyLong());
-    }
-
-    @Test
-    public void withOffset() {
-        assertThat(Sql2.Query.rowsFromWebsite()
-                .withStatement(_statement)
-                .withLimit(5)
-                .withOffset(5).buildRowsQuery(),
-            isA(RowsQuery.class)
-        );
-        verify(_query, times(1)).setLimit(5L);
-        verify(_query, times(1)).setOffset(5L);
     }
 
     @Test

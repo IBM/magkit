@@ -32,6 +32,7 @@ import static info.magnolia.context.MgnlContext.getJCRSession;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 /**
@@ -57,7 +58,9 @@ public class TemplateNameVoter extends BasePatternVoter {
      * @param template the template name as String.
      */
     public void addTemplate(String template) {
-        _templates = (String[]) ArrayUtils.add(_templates, template);
+        if (isNotBlank(template)) {
+            _templates = ArrayUtils.add(_templates, template.trim());
+        }
     }
 
     public String[] getTemplates() {
@@ -80,16 +83,18 @@ public class TemplateNameVoter extends BasePatternVoter {
 
     private String getTargetTemplateName(Object value) {
         String template = EMPTY;
-        String uri = resolveURIFromValue(value);
-        // skip expensive content lookup if URI is not of interest, e.g. ressource URI...
-        if (isBlank(_rootPath) || uri.startsWith(_rootPath)) {
-            String path = substringBeforeLast(uri, ".");
-            try {
-                Session session = getJCRSession(WEBSITE);
-                Node node = session.getNode(path);
-                template = NodeUtils.getTemplate(node);
-            } catch (RepositoryException e) {
-                // ignore, use empty string
+        if (value != null) {
+            String uri = resolveURIFromValue(value);
+            // skip expensive content lookup if URI is not of interest, e.g. ressource URI...
+            if (isBlank(_rootPath) || uri.startsWith(_rootPath)) {
+                String path = substringBeforeLast(uri, ".");
+                try {
+                    Session session = getJCRSession(WEBSITE);
+                    Node node = session.getNode(path);
+                    template = NodeUtils.getTemplate(node);
+                } catch (RepositoryException e) {
+                    // ignore, use empty string
+                }
             }
         }
         return template;

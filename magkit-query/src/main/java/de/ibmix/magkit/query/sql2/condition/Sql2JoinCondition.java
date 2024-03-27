@@ -25,8 +25,8 @@ import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 /**
  * The base interface for join conditions.
  *
- * @author wolf.bubenik@aperto.com
- * @since (18.05.2020)
+ * @author wolf.bubenik@ibmix.de
+ * @since 2020-05-18
  */
 public interface Sql2JoinCondition {
     void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames);

@@ -20,7 +20,9 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
+import de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils;
 import de.ibmix.magkit.test.cms.templating.TemplateDefinitionStubbingOperation;
+import de.ibmix.magkit.test.jcr.NodeStubbingOperation;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.repository.RepositoryConstants;
 import org.junit.After;
@@ -215,6 +217,32 @@ public class NodeUtilsTest {
         assertThat(NodeUtils.getName(null), nullValue());
         final Node node = mockNode("node");
         assertThat(NodeUtils.getName(node), equalTo("node"));
+    }
+
+    @Test
+    public void getNodeByIdentifier() throws RepositoryException {
+        Node expected = MagnoliaNodeMockUtils.mockPageNode("test", stubIdentifier("123"));
+        assertThat(NodeUtils.getNodeByIdentifier(null), nullValue());
+        assertThat(NodeUtils.getNodeByIdentifier(EMPTY), nullValue());
+        assertThat(NodeUtils.getNodeByIdentifier("456"), nullValue());
+        assertThat(NodeUtils.getNodeByIdentifier("123"), is(expected));
+    }
+
+    @Test
+    public void getChildAssetNodes() throws RepositoryException {
+        final Node test = mockNode("node");
+        assertThat(NodeUtils.getChildAssetNodes(null).size(), is(0));
+        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(0));
+
+        MagnoliaNodeMockUtils.mockComponentNode("node/component");
+        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(0));
+
+        final Node asset = mockNode("node/asset1", NodeStubbingOperation.stubType("mgnl:asset"));
+        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(1));
+        assertThat(NodeUtils.getChildAssetNodes(test).get(0), is(asset));
+
+        mockNode("node/asset2", NodeStubbingOperation.stubType("mgnl:asset"));
+        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(2));
     }
 
     @After

@@ -29,7 +29,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Test Sql2StringCondition.
  *
- * @author wolf.bubenik@aperto.com
+ * @author wolf.bubenik@ibmix.de
  * @since 02.04.2020
  */
 public class Sql2StringConditionTest {
