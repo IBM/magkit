@@ -55,6 +55,8 @@ public abstract class SelectorUtils {
 
     /**
      * Checks, if a print selector is given.
+     *
+     * @return true if print selector found
      */
     public static boolean isPrintView() {
         return selectorContains(SELECTOR_PRINT, false);
@@ -62,6 +64,8 @@ public abstract class SelectorUtils {
 
     /**
      * Checks a paging selector is given.
+     *
+     * @return true if paging selector found
      */
     public static boolean isPagingView() {
         return selectorContains(SELECTOR_PAGING, true);
@@ -87,6 +91,7 @@ public abstract class SelectorUtils {
      *
      * @param search     search term
      * @param startsWith selector starts only with search term
+     * @return true if selector contains search
      */
     public static boolean selectorContains(String search, boolean startsWith) {
         boolean contains = false;
@@ -112,7 +117,7 @@ public abstract class SelectorUtils {
      * Not allowed selectors are removed.
      *
      * @param url                 url to manipulate
-     * @param id                  Id of the selector, e.g. 'pid'
+     * @param id                  id of the selector, e.g. 'pid'
      * @param value               Value of the selector id
      * @param notAllowedSelectors array of not allowed selector ids
      * @return url with updated selectors or empty string if url is null or empty

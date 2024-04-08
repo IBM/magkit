@@ -115,6 +115,9 @@ public class ExtendedTextField extends CustomField<String> {
 
     /**
      * Update the label.
+     *
+     * @param inputValue      input value
+     * @param availableLength available length
      */
     public void updateRemainingLength(int inputValue, int availableLength) {
         getRemainingLength().setValue(availableLength - inputValue + "/" + availableLength);

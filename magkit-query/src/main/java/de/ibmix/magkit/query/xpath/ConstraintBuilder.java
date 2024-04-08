@@ -36,6 +36,7 @@ public class ConstraintBuilder {
 
     /**
      * Creates a new {@link ConstraintBuilder} instance.
+     *
      * @return an instance of ConstraintBuilder
      */
     public static ConstraintBuilder constraintBuilder() {
@@ -56,6 +57,7 @@ public class ConstraintBuilder {
      * Open a group of constraints within parentheses and a {@link Operator} in front. One should call
      * <code>closeGroup()</code> before calling <code>build()</code>, otherwise the constraint is not valid.
      *
+     * @param operator operator
      * @return the {@link ConstraintBuilder}
      */
     public ConstraintBuilder openGroup(final Operator operator) {

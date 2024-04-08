@@ -89,6 +89,8 @@ public final class NodeUtils {
     /**
      * Gets a node by identifier from website workspace.
      *
+     * @param identifier node identifier
+     * @return node for identifier
      * @see #getNodeByIdentifier(String, String)
      */
     public static Node getNodeByIdentifier(String identifier) {
@@ -99,6 +101,9 @@ public final class NodeUtils {
      * Gets a node by identifier from given workspace.
      * Catch the exception from magnolia NodeUtil.
      *
+     * @param workspace  workspace name
+     * @param identifier node identifier
+     * @return node for identifier
      * @see NodeUtil#getNodeByIdentifier(String, String)
      */
     public static Node getNodeByIdentifier(final String workspace, final String identifier) {
@@ -324,6 +329,9 @@ public final class NodeUtils {
 
     /**
      * Null safe call of {@link Node#getName()}.
+     *
+     * @param node jcr node
+     * @return name of the node or null
      */
     public static String getName(@Nullable final Node node) {
         String name = null;
@@ -341,6 +349,9 @@ public final class NodeUtils {
 
     /**
      * Null safe call of {@link Node#getIdentifier()}.
+     *
+     * @param node jcr node
+     * @return identifier of the node or null
      */
     public static String getIdentifier(@Nullable final Node node) {
         String identifier = null;
@@ -358,6 +369,9 @@ public final class NodeUtils {
 
     /**
      * Null safe call of {@link Node#getPath()}.
+     *
+     * @param node jcr node
+     * @return path of the node or null
      */
     public static String getPath(@Nullable final Node node) {
         String path = null;

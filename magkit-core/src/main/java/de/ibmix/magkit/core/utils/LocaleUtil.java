@@ -58,6 +58,8 @@ public final class LocaleUtil {
     /**
      * Builds a list with all i18n locales (languages) configured in magnolia,
      * i.e. the default site's locales.
+     *
+     * @return configured languages
      */
     public static Set<String> getConfiguredLanguages() {
         Collection<Locale> locales = getSiteLocales();
@@ -112,6 +114,7 @@ public final class LocaleUtil {
      * Determines the ISO language code from content node path.
      * Fallback to the default site fallback locale.
      *
+     * @param node  current jcr node
      * @return the configured language code from node path or the default site language code if non has been found in path
      */
     public static String determineLocaleFromContent(Node node) {
@@ -123,6 +126,7 @@ public final class LocaleUtil {
     /**
      * Determines the ISO language code from the node path.
      *
+     * @param path current path
      * @return the language code or null if no configured locale found in path.
      */
     public static String determineLocaleFromPath(String path) {
@@ -133,6 +137,7 @@ public final class LocaleUtil {
     /**
      * Determines the locale label from page node path.
      *
+     * @param page current page node
      * @return the language name or empty string if no locale is found for path.
      */
     public static String determineLocaleLabelFromNodePath(Node page) {
@@ -148,14 +153,16 @@ public final class LocaleUtil {
     /**
      * Extract the first ISO language code from the path string, that is a configured site language.
      *
+     * @param path current node path
+     * @param locales list of locale strings
      * @return the first language code from the string or null if not found
      */
-    public static String determineLanguage(String handle, Collection<String> configuredLocales) {
+    public static String determineLanguage(String path, Collection<String> locales) {
         String localeString = null;
-        String[] pathElements = split(handle, '/');
+        String[] pathElements = split(path, '/');
 
         for (String pathPart : pathElements) {
-            if (configuredLocales.contains(pathPart)) {
+            if (locales.contains(pathPart)) {
                 localeString = pathPart;
                 break;
             }

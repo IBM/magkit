@@ -35,6 +35,7 @@ public class NavigationItem extends Item {
 
     /**
      * Accessor for the list of subitems. Default is NULL.
+     *
      * @return A java.util.List&lt;NavigationItem&gt; or NULL if not set.
      */
     public List<NavigationItem> getSubItems() {
@@ -54,6 +55,9 @@ public class NavigationItem extends Item {
 
     /**
      * Constructor.
+     *
+     * @param key   key
+     * @param value value
      */
     public NavigationItem(String key, String value) {
         super(key, value);
@@ -61,6 +65,10 @@ public class NavigationItem extends Item {
 
     /**
      * Constructor.
+     *
+     * @param key      key
+     * @param value    value
+     * @param subItems sub items
      */
     public NavigationItem(String key, String value, List<NavigationItem> subItems) {
         super(key, value);
@@ -69,6 +77,8 @@ public class NavigationItem extends Item {
 
     /**
      * True, if the item has sub items.
+     *
+     * @return has sub items
      */
     public boolean hasSubItems() {
         return !CollectionUtils.isEmpty(_subItems);
@@ -76,7 +86,8 @@ public class NavigationItem extends Item {
 
     /**
      * Flag, if the item should be rendered as selected Item. Default is 'false'.
-     * @return True, if marked as selected.
+     *
+     * @return true, if marked as selected.
      */
     public boolean isSelected() {
         return _selected;
@@ -84,6 +95,8 @@ public class NavigationItem extends Item {
 
     /**
      * Flag, if the item should be rendered as selected Item. Default is 'false'.
+     *
+     * @param selected selected
      */
     public void setSelected(boolean selected) {
         _selected = selected;

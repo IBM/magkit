@@ -35,14 +35,14 @@ import static info.magnolia.ui.workbench.column.StatusColumnFormatter.Activation
 import static info.magnolia.ui.workbench.column.StatusColumnFormatter.ActivationStatus.NOT_ACTIVATED;
 
 /**
- * A status label that is sortable by its style in the order activated -> modified -> not activated.
+ * A status label that is sortable by its style in the order activated -&gt; modified -&gt; not activated.
  *
  * @author wolf.bubenik
  * @since 25.01.18.
  */
 public class ComparableStatusLabel extends Label implements Comparable<Label> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ComparableStatusLabel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComparableStatusLabel.class);
 
     private final String _label;
 
@@ -69,7 +69,7 @@ public class ComparableStatusLabel extends Label implements Comparable<Label> {
         try {
             activationStatus = NodeTypes.Activatable.getActivationStatus(node);
         } catch (RepositoryException e) {
-            LOG.error("Error on getting status of node [{}]", getNodePathIfPossible(node), e);
+            LOGGER.error("Error on getting status of node [{}]", getNodePathIfPossible(node), e);
         }
         return activationStatus;
     }

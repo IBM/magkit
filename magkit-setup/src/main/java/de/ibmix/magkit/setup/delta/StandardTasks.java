@@ -115,6 +115,10 @@ public final class StandardTasks {
 
     /**
      * Compares the versions and the revision classifier. If the version numbers are equal, a different classifier should trigger a module update.
+     *
+     * @param fromVersion from version
+     * @param toVersion to version
+     * @return true, if version classifier is different
      */
     public static boolean hasModuleNewRevision(final Version fromVersion, final Version toVersion) {
         boolean triggerUpdate = false;

@@ -26,9 +26,9 @@ import info.magnolia.module.InstallContext;
 /**
  * An ErrorHandler which logs handled errors to the InstallContext
  * as warnings, and wraps unhandled exceptions in NodeOperationException.
- * @see info.magnolia.nodebuilder.task.TaskLogErrorHandler
  *
  * @author frank.sommer
+ * @see info.magnolia.jcr.nodebuilder.task.TaskLogErrorHandler
  */
 public class TaskLogErrorHandler extends AbstractErrorHandler {
     private final InstallContext _installCtx;

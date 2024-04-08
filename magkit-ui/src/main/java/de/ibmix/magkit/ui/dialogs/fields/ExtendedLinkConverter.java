@@ -41,13 +41,13 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 /**
- * Handles input of links by urls (external) or absolute paths (internal) with additional selector, anchor or parameters.<br/>
- * Used in your page link fields:<br/>
+ * Handles input of links by urls (external) or absolute paths (internal) with additional selector, anchor or parameters.<br>
+ * Used in your page link fields:<br>
  * <code>
- * $type: pageLinkField<br/>
- * textInputAllowed: true<br/>
- * converterClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkConverter<br/>
- * fieldBinderClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkBinder<br/>
+ * $type: pageLinkField<br>
+ * textInputAllowed: true<br>
+ * converterClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkConverter<br>
+ * fieldBinderClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkBinder<br>
  * </code>
  *
  * @author frank.sommer

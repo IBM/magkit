@@ -32,7 +32,7 @@ import javax.jcr.query.Query;
 import java.util.Calendar;
 
 /**
- * Base wrapper wrapper for javax.jcr.query.Query to separate Row and Node queries.
+ * Base wrapper for javax.jcr.query.Query to separate Row and Node queries.
  * Provides methods to bind values to statement variables.
  *
  * @param <T> The type of QueryWrapper to be returned by builder methods
@@ -56,6 +56,7 @@ public abstract class QueryWrapper<T extends QueryWrapper> {
      *
      * @param varName name of variable in query
      * @param value   value to bind
+     * @return this
      * @throws IllegalArgumentException      if <code>varName</code> is not a valid
      *                                       variable in this query.
      * @throws javax.jcr.RepositoryException if an error occurs.
@@ -88,7 +89,7 @@ public abstract class QueryWrapper<T extends QueryWrapper> {
 
     /**
      * Returns the names of the bind variables in this query. If this query does
-     * not contains any bind variables then an empty array is returned.
+     * not contain any bind variables then an empty array is returned.
      *
      * @return the names of the bind variables in this query.
      * @throws RepositoryException if an error occurs.

@@ -82,7 +82,7 @@ public final class PropertyUtils {
      * Save call on node.getProperty(String).
      * We skip checking if the Property exists and catch the Exception to avoid fetching the Property twice.
      *
-     * @param node the node to read the Property from. May be NULL.
+     * @param node    the node to read the Property from. May be NULL.
      * @param relPath the path to the Property. May be NULL.
      * @return the addressed Property or NULL if the Node is NULL, the path is NULL or empty or the property does not exist or is not available.
      */
@@ -140,7 +140,7 @@ public final class PropertyUtils {
      * Value will be wrapped into a HtmlEscapingValueDecorator if the property was wrapped with a HTMLEscapingPropertyWrapper.
      *
      * @param input the property or null
-     * @return a List<Value> with all values of this property, never null
+     * @return a List&lt;Value&gt; with all values of this property, never null
      */
     public static List<Value> getValues(@Nullable final Property input) {
         Value[] values = getUnwrappedValues(input);
@@ -420,6 +420,8 @@ public final class PropertyUtils {
     /**
      * Retrieves the String values created by Magnolias MultiSelect.
      *
+     * @param multiSelectNode jcr node
+     * @return values
      * @see #retrieveMultiSelectProperties(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node multiSelectNode) {
@@ -431,6 +433,9 @@ public final class PropertyUtils {
     /**
      * Retrieves the String values created by Magnolias MultiSelect.
      *
+     * @param baseNode base node
+     * @param nodeName node name
+     * @return values
      * @see #retrieveMultiSelectValues(javax.jcr.Node)
      */
     public static Collection<String> retrieveMultiSelectValues(Node baseNode, String nodeName) {
@@ -442,6 +447,8 @@ public final class PropertyUtils {
     /**
      * Retrieves the ordered String values created by Magnolias MultiSelect.
      *
+     * @param multiSelectNode jcr node
+     * @return values
      * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
@@ -455,6 +462,9 @@ public final class PropertyUtils {
     /**
      * Retrieves the ordered String values created by Magnolias MultiSelect.
      *
+     * @param baseNode base node
+     * @param nodeName node name
+     * @return values
      * @see #retrieveMultiSelectProperties(javax.jcr.Node, String)
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node baseNode, String nodeName) {

@@ -414,6 +414,7 @@ public final class Sql2 {
              * Get a builder for a fulltext condition for a search in one named attribute.
              * Note that you must define a selector name in your statement.
              *
+             * @param property property name
              * @return a Sql2ContainsCondition instance for one given property
              */
             public static Sql2ContainsCondition contains(java.lang.String property) {

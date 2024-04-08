@@ -56,6 +56,7 @@ public class ReplaceTemplateTask extends RemoveTemplateNodesTask {
      * @param currentTemplate template id to be replaced
      * @param newTemplate     new template id
      * @param basePath        base path for replacement
+     * @param queryType       query type
      */
     public ReplaceTemplateTask(String currentTemplate, String newTemplate, String basePath, String queryType) {
         this(currentTemplate, newTemplate, basePath, queryType, createTaskName(currentTemplate, newTemplate));
@@ -67,6 +68,8 @@ public class ReplaceTemplateTask extends RemoveTemplateNodesTask {
      * @param currentTemplate template id to be replaced
      * @param newTemplate     new template id
      * @param basePath        base path for replacement
+     * @param queryType       query type
+     * @param taskName        task name
      */
     public ReplaceTemplateTask(String currentTemplate, String newTemplate, String basePath, String queryType, String taskName) {
         super(currentTemplate, basePath, queryType, taskName);

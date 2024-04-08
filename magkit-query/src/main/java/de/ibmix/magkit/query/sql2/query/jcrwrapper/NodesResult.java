@@ -39,7 +39,7 @@ import java.util.List;
  * @since 2020-08-21
  */
 public class NodesResult extends ResultWrapper {
-    private static final Logger LOG = LoggerFactory.getLogger(RowsResult.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RowsResult.class);
 
     public NodesResult(QueryResult result) {
         super(result);
@@ -49,14 +49,14 @@ public class NodesResult extends ResultWrapper {
      * Returns an iterator over the <code>Node</code>s of the result table. The
      * nodes are returned according to the ordering specified in the query.
      *
-     * @return a <code>Iterator<Node></></code> or an empty Iterator if an exception occurs.
+     * @return a <code>Iterator&lt;Node&gt;</code> or an empty Iterator if an exception occurs.
      */
     public Iterator<Node> getNodes() {
         Iterator<Node> nodes = Collections.emptyIterator();
         try {
             nodes = getResult().getNodes();
         } catch (RepositoryException e) {
-            LOG.warn("Failed to get query result rows.", e);
+            LOGGER.warn("Failed to get query result rows.", e);
         }
         return nodes;
     }

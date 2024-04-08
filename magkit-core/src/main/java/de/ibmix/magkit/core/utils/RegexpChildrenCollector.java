@@ -33,12 +33,12 @@ import java.util.regex.Pattern;
  * This class exists because Jackrabbit's {@link org.apache.jackrabbit.util.ChildrenCollectorFilter}
  * uses a proprietary wildcard matching (which is stupid).
  * It implements the {@link javax.jcr.ItemVisitor} interface.
- * <p></p>
+ * <br>
  * E.g.: for multi select values use the following call:
  * <code>
- *      RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<Property>(new ArrayList<Property>(), "\\d+", false, 1, Property.class);
+ *      RegexpChildrenCollector&lt;Property&gt; collector = new RegexpChildrenCollector&lt;Property&gt;(new ArrayList&lt;Property&gt;(), "\\d+", false, 1, Property.class);
  *      multiselectNode.accept(collector);
- *      Collection<Property> valueProperties = collector.getCollectedChildren();
+ *      Collection&lt;Property&gt; valueProperties = collector.getCollectedChildren();
  * </code>
  *
  * @param <T> subclass of {@link javax.jcr.Item}

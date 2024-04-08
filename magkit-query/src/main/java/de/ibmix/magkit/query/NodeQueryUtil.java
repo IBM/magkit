@@ -280,6 +280,10 @@ public final class NodeQueryUtil {
     }
 
     /**
+     * @param queryStatement query statement
+     * @param language       language
+     * @param bindValues     bind values
+     * @return query
      * @see #createQuery(String, String, java.util.Map, String)
      */
     public static Query createQuery(final String queryStatement, final String language, final Map<String, Value> bindValues) {
@@ -287,6 +291,9 @@ public final class NodeQueryUtil {
     }
 
     /**
+     * @param queryStatement query statement
+     * @param bindValues     bind values
+     * @return query
      * @see #createQuery(String, String, java.util.Map, String)
      */
     public static Query createSqlQuery(final String queryStatement, final Map<String, Value> bindValues) {
@@ -294,6 +301,8 @@ public final class NodeQueryUtil {
     }
 
     /**
+     * @param queryStatement query statement
+     * @return query
      * @see #createQuery(String, String, java.util.Map, String)
      */
     public static Query createXPathQuery(final String queryStatement) {

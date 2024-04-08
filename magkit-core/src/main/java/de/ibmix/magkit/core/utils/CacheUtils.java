@@ -51,6 +51,8 @@ public final class CacheUtils {
     /**
      * Sets the no cache headers in response.
      * With this headers Magnolia does not cache such responses.
+     *
+     * @param response http response
      */
     public static void preventCaching(HttpServletResponse response) {
         if (response != null) {

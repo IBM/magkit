@@ -42,7 +42,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * @since 2020-08-21
  */
 public class RowsResult extends ResultWrapper {
-    private static final Logger LOG = LoggerFactory.getLogger(RowsResult.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RowsResult.class);
 
     public RowsResult(QueryResult result) {
         super(result);
@@ -52,14 +52,14 @@ public class RowsResult extends ResultWrapper {
      * Returns an iterator over the <code>Row</code>s of the result table. The
      * rows are returned according to the ordering specified in the query.
      *
-     * @return a <code>Iterator<Row></code>, never null
+     * @return a <code>Iterator&lt;Row&gt;</code>, never null
      */
     public Iterator<Row> getRows() {
         Iterator<Row> rows = Collections.emptyIterator();
         try {
             rows = getResult().getRows();
         } catch (RepositoryException e) {
-            LOG.warn("Failed to get query result rows.", e);
+            LOGGER.warn("Failed to get query result rows.", e);
         }
         return rows;
     }
@@ -106,6 +106,7 @@ public class RowsResult extends ResultWrapper {
      * Accessor for the query result as List&lt;Node&gt;.
      * Provides the Nodes for the given selector name.
      *
+     * @param selector selector
      * @return the query result as javax.jcr.Node list or an empty list, never null
      */
     public List<Node> getRowNodeListFor(String selector) {
@@ -116,7 +117,7 @@ public class RowsResult extends ResultWrapper {
                 try {
                     result.add(iterator.next().getNode(selector));
                 } catch (RepositoryException e) {
-                    LOG.warn("Failed to get node for selector " + selector + " from result row.", e);
+                    LOGGER.warn("Failed to get node for selector " + selector + " from result row.", e);
                 }
             }
         }

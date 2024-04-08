@@ -76,10 +76,11 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * New Operation to solve problems with dublicating of nodes on repeated updates.
+     * New Operation to solve problems with duplicating of nodes on repeated updates.
      * Creates nodes with given name (relPath).
      *
      * @param relPath the node name or relative node path as String
+     * @param type    type
      * @return NodeOperation with created node.
      * @see CreatePathNodeOperation
      */
@@ -144,6 +145,9 @@ public abstract class NodeOperationFactory extends Ops {
 
     /**
      * Checks the name before try to delete.
+     *
+     * @param name node or property name
+     * @return node operation
      */
     public static NodeOperation removeIfExists(final String name) {
         return new AbstractNodeOperation() {
@@ -159,6 +163,8 @@ public abstract class NodeOperationFactory extends Ops {
 
     /**
      * Removes all child nodes.
+     *
+     * @return node operation
      */
     public static NodeOperation removeAllChilds() {
         return new AbstractNodeOperation() {
@@ -178,6 +184,10 @@ public abstract class NodeOperationFactory extends Ops {
 
     /**
      * Creates an uri pattern voter node operation.
+     *
+     * @param voterName voter name
+     * @param pattern   pattern
+     * @return node operation
      */
     public static NodeOperation addUriPatternVoter(final String voterName, final String pattern) {
         return addPatternVoter(voterName, URIPatternVoter.class.getName(), pattern);
@@ -185,6 +195,11 @@ public abstract class NodeOperationFactory extends Ops {
 
     /**
      * Creates a pattern voter node operation with given voter class.
+     *
+     * @param voterName  voter name
+     * @param voterClass voter class
+     * @param pattern    pattern
+     * @return node operation
      */
     public static NodeOperation addPatternVoter(final String voterName, final String voterClass, final String pattern) {
         return addOrGetContentNode(voterName).then(addOrSetProperty(StandardTasks.PN_CLASS, voterClass), addOrSetProperty(StandardTasks.PN_PATTERN, pattern));
