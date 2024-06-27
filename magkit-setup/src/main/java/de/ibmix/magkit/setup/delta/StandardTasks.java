@@ -57,6 +57,8 @@ public final class StandardTasks {
     public static final String PN_ENABLED = "enabled";
     public static final String PN_PATTERN = "pattern";
     private static final String NN_WORKFLOW = "workflow";
+    @SuppressWarnings("unused")
+    public static final String NN_CONFIG = "config";
 
     private static final String PATH_FILTER = "/server/filters";
 
