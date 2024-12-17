@@ -23,6 +23,7 @@ package de.ibmix.magkit.core.utils;
 import info.magnolia.jcr.wrapper.DelegatePropertyWrapper;
 import info.magnolia.jcr.wrapper.HTMLEscapingContentDecorator;
 import info.magnolia.jcr.wrapper.HTMLEscapingPropertyWrapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,7 +192,7 @@ public final class PropertyUtils {
         Value result = null;
         if (exists(input)) {
             try {
-                result = input.isMultiple() ? input.getValues()[0] : input.getValue();
+                result = input.isMultiple() ? ArrayUtils.get(input.getValues(), 0) : input.getValue();
             } catch (RepositoryException e) {
                 // ignore and return empty result
                 LOGGER.debug("Cannot access value of property ", e);

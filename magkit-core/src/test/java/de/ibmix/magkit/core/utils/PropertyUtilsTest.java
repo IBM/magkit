@@ -21,6 +21,7 @@ package de.ibmix.magkit.core.utils;
  */
 
 import de.ibmix.magkit.test.jcr.NodeStubbingOperation;
+import info.magnolia.jcr.decoration.ContentDecoratorPropertyWrapper;
 import info.magnolia.jcr.wrapper.HTMLEscapingPropertyWrapper;
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.TimeZone;
@@ -55,12 +57,14 @@ import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static de.ibmix.magkit.test.jcr.PropertyMockUtils.mockProperty;
+import static de.ibmix.magkit.test.jcr.PropertyStubbingOperation.stubValues;
 import static de.ibmix.magkit.test.jcr.ValueMockUtils.mockBinary;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 /**
@@ -463,5 +467,28 @@ public class PropertyUtilsTest {
         assertThat(getBinaryValues(mockProperty("test", b, a)).size(), is(2));
         assertThat(getBinaryValues(mockProperty("test", b, a)).get(0), is(b));
         assertThat(getBinaryValues(mockProperty("test", b, a)).get(1), is(a));
+    }
+
+    @Test
+    public void getValue() throws RepositoryException {
+        assertThat(PropertyUtils.getValue(null), nullValue());
+
+        Property p = mockProperty("test");
+        assertThat(PropertyUtils.getValue(p), nullValue());
+
+        // Test nor exception on empty multi value property:
+        stubValues(new Value[0]).of(p);
+        doReturn(true).when(p).isMultiple();
+        assertThat(PropertyUtils.getValue(p), nullValue());
+
+        stubValues("first").of(p);
+        assertThat(PropertyUtils.getValue(p).getString(), is("first"));
+
+        stubValues("first", "second", "third").of(p);
+        assertThat(PropertyUtils.getValue(p).getString(), is("first"));
+
+        // Test no NullPointerException on empty PropertyWrapper:
+        Property wrapper = new ContentDecoratorPropertyWrapper<>(null, null);
+        assertThat(PropertyUtils.getValue(wrapper), nullValue());
     }
 }
