@@ -58,11 +58,11 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
     }
 
     @Override
-    public void layout() {
-        super.layout();
+    public void populate(T item) {
+        super.populate(item);
         if (_definition != null) {
             initMaxComponents();
-            initContent();
+            //TODO: test multi form view: initContent();
         }
     }
 
@@ -71,16 +71,6 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
         if (_maxComponents == null) {
             _maxComponents = DEFAULT_MAX;
         }
-    }
-
-    private void initContent() {
-        _rootLayout = (VerticalLayout) asVaadinComponent();
-        int componentCount = _rootLayout.getComponentCount();
-        _rootLayout.addComponentAttachListener(this);
-        if (componentCount > 1) {
-            _rootLayout.addComponentDetachListener(this);
-        }
-        _rootLayout.addAttachListener(this);
     }
 
     @Override
