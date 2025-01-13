@@ -21,7 +21,7 @@
 
     <properties>
         <!-- keep in sync with corresponding versions from magnolia bundle -->
-        <version.magnolia.workflow>6.0.4</version.magnolia.workflow>
+        <version.magnolia.workflow>7.0.1</version.magnolia.workflow>
         <version.poi>5.2.2</version.poi>
 
         <version.magkit.test>1.1.0-SNAPSHOT</version.magkit.test>
