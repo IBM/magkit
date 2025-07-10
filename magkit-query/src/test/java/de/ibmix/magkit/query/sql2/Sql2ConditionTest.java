@@ -41,7 +41,7 @@ public class Sql2ConditionTest {
 
     @Test
     public void stringIdentifier() {
-        assertThat(Sql2.Condition.String.identifierEquals(null).asString(), is(""));
+        assertThat(Sql2.Condition.String.identifierEquals((String) null).asString(), is(""));
         assertThat(Sql2.Condition.String.identifierEquals().asString(), is(""));
         assertThat(Sql2.Condition.String.identifierEquals("123").asString(), is("[jcr:uuid] = '123'"));
         assertThat(Sql2.Condition.String.identifierEquals("test", "test-again").asString(), is("([jcr:uuid] = 'test' OR [jcr:uuid] = 'test-again')"));
@@ -49,7 +49,7 @@ public class Sql2ConditionTest {
 
     @Test
     public void stringTemplate() {
-        assertThat(Sql2.Condition.String.templateEquals(null).asString(), is(""));
+        assertThat(Sql2.Condition.String.templateEquals((String) null).asString(), is(""));
         assertThat(Sql2.Condition.String.templateEquals().asString(), is(""));
         assertThat(Sql2.Condition.String.templateEquals("tpl").asString(), is("[mgnl:template] = 'tpl'"));
         assertThat(Sql2.Condition.String.templateEquals("test", "other").asString(), is("([mgnl:template] = 'test' OR [mgnl:template] = 'other')"));

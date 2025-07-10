@@ -29,7 +29,6 @@ import info.magnolia.ui.field.FieldDefinition;
 import info.magnolia.ui.field.SelectFieldSupport;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.Optional;
 
 /**
@@ -44,8 +43,8 @@ public class ExtendedLinkBinder<T> extends FieldBinder.Default<T> {
     private final SelectFieldSupport<T> _selectFieldSupport;
 
     @Inject
-    ExtendedLinkBinder(ComponentProvider componentProvider, SelectFieldSupport<T> selectFieldSupport, Provider<UiFrameworkModule> uiFrameworkModuleProvider) {
-        super(componentProvider, uiFrameworkModuleProvider);
+    ExtendedLinkBinder(ComponentProvider componentProvider, SelectFieldSupport<T> selectFieldSupport, UiFrameworkModule uiFrameworkModule) {
+        super(componentProvider, uiFrameworkModule);
         _selectFieldSupport = selectFieldSupport;
     }
 
