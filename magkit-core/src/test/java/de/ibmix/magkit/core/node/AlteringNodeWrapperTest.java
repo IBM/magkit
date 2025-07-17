@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import javax.jcr.Node;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValue;
@@ -51,8 +50,8 @@ import static org.mockito.Mockito.mock;
 /**
  * Test AlteringNodeWrapper.
  *
- * @author wolf.bubenik
- * @since 10.05.19.
+ * @author wolf.bubenik@ibmix.de
+ * @since 10.05.2019
  */
 public class AlteringNodeWrapperTest {
 
@@ -80,9 +79,8 @@ public class AlteringNodeWrapperTest {
 
         List<String> stringValues = getStringValues(nodeWrapper, "names");
         assertThat(stringValues.size(), is(2));
-        Iterator<String> iterator = stringValues.iterator();
-        assertThat(iterator.next(), is("value1"));
-        assertThat(iterator.next(), is("value2"));
+        assertThat(stringValues.get(0), is("value1"));
+        assertThat(stringValues.get(1), is("value2"));
     }
 
     @Test
@@ -97,9 +95,8 @@ public class AlteringNodeWrapperTest {
 
         List<Boolean> values = getBooleanValues(nodeWrapper.getProperty("test"));
         assertThat(values.size(), is(2));
-        Iterator<Boolean> iterator = values.iterator();
-        assertThat(iterator.next(), is(true));
-        assertThat(iterator.next(), is(false));
+        assertThat(values.get(0), is(true));
+        assertThat(values.get(1), is(false));
     }
 
     @Test
@@ -114,9 +111,8 @@ public class AlteringNodeWrapperTest {
 
         List<Long> values = getLongValues(nodeWrapper.getProperty("test"));
         assertThat(values.size(), is(2));
-        Iterator<Long> iterator = values.iterator();
-        assertThat(iterator.next(), is(3L));
-        assertThat(iterator.next(), is(2L));
+        assertThat(values.get(0), is(3L));
+        assertThat(values.get(1), is(2L));
     }
 
     @Test
@@ -145,9 +141,8 @@ public class AlteringNodeWrapperTest {
 
         List<Double> values = getDoubleValues(nodeWrapper.getProperty("test"));
         assertThat(values.size(), is(2));
-        Iterator<Double> iterator = values.iterator();
-        assertThat(iterator.next(), is(3.2D));
-        assertThat(iterator.next(), is(2.3D));
+        assertThat(values.get(0), is(3.2D));
+        assertThat(values.get(1), is(2.3D));
     }
 
     @Test
