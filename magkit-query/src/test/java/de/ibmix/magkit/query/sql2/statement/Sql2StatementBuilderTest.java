@@ -32,10 +32,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2StatementBuilder.
- *
+ * Tests for Sql2Statement builder.
  * @author wolf.bubenik@ibmix.de
- * @since 06.04.2020
+ * @since 2020-04-06
  */
 public class Sql2StatementBuilderTest {
     private static final Logger LOG = LoggerFactory.getLogger(Sql2StatementBuilderTest.class);

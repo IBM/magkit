@@ -35,10 +35,39 @@ import java.util.List;
 import static de.ibmix.magkit.setup.delta.StandardTasks.hasModuleNewRevision;
 
 /**
- * A ModuleVersionHandler which just do the bootstrap on update and bootstraps on module install all bootstrap files under "/mgnl-bootstrap/install/moduleName".
- *
+ * ModuleVersionHandler responsible for bootstrapping module configuration and registering module-specific servlets.
+ * <p>
+ * Purpose: Orchestrates Magnolia update and install lifecycle steps for this module by providing additional tasks
+ * that ensure configuration (templates, dialogs, config nodes) and servlet registrations are present after
+ * installation or update.
+ * </p>
+ * <p>
+ * Main functionalities / key features:
+ * <ul>
+ *   <li>Adds a complete bootstrap of module configuration on install (all files under <code>/mgnl-bootstrap/install/moduleName</code>).</li>
+ *   <li>Adds incremental bootstrap of updated configuration on module updates when the module revision changes.</li>
+ *   <li>Ensures all module-provided servlets are registered if missing.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Important details:
+ * <ul>
+ *   <li>Revision detection is delegated to {@link de.ibmix.magkit.setup.delta.StandardTasks#hasModuleNewRevision(Version, Version)}.</li>
+ *   <li>Returned task and delta lists are never {@code null}; Magnolia processes them sequentially.</li>
+ *   <li>Errors or exceptions thrown by underlying tasks are handled by Magnolia's installation framework.</li>
+ * </ul>
+ * </p>
+ * <p><strong>Usage preconditions:</strong> Magnolia will instantiate and invoke this handler automatically when declared in the module descriptor (typically <code>module.xml</code>). Manual instantiation is rarely required.</p>
+ * <p><strong>Side effects:</strong> Creates or updates JCR configuration nodes and may register servlet definitions.</p>
+ * <p><strong>Thread-safety:</strong> Not designed for concurrent use; Magnolia invokes version handlers in a single-threaded install/update context.</p>
+ * <p><strong>Example:</strong></p>
+ * <pre>{@code
+ * // In module descriptor (module.xml):
+ * <versionHandler>de.ibmix.magkit.setup.BootstrapModuleVersionHandler</versionHandler>
+ * }
+ * </pre>
  * @author frank.sommer
- * @since 26.10.2010
+ * @since 2010-10-26
  */
 public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
 
@@ -53,6 +82,12 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
      */
     private final Task _checkServletRegistrationTask = new CheckModuleServletsTask();
 
+    /**
+     * Builds update deltas adding the default update delta when the module revision has changed.
+     * @param installContext current installation context provided by Magnolia; never {@code null}
+     * @param from the version currently installed; never {@code null}
+     * @return list of deltas to apply for update; never {@code null}
+     */
     @Override
     protected List<Delta> getUpdateDeltas(final InstallContext installContext, final Version from) {
         List<Delta> updateDeltas = super.getUpdateDeltas(installContext, from);
@@ -65,6 +100,11 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
         return updateDeltas;
     }
 
+    /**
+     * Provides default update tasks and appends module configuration bootstrap and servlet registration tasks.
+     * @param forVersion the target version being updated to; never {@code null}
+     * @return list of tasks executed during a default update; never {@code null}
+     */
     @Override
     protected List<Task> getDefaultUpdateTasks(Version forVersion) {
         List<Task> updateTasks = super.getDefaultUpdateTasks(forVersion);
@@ -73,6 +113,11 @@ public class BootstrapModuleVersionHandler extends DefaultModuleVersionHandler {
         return updateTasks;
     }
 
+    /**
+     * Provides additional install tasks by adding a full bootstrap of all module configuration.
+     * @param installContext current installation context; never {@code null}
+     * @return list of extra tasks executed during module install; never {@code null}
+     */
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
         List<Task> installTasks = new ArrayList<>(super.getExtraInstallTasks(installContext));

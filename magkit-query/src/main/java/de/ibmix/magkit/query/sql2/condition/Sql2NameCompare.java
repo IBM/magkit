@@ -21,17 +21,29 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * The generic interface for property constraints.
- * Excluding not(). To be used when not() has been called.
+ * Comparison step API for node name conditions AFTER invoking a potential negation (name() specific variant).
+ * Supports a subset of string comparisons suitable for JCR name() operand (no LIKE, length, multi NOT).
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-11-11
  */
 public interface Sql2NameCompare {
+    /** Strictly lower than comparison.
+     * @return single-value step */
     Sql2NameOperandSingle lowerThan();
+    /** Lower or equal comparison.
+     * @return single-value step */
     Sql2NameOperandSingle lowerOrEqualThan();
+    /** Equals any of supplied names (OR).
+     * @return multi-value step */
     Sql2NameOperandMultiple equalsAny();
+    /** Greater or equal comparison.
+     * @return single-value step */
     Sql2NameOperandSingle greaterOrEqualThan();
+    /** Strictly greater than comparison.
+     * @return single-value step */
     Sql2NameOperandSingle greaterThan();
+    /** Not equal comparison against any supplied name (OR).
+     * @return multi-value step */
     Sql2NameOperandMultiple excludeAny();
 }

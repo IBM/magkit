@@ -32,10 +32,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2PathCondition.
+ * Tests for Sql2PathCondition.
  *
  * @author wolf.bubenik@ibmix.de
- * @since 01.04.2020
+ * @since 2020-04-01
  */
 public class Sql2PathConditionTest {
 

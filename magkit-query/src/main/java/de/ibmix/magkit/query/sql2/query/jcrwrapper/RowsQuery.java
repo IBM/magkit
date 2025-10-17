@@ -25,8 +25,17 @@ import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 
 /**
- * A wrapper for javax.jcr.query.Query to separate Row and Node queries.
- *
+ * Fluent wrapper around a JCR {@link Query} producing {@link RowsResult} for row-oriented access.
+ * <p>Purpose: Provides convenience methods to bind typed variables and execute the query yielding a row-centric
+ * result abstraction. Complements {@link NodesQuery} for node-based consumption.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Typed fluent bind methods inherited from {@link QueryWrapper}.</li>
+ *   <li>Single-step {@link #execute()} returning a {@link RowsResult} with iteration utilities.</li>
+ * </ul>
+ * <p>Thread-safety: NOT thread-safe. Confine to a single thread.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code RowsResult result = new RowsQuery(query).bindString("title", "Welcome").execute();}</pre>
  * @author wolf.bubenik@ibmix.de
  * @since 2020-08-21
  */
@@ -42,17 +51,11 @@ public class RowsQuery extends QueryWrapper<RowsQuery> {
     }
 
     /**
-     * Executes this query and returns a <code>{@link RowsResult}</code>
-     * object.
-     * <p>
-     * If this <code>Query</code> contains a variable (see {@link
-     * javax.jcr.query.qom.BindVariableValue BindVariableValue}) which has not
-     * been bound to a value (see {@link Query#bindValue}) then this method
-     * throws an <code>InvalidQueryException</code>.
-     *
-     * @return a <code>RowsResult</code> object
-     * @throws InvalidQueryException if the query contains an unbound variable.
-     * @throws RepositoryException   if another error occurs.
+     * Execute the underlying JCR query returning a {@link RowsResult} for row-based traversal.
+     * Variables must have been bound prior to invocation; otherwise an {@link InvalidQueryException} is thrown.
+     * @return non-null {@link RowsResult}
+     * @throws InvalidQueryException if an unbound variable exists
+     * @throws RepositoryException for other repository access issues
      */
     public RowsResult execute() throws RepositoryException {
         return new RowsResult(getQuery().execute());

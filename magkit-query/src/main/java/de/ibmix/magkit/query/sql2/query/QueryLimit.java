@@ -21,13 +21,36 @@ package de.ibmix.magkit.query.sql2.query;
  */
 
 /**
- * The QueryBuilder step interface declaring methods for the query limits and offsets.
- *
- * @param <T> the type of Sql2QueryBuilder to be returned by methods
+ * Builder step interface declaring methods for query result limiting and paging.
+ * <p>Purpose: Adds optional limit (maximum number of results) and offset (skip count for paging) configuration to a
+ * fluent SQL2 query builder chain. Implementations enforce non-negative values; negative input is coerced to 0.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Fluent limit and offset specification.</li>
+ *   <li>Type parameter {@code <T>} preserves concrete builder type for chaining without casts.</li>
+ * </ul>
+ * <p>Null & error handling: Methods never return {@code null}; they return the concrete builder. Invalid (negative)
+ * values are sanitized (treated as 0) by typical implementations.</p>
+ * <p>Thread-safety: Not inherently thread-safe; builder instances should be confined to a single thread.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code Sql2QueryBuilder.forRows().fromWebsite().withStatement("SELECT * FROM [mgnl:page]")
+ *     .withOffset(20).withLimit(10).buildRowsQuery().execute();}</pre>
+ * @param <T> the concrete builder type enabling fluent chaining
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-28
  */
 public interface QueryLimit<T>  {
+    /**
+     * Set an upper bound on the number of returned results.
+     * @param limit maximum result size (negative values treated as 0 by implementations)
+     * @return fluent builder instance
+     */
     T withLimit(long limit);
+
+    /**
+     * Set a result offset for paging (number of initial results to skip).
+     * @param offset number of results to skip (negative values treated as 0)
+     * @return fluent builder instance
+     */
     T withOffset(long offset);
 }

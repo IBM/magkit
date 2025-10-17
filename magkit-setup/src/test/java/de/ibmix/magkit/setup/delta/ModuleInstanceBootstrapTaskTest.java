@@ -35,8 +35,10 @@ import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefiniti
 import static org.junit.Assert.assertFalse;
 
 /**
+ * Minimal tests for instance-specific bootstrap filtering.
+ *
  * @author Philipp Güttler (Aperto GmbH - An IBM Company)
- * @since 03.05.2018
+ * @since 2018-05-03
  */
 public class ModuleInstanceBootstrapTaskTest {
 

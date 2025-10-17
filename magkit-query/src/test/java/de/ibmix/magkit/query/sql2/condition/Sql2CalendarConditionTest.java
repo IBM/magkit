@@ -30,10 +30,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2CalendarCondition.
- *
+ * Tests for Sql2CalendarCondition.
  * @author wolf.bubenik@ibmix.de
- * @since (20.04.2020)
+ * @since 2020-04-20
  */
 public class Sql2CalendarConditionTest {
 

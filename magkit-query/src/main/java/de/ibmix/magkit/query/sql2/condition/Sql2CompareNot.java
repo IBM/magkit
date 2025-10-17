@@ -21,13 +21,19 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * The generic interface for property constraints.
- * Including not(). To be used when not() has not been called.
+ * Generic fluent comparison API for property conditions BEFORE a {@code not()} call.
+ * Extends {@link Sql2Compare} by adding the {@link #not()} method to start a negated comparison sequence.
+ * Returning {@link Sql2Compare} from {@code not()} deliberately narrows the API to prevent double negation.
  *
  * @param <V> the type of the property (String, Long, Double, Calendar)
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-07
  */
 public interface Sql2CompareNot<V> extends Sql2Compare<V> {
+    /**
+     * Negate the upcoming comparison (logical NOT). After invocation only comparison operators are available.
+     *
+     * @return comparison step API without another not()
+     */
     Sql2Compare<V> not();
 }

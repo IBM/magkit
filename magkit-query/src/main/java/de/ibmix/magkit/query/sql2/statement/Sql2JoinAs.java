@@ -21,11 +21,19 @@ package de.ibmix.magkit.query.sql2.statement;
  */
 
 /**
- * TODO: Comment.
+ * Fluent API step after choosing a JOIN type to assign a selector name for the joined node type.
+ * <p>The selector name allows scoping conditions and attribute references for the joined selector.
+ * If omitted (null/blank) subsequent conditions referencing the join will be invalid.</p>
+ * <p>Thread-safety: Not thread-safe; builder state is mutated.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-18
  */
 public interface Sql2JoinAs {
+    /**
+     * Assign the selector name to the joined node type.
+     * @param joinSelectorName alias for the joined selector (may be null/blank to skip)
+     * @return next step to define the ON join condition
+     */
     Sql2JoinOn joinAs(String joinSelectorName);
 }

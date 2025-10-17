@@ -22,10 +22,17 @@ package de.ibmix.magkit.query.sql2.statement;
 
 /**
  * SQL2 statement builder interface for fluent API: Optional from step.
+ * <p>Defines the node type for the primary selector. If omitted defaults to nt:base. Blank or null values are ignored.</p>
+ * <p>Thread-safety: Implementations are not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-15
  */
 public interface Sql2From extends Sql2As {
+    /**
+     * Specify the JCR node type for the FROM clause (defaults to nt:base if blank or null).
+     * @param nodeType the JCR node type name
+     * @return next step allowing assignment of a selector name
+     */
     Sql2As from(String nodeType);
 }

@@ -39,10 +39,31 @@ import static de.ibmix.magkit.setup.nodebuilder.task.NodeBuilderTaskFactory.sele
 import static info.magnolia.jcr.nodebuilder.Ops.getNode;
 
 /**
- * Checks the registration of all module servlets.
+ * Checks and (re)registers all servlet definitions declared by the current module.
+ * <p>
+ * The task iterates over the {@link ServletDefinition} list of the {@link ModuleDefinition} currently being installed
+ * and generates a sequence of sub tasks: for each existing servlet configuration a removal task is added first to
+ * ensure a clean re-installation, followed by a {@link RegisterServletTask} to register the servlet with a validated
+ * node name. Finally all accumulated sub tasks are executed in order by {@link ArrayDelegateTask#execute(InstallContext)}.
+ * </p>
+ * <p>
+ * Preconditions: A valid config workspace session must be obtainable from the {@link InstallContext}. If repository
+ * access fails the task logs and warns but continues without registering additional tasks.
+ * </p>
+ * <p>
+ * Side Effects: Removes existing servlet configuration nodes below /server/filters/servlets prior to re-registration.
+ * </p>
+ * <p>
+ * Error Handling: Repository access issues are caught and converted into an install warning; no exception is thrown
+ * upwards to keep the installation resilient.
+ * </p>
+ * <p>
+ * Thread-Safety: Intended to run in Magnolia's single-threaded module installation phase; no special synchronization.
+ * </p>
+ * Usage Example: Automatically part of a module version handler assembling installation/update tasks.
  *
  * @author frank.sommer
- * @since 14.06.11
+ * @since 2011-06-14
  */
 public class CheckModuleServletsTask extends ArrayDelegateTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckModuleServletsTask.class);
@@ -53,6 +74,16 @@ public class CheckModuleServletsTask extends ArrayDelegateTask {
         super("Register module servlets", "Registers servlets for this module.");
     }
 
+    /**
+     * Builds and executes the sub task list for servlet re-registration.
+     * <p>
+     * For each servlet definition: if a node with the servlet name already exists it adds a removal task first, then
+     * adds a {@link RegisterServletTask}. After collection, delegates execution to the super implementation.
+     * </p>
+     *
+     * @param installContext current installation context supplying module definition and repository sessions
+     * @throws TaskExecutionException if a delegated sub task throws an exception during its execution
+     */
     @Override
     public void execute(final InstallContext installContext) throws TaskExecutionException {
         final ModuleDefinition moduleDefinition = installContext.getCurrentModuleDefinition();

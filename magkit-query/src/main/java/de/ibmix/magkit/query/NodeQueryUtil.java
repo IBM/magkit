@@ -58,10 +58,46 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 
 /**
- * Utility methods for common queries.
+ * Utility class offering convenience methods to build and execute common Magnolia JCR queries (SQL2 and XPath)
+ * against repositories (primarily the {@code website} repository). It focuses on single-selector queries and
+ * template-based lookup of pages and components.
+ *
+ * Key features:
+ * <ul>
+ *   <li>Execution of simple JCR-SQL2 and XPath queries returning {@link Node} lists.</li>
+ *   <li>Lookup of pages/components by template name with optional additional XPath constraints.</li>
+ *   <li>Retrieval of descendant components across multiple area roots.</li>
+ *   <li>Factory methods to create {@link Query} instances with optional bind values (SQL2 only).</li>
+ *   <li>Selector-based result extraction for multi-selector queries.</li>
+ * </ul>
+ *
+ * Usage preconditions:
+ * <ul>
+ *   <li>A valid Magnolia context must provide an active JCR {@link Session} for the specified repository.</li>
+ *   <li>Methods expecting paths (e.g. {@code searchRoot}) assume absolute repository paths.</li>
+ * </ul>
+ *
+ * Null and error handling:
+ * <ul>
+ *   <li>Query creation or execution errors are logged; methods then return {@code null}, an empty list, or
+ *       {@code null} iterator depending on the method signature.</li>
+ *   <li>Callers should defensively handle {@code null} results.</li>
+ * </ul>
+ *
+ * Side effects: Read-only; no repository modifications are performed.
+ *
+ * Thread-safety: Stateless and composed entirely of {@code static} methods. Safe for concurrent use; underlying
+ * Magnolia infrastructure manages session lifecycles.
+ *
+ * Usage example:
+ * <pre>{@code
+ * List<Node> articlePages = NodeQueryUtil.getPagesWithTemplate("my-module:pages/article", null);
+ * Node teaser = NodeQueryUtil.findDescendantComponent("my-module:components/teaser", "/website/path/to/page");
+ * }</pre>
  *
  * @author angelika.foerst
  * @author frank.sommer
+ * @since 2023-01-01
  */
 public final class NodeQueryUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeQueryUtil.class);
@@ -71,36 +107,34 @@ public final class NodeQueryUtil {
     public static final String DUMMY_ORDERING = "@jcr:primaryType";
 
     /**
-     * Executes simple query statements on the website repository.
-     * This method can only deal with queries containing just one selector (no joins).
-     * For more complex queries use {@link #createQuery(String, String, java.util.Map)}.
+     * Executes simple query statements on the website repository using JCR-SQL2 for a single selector.
+     * Primarily intended for straightforward node retrieval without joins.
      *
      * @param sqlQueryStatement the query in JCR-SQL2 syntax
-     * @return a list of nodes or null
+     * @return list of matching nodes or {@code null} on error
      */
     public static List<Node> executeSqlQuery(final String sqlQueryStatement) {
         return executeQuery(sqlQueryStatement, JCR_SQL2, WEBSITE);
     }
 
     /**
-     * Executes simple query statements on the given repository.
-     * This method can only deal with queries containing just one selector (no joins).
+     * Executes simple query statements on the given repository using JCR-SQL2 for a single selector.
      *
      * @param sqlQueryStatement the query in JCR-SQL2 syntax
-     * @param repository        target repository
-     * @return a list of nodes or null
+     * @param repository target repository name
+     * @return list of matching nodes or {@code null} on error
      */
     public static List<Node> executeSqlQuery(final String sqlQueryStatement, final String repository) {
         return executeQuery(sqlQueryStatement, JCR_SQL2, repository);
     }
 
     /**
-     * Executes a query and returns a list of nodes.
+     * Executes a query and returns all matched nodes for single-selector statements.
      *
-     * @param queryStatement query statement
-     * @param language       language of the query statement
-     * @param repository     target repository
-     * @return a list of nodes or null
+     * @param queryStatement query statement (SQL2 or XPath)
+     * @param language query language identifier
+     * @param repository target repository name
+     * @return list of matching nodes or {@code null} on error
      * @see info.magnolia.cms.util.QueryUtil
      */
     public static List<Node> executeQuery(final String queryStatement, final String language, final String repository) {
@@ -115,23 +149,24 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Returns pages having a given template. A root node for the search may be specified.
+     * Returns pages having the given template, optionally scoped to a search root.
      *
-     * @param templateName name of the page template. Fully qualified, e.g. 'rsmn-main:pages/rmArticle'
-     * @param searchRoot   the search root or null
-     * @return a list of nodes or null
+     * @param templateName fully qualified page template name
+     * @param searchRoot optional root node limiting the search scope (may be {@code null})
+     * @return list of page nodes matching the template or {@code null} on error
      */
     public static List<Node> getPagesWithTemplate(final String templateName, final Node searchRoot) {
         return getPagesWithTemplate(templateName, searchRoot, null);
     }
 
     /**
-     * Returns pages having a given template. A root node and additional constraints on the page may be specified.
+     * Returns pages having the given template, optionally scoped to a search root and filtered by an additional
+     * XPath condition applied to the page node.
      *
-     * @param templateName       name of the page template. Fully qualified, e.g. 'rsmn-main:pages/rmArticle'
-     * @param searchRoot         the search root or null
-     * @param xPathPageCondition additional condition that wil be applied on the page. Uses XPath notation and is surrounded by square brackets.
-     * @return a list of nodes or null
+     * @param templateName fully qualified page template name
+     * @param searchRoot optional root node limiting the search scope (may be {@code null})
+     * @param xPathPageCondition optional additional XPath condition (without surrounding brackets); may be {@code null}
+     * @return list of page nodes matching the criteria or {@code null} on error
      */
     public static List<Node> getPagesWithTemplate(final String templateName, final Node searchRoot, final String xPathPageCondition) {
         final StringBuilder statement = new StringBuilder();
@@ -146,12 +181,13 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Returns components having a given template. A root node and additional constraints on the component may be specified.
+     * Returns components having a given template, optionally scoped to a search root and filtered by an additional
+     * XPath condition.
      *
-     * @param templateName   name of the component template. Fully qualified, e.g. 'rsmn-main:components/rmDynamicGuideList'
-     * @param searchRoot     the search root or null
-     * @param xPathCondition additional condition that wil be applied on the component. Uses XPath notation and is surrounded by square brackets.
-     * @return a list of nodes or null
+     * @param templateName fully qualified component template name
+     * @param searchRoot optional root node limiting the search scope (may be {@code null})
+     * @param xPathCondition optional additional XPath condition (without surrounding brackets); may be {@code null}
+     * @return list of component nodes matching the criteria or {@code null} on error
      */
     public static List<Node> getComponentsWithTemplate(final String templateName, final Node searchRoot, final String xPathCondition) {
         String rootPath = searchRoot != null ? getPathIfPossible(searchRoot) : EMPTY;
@@ -159,12 +195,13 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Returns components having a given template. A root node and additional constraints on the component may be specified.
+     * Returns components having a given template, optionally scoped to a search root path and filtered by an
+     * additional XPath condition.
      *
-     * @param templateName   name of the component template. Fully qualified, e.g. 'rsmn-main:components/rmDynamicGuideList'
-     * @param searchRoot     the search root or empty string
-     * @param xPathCondition additional condition that wil be applied on the component. Uses XPath notation and is surrounded by square brackets.
-     * @return a list of nodes or null
+     * @param templateName fully qualified component template name
+     * @param searchRoot optional root path limiting the search scope (may be empty)
+     * @param xPathCondition optional additional XPath condition (without surrounding brackets); may be {@code null}
+     * @return list of component nodes matching the criteria or {@code null} on error
      */
     public static List<Node> getComponentsWithTemplate(final String templateName, final String searchRoot, final String xPathCondition) {
         XpathBuilder xpathBuilder = new XpathBuilder();
@@ -185,11 +222,11 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Creates a query for a component inside a page.
+     * Finds the first component node with the specified template on a page identified by its path.
      *
-     * @param componentsTemplateName template name of the component
-     * @param searchRoot             search root (path of the page node)
-     * @return component node or null
+     * @param componentsTemplateName component template name
+     * @param searchRoot page node path used as search root
+     * @return first matching component node or {@code null} if none found or on error
      */
     public static Node findComponentOnPage(final String componentsTemplateName, final String searchRoot) {
         Node componentNode = null;
@@ -207,11 +244,11 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Find a descendant component node.
+     * Finds the first descendant component node matching the given template below the provided search root path.
      *
-     * @param componentsTemplateName component template name
-     * @param searchRoot             search root
-     * @return component node
+     * @param componentsTemplateName component template name to match
+     * @param searchRoot root path used to limit the search
+     * @return first matching component node or {@code null} if none found or on error
      */
     public static Node findDescendantComponent(final String componentsTemplateName, final String searchRoot) {
         Node componentNode = null;
@@ -223,11 +260,11 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Find descendant component nodes.
+     * Finds descendant component nodes matching the given template below one or more search root paths.
      *
-     * @param componentsTemplateName component template name
-     * @param searchRoots            search roots
-     * @return node iterator
+     * @param componentsTemplateName component template name to match
+     * @param searchRoots one or more root paths used to limit the search
+     * @return iterator over matching component nodes or {@code null} on error
      */
     public static NodeIterator findDescendantComponents(final String componentsTemplateName, final String... searchRoots) {
         NodeIterator nodeIterator = null;
@@ -252,13 +289,13 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * Creates a {@link javax.jcr.query.Query}.
+     * Creates a {@link Query} for the given statement, language and repository, optionally binding values (SQL2 only).
      *
      * @param queryStatement the query statement
-     * @param language       the query language
-     * @param bindValues     a mapping of parameter names to values
-     * @param repository     the repository on which the query is executed
-     * @return a query object
+     * @param language the query language identifier (e.g. {@code JCR_SQL2}, {@code XPATH})
+     * @param bindValues mapping of parameter names to values (SQL2 only); may be {@code null} or empty
+     * @param repository repository name
+     * @return newly created query object or {@code null} on error
      */
     public static Query createQuery(final String queryStatement, final String language, final Map<String, Value> bindValues, final String repository) {
         Query query = null;
@@ -280,41 +317,47 @@ public final class NodeQueryUtil {
     }
 
     /**
-     * @param queryStatement query statement
-     * @param language       language
-     * @param bindValues     bind values
-     * @return query
-     * @see #createQuery(String, String, java.util.Map, String)
+     * Convenience overload creating a {@link Query} on the default {@code website} repository.
+     *
+     * @param queryStatement the query statement
+     * @param language query language identifier
+     * @param bindValues mapping of parameter names to values (SQL2 only); may be {@code null} or empty
+     * @return query object or {@code null} on error
+     * @see #createQuery(String, String, Map, String)
      */
     public static Query createQuery(final String queryStatement, final String language, final Map<String, Value> bindValues) {
         return createQuery(queryStatement, language, bindValues, WEBSITE);
     }
 
     /**
-     * @param queryStatement query statement
-     * @param bindValues     bind values
-     * @return query
-     * @see #createQuery(String, String, java.util.Map, String)
+     * Convenience factory for a SQL2 {@link Query} on the default repository.
+     *
+     * @param queryStatement the SQL2 query statement
+     * @param bindValues mapping of parameter names to values; may be {@code null} or empty
+     * @return query object or {@code null} on error
+     * @see #createQuery(String, String, Map, String)
      */
     public static Query createSqlQuery(final String queryStatement, final Map<String, Value> bindValues) {
         return createQuery(queryStatement, JCR_SQL2, bindValues, WEBSITE);
     }
 
     /**
-     * @param queryStatement query statement
-     * @return query
-     * @see #createQuery(String, String, java.util.Map, String)
+     * Convenience factory for an XPath {@link Query} on the default repository.
+     *
+     * @param queryStatement the XPath query statement
+     * @return query object or {@code null} on error
+     * @see #createQuery(String, String, Map, String)
      */
     public static Query createXPathQuery(final String queryStatement) {
         return createQuery(queryStatement, XPATH, null, WEBSITE);
     }
 
     /**
-     * Executes a query and retrieves the results identified by a selector.
+     * Executes a multi-selector query and retrieves nodes identified by the given selector name.
      *
-     * @param query        the query object
-     * @param selectorName the selector
-     * @return a list of nodes or null
+     * @param query the prepared query object (may be {@code null})
+     * @param selectorName selector name used to extract the node from each row
+     * @return list of nodes matching the selector or empty list if query is {@code null}; {@code null} entries are not added
      */
     public static List<Node> executeQuery(final Query query, final String selectorName) {
         final List<Node> resultList = new ArrayList<>();
@@ -334,6 +377,9 @@ public final class NodeQueryUtil {
         return resultList;
     }
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private NodeQueryUtil() {
         //private constructor
     }

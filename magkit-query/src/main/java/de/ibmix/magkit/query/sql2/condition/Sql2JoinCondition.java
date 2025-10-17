@@ -23,11 +23,21 @@ package de.ibmix.magkit.query.sql2.condition;
 import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 
 /**
- * The base interface for join conditions.
+ * Base interface for join conditions (JCR-SQL2 {@code ON} clause fragments) comparing aspects of the selected
+ * and the joined selector. Implementations render themselves via {@link #appendTo(StringBuilder, Sql2SelectorNames)}.
+ * Empty implementations should append nothing and are skipped by higher-level builders.
+ *
+ * Thread-safety: Implementations are not expected to be thread safe.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-18
  */
 public interface Sql2JoinCondition {
+    /**
+     * Append this join condition fragment to the accumulating SQL2 buffer.
+     *
+     * @param sql2 accumulator (never null)
+     * @param selectorNames provider for selector names
+     */
     void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames);
 }

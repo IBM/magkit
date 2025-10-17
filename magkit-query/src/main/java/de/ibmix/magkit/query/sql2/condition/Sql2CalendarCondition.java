@@ -29,7 +29,14 @@ import java.util.TimeZone;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * Builder class for date property conditions.
+ * Builder for date (Calendar) property conditions supporting equality and range related comparisons
+ * on arbitrary date properties as well as common Magnolia audit properties (created, last activated, etc.).
+ * <p>
+ * Values are rendered as ISO 8601 using a custom in-place formatter copied (and slightly adapted) from
+ * {@code org.apache.jackrabbit.util.ISO8601} to avoid intermediate object creation.
+ * </p>
+ * Thread-safety: Not thread safe.
+ * Null handling: Methods silently ignore {@code null} values and produce no constraint output.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-16
@@ -48,22 +55,48 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
         super(property);
     }
 
+    /**
+     * Start a date condition on an arbitrary property.
+     *
+     * @param name property name
+     * @return comparison API
+     */
     public static Sql2CompareNot<Calendar> property(final String name) {
         return new Sql2CalendarCondition(name);
     }
 
+    /**
+     * Start a condition on the Magnolia created date property.
+     *
+     * @return comparison API
+     */
     public static Sql2CompareNot<Calendar> created() {
         return property(NodeTypes.Created.CREATED);
     }
 
+    /**
+     * Start a condition on the Magnolia last activated property.
+     *
+     * @return comparison API
+     */
     public static Sql2CompareNot<Calendar> lastActivated() {
         return property(NodeTypes.Activatable.LAST_ACTIVATED);
     }
 
+    /**
+     * Start a condition on the Magnolia last modified property.
+     *
+     * @return comparison API
+     */
     public static Sql2CompareNot<Calendar> lastModified() {
         return property(NodeTypes.LastModified.LAST_MODIFIED);
     }
 
+    /**
+     * Start a condition on the Magnolia deleted property.
+     *
+     * @return comparison API
+     */
     public static Sql2CompareNot<Calendar> deleted() {
         return property(NodeTypes.Deleted.DELETED);
     }
@@ -86,11 +119,11 @@ public final class Sql2CalendarCondition extends Sql2PropertyCondition<Sql2Calen
     }
 
     /**
-     * Copied code from org.apache.jackrabbit.util.ISO8601. Modified to use existing StringBuilder.
+     * Convert the calendar to ISO8601 and append to buffer.
      *
-     * @param cal the date to be converted into ISO8601 string as Calendar
-     * @param sql2 the StringBuilder where to add the date string to
-     * @throws IllegalArgumentException when one of the parameters is null or the year has more than 4 digits.
+     * @param cal calendar to format
+     * @param sql2 destination buffer
+     * @throws IllegalArgumentException if year out of supported range
      */
     private void appendIso8601(final Calendar cal, final StringBuilder sql2) {
         /*

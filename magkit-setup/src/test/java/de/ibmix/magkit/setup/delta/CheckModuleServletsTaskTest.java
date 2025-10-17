@@ -47,10 +47,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the re-installation of the module servlets.
+ * Minimal tests for servlet re-registration task.
  *
  * @author frank.sommer
- * @since 03.01.2019
+ * @since 2019-01-03
  */
 public class CheckModuleServletsTaskTest {
 

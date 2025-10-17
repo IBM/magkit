@@ -32,25 +32,42 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
- * Provides methods to access Node results.
- *
+ * Specialized {@link ResultWrapper} exposing node-oriented access to a {@link javax.jcr.query.QueryResult}.
+ * <p>Purpose: Provide a focused API for iterating {@link javax.jcr.Node} results returned directly by a JCR-SQL2 or
+ * QOM query (as opposed to row-based access). This complements {@link RowsResult}.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Safe iteration over result nodes with graceful degradation (empty iterator if errors occur).</li>
+ *   <li>Convenience conversion of the iterator to a {@link List} while preserving iteration order.</li>
+ *   <li>Consistent non-null return contracts.</li>
+ * </ul>
+ * <p>Null & error handling: All accessors return non-null collections (possibly empty). Repository access issues are
+ * caught and logged at WARN level.</p>
+ * <p>Thread-safety: Instances are NOT thread-safe. Consume in a single thread; do not share concurrently without
+ * external synchronization.</p>
+ * <p>Side effects: Only logging; underlying {@code QueryResult} is read-only.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code List<Node> nodes = new NodesQuery(query).execute().getNodeList();}</pre>
  * @author wolf.bubenik@ibmix.de
  * @since 2020-08-21
  */
 public class NodesResult extends ResultWrapper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RowsResult.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NodesResult.class);
 
+    /**
+     * Create a new node-oriented result wrapper.
+     * @param result underlying JCR query result
+     */
     public NodesResult(QueryResult result) {
         super(result);
     }
 
     /**
-     * Returns an iterator over the <code>Node</code>s of the result table. The
-     * nodes are returned according to the ordering specified in the query.
-     *
-     * @return a <code>Iterator&lt;Node&gt;</code> or an empty Iterator if an exception occurs.
+     * Obtain an iterator over all {@link Node} objects in their query-defined order.
+     * Returns an empty iterator if the underlying JCR call fails.
+     * @return non-null iterator of nodes (possibly empty)
      */
+    @SuppressWarnings("unchecked")
     public Iterator<Node> getNodes() {
         Iterator<Node> nodes = Collections.emptyIterator();
         try {
@@ -61,6 +78,10 @@ public class NodesResult extends ResultWrapper {
         return nodes;
     }
 
+    /**
+     * Collect all {@link Node} objects into a {@link List} preserving iteration order.
+     * @return non-null list of nodes (possibly empty)
+     */
     public List<Node> getNodeList() {
         Iterator<Node> iterator = getNodes();
         List<Node> rows = new ArrayList<>();

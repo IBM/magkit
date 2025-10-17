@@ -29,21 +29,44 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
- * Used to collect child items of a node, matching a given regular expression.
- * This class exists because Jackrabbit's {@link org.apache.jackrabbit.util.ChildrenCollectorFilter}
- * uses a proprietary wildcard matching (which is stupid).
- * It implements the {@link javax.jcr.ItemVisitor} interface.
- * <br>
- * E.g.: for multi select values use the following call:
- * <code>
- *      RegexpChildrenCollector&lt;Property&gt; collector = new RegexpChildrenCollector&lt;Property&gt;(new ArrayList&lt;Property&gt;(), "\\d+", false, 1, Property.class);
- *      multiselectNode.accept(collector);
- *      Collection&lt;Property&gt; valueProperties = collector.getCollectedChildren();
- * </code>
- *
- * @param <T> subclass of {@link javax.jcr.Item}
- *
+ * Collects child {@link Item} instances of a starting {@link Node} whose names match a provided regular expression.
+ * This is an alternative to Jackrabbit's {@code org.apache.jackrabbit.util.ChildrenCollectorFilter} which uses a
+ * proprietary wildcard matching; this implementation relies purely on standard {@link Pattern} regular expressions.
+ * <p>
+ * Main functionality:
+ * <ul>
+ *     <li>Traverses a node hierarchy either breadth-first or depth-first (configurable in constructor).</li>
+ *     <li>Limits traversal depth via a {@code maxLevel} parameter (e.g. {@code 1} for direct children only).</li>
+ *     <li>Filters collected items by both Java type ({@link Node} / {@link Property} / {@link Item}) and name pattern.</li>
+ *     <li>Adds matching items to a caller-provided {@link Collection} instance.</li>
+ * </ul>
+ * <p>
+ * Usage preconditions:
+ * <ul>
+ *     <li>The provided {@code collectedChildren} collection must not be {@code null}.</li>
+ *     <li>The pattern (string or {@link Pattern}) should compile successfully; invalid regex will trigger a
+ *     {@link java.util.regex.PatternSyntaxException} on construction.</li>
+ *     <li>{@code maxLevel} should be {@code >= 1}; values {@code <= 0} would make traversal meaningless.</li>
+ * </ul>
+ * <p>
+ * Side effects: The passed in collection instance is mutated by adding matching items during traversal.
+ * <p>
+ * Null & error handling: Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
+ * from underlying JCR operations when accessing item names. Those exceptions are propagated.
+ * <p>
+ * Thread-safety: Instances are not thread-safe because they mutate the externally supplied collection. Use one
+ * instance per traversal thread or provide appropriate external synchronization if sharing the collection.
+ * <p>
+ * Example usage (multi select values):
+ * <pre>
+ *     RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<>(new ArrayList<>(), "\\d+", false, 1, Property.class);
+ *     multiselectNode.accept(collector);
+ *     Collection<Property> valueProperties = collector.getCollectedChildren();
+ * </pre>
+ * <p>
+ * @param <T> subclass of {@link Item} that will be collected
  * @author lars.gendner
+ * @since ???
  */
 public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisitor.Default {
 
@@ -64,26 +87,24 @@ public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisit
      *
      * @param collectedChildren collection in which items will be collected
      * @param childNamePatternString regular expression for children names
-     * @param breadthFirst set to <code>true</code> if children hierarchy shall be traversed breadth-first, set to <code>false</code> if depth-first
-     * @param maxLevel maximum level of traversal (set to <code>1</code> for direct children collection)
-     * @param classToCollect only instances of this class will be collected (reasonable values: <code>Item.class</code>, <code>Property.class</code>, <code>Node.class</code>)
-     *
-     * @see java.util.regex.Pattern#compile(String)
+     * @param breadthFirst set to {@code true} for breadth-first traversal, {@code false} for depth-first
+     * @param maxLevel maximum level of traversal (set to {@code 1} for direct children collection)
+     * @param classToCollect only instances of this class will be collected (e.g. {@code Item.class}, {@code Property.class}, {@code Node.class})
+     * @see Pattern#compile(String)
      */
     public RegexpChildrenCollector(Collection<T> collectedChildren, String childNamePatternString, boolean breadthFirst, int maxLevel, Class<? extends T> classToCollect) {
         this(collectedChildren, Pattern.compile(childNamePatternString), breadthFirst, maxLevel, classToCollect);
     }
 
     /**
-     * Constructs an instance using a {@link java.util.regex.Pattern}.
+     * Constructs an instance using a precompiled {@link Pattern}.
      *
      * @param collectedChildren collection in which items will be collected
      * @param childNamePattern pattern for children names
-     * @param breadthFirst set to <code>true</code> if children hierarchy shall be traversed breadth-first, set to <code>false</code> if depth-first
-     * @param maxLevel maximum level of traversal (set to <code>1</code> for direct children collection)
-     * @param classToCollect only instances of this class will be collected (reasonable values: <code>Item.class</code>, <code>Property.class</code>, <code>Node.class</code>)
-     *
-     * @see java.util.regex.Pattern#compile(String)
+     * @param breadthFirst set to {@code true} for breadth-first traversal, {@code false} for depth-first
+     * @param maxLevel maximum level of traversal (set to {@code 1} for direct children collection)
+     * @param classToCollect only instances of this class will be collected (e.g. {@code Item.class}, {@code Property.class}, {@code Node.class})
+     * @see Pattern#compile(String)
      */
     public RegexpChildrenCollector(Collection<T> collectedChildren, Pattern childNamePattern, boolean breadthFirst, int maxLevel, Class<? extends T> classToCollect) {
         super(breadthFirst, maxLevel);
@@ -117,27 +138,49 @@ public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisit
     }
 
     /**
-     * Checks if the name of an item matches the {@link #_childNamePattern}.
-     * @param item item to be checked
-     * @return <code>true</code> if name matches, otherwise <code>false</code>
-     * @throws javax.jcr.RepositoryException if an error occurs retrieving the name of the item
+     * Checks whether the name of the supplied {@link Item} matches the configured child name pattern.
+     *
+     * @param item the item whose JCR name is evaluated against the pattern
+     * @return {@code true} if the item's name matches the pattern, otherwise {@code false}
+     * @throws RepositoryException if retrieving the item name fails
      */
     private boolean isItemNameMatching(Item item) throws RepositoryException {
         return getChildNamePattern().matcher(item.getName()).matches();
     }
 
+    /**
+     * Returns the {@link Pattern} used to test child item names.
+     *
+     * @return the non-null compiled pattern
+     */
     public Pattern getChildNamePattern() {
         return _childNamePattern;
     }
 
+    /**
+     * Returns the collection that holds all collected child items.
+     *
+     * @return mutable collection of collected items (never null)
+     */
     public Collection<T> getCollectedChildren() {
         return _collectedChildren;
     }
 
+    /**
+     * Replaces the target collection used for storing collected items.
+     * Existing collected references are discarded in favor of the new collection instance.
+     *
+     * @param collectedChildren new collection to store future collected items; must not be {@code null}
+     */
     public void setCollectedChildren(Collection<T> collectedChildren) {
         _collectedChildren = collectedChildren;
     }
 
+    /**
+     * Returns the class object that determines which item types are collected.
+     *
+     * @return the class used for filtering collected items by type
+     */
     public Class<? extends T> getClassToCollect() {
         return _classToCollect;
     }

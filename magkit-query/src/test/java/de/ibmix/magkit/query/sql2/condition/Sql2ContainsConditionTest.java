@@ -28,10 +28,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2ContainsCondition.
- *
+ * Tests for Sql2ContainsCondition.
  * @author wolf.bubenik@ibmix.de
- * @since 3.5.2 (05.01.21)
+ * @since 2021-01-05
  */
 public class Sql2ContainsConditionTest {
     private static final Sql2SelectorNames SELECTOR_NAMES = new Sql2SelectorNames() {

@@ -21,12 +21,21 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * The String interface for property constraints.
- * Including not(). To be used when not() has not been called.
+ * Entry comparison API for String properties BEFORE calling {@code not()} allowing a negation.
+ * Extends {@link Sql2CompareString} with {@link #not()} which then returns a narrowed API without another
+ * negation option to avoid double NOT misuse.
+ *
+ * Thread-safety: Not thread safe.
+ * Null handling: Null/empty values ignored when rendering.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-26
  */
 public interface Sql2CompareStringNot extends Sql2CompareString {
+    /**
+     * Negate the upcoming string comparison operations.
+     *
+     * @return string comparison API without further not()
+     */
     Sql2CompareString not();
 }

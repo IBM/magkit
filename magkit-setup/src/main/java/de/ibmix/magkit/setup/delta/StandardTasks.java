@@ -45,9 +45,26 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
 import static org.apache.commons.lang3.StringUtils.strip;
 
 /**
- * Collection of standard module version handler tasks.
+ * Utility class aggregating common Magnolia module version handler tasks.
+ * <p>
+ * Provides factory methods for frequently required configuration adjustments during module installation or updates:
+ * <ul>
+ *     <li>Workflow simplification (auto-approve human tasks, retry action availability)</li>
+ *     <li>Filter bypass creation (URI or extension based)</li>
+ *     <li>Security callback replacement</li>
+ *     <li>Version revision classifier comparison helper</li>
+ * </ul>
+ * Each method returns a {@link Task} ready to be added to a version handler. Where multiple changes need orchestration,
+ * an {@link ArrayDelegateTask} sequence is returned.
+ * </p>
+ * <p>Preconditions: Requires Magnolia configuration repository availability during execution.</p>
+ * <p>Side Effects: Modifies nodes below /server/filters, /modules/<module>/workflow-jbpm, /server/filters/securityCallback.</p>
+ * <p>Error Handling: Individual tasks encapsulate their own exception handling; this class only assembles tasks.</p>
+ * <p>Thread-Safety: Stateless; all methods are safe for concurrent invocation.</p>
+ * <p>Usage Example: {@code tasks.add(StandardTasks.setSimpleWorkflow());}</p>
  *
  * @author Norman Wiechmann (Aperto AG)
+ * @since ??
  */
 public final class StandardTasks {
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardTasks.class);
@@ -63,9 +80,9 @@ public final class StandardTasks {
     private static final String PATH_FILTER = "/server/filters";
 
     /**
-     * Set for activation and deactivation the simple workflow.
+     * Creates a task sequence configuring a simple workflow (auto approval and retry availability adjustments).
      *
-     * @return task to execute
+     * @return composite task performing workflow simplification
      */
     public static Task setSimpleWorkflow() {
         return new ArrayDelegateTask("Set simple workflow", "Set all configurations simple workflow without approval step.",
@@ -82,10 +99,25 @@ public final class StandardTasks {
         );
     }
 
+    /**
+     * Convenience helper adding a monitoring bypass if missing.
+     *
+     * @return task establishing filter bypass for /monitoring
+     */
     public static Task addBypassForMonitoring() {
         return addFilteringBypassIfMissing("/monitoring", PATH_FILTER);
     }
 
+    /**
+     * Creates a task that adds a filter bypass configuration if it does not already exist.
+     * <p>
+     * Uses either {@link URIStartsWithVoter} (for absolute path beginning with '/') or {@link ExtensionVoter} for plain extensions.
+     * </p>
+     *
+     * @param uriPattern URI path (starting with '/') or file extension pattern
+     * @param filterPath path to filter configuration node
+     * @return task validating presence and creating bypass config if absent
+     */
     public static Task addFilteringBypassIfMissing(final String uriPattern, final String filterPath) {
         // for path pattern remove beginning or ending slashes before creating a valid node name
         String nodeName = Components.getComponent(NodeNameHelper.class).getValidatedName(strip(uriPattern, "/"));
@@ -107,6 +139,11 @@ public final class StandardTasks {
         return new NodeExistsDelegateTask("Check " + nodeName + " bypass", "Check " + nodeName + " bypass in " + filterPath + " config.", CONFIG, filterPath + "/bypasses/" + nodeName, null, creationTask);
     }
 
+    /**
+     * Creates a task to set the author form client callback implementation.
+     *
+     * @return task adjusting security callback configuration
+     */
     public static Task setSecurityCallback() {
         return selectServerConfig("Change callback", "Set the author form client callback.",
             getNode("filters/securityCallback/clientCallbacks/form").then(
@@ -116,11 +153,14 @@ public final class StandardTasks {
     }
 
     /**
-     * Compares the versions and the revision classifier. If the version numbers are equal, a different classifier should trigger a module update.
+     * Compares versions including classifier to decide if an update should be triggered.
+     * <p>
+     * If numeric version parts are equivalent but the classifier differs (or a released version without classifier replaces a classified one) then update is indicated.
+     * </p>
      *
-     * @param fromVersion from version
-     * @param toVersion to version
-     * @return true, if version classifier is different
+     * @param fromVersion existing installed version
+     * @param toVersion candidate version
+     * @return true if classifier change suggests update
      */
     public static boolean hasModuleNewRevision(final Version fromVersion, final Version toVersion) {
         boolean triggerUpdate = false;

@@ -25,7 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 
 /**
- * The builder for a sql2 String condition.
+ * Builder for a sql2 String property condition. Extends the generic property behaviour with LIKE based
+ * matching supporting startsWith, endsWith and contains semantics (ANY/ALL variants). Supports optional
+ * case transformations and (planned) length() dynamic operand.
+ *
+ * Thread-safety: Not thread safe.
+ * Null handling: Null values produce no output. For LIKE operations empty strings are ignored.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-01
@@ -47,14 +52,27 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
         super(property);
     }
 
+    /**
+     * Start a string condition for the given property name.
+     * @param name property name (may be null/blank -> empty condition later)
+     * @return dynamic operand (case transformation) API
+     */
     public static Sql2DynamicOperand property(final String name) {
         return new Sql2StringCondition(name);
     }
 
+    /**
+     * Convenience start method targeting Magnolia's renderable template property.
+     * @return dynamic operand API for template property
+     */
     public static Sql2DynamicOperand template() {
         return property(NodeTypes.Renderable.TEMPLATE);
     }
 
+    /**
+     * Convenience start method targeting the JCR UUID property.
+     * @return dynamic operand API for identifier property
+     */
     public static Sql2DynamicOperand identifier() {
         return property(JcrConstants.JCR_UUID);
     }
@@ -65,45 +83,78 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
         return this;
     }
 
+    /**
+     * Negate the upcoming comparison sequence (wrap output in not(...)).
+     * @return narrowed API without another not()
+     */
     public Sql2CompareString not() {
         super.not();
         return me();
     }
 
+    /**
+     * Apply lower() to the property value prior to comparison.
+     * @return comparison API (still allowing not() before calling a comparison operator)
+     */
     public Sql2CompareStringNot lowerCase() {
         _operandMethod = METHOD_LOWER;
         return me();
     }
 
+    /**
+     * Apply upper() to the property value prior to comparison.
+     * @return comparison API (still allowing not())
+     */
     public Sql2CompareStringNot upperCase() {
         _operandMethod = METHOD_UPPER;
         return me();
     }
 
+    /**
+     * Switch into a length() dynamic operand context for subsequent numeric comparison.
+     * NOTE: Currently not implemented and returns null deliberately.
+     * @return numeric comparison API (null until implemented)
+     */
     public Sql2CompareNot<Long> length() {
         _operandMethod = METHOD_LENGTH;
-        // todo: what to return??
+        // length() not yet implemented; returns null to signal unsupported dynamic operand.
         return null;
     }
 
+    /**
+     * Prepare a LIKE startsWith comparison (value%). Multiple values use OR semantics.
+     * @return multi-value step
+     */
     public Sql2StaticOperandMultiple<String> startsWithAny() {
         _startsWith = true;
         _isLike = true;
         return me();
     }
 
+    /**
+     * Prepare a LIKE endsWith comparison (%value). Multiple values use OR semantics.
+     * @return multi-value step
+     */
     public Sql2StaticOperandMultiple<String> endsWithAny() {
         _endsWith = true;
         _isLike = true;
         return me();
     }
 
+    /**
+     * Prepare a LIKE contains comparison (%value%). Multiple values use OR semantics.
+     * @return multi-value step
+     */
     public Sql2StaticOperandMultiple<String> likeAny() {
         _contains = true;
         _isLike = true;
         return me();
     }
 
+    /**
+     * Prepare a LIKE contains comparison (%value%) expecting ALL values (AND semantics).
+     * @return multi-value step
+     */
     public Sql2StaticOperandMultiple<String> likeAll() {
         _contains = true;
         _isLike = true;

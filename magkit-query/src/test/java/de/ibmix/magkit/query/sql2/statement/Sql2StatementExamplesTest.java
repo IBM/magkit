@@ -33,10 +33,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Tests showing examples on how to use the Sql2 query facade.
- *
+ * Usage examples for Sql2 statement builder.
  * @author wolf.bubenik@ibmix.de
- * @since (21.8.2020)
+ * @since 2020-08-21
  */
 public class Sql2StatementExamplesTest {
 

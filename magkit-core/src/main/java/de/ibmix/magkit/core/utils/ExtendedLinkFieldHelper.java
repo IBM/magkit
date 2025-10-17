@@ -40,7 +40,31 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 /**
- * Helper class to get partitions of an uri.
+ * Utility to extract and re-compose extended link components (base path/UUID, selectors, query string, anchor) for Magnolia link fields.
+ * <p>
+ * Main functionality:
+ * <ul>
+ *   <li>Parse a raw link/UUID value and obtain its base portion independently of extended components.</li>
+ *   <li>Extract selector chain, query string and anchor fragment from a value.</li>
+ *   <li>Merge individual components back into a single extended link string in Magnolia selector format.</li>
+ *   <li>Create an extended link for a JCR {@link Node} property including optional selector, query and anchor suffix properties.</li>
+ * </ul>
+ * Key details:
+ * <ul>
+ *   <li>Selectors are injected directly before an eventual file extension (last dot) or appended at end if none exists.</li>
+ *   <li>A UUID (36 chars) at start is treated as base if detected even when represented internally as a path.</li>
+ *   <li>Values that are not paths, anchors or UUIDs yield {@code null} for URI creation.</li>
+ * </ul>
+ * Usage preconditions: Methods expect either a Magnolia path, anchor string, or a raw UUID (optionally followed by extended parts).
+ * Side effects: The helper is stateless and does not modify passed {@link Node} instances; it only reads properties.
+ * Null & error handling: Invalid or unsupported input strings produce {@code null} results for component getters; merge operations skip null/blank parts gracefully.
+ * Thread-safety: The class is stateless and annotated {@link Singleton}; all methods are thread-safe.
+ * Usage example:
+ * <pre>
+ *   ExtendedLinkFieldHelper helper = new ExtendedLinkFieldHelper();
+ *   String extended = helper.mergeComponents("/my/page", "print.detail", "a=1&b=2", "section");
+ *   // Result: /my/page.print.detail.?a=1&b=2#section
+ * </pre>
  *
  * @author Philipp Güttler (Aperto AG)
  * @since 03.06.2015
@@ -56,10 +80,11 @@ public class ExtendedLinkFieldHelper {
     private static final int DEFAULT_UUID_LENGTH = 36;
 
     /**
-     * Returns the path of an uri. If the uri scheme contains an identifier, the identifier is returned instead, even it is treaded as path internally.
+     * Returns the base portion (path or UUID) of the given value, omitting selectors, query and anchor.
+     * If the path begins with a UUID it returns that UUID instead of the path representation.
      *
-     * @param value the uri string
-     * @return the path or the uuid
+     * @param value raw value possibly containing selectors/query/anchor
+     * @return base path or UUID; {@code null} if value cannot be interpreted as URI/UUID
      */
     public String getBase(final String value) {
         final URI uri = createUri(value);
@@ -75,15 +100,22 @@ public class ExtendedLinkFieldHelper {
     }
 
     /**
-     * Removes all components from the given uri.
+     * Removes the base (path/UUID) portion and returns only extended components concatenated.
      *
-     * @param value the uri, which might contain additional components
-     * @return everything except the path
+     * @param value raw value containing path/UUID and optional components
+     * @return merged selector/query/anchor without base (may be empty string if none present)
      */
     public String stripBase(final String value) {
         return mergeComponents(null, getSelectors(value), getQuery(value), getAnchor(value));
     }
 
+    /**
+     * Extracts the selector chain from the given URI string.
+     * Selectors are Magnolia-specific fragments between dots preceding the final path segment or extension.
+     *
+     * @param uri raw link value
+     * @return selector chain joined by '.' or {@code null} if none present
+     */
     public String getSelectors(final String uri) {
         String nodePath = uri;
         final StringBuilder selectors = new StringBuilder();
@@ -96,16 +128,39 @@ public class ExtendedLinkFieldHelper {
         return selectors.length() == 0 ? null : removeEnd(selectors.toString(), SELECTOR_DELIMITER);
     }
 
+    /**
+     * Extracts the query string (without leading '?').
+     *
+     * @param uri raw link value
+     * @return query string or {@code null} if absent or value invalid
+     */
     public String getQuery(final String uri) {
         final URI obj = createUri(uri);
         return obj == null ? null : obj.getQuery();
     }
 
+    /**
+     * Extracts the anchor fragment (without leading '#').
+     *
+     * @param uri raw link value
+     * @return anchor fragment or {@code null} if absent or value invalid
+     */
     public String getAnchor(final String uri) {
         final URI obj = createUri(uri);
         return obj == null ? null : obj.getFragment();
     }
 
+    /**
+     * Merges the given components into a Magnolia extended link string.
+     * Selector chain is inserted before the last file extension dot if present, or appended at end otherwise.
+     * Null or blank components are ignored.
+     *
+     * @param base base path or UUID (may be {@code null})
+     * @param selector selector chain (dot separated) or {@code null}
+     * @param query query string without leading '?' or {@code null}
+     * @param anchor anchor fragment without leading '#' or {@code null}
+     * @return composed extended link string (never {@code null})
+     */
     public String mergeComponents(final String base, final String selector, final String query, final String anchor) {
         StringBuilder result = new StringBuilder(defaultString(base));
         if (isNotBlank(selector)) {
@@ -125,14 +180,13 @@ public class ExtendedLinkFieldHelper {
     }
 
     /**
-     * Creates a link for the reference provided by the source node as property value.
-     * Handles internal and external links and adds the extended link features (anchor, query string, selector).
+     * Creates an extended link for a JCR node reference, augmenting a base link with optional anchor, query and selectors stored in suffixed properties.
      *
-     * @param source the source node that contains the reference
-     * @param linkPropertyName the name of the link property at source node
-     * @param workspace the workspace name of the target node
-     * @param linkType the LinkTool.LinkType that determines weather an internal, external or redirect URL should be created.
-     * @return the URL for the reference or NULL
+     * @param source node containing the link reference and optional suffixed properties
+     * @param linkPropertyName base property name holding the reference target
+     * @param workspace target workspace name for internal link resolution
+     * @param linkType type of link to create (internal/external/redirect)
+     * @return composed URL or {@code null} if base link cannot be resolved or is empty
      */
     public String createExtendedLink(Node source, String linkPropertyName, String workspace, LinkTool.LinkType linkType) {
         String link = LinkTool.createLinkForReference(source, linkPropertyName, workspace, linkType);
@@ -146,15 +200,23 @@ public class ExtendedLinkFieldHelper {
     }
 
     /**
-     * Creates an URI from given string.
+     * Creates a {@link URI} from the provided value if it resembles a Magnolia path, anchor or UUID (followed by components).
+     * For raw UUID values a synthetic leading '/' is added to satisfy {@link URI} path requirements.
      *
-     * @param value a path or an uuid, and additional uri components
-     * @return the uri or null
+     * @param value raw path, anchor or UUID (+ optional components)
+     * @return URI instance or {@code null} if not interpretable
      */
     protected URI createUri(final String value) {
         return LinkTool.isPath(value) || LinkTool.isAnchor(value) ? URI.create(value) : LinkTool.isUuid(substring(value, 0, DEFAULT_UUID_LENGTH)) ? URI.create("/" + defaultString(value)) : null;
     }
 
+    /**
+     * Determines if more selector segments are present in the remaining URI string portion.
+     * A segment is considered present if the string contains a '.' and does not start with a '.' (file extension boundary).
+     *
+     * @param uri remaining URI fragment
+     * @return {@code true} if another selector segment can be parsed; otherwise {@code false}
+     */
     protected boolean containsMoreSelectors(final String uri) {
         return !startsWith(uri, TAG_FILE_EXTENSION) && contains(uri, SELECTOR_DELIMITER);
     }

@@ -27,10 +27,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2ConstraintGroup.
- *
+ * Tests for Sql2ConstraintGroup.
  * @author wolf.bubenik@ibmix.de
- * @since 05.04.2020
+ * @since 2020-04-05
  */
 public class Sql2ConstraintGroupTest {
 

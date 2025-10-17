@@ -23,7 +23,16 @@ package de.ibmix.magkit.query.sql2.condition;
 import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 
 /**
- * Builder for SQL2 join conditions on path. To be used for joins only.
+ * Builder for SQL2 join path relation conditions between the selected and joined selector. All factory
+ * methods express the direction of the relationship (joined is descendant of selected, etc.).
+ * <p>Usage example:</p>
+ * <pre>{@code
+ * Sql2PathJoinCondition c = Sql2PathJoinCondition.isJoinedChildOfSelected();
+ * String fragment = c.asString("a", "b");
+ * // -> "ischildnode(b,a)"
+ * }</pre>
+ * Thread-safety: Not thread safe.
+ * Null handling: Selector names are expected to be provided during rendering; no internal validation.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-18
@@ -38,26 +47,51 @@ public final class Sql2PathJoinCondition implements Sql2JoinCondition {
         _isJoinSelectorFirst = isJoinSelectorFirst;
     }
 
+    /**
+     * Relationship: joined selector is a descendant of the selected (FROM) selector.
+     * @return new join path condition
+     */
     public static Sql2PathJoinCondition isJoinedDescendantOfSelected() {
         return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_DESCENDANT, true);
     }
 
+    /**
+     * Relationship: selected (FROM) selector is a descendant of the joined selector.
+     * @return new join path condition
+     */
     public static Sql2PathJoinCondition isSelectedDescendantOfJoined() {
         return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_DESCENDANT, false);
     }
 
+    /**
+     * Relationship: joined selector is a direct child of the selected (FROM) selector.
+     * @return new join path condition
+     */
     public static Sql2PathJoinCondition isJoinedChildOfSelected() {
         return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_CHILD, true);
     }
 
+    /**
+     * Relationship: selected (FROM) selector is a direct child of the joined selector.
+     * @return new join path condition
+     */
     public static Sql2PathJoinCondition isSelectedChildOfJoined() {
         return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_CHILD, false);
     }
 
+    /**
+     * Relationship: both selectors address the same node.
+     * @return new join path condition
+     */
     public static Sql2PathJoinCondition isJoinedEqualsSelected() {
         return new Sql2PathJoinCondition(Sql2PathCondition.SQL2_METHOD_SAME, false);
     }
 
+    /**
+     * Append this join path relation to the buffer.
+     * @param sql2 target buffer (never null)
+     * @param selectorNames provider for selector names
+     */
     @Override
     public void appendTo(StringBuilder sql2, final Sql2SelectorNames selectorNames) {
         String first = _isJoinSelectorFirst ? selectorNames.getJoinSelectorName() : selectorNames.getFromSelectorName();

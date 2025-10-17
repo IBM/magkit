@@ -30,7 +30,18 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
- * The builder for a sql2 path condition.
+ * Builder for a SQL2 path relation condition using JCR path functions (issamenode, ischildnode, isdescendantnode).
+ * Supports negation via {@link #not()} and choosing one of the path relation methods against either an absolute
+ * path string or a JCR Node (path extracted best effort). The builder stays empty unless both path and method are set.
+ *
+ * Features:
+ * <ul>
+ *   <li>Same node, child node, descendant node checks</li>
+ *   <li>Negation support wrapping the function call in {@code not(...)}</li>
+ *   <li>Join selector awareness via {@link #forJoin()}</li>
+ * </ul>
+ * Thread-safety: Not thread safe.
+ * Null handling: Null / blank paths result in an empty condition (ignored when rendering).
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-01
@@ -50,6 +61,10 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
     private Sql2PathCondition() {
     }
 
+    /**
+     * Start building a path condition (configure relation and path afterwards).
+     * @return new empty path condition instance
+     */
     public static Sql2PathCondition is() {
         return new Sql2PathCondition();
     }
@@ -59,37 +74,71 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
         return isNotBlank(_path) && isNotBlank(_method);
     }
 
+    /**
+     * Negate the path constraint (wrap in not()).
+     * @return this
+     */
     public Sql2PathCondition not() {
         _not = true;
         return this;
     }
 
+    /**
+     * Constrain to child relationship using a String path.
+     * @param path parent path
+     * @return this
+     */
     public Sql2JoinConstraint child(final String path) {
         _path = trim(path);
         _method = SQL2_METHOD_CHILD;
         return this;
     }
 
+    /**
+     * Constrain to child relationship using a Node (path extracted).
+     * @param parent parent node
+     * @return this
+     */
     public Sql2JoinConstraint child(final Node parent) {
         return child(toPath(parent));
     }
 
+    /**
+     * Constrain to descendant relationship using a String path.
+     * @param path ancestor path
+     * @return this
+     */
     public Sql2JoinConstraint descendant(final String path) {
         _path = trim(path);
         _method = SQL2_METHOD_DESCENDANT;
         return this;
     }
 
+    /**
+     * Constrain to descendant relationship using a Node (path extracted).
+     * @param parent ancestor node
+     * @return this
+     */
     public Sql2JoinConstraint descendant(final Node parent) {
         return descendant(toPath(parent));
     }
 
+    /**
+     * Constrain to same node relationship using a String path.
+     * @param path node path
+     * @return this
+     */
     public Sql2JoinConstraint same(final String path) {
         _path = trim(path);
         _method = SQL2_METHOD_SAME;
         return this;
     }
 
+    /**
+     * Constrain to same node relationship using a Node (path extracted).
+     * @param parent node
+     * @return this
+     */
     public Sql2JoinConstraint same(final Node parent) {
         return same(toPath(parent));
     }
@@ -98,6 +147,12 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
         return node != null ? getPathIfPossible(node) : EMPTY;
     }
 
+    /**
+     * Append the configured path relation function call to the buffer if non-empty.
+     * @param sql2 target buffer (never null)
+     * @param selectorNames selector provider determining which selector name to include
+     */
+    @Override
     public void appendTo(StringBuilder sql2, final Sql2SelectorNames selectorNames) {
         if (isNotEmpty()) {
             if (_not) {
@@ -119,6 +174,10 @@ public final class Sql2PathCondition implements Sql2JoinConstraint {
         }
     }
 
+    /**
+     * Use the join selector name instead of the from selector when rendering.
+     * @return this for fluent chaining
+     */
     @Override
     public Sql2JoinConstraint forJoin() {
         _forJoin = true;

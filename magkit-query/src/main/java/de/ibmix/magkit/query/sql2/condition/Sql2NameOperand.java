@@ -21,12 +21,17 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * Builder Interface for String conditions that declares usage of jcr methods for strings.
+ * Name operand interface adding case transformation functions to a name() comparison chain.
+ * Returned interfaces intentionally limit further available operations to keep the DSL guided.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-11-11
  */
 public interface Sql2NameOperand extends Sql2NameCompare {
+    /** Apply lower() to name().
+     * @return comparison API */
     Sql2NameCompare lowerCase();
+    /** Apply upper() to name().
+     * @return comparison API */
     Sql2NameCompare upperCase();
 }

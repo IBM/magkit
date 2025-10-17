@@ -44,7 +44,8 @@ import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
 /**
- * Test for node property voter.
+ * Unit tests for {@link NodePropertyVoter} covering configuration completeness, property matching scenarios
+ * and context based path resolution.
  *
  * @author frank.sommer
  * @since 14.01.13

@@ -21,14 +21,27 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * Builder Interface for String conditions that declares methods only available for Strings.
+ * Specialised comparison step API for String properties exposing LIKE variations (starts/ends/contains).
+ * Only available after choosing a String property and (optionally) applying {@code not()}.
+ * Implementations provide multi-value variants to allow combining several patterns in one step.
+ *
+ * Thread-safety: Not thread safe.
+ * Null handling: Null/empty values are ignored during rendering.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-26
  */
 public interface Sql2CompareString extends Sql2Compare<String> {
+    /** Prepare a LIKE comparison matching any value at the beginning.
+     * @return multi-value operand step */
     Sql2StaticOperandMultiple<String> startsWithAny();
+    /** Prepare a LIKE comparison matching any value at the end.
+     * @return multi-value operand step */
     Sql2StaticOperandMultiple<String> endsWithAny();
+    /** Prepare a LIKE comparison matching any value anywhere (OR semantics).
+     * @return multi-value operand step */
     Sql2StaticOperandMultiple<String> likeAny();
+    /** Prepare a LIKE comparison matching all values (AND semantics).
+     * @return multi-value operand step */
     Sql2StaticOperandMultiple<String> likeAll();
 }

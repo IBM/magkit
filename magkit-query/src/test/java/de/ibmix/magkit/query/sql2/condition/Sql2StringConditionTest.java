@@ -27,10 +27,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2StringCondition.
- *
+ * Tests for Sql2StringCondition.
  * @author wolf.bubenik@ibmix.de
- * @since 02.04.2020
+ * @since 2020-04-02
  */
 public class Sql2StringConditionTest {
 

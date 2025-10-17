@@ -28,10 +28,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test Sql2NullCondition.
+ * Tests for Sql2NullCondition.
  *
  * @author wolf.bubenik@ibmix.de
- * @since (17.06.20)
+ * @since 2020-06-17
  */
 public class Sql2NullConditionTest {
 

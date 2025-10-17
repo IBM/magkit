@@ -36,9 +36,19 @@ import static info.magnolia.resourceloader.jcr.JcrResourceOrigin.RESOURCES_WORKS
 
 /**
  * An update task for removing all hotfixes in module specific resources.
+ * <p>
+ * Executes a query selecting all content nodes under the supplied base path which do not have a template set. These
+ * nodes are considered hotfix artefacts and are removed. Intended for cleanup after consolidating resources into
+ * proper templated definitions.
+ * </p>
+ * <p>Preconditions: Base path exists in the resources workspace.</p>
+ * <p>Side Effects: Permanently deletes matching resource nodes.</p>
+ * <p>Error Handling: Propagates {@link RepositoryException} to caller; individual removals are not guarded.</p>
+ * <p>Thread-Safety: Single-threaded expected; no synchronization provided.</p>
+ * <p>Usage Example: {@code tasks.add(new RemoveResourcesHotfixesTask("/my-module"));}</p>
  *
  * @author frank.sommer
- * @since 18.08.2016
+ * @since 2016-08-18
  */
 public class RemoveResourcesHotfixesTask extends AbstractRepositoryTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoveResourcesHotfixesTask.class);
@@ -55,6 +65,12 @@ public class RemoveResourcesHotfixesTask extends AbstractRepositoryTask {
         _basePath = basePath;
     }
 
+    /**
+     * Performs the query for hotfix nodes (nodes without template) and removes them.
+     *
+     * @param installContext current installation context
+     * @throws RepositoryException if query or removal fails
+     */
     @Override
     protected void doExecute(final InstallContext installContext) throws RepositoryException {
         String moduleName = installContext.getCurrentModuleDefinition().getName();

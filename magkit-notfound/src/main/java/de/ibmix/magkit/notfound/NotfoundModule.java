@@ -29,9 +29,48 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 /**
  * Module class of the Magkit module.
+ * <p>
+ * Provides configuration settings for handling "not found" (404 and related) error pages in a Magnolia based
+ * installation. It encapsulates three main configurable aspects:
+ * <ul>
+ *   <li><b>defaultErrorPath</b>: An absolute or site-root based default path used when no site specific error page
+ *       has been defined.</li>
+ *   <li><b>relativeErrorPath</b>: A relative path fragment (defaults to "error") that can be appended to a site base
+ *       path to resolve a site specific error page location.</li>
+ *   <li><b>errorCodeMapping</b>: A mapping from HTTP status codes (e.g. "404", "500") to page names or path fragments
+ *       allowing fine grained selection of error pages per status code.</li>
+ * </ul>
+ * Additionally this module declares the site parameter key {@link #SITE_PARAM_FRAGMENT_LENGTH} which controls how
+ * many base path fragments are considered when resolving site specific error pages.
+ * <p>
+ * <b>Usage Preconditions:</b> All properties are expected to be initialized by Magnolia module configuration
+ * (e.g. via YAML or JCR configuration) before first usage. Defaults ensure non-null values.
+ * </p>
+ * <p>
+ * <b>Null and Error Handling:</b> Fields are initialized to safe defaults (empty string, "error", empty mapping).
+ * Setters allow null assignment; callers should avoid passing null to prevent additional null checks downstream.
+ * </p>
+ * <p>
+ * <b>Thread-Safety:</b> This class is <em>not</em> thread-safe. It is typically instantiated and configured once during
+ * application/module initialization and then accessed read-only. Concurrent mutations of its properties must be
+ * externally synchronized.
+ * </p>
+ * <p>
+ * <b>Side Effects:</b> This class has no side effects; it stores configuration data only.
+ * </p>
+ * <p>
+ * <b>Example Usage:</b>
+ * <pre>{@code
+ * NotfoundModule cfg = new NotfoundModule();
+ * cfg.setDefaultErrorPath("/global/error/index");
+ * cfg.setRelativeErrorPath("error");
+ * cfg.setErrorCodeMapping(Map.of("404", "not-found", "500", "system-error"));
+ * String base = cfg.getDefaultErrorPath();
+ * }
+ * </code></pre>
  *
  * @author frank.sommer
- * @since 12.05.14
+ * @since 2014-05-12
  */
 @Getter
 @Setter

@@ -38,7 +38,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
- * Test TemplateNameVoter.
+ * Unit tests for {@link TemplateNameVoter} validating template collection handling, root path filtering
+ * and template matching scenarios.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-01-05

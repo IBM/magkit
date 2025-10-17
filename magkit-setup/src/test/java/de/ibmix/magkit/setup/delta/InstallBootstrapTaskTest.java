@@ -33,8 +33,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Minimal tests for bootstrap installation path filtering.
+ *
  * @author Philipp Güttler (Aperto GmbH - An IBM Company)
- * @since 03.05.2018
+ * @since 2018-05-03
  */
 public class InstallBootstrapTaskTest {
 

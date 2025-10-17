@@ -43,7 +43,47 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.split;
 
 /**
- * Static utility methods for locales (languages).
+ * Utility class providing static helper methods for working with {@link Locale} and Magnolia i18n configuration.
+ * <p>
+ * Core functionalities:
+ * <ul>
+ *   <li>Access to the configured site locales and their ISO language codes.</li>
+ *   <li>Determination of a locale (language) from a JCR node or path.</li>
+ *   <li>Lookup of display labels for locales based on path information.</li>
+ *   <li>Retrieval of available countries mapped (countryName -> countryCode).</li>
+ * </ul>
+ * <p>
+ * Important details:
+ * <ul>
+ *   <li>The list of site locales is cached the first time {@link #getSiteLocales()} is called. Subsequent changes
+ *       to Magnolia's site configuration will NOT be reflected until {@link #resetDefaultSiteLocals()} is invoked.</li>
+ *   <li>If no fallback locale is configured, {@link java.util.Locale#ENGLISH} is used as default.</li>
+ *   <li>Locale extraction from a path scans path segments and returns the first segment matching a configured language.</li>
+ * </ul>
+ * <p>
+ * Null and error handling:
+ * <ul>
+ *   <li>Methods returning language codes may return {@code null} or an empty string when no configured locale is found.</li>
+ *   <li>{@link #determineLocaleFromContent(Node)} falls back to the default site locale when none is found in the path.</li>
+ * </ul>
+ * <p>
+ * Thread-safety: This class is effectively thread-safe for read operations on cached data after initialization. The
+ * cache initialization is not synchronized; concurrent first access may initialize the cache multiple times with the
+ * same logical result. Manual reset via {@link #resetDefaultSiteLocals()} is not thread-safe and should only be used
+ * in controlled test scenarios.
+ * <p>
+ * Side effects: Calling {@link #resetDefaultSiteLocals()} clears the static cache and forces re-reading Magnolia's
+ * configuration on the next {@link #getSiteLocales()} invocation.
+ * <p>
+ * Usage example:
+ * <pre>{@code
+ * // Obtain configured language codes
+ * Set<String> languages = LocaleUtil.getConfiguredLanguages();
+ * // Determine language from path
+ * String lang = LocaleUtil.determineLocaleFromPath("/travel/en/home");
+ * // Fallback behavior
+ * String contentLang = LocaleUtil.determineLocaleFromContent(node);
+ * }</pre>
  *
  * @author jfrantzius
  * @since 2014-05-14
@@ -56,10 +96,10 @@ public final class LocaleUtil {
     }
 
     /**
-     * Builds a list with all i18n locales (languages) configured in magnolia,
-     * i.e. the default site's locales.
+     * Builds an ordered set of all configured ISO language codes (Magnolia i18n locales) of the default site.
+     * <p>The languages are derived from {@link #getSiteLocales()} by extracting {@link Locale#getLanguage()}.</p>
      *
-     * @return configured languages
+     * @return ordered set of configured language codes (never null, may be empty)
      */
     public static Set<String> getConfiguredLanguages() {
         Collection<Locale> locales = getSiteLocales();
@@ -76,11 +116,12 @@ public final class LocaleUtil {
     private static List<Locale> c_defaultSiteLocals;
 
     /**
-     * Return the default site's locales as configured.
-     * ! Note that this list is cached as static class constant.
-     * All changes of site configuration after first call of this method will not take effect here.
+     * Returns the list of {@link Locale}s configured for the default site.
+     * <p>Caches the first successful lookup statically. Subsequent changes to Magnolia's configuration are ignored
+     * until {@link #resetDefaultSiteLocals()} is called.</p>
+     * <p>Note: The returned list may be {@code null} if the i18n configuration is not available.</p>
      *
-     * @return the list of all configured locals, never null
+     * @return list of configured site locales or {@code null} if not resolvable
      */
     public static List<Locale> getSiteLocales() {
         if (c_defaultSiteLocals == null) {
@@ -89,20 +130,28 @@ public final class LocaleUtil {
             if (i18n != null) {
                 Collection<Locale> locales = i18n.getLocales();
                 c_defaultSiteLocals = new ArrayList<>(locales);
+                LOGGER.debug("Initialized site locales: {}", c_defaultSiteLocals);
+            } else {
+                LOGGER.warn("I18nContentSupport not available - site locales remain null.");
             }
         }
         return c_defaultSiteLocals;
     }
 
-    // introduced for testing. However, caching the locales in a static class field may not be a good idea at all.
+    /**
+     * Resets the cached site locales so that a subsequent call to {@link #getSiteLocales()} re-reads Magnolia's
+     * configuration. Intended for testing only.
+     */
     static void resetDefaultSiteLocals() {
         c_defaultSiteLocals = null;
+        LOGGER.debug("Site locales cache reset.");
     }
 
     /**
-     * Return the default site's fallback locale.
+     * Returns the configured fallback {@link Locale} for the default Magnolia site.
+     * <p>Falls back to {@link Locale#ENGLISH} if no fallback is defined or if i18n configuration is absent.</p>
      *
-     * @return the site fallback local or Locale.ENGLISH if non has been configured
+     * @return the fallback locale (never null)
      */
     public static Locale getDefaultSiteLocale() {
         SiteManager siteManager = Components.getComponent(SiteManager.class);
@@ -111,11 +160,11 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the ISO language code from content node path.
-     * Fallback to the default site fallback locale.
+     * Determines the ISO language code from the path of the provided JCR {@link Node}.
+     * <p>If no configured language is found in the path, returns the fallback site language.</p>
      *
-     * @param node  current jcr node
-     * @return the configured language code from node path or the default site language code if non has been found in path
+     * @param node current JCR node (may be null)
+     * @return language code found in the node path or the fallback language code if none detected (never null, never empty)
      */
     public static String determineLocaleFromContent(Node node) {
         String handle = node != null ? getPathIfPossible(node) : EMPTY;
@@ -124,10 +173,10 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the ISO language code from the node path.
+     * Determines the ISO language code from a repository path string by checking for configured languages.
      *
-     * @param path current path
-     * @return the language code or null if no configured locale found in path.
+     * @param path current path (may be null or empty)
+     * @return language code or {@code null} if none of the configured languages occur in the path
      */
     public static String determineLocaleFromPath(String path) {
         Set<String> configuredLocales = getConfiguredLanguages();
@@ -135,10 +184,11 @@ public final class LocaleUtil {
     }
 
     /**
-     * Determines the locale label from page node path.
+     * Resolves a human-readable display label for the locale detected in a page node path.
+     * <p>The display name is localized to the locale itself (e.g. "Deutsch", "English").</p>
      *
-     * @param page current page node
-     * @return the language name or empty string if no locale is found for path.
+     * @param page current page node (may be null)
+     * @return localized display name of the detected locale or empty string if none found
      */
     public static String determineLocaleLabelFromNodePath(Node page) {
         String label = EMPTY;
@@ -151,11 +201,11 @@ public final class LocaleUtil {
     }
 
     /**
-     * Extract the first ISO language code from the path string, that is a configured site language.
+     * Scans a path for the first segment that matches one of the provided language codes.
      *
-     * @param path current node path
-     * @param locales list of locale strings
-     * @return the first language code from the string or null if not found
+     * @param path current node path (may be null or empty)
+     * @param locales collection of configured language codes to match against (not null)
+     * @return the first matched language code or {@code null} if none found
      */
     public static String determineLanguage(String path, Collection<String> locales) {
         String localeString = null;
@@ -171,9 +221,10 @@ public final class LocaleUtil {
     }
 
     /**
-     * List of all available countries, sorted by name.
+     * Builds a map of all available countries on the current JVM, sorted by display name insertion order.
+     * <p>Each entry maps {@code countryName -> countryCode}. Only unique country codes are included.</p>
      *
-     * @return Map of countries and their names (countryName, countryCode)
+     * @return ordered map of country display names to their ISO codes (may be empty, never null)
      */
     public static Map<String, String> getAvailableCountries() {
         Locale[] locales = Locale.getAvailableLocales();
