@@ -20,11 +20,12 @@
     </modules>
 
     <properties>
+        <version.magnolia>6.2.45</version.magnolia>
         <!-- keep in sync with corresponding versions from magnolia bundle -->
-        <version.magnolia.workflow>6.0.4</version.magnolia.workflow>
-        <version.poi>5.2.2</version.poi>
+        <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
+        <version.poi>5.3.0</version.poi>
 
-        <version.magkit.test>1.0.5</version.magkit.test>
+        <version.magkit.test>1.0.8</version.magkit.test>
     </properties>
 
     <dependencyManagement>
@@ -65,7 +66,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.28</version>
+                <version>1.18.42</version>
                 <scope>provided</scope>
             </dependency>
 
