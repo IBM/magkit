@@ -352,8 +352,11 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
                 mergedNodes.put(n.getName(), n);
             }
         }
-
-        mergedNodes.putAll(_childNodes);
+        for (Map.Entry<String, Node> entry : _childNodes.entrySet()) {
+            if (!_hiddenChildNodes.contains(entry.getKey())) {
+                mergedNodes.put(entry.getKey(), entry.getValue());
+            }
+        }
         return new NodeIteratorAdapter(mergedNodes.values());
     }
 
@@ -372,7 +375,11 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
                 nodeProperties.put(property.getName(), property);
             }
         }
-        nodeProperties.putAll(_properties);
+        for (Map.Entry<String, Property> entry : _properties.entrySet()) {
+            if (!_hiddenProperties.contains(entry.getKey())) {
+                nodeProperties.put(entry.getKey(), entry.getValue());
+            }
+        }
         return new PropertyIteratorAdapter(nodeProperties.values());
     }
 
