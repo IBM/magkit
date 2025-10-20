@@ -40,6 +40,7 @@ import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValues;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
@@ -185,5 +186,184 @@ public class AlteringNodeWrapperTest {
         stubProperty("test", "test-value").of(node);
         assertThat(wrapper.hasProperty("test"), is(true));
         assertThat(wrapper.hasProperty("mapped"), is(false));
+    }
+
+    /**
+     * Verifies merging and overriding of properties and hiding logic using getProperties().
+     */
+    @Test
+    public void hiddenPropertyAndOverrideMerge() throws Exception {
+        Node base = mockNode("base", stubProperty("title", "base-title"), stubProperty("keep", "keep-value"));
+        AlteringNodeWrapper wrapper = new AlteringNodeWrapper(base)
+            .withProperty("title", "wrapped-title")
+            .withProperty("added", "new-value")
+            .withHiddenProperty("keep");
+
+        // title overridden
+        assertThat(getStringValue(wrapper.getProperty("title")), is("wrapped-title"));
+        // hidden property not accessible
+        assertThat(wrapper.getProperty("keep"), nullValue());
+        assertThat(wrapper.hasProperty("keep"), is(false));
+        // added property present
+        assertThat(getStringValue(wrapper.getProperty("added")), is("new-value"));
+
+        // merged iterator contains overridden and added, but not hidden
+        java.util.Set<String> names = new java.util.HashSet<>();
+        javax.jcr.PropertyIterator it = wrapper.getProperties();
+        while (it.hasNext()) {
+            names.add(it.nextProperty().getName());
+        }
+        assertThat(names.contains("title"), is(true));
+        assertThat(names.contains("added"), is(true));
+        assertThat(names.contains("keep"), is(false));
+    }
+
+    /**
+     * Tests merging synthetic child nodes, overriding existing ones and hiding originals.
+     */
+    @Test
+    public void childNodeMergeHideAndOverride() throws Exception {
+        Node root = mockNode("root");
+        Node childA = mockNode("root/a");
+        Node childB = mockNode("root/b", stubProperty("bProp", "b-value"));
+        // Synthetic replacement for a with distinguishing property
+        Node injectedA = mockNode("aInjected", stubProperty("x", "y"));
+        Node injectedC = mockNode("cInjected", stubProperty("cProp", "c-value"));
+
+        AlteringNodeWrapper wrapper = new AlteringNodeWrapper(root)
+            .withChildNode("a", injectedA)
+            .withChildNode("c", injectedC)
+            .withHiddenNode("b");
+
+        // Hidden b
+        assertThat(wrapper.hasNode("b"), is(false));
+        assertThat(wrapper.getNode("b"), nullValue());
+        // Overridden a now exposes property x
+        assertThat(wrapper.hasNode("a"), is(true));
+        assertThat(getStringValue(wrapper.getNode("a").getProperty("x")), is("y"));
+        // Added c
+        assertThat(wrapper.hasNode("c"), is(true));
+        assertThat(getStringValue(wrapper.getNode("c").getProperty("cProp")), is("c-value"));
+
+        java.util.Set<String> childNames = new java.util.HashSet<>();
+        javax.jcr.NodeIterator ni = wrapper.getNodes();
+        while (ni.hasNext()) {
+            childNames.add(ni.nextNode().getName());
+        }
+        assertThat(childNames.contains("aInjected"), is(true));
+        assertThat(childNames.contains("cInjected"), is(true));
+        assertThat(childNames.contains("b"), is(false));
+    }
+
+    /**
+     * Ensures fallback to nearest ancestor page resolves property absent on wrapped component.
+     */
+    @Test
+    public void fallbackToPageResolvesAncestorProperty() throws Exception {
+        Node page = mockPageNode("content/page", stubProperty("test", "page-value"));
+        Node component = de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode("content/page/component");
+        FallbackNodeWrapper wrapper = new AlteringNodeWrapper(component).withFallbackToPage();
+        assertThat(getStringValue(wrapper.getProperty("test")), is("page-value"));
+    }
+
+    /**
+     * Verifies custom ancestor predicate fallback resolves property from matched ancestor node.
+     */
+    @Test
+    public void fallbackToAncestorCustomPredicate() throws Exception {
+        Node ancestor = mockNode("root/ancestor", stubProperty("foo", "bar"));
+        Node child = mockNode("root/ancestor/child/grandchild");
+        FallbackNodeWrapper wrapper = new AlteringNodeWrapper(child)
+            .withFallbackToAncestor(n -> {
+                try { return n.getPath().endsWith("/ancestor"); } catch (Exception e) { return false; }
+            });
+        assertThat(getStringValue(wrapper.getProperty("foo")), is("bar"));
+    }
+
+    /**
+     * Ensures reference fallback resolves property from target node referenced by link property.
+     */
+    @Test
+    public void fallbackToReferenceResolvesLinkedNode() throws Exception {
+        Node target = mockPageNode("root/pageRef", stubProperty("refProp", "ref-value"));
+        Node source = mockPageNode("root/pageRef/component", stubProperty("link", "/root/pageRef"));
+        FallbackNodeWrapper wrapper = new AlteringNodeWrapper(source).withFallbackToReference("website", "link");
+        assertThat(getStringValue(wrapper.getProperty("refProp")), is("ref-value"));
+    }
+
+    /**
+     * Checks immutable wrapper blocks mutating operations while allowing reads.
+     */
+    @Test
+    public void immutablePreventsUnderlyingMutations() throws Exception {
+        Node node = mockNode("immut", stubProperty("p", "v"));
+        AlteringNodeWrapper wrapper = new AlteringNodeWrapper(node).immutable();
+        assertThat(wrapper.getWrappedNode() instanceof ImmutableNodeWrapper, is(true));
+        assertThat(getStringValue(wrapper.getProperty("p")), is("v"));
+        boolean unsupported = false;
+        try {
+            wrapper.getWrappedNode().setProperty("x", "y");
+        } catch (UnsupportedOperationException e) {
+            unsupported = true;
+        }
+        assertThat(unsupported, is(true));
+    }
+
+    /**
+     * Confirms hidden properties (underlying + stubbed) are inaccessible and not reported via hasProperty.
+     */
+    @Test
+    public void hiddenPropertyOnUnderlyingAndStubbed() throws Exception {
+        Node node = mockNode("hideNode", stubProperty("toHide", "orig"));
+        AlteringNodeWrapper wrapper = new AlteringNodeWrapper(node)
+            .withHiddenProperty("toHide")
+            .withProperty("other", "val")
+            .withHiddenProperty("other");
+        assertThat(wrapper.getProperty("toHide"), nullValue());
+        assertThat(wrapper.hasProperty("toHide"), is(false));
+        assertThat(wrapper.getProperty("other"), nullValue());
+        assertThat(wrapper.hasProperty("other"), is(false));
+    }
+
+    /**
+     * Validates name pattern filtering works with overridden and hidden child nodes.
+     */
+    @Test
+    public void overrideChildNodeKeepsNamePatternFiltering() throws Exception {
+        Node root = mockNode("root");
+        mockNode("root/alpha");
+        mockNode("root/beta");
+        Node injected = mockNode("alphaInjected", stubProperty("marker", "yes"));
+        AlteringNodeWrapper wrapper = new AlteringNodeWrapper(root).withChildNode("alpha", injected).withHiddenNode("beta");
+        javax.jcr.NodeIterator filtered = wrapper.getNodes("alpha");
+        java.util.List<String> names = new java.util.ArrayList<>();
+        while (filtered.hasNext()) { names.add(filtered.nextNode().getName()); }
+        assertThat(names.size(), is(1));
+        assertThat(names.get(0), is("alphaInjected"));
+        assertThat(getStringValue(wrapper.getNode("alpha").getProperty("marker")), is("yes"));
+    }
+
+    /**
+     * Validates glob name filtering with multiple names and hidden nodes excluded from iterator.
+     */
+    @Test
+    public void overrideChildNodeGlobFiltering() throws Exception {
+        Node root = mockNode("globRoot");
+        mockNode("globRoot/alpha");
+        mockNode("globRoot/beta");
+        Node injected = mockNode("alphaInjected", stubProperty("marker", "glob"));
+        AlteringNodeWrapper wrapper = new AlteringNodeWrapper(root)
+            .withChildNode("alpha", injected)
+            .withHiddenNode("beta")
+            .withChildNode("gamma", mockNode("gammaInjected"));
+        javax.jcr.NodeIterator filtered = wrapper.getNodes(new String[]{"alpha", "beta", "gamma"});
+        java.util.List<String> names = new java.util.ArrayList<>();
+        while (filtered.hasNext()) { names.add(filtered.nextNode().getName()); }
+        // beta muss versteckt sein
+        assertThat(names.contains("beta"), is(false));
+        // alpha überschrieben und vorhanden
+        assertThat(names.contains("alphaInjected"), is(true));
+        // gamma hinzugefügt
+        assertThat(names.contains("gammaInjected"), is(true));
     }
 }
