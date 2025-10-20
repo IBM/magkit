@@ -39,7 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the {@link LinkConverter}.
+ * Unit tests for {@link LinkConverter} basic path/external/anchor conversion behavior.
  *
  * @author frank.sommer
  * @since 3.1.3

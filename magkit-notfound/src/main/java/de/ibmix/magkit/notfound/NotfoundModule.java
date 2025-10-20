@@ -67,7 +67,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * cfg.setErrorCodeMapping(Map.of("404", "not-found", "500", "system-error"));
  * String base = cfg.getDefaultErrorPath();
  * }
- * </code></pre>
+ * </pre>
  *
  * @author frank.sommer
  * @since 2014-05-12

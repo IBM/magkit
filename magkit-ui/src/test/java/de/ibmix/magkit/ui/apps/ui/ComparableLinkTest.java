@@ -32,10 +32,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Tests {@link ComparableLink}.
+ * Unit tests for {@link ComparableLink} ordering and equality behavior.
  *
  * @author oliver.emke
- * @since 27.01.17
+ * @since 2017-01-27
  */
 public class ComparableLinkTest {
 

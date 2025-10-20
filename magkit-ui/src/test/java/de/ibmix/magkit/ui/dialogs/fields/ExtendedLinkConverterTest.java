@@ -44,10 +44,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for converter of extended link field.
+ * Unit tests for {@link ExtendedLinkConverter} ensuring correct conversion of paths with suffixes.
  *
  * @author Philipp Güttler (Aperto AG)
- * @since 04.06.2015
+ * @since 2015-06-04
  */
 public class ExtendedLinkConverterTest {
 

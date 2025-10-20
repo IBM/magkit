@@ -37,9 +37,9 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
 /**
- * NodeTypeDefinition Test.
- *
+ * Unit tests for {@link NodeTypeValidator}.
  * @author ngoc.tran
+ * @since 2024-03-22
  */
 public class NodeTypeValidatorTest {
     private NodeTypeValidator _nodeTypeValidator;

@@ -24,10 +24,21 @@ import info.magnolia.ui.field.FieldType;
 import info.magnolia.ui.field.TextFieldDefinition;
 
 /**
- * Extends the ordinary {@link TextFieldDefinition}.
+ * Extension of {@link TextFieldDefinition} providing an additional recommended length hint for editorial guidance.
+ * <p>
+ * When the field has no enforced maximum length but a recommended length is set (&gt; 0), the factory will wrap the
+ * underlying Vaadin text field with {@link ExtendedTextField} adding a remaining length indicator label.
+ * </p>
+ * <p>Key features:
+ * <ul>
+ *   <li>Recommended length separate from max length.</li>
+ *   <li>Factory-controlled decoration only when max length is not set.</li>
+ * </ul>
+ * </p>
+ * <p>Thread-safety: Not thread-safe; definition instances are configuration objects.</p>
  *
  * @author Janine.Kleessen
- * @since 17.02.2021
+ * @since 2021-02-17
  */
 @FieldType("extendedTextField")
 public class ExtendedTextFieldDefinition extends TextFieldDefinition {
@@ -38,10 +49,18 @@ public class ExtendedTextFieldDefinition extends TextFieldDefinition {
         setFactoryClass(ExtendedTextFieldFactory.class);
     }
 
+    /**
+     * Recommended length for editorial display when max length &lt; 1.
+     * @return recommended length or -1 if not set
+     */
     public int getRecommendedLength() {
         return _recommendedLength;
     }
 
+    /**
+     * Set recommended length used for remaining-length indicator.
+     * @param recommendedLength positive recommended length or -1 to disable
+     */
     public void setRecommendedLength(int recommendedLength) {
         _recommendedLength = recommendedLength;
     }

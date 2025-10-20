@@ -25,8 +25,9 @@ import de.ibmix.magkit.core.utils.NodeUtils;
 import javax.jcr.Node;
 
 /**
- * Node-Validator that checks the id value of the node template.
- *
+ * Validator checking that a node's template ID matches one of the accepted values from its definition.
+ * <p>Relies on {@link NodeUtils#getTemplate(Node)} to resolve the template metadata.</p>
+ * <p>Thread-safety: Not thread-safe; one instance per field usage.</p>
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */
@@ -44,6 +45,11 @@ public class TemplateIdValidator extends NodeValidator {
         _definition = validatorDefinition;
     }
 
+    /**
+     * Evaluate node validity including template ID constraint.
+     * @param node JCR node (may be null)
+     * @return true if node exists and template id is accepted
+     */
     public boolean isValidValue(Node node) {
         return super.isValidValue(node) && _definition.hasAcceptedValue(NodeUtils.getTemplate(node));
     }

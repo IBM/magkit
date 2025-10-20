@@ -26,7 +26,15 @@ import info.magnolia.ui.field.AbstractFieldValidatorFactory;
 import javax.jcr.Node;
 
 /**
- * Factory for the TemplateTypeValidator.
+ * Factory creating {@link TemplateTypeValidator} instances from {@link TemplateTypeValidatorDefinition}.
+ * <p>
+ * Key features:
+ * <ul>
+ *   <li>Stateless creation – new validator per field binding.</li>
+ *   <li>Encapsulates mapping from definition to concrete validator.</li>
+ * </ul>
+ * </p>
+ * <p>Thread-safety: Factory instances are not thread-safe; Magnolia creates them per UI usage.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22

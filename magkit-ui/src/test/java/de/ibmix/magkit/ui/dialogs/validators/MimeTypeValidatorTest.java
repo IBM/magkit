@@ -33,10 +33,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the mime type validator.
- *
+ * Unit tests for {@link MimeTypeValidator}.
  * @author frank.sommer
- * @since 24.01.2024
+ * @since 2024-01-24
  */
 public class MimeTypeValidatorTest {
 

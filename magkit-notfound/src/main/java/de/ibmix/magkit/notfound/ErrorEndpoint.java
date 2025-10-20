@@ -68,10 +68,10 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * <p><strong>Usage Example:</strong></p>
  * <pre>{@code
  * // In web.xml error mapping
- * <error-page>
- *   <error-code>404</error-code>
- *   <location>/magnoliaError/error/default</location>
- * </error-page>
+ * &lt;error-page&gt;
+ *   &lt;error-code&gt;404&lt;/error-code&gt;
+ *   &lt;location&gt;/magnoliaError/error/default&lt;/location&gt;
+ * &lt;/error-page&gt;
  * }</pre>
  *
  * @author frank.sommer

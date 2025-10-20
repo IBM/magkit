@@ -28,9 +28,11 @@ import lombok.Setter;
 import java.util.Collection;
 
 /**
- * Mime type validator definition.
- *
+ * Definition holding the accepted MIME type patterns for {@link MimeTypeValidator}.
+ * <p>Patterns may include '*' wildcards. An empty collection treats all assets as valid.</p>
+ * <p>Thread-safety: Configuration only; not thread-safe.</p>
  * @author frank.sommer
+ * @since 2024-01-24
  */
 @Getter
 @Setter

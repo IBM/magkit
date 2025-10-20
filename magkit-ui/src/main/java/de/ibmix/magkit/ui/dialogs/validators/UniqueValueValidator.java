@@ -32,10 +32,18 @@ import javax.jcr.Node;
 import java.util.List;
 
 /**
- * Unique value validator.
- *
+ * Validator ensuring a string value is unique among nodes matching workspace/nodeType/property constraints.
+ * <p>Executes a query via {@link NodesByQuery} to find nodes with the same property value; allows match with itself.</p>
+ * <p>Key features:
+ * <ul>
+ *   <li>Workspace-scoped uniqueness check.</li>
+ *   <li>Property-based filtering across a node type.</li>
+ *   <li>Self-update allowance (ignores the current node's own value).</li>
+ * </ul>
+ * </p>
+ * <p>Null & config handling: If mandatory config values missing, validation returns false (not valid) or treats as valid? Here it's false until properly configured.</p>
  * @author frank.sommer
- * @since 12.03.2024
+ * @since 2024-03-12
  */
 @Slf4j
 public class UniqueValueValidator extends AbstractValidator<String> {
@@ -49,11 +57,22 @@ public class UniqueValueValidator extends AbstractValidator<String> {
         _itemContext = itemContext;
     }
 
+    /**
+     * Vaadin apply hook mapping uniqueness to a ValidationResult.
+     * @param value candidate value
+     * @param context value context (unused)
+     * @return validation result
+     */
     @Override
     public ValidationResult apply(String value, ValueContext context) {
         return toResult(value, isValidValue(value));
     }
 
+    /**
+     * Determine uniqueness of value among matching nodes (excluding current node).
+     * @param value candidate value (may be null)
+     * @return true if unique or only present on current node
+     */
     private boolean isValidValue(String value) {
         boolean valid = false;
         final String workspace = _definition.getWorkspace();

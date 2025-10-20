@@ -25,8 +25,8 @@ import de.ibmix.magkit.core.utils.NodeUtils;
 import javax.jcr.Node;
 
 /**
- * Node-Validator that checks the id value of the node template type.
- *
+ * Validator enforcing accepted template type values for a node.
+ * <p>Retrieves template type via {@link NodeUtils#getTemplateType(Node)} and checks against accepted values list.</p>
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */
@@ -44,6 +44,11 @@ public class TemplateTypeValidator extends NodeValidator {
         _definition = validatorDefinition;
     }
 
+    /**
+     * Validate node template type against accepted values.
+     * @param node JCR node (may be null)
+     * @return true if node exists and template type accepted
+     */
     public boolean isValidValue(Node node) {
         return super.isValidValue(node) && _definition.hasAcceptedValue(NodeUtils.getTemplateType(node));
     }

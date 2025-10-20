@@ -63,7 +63,7 @@ import static de.ibmix.magkit.setup.delta.StandardTasks.hasModuleNewRevision;
  * <p><strong>Example:</strong></p>
  * <pre>{@code
  * // In module descriptor (module.xml):
- * <versionHandler>de.ibmix.magkit.setup.BootstrapModuleVersionHandler</versionHandler>
+ * &lt;versionHandler&gt;de.ibmix.magkit.setup.BootstrapModuleVersionHandler&lt;/versionHandler&gt;
  * }
  * </pre>
  * @author frank.sommer

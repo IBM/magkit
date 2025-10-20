@@ -31,9 +31,17 @@ import javax.jcr.RepositoryException;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 /**
- * Validator für Knotentypen.
- *
+ * Validator ensuring a node's primary or mixin type matches any configured accepted types.
+ * <p>Checks primary type via {@link Node#isNodeType(String)} and iterates configured accepted types for a match.</p>
+ * <p>Key features:
+ * <ul>
+ *   <li>Supports empty accepted list (treats as always valid).</li>
+ *   <li>Graceful exception handling during type inspection – logs and treats as non-match.</li>
+ * </ul>
+ * </p>
+ * <p>Thread-safety: Not thread-safe; instance per field binding.</p>
  * @author ngoc.tran
+ * @since 2024-03-22
  */
 @Slf4j
 public class NodeTypeValidator extends AbstractValidator<Node> {
@@ -45,6 +53,11 @@ public class NodeTypeValidator extends AbstractValidator<Node> {
         _definition = definition;
     }
 
+    /**
+     * Validate node against accepted node type list.
+     * @param node node (may be null)
+     * @return true if valid
+     */
     public boolean isValidValue(Node node) {
         boolean valid = true;
         if (node != null) {
@@ -53,6 +66,12 @@ public class NodeTypeValidator extends AbstractValidator<Node> {
         return valid;
     }
 
+    /**
+     * Safe node type check encapsulating JCR exceptions.
+     * @param node node to inspect
+     * @param nodeType candidate type name
+     * @return true if node reports the type
+     */
     private boolean isNodeType(Node node, String nodeType) {
         try {
             return node.isNodeType(nodeType);
@@ -62,6 +81,11 @@ public class NodeTypeValidator extends AbstractValidator<Node> {
         return false;
     }
 
+    /**
+     * Iterate accepted node types for first match.
+     * @param node node to validate
+     * @return true if any accepted type matches
+     */
     private boolean isAcceptedNodeType(Node node) {
         for (String acceptedNodeType : _definition.getAcceptedNodeTypes()) {
             if (isNodeType(node, acceptedNodeType)) {
@@ -71,6 +95,12 @@ public class NodeTypeValidator extends AbstractValidator<Node> {
         return false;
     }
 
+    /**
+     * Vaadin apply hook mapping validity to {@link ValidationResult}.
+     * @param value node value
+     * @param context value context
+     * @return validation outcome
+     */
     @Override
     public ValidationResult apply(Node value, ValueContext context) {
         return toResult(value, isValidValue(value));

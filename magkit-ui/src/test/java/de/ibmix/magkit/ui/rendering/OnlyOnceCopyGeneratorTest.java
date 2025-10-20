@@ -41,9 +41,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Testing OnlyOnceCopyGenerator.
+ * Tests for {@link OnlyOnceCopyGenerator}.
  *
- * @author wolf.bubenik @ibmix.de
+ * @author wolf.bubenik@ibmix.de
  * @since 2023-06-02
  */
 public class OnlyOnceCopyGeneratorTest {

@@ -24,10 +24,22 @@ import info.magnolia.ui.field.FieldType;
 import info.magnolia.ui.field.JcrMultiValueFieldDefinition;
 
 /**
- * Multi field with specific size. Used for simple multi fields stored in a multi value property.
+ * Definition for a simple multi-value field stored in a single multi-value property with a configurable size limit.
+ * <p>
+ * Suitable for lists of primitive values (strings, numbers) rather than composite groups. Adds maximum component
+ * configuration similar to {@link SpecificMultiFieldDefinition} but leverages {@link JcrMultiValueFieldDefinition}.
+ * </p>
+ * <p>Key features:
+ * <ul>
+ *   <li>Configurable maximum number of values (defaults to {@link #DEFAULT_MAX}).</li>
+ *   <li>Optional parent count property name for contextual constraints.</li>
+ *   <li>Uses same view implementation {@link SpecificMultiFormView} for consistent UI behavior.</li>
+ * </ul>
+ * </p>
+ * <p>Thread-safety: Not thread-safe; configure once during dialog initialization.</p>
  *
  * @author payam.tabrizi
- * @since 22.02.21
+ * @since 2021-02-22
  */
 @FieldType("specificMultiValueField")
 public class SpecificMultiValueFieldDefinition extends JcrMultiValueFieldDefinition implements SpecificMultiDefinition {
@@ -39,18 +51,33 @@ public class SpecificMultiValueFieldDefinition extends JcrMultiValueFieldDefinit
         setImplementationClass((Class) SpecificMultiFormView.class);
     }
 
+    /**
+     * @return maximum allowed values or default
+     */
     public Long getMaxComponents() {
         return _maxComponents;
     }
 
+    /**
+     * Set maximum allowed values.
+     * @param maxComponents new maximum (null falls back to default)
+     */
     public void setMaxComponents(Long maxComponents) {
         _maxComponents = maxComponents;
     }
 
+    /**
+     * Name of related parent count property.
+     * @return property name or null
+     */
     public String getParentComponentProperty() {
         return _parentCountProperty;
     }
 
+    /**
+     * Configure parent count property name.
+     * @param parentCountProperty property name reference
+     */
     public void setParentCountProperty(final String parentCountProperty) {
         _parentCountProperty = parentCountProperty;
     }

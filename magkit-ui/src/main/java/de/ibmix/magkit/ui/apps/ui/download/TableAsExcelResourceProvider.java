@@ -69,10 +69,42 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
- * A ResourceProvider that provides the Table content as DownloadStream.
+ * Helper / provider that converts a Vaadin {@link Table} (legacy v7 component) into a downloadable Excel workbook.
+ * <p>
+ * It exposes a lightweight {@link ConnectorResource} whose {@link DownloadStream} is created lazily when a user
+ * triggers the download (e.g. by clicking a link or button bound to the resource). The workbook is generated in
+ * memory, flushed to a temporary file (due to POI streaming constraints), then streamed back via an {@link InputStream}.
+ * </p>
+ * <p>
+ * Key features:
+ * <ul>
+ *   <li>Supports exporting only currently visible columns (respects user column visibility).</li>
+ *   <li>Adds a title row and header row with bold styling, merges the title across all visible columns.</li>
+ *   <li>Auto-calculates column widths based on encountered cell values (bounded by Excel limit 255 characters).</li>
+ *   <li>Detects {@link Link} values and converts them into Excel hyperlinks (external URL or file path).</li>
+ *   <li>Generates safe sheet and file names by removing unsupported characters and normalizing spaces.</li>
+ *   <li>Removes configured Magnolia context path portion from the server base URL for correct public links.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Usage preconditions: Provide a non-null {@link Table} with initialized visible columns. The table should already be
+ * populated; dynamic changes after constructing this provider are not reflected unless a new instance is created.
+ * </p>
+ * <p>
+ * Side effects: Creates a temporary file inside Magnolia's temp directory for each download request which is not
+ * explicitly deleted here (left to OS temp cleanup). Keeps workbook only for the duration of stream creation.
+ * </p>
+ * <p>
+ * Null & error handling: Methods validate mandatory arguments with {@link IllegalArgumentException}. IO failures during
+ * file creation / writing are logged and result in a {@code null} stream which Vaadin will treat as an empty download.
+ * </p>
+ * <p>
+ * Thread-safety: Not thread-safe. Instances should be used within the UI thread. No shared mutable static state except
+ * constants. A single instance should not be accessed concurrently by multiple threads.
+ * </p>
  *
  * @author wolf.bubenik
- * @since 26.01.18
+ * @since 2018-01-26
  */
 public class TableAsExcelResourceProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(TableAsExcelResourceProvider.class);
@@ -89,6 +121,14 @@ public class TableAsExcelResourceProvider {
     private final Set<Object> _visibleColumns;
     private final String _title;
 
+    /**
+     * Construct a provider for exporting the supplied table.
+     *
+     * @param source the table to export (must not be {@code null})
+     * @param fileNameBase base name used for sheet and file (invalid characters and colons removed)
+     * @param title title placed into the first (merged) row; may be empty but not {@code null}
+     * @throws IllegalArgumentException if {@code source} is {@code null}
+     */
     public TableAsExcelResourceProvider(final Table source, final String fileNameBase, final String title) {
         _source = source;
         _visibleColumns = new HashSet<>(Arrays.asList(_source.getVisibleColumns()));
@@ -97,6 +137,11 @@ public class TableAsExcelResourceProvider {
         _title = title;
     }
 
+    /**
+     * Create a Vaadin resource representing the Excel file download.
+     *
+     * @return connector resource ready to be attached to a {@link Link} or button
+     */
     public ConnectorResource getResource() {
         return new ConnectorResource() {
             @Override
@@ -116,6 +161,12 @@ public class TableAsExcelResourceProvider {
         };
     }
 
+    /**
+     * Serialize the workbook into a temporary file and return an input stream for download.
+     *
+     * @param wb the workbook to serialize (must not be {@code null})
+     * @return input stream positioned at the beginning of the serialized workbook or {@code null} on IO error
+     */
     private InputStream toInputStream(Workbook wb) {
         FileSystemHelper fileSystemHelper = getComponent(FileSystemHelper.class);
         InputStream in = null;
@@ -132,6 +183,11 @@ public class TableAsExcelResourceProvider {
         return in;
     }
 
+    /**
+     * Build the workbook in memory including header and all visible rows.
+     *
+     * @return populated workbook (never {@code null})
+     */
     private Workbook createExcel() {
         Workbook wb = new XSSFWorkbook();
         CellStyle headerStyle = getHeaderStyle(wb);
@@ -147,6 +203,12 @@ public class TableAsExcelResourceProvider {
         return wb;
     }
 
+    /**
+     * Create header cell style (bold font) used for both title and column headers.
+     *
+     * @param wb workbook (must not be {@code null})
+     * @return header style
+     */
     CellStyle getHeaderStyle(final Workbook wb) {
         CellStyle headerStyle = wb.createCellStyle();
         Font font = wb.createFont();
@@ -155,6 +217,11 @@ public class TableAsExcelResourceProvider {
         return headerStyle;
     }
 
+    /**
+     * Render all visible rows (after the header) including link formatting and column width detection.
+     *
+     * @param sheet target sheet (must not be {@code null})
+     */
     void renderSheet(final Sheet sheet) {
         int rowCount = HEADER_ROW_NUMBER;
         Collection itemIds = _source.getVisibleItemIds();
@@ -182,6 +249,13 @@ public class TableAsExcelResourceProvider {
         setColumnWidth(sheet, maxColumnWidth);
     }
 
+    /**
+     * Add hyperlink metadata to a cell representing a Vaadin {@link Link}.
+     *
+     * @param value the link (must not be {@code null})
+     * @param cell excel cell (must not be {@code null})
+     * @param helper POI creation helper (must not be {@code null})
+     */
     private void addCellLink(Link value, Cell cell, CreationHelper helper) {
         checkArgument(cell != null, "The Cell must not be null.");
         checkArgument(helper != null, "The CreationHelper must not be null.");
@@ -190,6 +264,13 @@ public class TableAsExcelResourceProvider {
         cell.setHyperlink(link);
     }
 
+    /**
+     * Turn a Vaadin {@link Link} into a full URL (server base + target path) if possible.
+     *
+     * @param value link (must not be {@code null})
+     * @return absolute URL or empty string if no resolvable target
+     * @throws IllegalArgumentException if {@code value} is {@code null}
+     */
     String toUrl(Link value) {
         checkArgument(value != null, "The Link must not be null.");
         String url = EMPTY;
@@ -202,6 +283,11 @@ public class TableAsExcelResourceProvider {
         return isNotEmpty(url) ? getBaseUrl() + url : EMPTY;
     }
 
+    /**
+     * Resolve configured base URL without Magnolia context path suffix.
+     *
+     * @return base URL suitable for concatenation with resource paths
+     */
     String getBaseUrl() {
         // On our and migros systems, the defaultBaseUrl is configured with the context path.
         // This must be removed to ensure building of correct URLs.
@@ -209,6 +295,12 @@ public class TableAsExcelResourceProvider {
         return removeEnd(result, MgnlContext.getContextPath());
     }
 
+    /**
+     * Create style for hyperlink cells (blue, underlined).
+     *
+     * @param wb workbook (must not be {@code null})
+     * @return cell style with link formatting
+     */
     private CellStyle getLinkStyle(final Workbook wb) {
         checkArgument(wb != null, "The Workbook must not be null.");
         Font hlinkFont = wb.createFont();
@@ -219,6 +311,14 @@ public class TableAsExcelResourceProvider {
         return hlinkStyle;
     }
 
+    /**
+     * Write a value into a cell (converting components to their caption) and return its trimmed string form.
+     *
+     * @param value any object or Vaadin component (may be {@code null})
+     * @param cell excel cell (must not be {@code null})
+     * @return trimmed cell value string (never {@code null})
+     * @throws IllegalArgumentException if {@code cell} is {@code null}
+     */
     String addCellString(Object value, Cell cell) {
         checkArgument(cell != null, "The Cell must not be null.");
         String valueString = value instanceof AbstractComponent ? ((AbstractComponent) value).getCaption() : value != null ? value.toString() : EMPTY;
@@ -227,6 +327,12 @@ public class TableAsExcelResourceProvider {
         return valueString;
     }
 
+    /**
+     * Apply calculated column widths to the sheet (bounded by Excel limit) expressed in character fractions.
+     *
+     * @param sheet sheet (must not be {@code null})
+     * @param maxColumnWidth array with max characters per column (may be empty)
+     */
     private void setColumnWidth(Sheet sheet, int[] maxColumnWidth) {
         checkArgument(sheet != null, "The Sheet must not be null.");
         if (ArrayUtils.isNotEmpty(maxColumnWidth)) {
@@ -237,12 +343,25 @@ public class TableAsExcelResourceProvider {
         }
     }
 
+    /**
+     * Update maximum width tracking for a column.
+     *
+     * @param maxColumnWidth tracking array (must not be {@code null})
+     * @param value cell value string (may be {@code null})
+     * @param index column index (must be within bounds)
+     */
     void updateColumnWidth(int[] maxColumnWidth, String value, int index) {
         if (value != null && maxColumnWidth[index] < value.length()) {
             maxColumnWidth[index] = value.length();
         }
     }
 
+    /**
+     * Render title row and column headers. Assumes at least one visible item exists to derive header ordering.
+     *
+     * @param sheet target sheet (must not be {@code null})
+     * @param headerStyle style to apply to header cells (must not be {@code null})
+     */
     void renderHeader(final Sheet sheet, final CellStyle headerStyle) {
         checkArgument(sheet != null, "The Sheet must not be null.");
         Row contextRow = sheet.createRow(TITLE_ROW_NUMBER);
@@ -267,6 +386,12 @@ public class TableAsExcelResourceProvider {
         }
     }
 
+    /**
+     * Derive the style for the title row (based on header style plus vertical centering).
+     *
+     * @param wb workbook (must not be {@code null})
+     * @return derived title style
+     */
     private CellStyle getTitleStyle(final Workbook wb) {
         CellStyle style = getHeaderStyle(wb);
         style.setVerticalAlignment(VerticalAlignment.CENTER);

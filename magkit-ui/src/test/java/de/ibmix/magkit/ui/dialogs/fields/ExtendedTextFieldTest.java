@@ -26,9 +26,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Test the [@link ExtendedTextField}.
+ * Unit tests for {@link ExtendedTextField} remaining-length calculation.
  *
  * @author frank.sommer
+ * @since 2021-02-17
  */
 public class ExtendedTextFieldTest {
 

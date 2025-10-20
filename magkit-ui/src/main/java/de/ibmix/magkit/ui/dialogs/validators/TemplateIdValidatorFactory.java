@@ -26,8 +26,14 @@ import info.magnolia.ui.field.AbstractFieldValidatorFactory;
 import javax.jcr.Node;
 
 /**
- * Factory for the TemplateIdValidator.
- *
+ * Factory creating {@link TemplateIdValidator} instances.
+ * <p>
+ * Key features:
+ * <ul>
+ *   <li>Bridges definition configuration to validator construction.</li>
+ *   <li>Stateless aside from holding the definition reference.</li>
+ * </ul>
+ * </p>
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

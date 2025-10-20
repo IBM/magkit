@@ -41,28 +41,28 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  * Utility class offering helpers for common string encoding/decoding tasks used across Magnolia integration code.
  * <p>
  * Main features:
+ * </p>
  * <ul>
  *   <li>Base64 encoding and decoding using UTF-8.</li>
  *   <li>URL encoding/decoding using UTF-8.</li>
  *   <li>Reduced HTML escaping for embedding values safely in Magnolia URL selectors without escaping ampersands.</li>
  * </ul>
- * Important details:
+ * <p>Important details:</p>
  * <ul>
  *   <li>All methods are null-safe: a {@code null}, empty or blank input results in an empty string.</li>
  *   <li>Debug logging is performed for successful (de-)encoding operations.</li>
- *   <li>The class is stateless and therefore thread-safe.</li>
  * </ul>
- * Usage example:
+ * <p>Usage example:</p>
  * <pre>{@code
  * String encoded = EncodingUtils.getBase64Encoded("hello world");
  * String decoded = EncodingUtils.getBase64Decoded(encoded);
  * String urlParam = EncodingUtils.getUrlEncoded("a value with spaces");
  * String[] encodedParams = EncodingUtils.getUrlEncodedValues(new String[]{"v1", "v2"});
- * String htmlSafe = EncodingUtils.URL_HTML_ESCAPER.escape("<tag>\"quote\"</tag>");
- * }</code></pre>
- * Null & error handling: Invalid Base64 input will decode to an arbitrary string (no explicit validation performed).
- * Side effects: Only debug log statements; no external state modifications.
- * Thread-safety: All operations are pure and use only local variables.
+ * String htmlSafe = EncodingUtils.URL_HTML_ESCAPER.escape("&lt;tag&gt\"quote\"&lt;/tag&gt");
+ * }</pre>
+ * <p>Null & error handling: Invalid Base64 input will decode to an arbitrary string (no explicit validation performed).</p>
+ * <p>Side effects: Only debug log statements; no external state modifications.</p>
+ * <p>Thread-safety: All operations are pure and use only local variables.</p>
  *
  * @author oliver.emke, Aperto AG
  * @since 2011-03-14

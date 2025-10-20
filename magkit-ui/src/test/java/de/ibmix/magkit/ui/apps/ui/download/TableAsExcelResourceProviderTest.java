@@ -58,10 +58,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 /**
- * Test TableAsExcelResourceProvider.
+ * Unit tests for {@link TableAsExcelResourceProvider} export logic and helpers.
  *
+ * @since 2018-01-31
  * @author wolf.bubenik
- * @since 31.01.18.
  */
 public class TableAsExcelResourceProviderTest {
 

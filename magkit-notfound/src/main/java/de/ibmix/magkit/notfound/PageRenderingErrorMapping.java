@@ -58,14 +58,14 @@ import javax.ws.rs.ext.Provider;
  * </p>
  * <p>
  * Usage example (simplified):
+ * </p>
  * <pre>
  * // When a PageRenderingException is thrown inside a JAX-RS resource method,
  * // the runtime invokes this mapper to build a uniform error response.
  * </pre>
- * </p>
  *
  * @author frank.sommer
- * @since 15.09.2023
+ * @since 2023-09-15
  */
 @Slf4j
 @Provider
