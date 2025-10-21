@@ -119,8 +119,11 @@ public class LinkToolTest {
         assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
         assertThat(LinkTool.createLinkForReference(source, "link", null, LinkTool.LinkType.INTERNAL), nullValue());
 
-        stubProperty("link", "https://test.aperto.de").of(source);
-        assertThat(LinkTool.createLinkForReference(source, "link", null, null), is("https://test.aperto.de"));
+        // External link value unchanged even if LinkType provided
+        String external = "https://test.aperto.de";
+        stubProperty("link", external).of(source);
+        assertThat(LinkTool.createLinkForReference(source, "link", null, null), is(external));
+        assertThat("External link should be returned unchanged even with LinkType", LinkTool.createLinkForReference(source, "link", null, LinkTool.LinkType.EXTERNAL), is(external));
 
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
@@ -130,5 +133,14 @@ public class LinkToolTest {
         assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.INTERNAL), is("/aperto/target.html"));
         assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.REDIRECT), is("/target.html"));
         assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.EXTERNAL), is("http://test.aperto.de/target.html"));
+    }
+
+    @Test
+    public void createExternalLinkForPath() throws RepositoryException {
+        mockWebContext(stubContextPath("/aperto"));
+        mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
+        Node site = mockMgnlNode("test", "target", "aperto:test");
+        String result = LinkTool.createExternalLinkForPath(site, "/resources/image.png");
+        assertThat(result, is("http://test.aperto.de/aperto/resources/image.png"));
     }
 }

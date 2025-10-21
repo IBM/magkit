@@ -274,4 +274,104 @@ public class StubbingPropertyTest {
     public void remove() throws RepositoryException {
         new StubbingProperty(_parent, "test", "value").remove();
     }
+
+    /**
+     * Verify isSame returns true for two properties with identical underlying value and for self comparison.
+     */
+    @Test
+    public void isSameTrue() throws RepositoryException {
+        StubbingProperty p1 = new StubbingProperty(_parent, "same", "value");
+        StubbingProperty p2 = new StubbingProperty(_parent, "same", "value");
+        assertThat(p1.isSame(p1), is(true));
+        assertThat(p1.isSame(p2), is(true));
+    }
+
+    /**
+     * Verify isSame returns false for properties with different values.
+     */
+    @Test
+    public void isSameFalse() throws RepositoryException {
+        StubbingProperty p1 = new StubbingProperty(_parent, "same", "value");
+        StubbingProperty p2 = new StubbingProperty(_parent, "same", "other");
+        assertThat(p1.isSame(p2), is(false));
+    }
+
+    /**
+     * Ensure getProperty throws NotImplementedException.
+     */
+    @Test(expected = NotImplementedException.class)
+    public void getPropertyNotImplemented() throws RepositoryException {
+        new StubbingProperty(_parent, "test", "value").getProperty();
+    }
+
+    /**
+     * Test constructor with null vararg (no values) resulting in null single value and non-multiple semantics.
+     */
+    @Test
+    public void emptyValues() throws RepositoryException {
+        StubbingProperty p = new StubbingProperty(_parent, "empty", (String[]) null);
+        assertThat(p.getValue(), nullValue());
+        assertThat(p.getValues().length, is(1));
+        assertThat(p.getValues()[0], nullValue());
+        assertThat(p.isMultiple(), is(false));
+    }
+
+    /**
+     * Test multi-valued reference property reports isMultiple true.
+     */
+    @Test
+    public void referenceIsMultiple() throws RepositoryException {
+        Node n = NodeMockUtils.mockNode("test");
+        StubbingProperty p = new StubbingProperty(_parent, "ref", n, n);
+        assertThat(p.isMultiple(), is(true));
+        assertThat(p.getNode(), is(n));
+        assertThat(p.getNodes().length, is(2));
+    }
+
+    /**
+     * Ensure toString returns a non-null string containing the class name.
+     */
+    @Test
+    public void toStringTest() throws RepositoryException {
+        StubbingProperty p = new StubbingProperty(_parent, "test", "value");
+        String s = p.toString();
+        assertThat(s, notNullValue());
+        assertThat(s.contains(StubbingProperty.class.getSimpleName()), is(true));
+    }
+
+    /**
+     * isSame must return false when other item is not a StubbingProperty.
+     */
+    @Test
+    public void isSameOtherItemFalse() throws RepositoryException {
+        StubbingProperty p = new StubbingProperty(_parent, "test", "value");
+        Node other = NodeMockUtils.mockNode("other");
+        assertThat(p.isSame(other), is(false));
+    }
+
+    /**
+     * Single reference property must not be multiple.
+     */
+    @Test
+    public void referenceSingleNotMultiple() throws RepositoryException {
+        Node n = NodeMockUtils.mockNode("single");
+        StubbingProperty p = new StubbingProperty(_parent, "ref", n);
+        assertThat(p.isMultiple(), is(false));
+        assertThat(p.getNode(), is(n));
+        assertThat(p.getNodes(), notNullValue());
+        assertThat(p.getNodes().length, is(1));
+        assertThat(p.getNodes()[0], is(n));
+    }
+
+    /**
+     * Length for reference property should match identifier length.
+     */
+    @Test
+    public void referenceLength() throws RepositoryException {
+        Node n = NodeMockUtils.mockNode("len");
+        StubbingProperty p = new StubbingProperty(_parent, "ref", n);
+        assertThat(p.getType(), is(PropertyType.REFERENCE));
+        assertThat(p.getString(), is(n.getIdentifier()));
+        assertThat(p.getLength(), is((long) n.getIdentifier().length()));
+    }
 }

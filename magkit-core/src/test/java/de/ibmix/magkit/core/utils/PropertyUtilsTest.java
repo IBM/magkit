@@ -23,6 +23,7 @@ package de.ibmix.magkit.core.utils;
 import de.ibmix.magkit.test.jcr.NodeStubbingOperation;
 import info.magnolia.jcr.decoration.ContentDecoratorPropertyWrapper;
 import info.magnolia.jcr.wrapper.HTMLEscapingPropertyWrapper;
+import org.apache.jackrabbit.JcrConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import java.util.Calendar;
@@ -37,6 +39,7 @@ import java.util.Collection;
 import java.util.TimeZone;
 
 import static de.ibmix.magkit.core.utils.PropertyUtils.PROPERTY_NAME_COMPARATOR;
+import static de.ibmix.magkit.core.utils.PropertyUtils.exists;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBinaryValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBinaryValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValue;
@@ -47,10 +50,12 @@ import static de.ibmix.magkit.core.utils.PropertyUtils.getDoubleValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getDoubleValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getProperties;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getProperty;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.retrieveMultiSelectProperties;
+import static de.ibmix.magkit.core.utils.PropertyUtils.retrieveMultiSelectValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
@@ -60,9 +65,11 @@ import static de.ibmix.magkit.test.jcr.PropertyMockUtils.mockProperty;
 import static de.ibmix.magkit.test.jcr.PropertyStubbingOperation.stubValues;
 import static de.ibmix.magkit.test.jcr.ValueMockUtils.mockBinary;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -490,5 +497,85 @@ public class PropertyUtilsTest {
         // Test no NullPointerException on empty PropertyWrapper:
         Property wrapper = new ContentDecoratorPropertyWrapper<>(null, null);
         assertThat(PropertyUtils.getValue(wrapper), nullValue());
+    }
+
+    // --- Additional tests for uncovered branches and fallbacks ---
+
+    @Test
+    public void existsMethodVariants() throws RepositoryException {
+        assertThat(exists(null), is(false));
+        Property plain = mockProperty("plain", "x");
+        assertThat(exists(plain), is(true));
+        Property emptyWrapper = new ContentDecoratorPropertyWrapper<>(null, null);
+        assertThat(exists(emptyWrapper), is(false));
+    }
+
+    @Test
+    public void retrieveMultiSelectValuesVariants() throws RepositoryException {
+        Node node = mockPageNode("/multi",
+            stubProperty("2", "zwei"),
+            stubProperty("0", "eins"),
+            stubProperty("1", "drei"),
+            stubProperty("title", "ignore")
+        );
+        Collection<String> unordered = retrieveMultiSelectValues(node);
+        assertThat(unordered.size(), is(3));
+        assertThat(unordered, containsInAnyOrder("eins", "zwei", "drei"));
+
+        Node parent = mockPageNode("/parent");
+        mockPageNode("/parent/sub",
+            stubProperty("0", "a"),
+            stubProperty("1", "b"),
+            stubProperty("5", "c")
+        );
+        Collection<String> bySub = retrieveMultiSelectValues(parent, "sub");
+        assertThat(bySub.size(), is(3));
+        assertThat(bySub, containsInAnyOrder("a", "b", "c"));
+    }
+
+    @Test
+    public void fallbackGetterVariants() throws RepositoryException {
+        Node node = mockPageNode("/fallback");
+        assertThat(PropertyUtils.getStringValue(node, "missing", "fb"), is("fb"));
+        Calendar fbCal = Calendar.getInstance();
+        assertThat(PropertyUtils.getCalendarValue(node, "missingCal", fbCal), is(fbCal));
+        assertThat(PropertyUtils.getLongValue(node, "missingLong", 42L), is(42L));
+        assertThat(PropertyUtils.getDoubleValue(node, "missingDouble", 3.14D), is(3.14D));
+        assertThat(PropertyUtils.getBooleanValue(node, "missingBool", Boolean.TRUE), is(true));
+        Binary fbBin = mockBinary("bin");
+        assertThat(PropertyUtils.getBinaryValue(node, "missingBin", fbBin), is(fbBin));
+
+        // Ensure fallbacks are NOT used when value exists:
+        NodeStubbingOperation.stubProperty("long", 123L).of(node);
+        assertThat(PropertyUtils.getLongValue(node, "long", 999L), is(123L));
+        NodeStubbingOperation.stubProperty("str", "value").of(node);
+        assertThat(PropertyUtils.getStringValue(node, "str", "other"), is("value"));
+    }
+
+    @Test
+    public void getPropertiesVariants() throws RepositoryException {
+        assertThat(getProperties((Node) null), nullValue());
+        assertThat(getProperties((Node) null, "*") , nullValue());
+        assertThat(getProperties((Node) null, new String[]{"*"}), nullValue());
+
+        Node node = mockNode(stubProperty("prop", "v"));
+        PropertyIterator iter = PropertyUtils.getProperties(node);
+        assertThat(iter.nextProperty(), is(node.getProperty(JcrConstants.JCR_PRIMARYTYPE)));
+        assertThat(iter.nextProperty(), is(node.getProperty("prop")));
+
+        iter = PropertyUtils.getProperties(node, "prop*");
+        assertThat(iter.nextProperty(), is(node.getProperty(JcrConstants.JCR_PRIMARYTYPE)));
+        assertThat(iter.nextProperty(), is(node.getProperty("prop")));
+
+        iter = PropertyUtils.getProperties(node, new String[]{"prop*"});
+        assertThat(iter.nextProperty(), is(node.getProperty(JcrConstants.JCR_PRIMARYTYPE)));
+        assertThat(iter.nextProperty(), is(node.getProperty("prop")));
+
+        doThrow(new RepositoryException()).when(node).getProperties();
+        doThrow(new RepositoryException()).when(node).getProperties(anyString());
+        doThrow(new RepositoryException()).when(node).getProperties(any(String[].class));
+        assertThat(getProperties(node), nullValue());
+        assertThat(getProperties(node, "*") , nullValue());
+        assertThat(getProperties(node, new String[]{"*"}), nullValue());
     }
 }

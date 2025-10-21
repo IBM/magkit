@@ -199,6 +199,58 @@ public class ExtendedLinkFieldHelperTest {
         assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html?param=value#anchor"));
     }
 
+    // Additional tests for uncovered branches and edge cases.
+
+    @Test
+    public void testGetBaseForUuidWithComponents() {
+        String value = UUID + "~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR;
+        assertThat(_helper.getBase(value), equalTo(UUID));
+    }
+
+    @Test
+    public void testCreateUriForUuidWithComponents() {
+        String value = UUID + "~" + SELECTOR_FOO + "~" + "?" + QUERY + "#" + ANCHOR;
+        URI uri = _helper.createUri(value);
+        assertThat(uri, equalTo(URI.create("/" + value)));
+    }
+
+    @Test
+    public void testMergeComponentsSelectorsOnly() {
+        assertThat(_helper.mergeComponents(null, SELECTOR_FOO, null, null), equalTo("~" + SELECTOR_FOO + "~"));
+        assertThat(_helper.mergeComponents(null, SELECTOR_FOO, QUERY, ANCHOR), equalTo("~" + SELECTOR_FOO + "~" + "?" + QUERY + "#" + ANCHOR));
+    }
+
+    @Test
+    public void testGetSelectorsWithExtension() {
+        String pathWithSelectorAndExt = "/content/page" + "~" + SELECTOR_FOO + "~" + ".html";
+        assertThat(_helper.getSelectors(pathWithSelectorAndExt), equalTo(SELECTOR_FOO));
+    }
+
+    @Test
+    public void testCreateExtendedLinkExternalPropertyValue() throws RepositoryException {
+        Node source = mockNode("sourceExternal");
+        // External link value should be returned unchanged except for appended components.
+        stubProperty("link", EXTERNAL_LINK).of(source);
+        stubProperty("link_selector", SELECTORS).of(source);
+        stubProperty("link_query", QUERY).of(source);
+        stubProperty("link_anchor", ANCHOR).of(source);
+        String expected = EXTERNAL_LINK.replace(".html", "~" + SELECTORS + "~.html") + "?" + QUERY + "#" + ANCHOR;
+        assertThat(_helper.createExtendedLink(source, "link", "ignored", LinkTool.LinkType.EXTERNAL), equalTo(expected));
+    }
+
+    @Test
+    public void testStripBase() {
+        assertThat(_helper.stripBase(null), equalTo(EMPTY));
+        assertThat(_helper.stripBase(PATH), equalTo(EMPTY));
+        assertThat(_helper.stripBase(PATH_WITH_SELECTOR), equalTo("~" + SELECTOR_FOO + "~"));
+        assertThat(_helper.stripBase(PATH_WITH_QUERY), equalTo("?" + QUERY));
+        assertThat(_helper.stripBase(PATH_WITH_ANCHOR), equalTo("#" + ANCHOR));
+        assertThat(_helper.stripBase(PATH_FULL), equalTo("~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR));
+        assertThat(_helper.stripBase("#" + ANCHOR), equalTo("#" + ANCHOR));
+        String uuidFull = UUID + "~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR;
+        assertThat(_helper.stripBase(uuidFull), equalTo("~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR));
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         cleanContext();

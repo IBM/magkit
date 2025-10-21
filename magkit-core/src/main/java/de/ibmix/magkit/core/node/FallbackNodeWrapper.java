@@ -22,6 +22,7 @@ package de.ibmix.magkit.core.node;
 
 import de.ibmix.magkit.core.utils.NodeUtils;
 import de.ibmix.magkit.core.utils.PropertyUtils;
+import info.magnolia.jcr.util.NodeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
@@ -79,7 +80,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
 
     private List<Node> _fallbackNodes;
     private Predicate<Property> _propertyCondition;
-    private Predicate<Iterator> _iteratorCondition;
+    private Predicate<Iterator<?>> _iteratorCondition;
     private Map<String, String[]> _propertyNameFallbacks;
 
     /**
@@ -102,6 +103,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
         _propertyCondition = property -> StringUtils.isNotEmpty(PropertyUtils.getStringValue(property));
         _iteratorCondition = iterator -> Objects.nonNull(iterator) && iterator.hasNext();
         _propertyNameFallbacks = new HashMap<>();
+        _fallbackNodes = Collections.emptyList();
     }
 
     /**
@@ -115,6 +117,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
         _propertyCondition = property -> StringUtils.isNotEmpty(PropertyUtils.getStringValue(property));
         _iteratorCondition = iterator -> Objects.nonNull(iterator) && iterator.hasNext();
         _propertyNameFallbacks = new HashMap<>();
+        _fallbackNodes = Collections.emptyList();
     }
 
     /**
@@ -136,7 +139,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      * @param predicate iterator evaluation function (must not be null)
      * @return fluent API instance
      */
-    public FallbackNodeWrapper withIteratorCondition(Predicate<Iterator> predicate) {
+    public FallbackNodeWrapper withIteratorCondition(Predicate<Iterator<?>> predicate) {
         Validate.notNull(predicate);
         _iteratorCondition = predicate;
         return this;
@@ -227,10 +230,19 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      * @return primary iterator if condition passes else first fallback satisfying condition or empty iterator
      */
     NodeIterator getNodes(Function<Node, NodeIterator> iteratorFunction) {
-        NodeIterator result = iteratorFunction.apply(getWrappedNode());
-        if (!_iteratorCondition.test(result)) {
-            // TODO: Support filtering out hidden nodes by their name
-            result = _fallbackNodes.stream().map(iteratorFunction).filter(_iteratorCondition).findFirst().orElse(EMPTY_NODE_ITERATOR);
+        NodeIterator initial = iteratorFunction.apply(getWrappedNode());
+        List<Node> primaryNodes = NodeUtil.asList(NodeUtil.asIterable(initial));
+        NodeIterator result = new NodeIteratorAdapter(primaryNodes);
+        if (!_iteratorCondition.test(new NodeIteratorAdapter(primaryNodes))) {
+            for (Node fallback : _fallbackNodes) {
+                NodeIterator fbIt = iteratorFunction.apply(fallback);
+                List<Node> fbList = NodeUtil.asList(NodeUtil.asIterable(fbIt));
+                if (_iteratorCondition.test(new NodeIteratorAdapter(fbList))) {
+                    result = new NodeIteratorAdapter(fbList);
+                    return result;
+                }
+            }
+            result = EMPTY_NODE_ITERATOR;
         }
         return result;
     }
@@ -310,10 +322,31 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      * @return primary property iterator if condition passes else first fallback satisfying condition or empty iterator
      */
     PropertyIterator getProperties(Function<Node, PropertyIterator> iteratorFunction) {
-        PropertyIterator result = iteratorFunction.apply(getWrappedNode());
-        if (!_iteratorCondition.test(result)) {
-            // TODO: Support filtering out hidden properties by their name
-            result = _fallbackNodes.stream().map(iteratorFunction).filter(_iteratorCondition).findFirst().orElse(EMPTY_PROPERTY_ITERATOR);
+        PropertyIterator initial = iteratorFunction.apply(getWrappedNode());
+        List<Property> primaryProps = toPropertyList(initial);
+        PropertyIterator result = new PropertyIteratorAdapter(primaryProps);
+        if (!_iteratorCondition.test(new PropertyIteratorAdapter(primaryProps))) {
+            for (Node fallback : _fallbackNodes) {
+                PropertyIterator fbIt = iteratorFunction.apply(fallback);
+                List<Property> fbList = toPropertyList(fbIt);
+                if (_iteratorCondition.test(new PropertyIteratorAdapter(fbList))) {
+                    result = new PropertyIteratorAdapter(fbList);
+                    return result;
+                }
+            }
+            result = EMPTY_PROPERTY_ITERATOR;
+        }
+        return result;
+    }
+
+    private List<Property> toPropertyList(PropertyIterator iterator) {
+        List<Property> result = Collections.emptyList();
+        if (iterator != null) {
+            List<Property> list = new java.util.ArrayList<>();
+            while (iterator.hasNext()) {
+                list.add(iterator.nextProperty());
+            }
+            result = list;
         }
         return result;
     }

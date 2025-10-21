@@ -25,8 +25,10 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.ibmix.magkit.core.utils.EncodingUtils.URL_HTML_ESCAPER;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Decoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Encoded;
+import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlDecoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncodedValues;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,11 +59,43 @@ public class EncodingUtilsTest {
     }
 
     @Test
+    public void testGetBase64DecodedEdgeCases() {
+        assertEquals("", getBase64Decoded(null));
+        assertEquals("", getBase64Decoded(""));
+        // blank should be treated as empty
+        assertEquals("", getBase64Decoded("   "));
+        assertEquals("hello world", getBase64Decoded("aGVsbG8gd29ybGQ="));
+    }
+
+    @Test
     public void testGetUrlEncoded() {
         Map<String, String> testData = createUrlEncodeTestData();
         for (Map.Entry<String, String> entrySet : testData.entrySet()) {
             assertEquals("Testing [" + entrySet.getKey() + "] ...", entrySet.getValue(), getUrlEncoded(entrySet.getKey()));
         }
+    }
+
+    @Test
+    public void testGetUrlEncodedBlankSpace() {
+        assertEquals("+", getUrlEncoded(" "));
+    }
+
+    @Test
+    public void testGetUrlDecoded() {
+        assertEquals("", getUrlDecoded(null));
+        assertEquals("", getUrlDecoded(""));
+        assertEquals("unternehmensf?hrung", getUrlDecoded("unternehmensf%3Fhrung"));
+        assertEquals("Candida & Terasuisse", getUrlDecoded("Candida+%26+Terasuisse"));
+        assertEquals("\r\n", getUrlDecoded("%0D%0A"));
+        assertEquals(" ", getUrlDecoded("+"));
+    }
+
+    @Test
+    public void testUrlHtmlEscaper() {
+        String input = "<&>\"'";
+        // & is not escaped by the reduced escaper
+        String expected = "&lt;&&gt;&quot;&#39;";
+        assertEquals(expected, URL_HTML_ESCAPER.escape(input));
     }
 
     @Test

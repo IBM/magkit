@@ -25,9 +25,15 @@ import org.junit.After;
 import org.junit.Test;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.PropertyIterator;
+import javax.jcr.RepositoryException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValues;
@@ -40,6 +46,7 @@ import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValues;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
@@ -47,19 +54,29 @@ import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 /**
  * Test AlteringNodeWrapper.
  *
  * @author wolf.bubenik
- * @since 10.05.19.
+ * @since 2019-05-10
  */
 public class AlteringNodeWrapperTest {
 
     @After
     public void tearDown() throws Exception {
         cleanContext();
+    }
+
+    @Test
+    public void testAlteringNodeWrapperDefaults() throws RepositoryException {
+        AlteringNodeWrapper nodeWrapper = new AlteringNodeWrapper("test", "nt:unstructured");
+        assertThat(nodeWrapper.getName(), is("test"));
+        assertThat(nodeWrapper.getPrimaryNodeType().getName(), is("nt:unstructured"));
+        assertFalse(nodeWrapper.getNodes().hasNext());
+        assertFalse(nodeWrapper.getProperties().hasNext());
     }
 
     @Test
@@ -193,7 +210,10 @@ public class AlteringNodeWrapperTest {
      */
     @Test
     public void hiddenPropertyAndOverrideMerge() throws Exception {
-        Node base = mockNode("base", stubProperty("title", "base-title"), stubProperty("keep", "keep-value"));
+        Node base = mockNode("base",
+            stubProperty("title", "base-title"),
+            stubProperty("keep", "keep-value")
+        );
         AlteringNodeWrapper wrapper = new AlteringNodeWrapper(base)
             .withProperty("title", "wrapped-title")
             .withProperty("added", "new-value")
@@ -208,8 +228,8 @@ public class AlteringNodeWrapperTest {
         assertThat(getStringValue(wrapper.getProperty("added")), is("new-value"));
 
         // merged iterator contains overridden and added, but not hidden
-        java.util.Set<String> names = new java.util.HashSet<>();
-        javax.jcr.PropertyIterator it = wrapper.getProperties();
+        Set<String> names = new HashSet<>();
+        PropertyIterator it = wrapper.getProperties();
         while (it.hasNext()) {
             names.add(it.nextProperty().getName());
         }
@@ -224,15 +244,15 @@ public class AlteringNodeWrapperTest {
     @Test
     public void childNodeMergeHideAndOverride() throws Exception {
         Node root = mockNode("root");
-        Node childA = mockNode("root/a");
-        Node childB = mockNode("root/b", stubProperty("bProp", "b-value"));
+        mockNode("root/a");
+        mockNode("root/b", stubProperty("bProp", "b-value"));
         // Synthetic replacement for a with distinguishing property
-        Node injectedA = mockNode("aInjected", stubProperty("x", "y"));
-        Node injectedC = mockNode("cInjected", stubProperty("cProp", "c-value"));
+        Node injected1 = mockNode("aInjected", stubProperty("x", "y"));
+        Node injected3 = mockNode("cInjected", stubProperty("cProp", "c-value"));
 
         AlteringNodeWrapper wrapper = new AlteringNodeWrapper(root)
-            .withChildNode("a", injectedA)
-            .withChildNode("c", injectedC)
+            .withChildNode("a", injected1)
+            .withChildNode("c", injected3)
             .withHiddenNode("b");
 
         // Hidden b
@@ -245,8 +265,8 @@ public class AlteringNodeWrapperTest {
         assertThat(wrapper.hasNode("c"), is(true));
         assertThat(getStringValue(wrapper.getNode("c").getProperty("cProp")), is("c-value"));
 
-        java.util.Set<String> childNames = new java.util.HashSet<>();
-        javax.jcr.NodeIterator ni = wrapper.getNodes();
+        Set<String> childNames = new HashSet<>();
+        NodeIterator ni = wrapper.getNodes();
         while (ni.hasNext()) {
             childNames.add(ni.nextNode().getName());
         }
@@ -260,8 +280,8 @@ public class AlteringNodeWrapperTest {
      */
     @Test
     public void fallbackToPageResolvesAncestorProperty() throws Exception {
-        Node page = mockPageNode("content/page", stubProperty("test", "page-value"));
-        Node component = de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode("content/page/component");
+        mockPageNode("content/page", stubProperty("test", "page-value"));
+        Node component = mockComponentNode("content/page/component");
         FallbackNodeWrapper wrapper = new AlteringNodeWrapper(component).withFallbackToPage();
         assertThat(getStringValue(wrapper.getProperty("test")), is("page-value"));
     }
@@ -271,11 +291,15 @@ public class AlteringNodeWrapperTest {
      */
     @Test
     public void fallbackToAncestorCustomPredicate() throws Exception {
-        Node ancestor = mockNode("root/ancestor", stubProperty("foo", "bar"));
+        mockNode("root/ancestor", stubProperty("foo", "bar"));
         Node child = mockNode("root/ancestor/child/grandchild");
         FallbackNodeWrapper wrapper = new AlteringNodeWrapper(child)
             .withFallbackToAncestor(n -> {
-                try { return n.getPath().endsWith("/ancestor"); } catch (Exception e) { return false; }
+                try {
+                    return n.getPath().endsWith("/ancestor");
+                } catch (Exception e) {
+                    return false;
+                }
             });
         assertThat(getStringValue(wrapper.getProperty("foo")), is("bar"));
     }
@@ -285,7 +309,7 @@ public class AlteringNodeWrapperTest {
      */
     @Test
     public void fallbackToReferenceResolvesLinkedNode() throws Exception {
-        Node target = mockPageNode("root/pageRef", stubProperty("refProp", "ref-value"));
+        mockPageNode("root/pageRef", stubProperty("refProp", "ref-value"));
         Node source = mockPageNode("root/pageRef/component", stubProperty("link", "/root/pageRef"));
         FallbackNodeWrapper wrapper = new AlteringNodeWrapper(source).withFallbackToReference("website", "link");
         assertThat(getStringValue(wrapper.getProperty("refProp")), is("ref-value"));
@@ -335,8 +359,8 @@ public class AlteringNodeWrapperTest {
         mockNode("root/beta");
         Node injected = mockNode("alphaInjected", stubProperty("marker", "yes"));
         AlteringNodeWrapper wrapper = new AlteringNodeWrapper(root).withChildNode("alpha", injected).withHiddenNode("beta");
-        javax.jcr.NodeIterator filtered = wrapper.getNodes("alpha");
-        java.util.List<String> names = new java.util.ArrayList<>();
+        NodeIterator filtered = wrapper.getNodes("alpha");
+        List<String> names = new ArrayList<>();
         while (filtered.hasNext()) { names.add(filtered.nextNode().getName()); }
         assertThat(names.size(), is(1));
         assertThat(names.get(0), is("alphaInjected"));
@@ -356,8 +380,8 @@ public class AlteringNodeWrapperTest {
             .withChildNode("alpha", injected)
             .withHiddenNode("beta")
             .withChildNode("gamma", mockNode("gammaInjected"));
-        javax.jcr.NodeIterator filtered = wrapper.getNodes(new String[]{"alpha", "beta", "gamma"});
-        java.util.List<String> names = new java.util.ArrayList<>();
+        NodeIterator filtered = wrapper.getNodes(new String[]{"alpha", "beta", "gamma"});
+        List<String> names = new ArrayList<>();
         while (filtered.hasNext()) { names.add(filtered.nextNode().getName()); }
         // beta muss versteckt sein
         assertThat(names.contains("beta"), is(false));
