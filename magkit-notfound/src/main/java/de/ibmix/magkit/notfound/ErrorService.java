@@ -169,7 +169,7 @@ public class ErrorService {
         String basePath = EMPTY;
         if (pathFragments.length > 0) {
             basePath = StringUtils.join(Arrays.copyOf(pathFragments, pathFragments.length - 1), '/');
-            if (isNotBlank(basePath)) {
+            if (isNotBlank(basePath) && !basePath.startsWith("/")) {
                 basePath = '/' + basePath;
             }
         }
