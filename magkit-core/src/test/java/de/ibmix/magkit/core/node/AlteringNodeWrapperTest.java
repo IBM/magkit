@@ -48,7 +48,7 @@ import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValues;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
-import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
+import static de.ibmix.magkit.test.cms.node.PageNodeStubbingOperation.stubTemplate;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static org.hamcrest.MatcherAssert.assertThat;

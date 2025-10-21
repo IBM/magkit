@@ -43,7 +43,7 @@ import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockAreaNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockComponentNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
-import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
+import static de.ibmix.magkit.test.cms.node.PageNodeStubbingOperation.stubTemplate;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubType;

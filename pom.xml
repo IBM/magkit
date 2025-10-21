@@ -25,7 +25,7 @@
         <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
         <version.poi>5.3.0</version.poi>
 
-        <version.magkit.test>1.0.8</version.magkit.test>
+        <version.magkit.test>1.0.9-SNAPSHOT</version.magkit.test>
     </properties>
 
     <dependencyManagement>
