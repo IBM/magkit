@@ -21,8 +21,8 @@ package de.ibmix.magkit.core.node;
  */
 
 import de.ibmix.magkit.test.jcr.SessionMockUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.jcr.ItemVisitor;
@@ -38,11 +38,11 @@ import java.util.List;
 
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -68,60 +68,60 @@ import static org.mockito.Mockito.verify;
  */
 public class NullableDelegateNodeWrapperTest {
 
-    @After
+    @AfterEach
     public void tearDown() {
         SessionMockUtils.cleanSession();
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void syntheticConstructorNullNameThrows() {
-        new TestNullableDelegateNodeWrapper(null, "mgnl:content");
+        assertThrows(NullPointerException.class, () -> new TestNullableDelegateNodeWrapper(null, "mgnl:content"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void syntheticConstructorEmptyNameThrows() {
-        new TestNullableDelegateNodeWrapper("", "mgnl:content");
+        assertThrows(IllegalArgumentException.class, () -> new TestNullableDelegateNodeWrapper("", "mgnl:content"));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void syntheticConstructorNullPrimaryTypeThrows() {
-        new TestNullableDelegateNodeWrapper("virtual", null);
+        assertThrows(NullPointerException.class, () -> new TestNullableDelegateNodeWrapper("virtual", null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void syntheticConstructorEmptyPrimaryTypeThrows() {
-        new TestNullableDelegateNodeWrapper("virtual", "");
+        assertThrows(IllegalArgumentException.class, () -> new TestNullableDelegateNodeWrapper("virtual", ""));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void wrappingConstructorNullNodeThrows() {
-        new TestNullableDelegateNodeWrapper((Node) null);
+        assertThrows(NullPointerException.class, () -> new TestNullableDelegateNodeWrapper((Node) null));
     }
 
     @Test
     public void syntheticDefaults() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
         assertFalse(synthetic.hasWrappedNode());
-        assertThat(synthetic.getName(), is("virtual"));
-        assertThat(synthetic.getPath(), is("/virtual"));
-        assertThat(synthetic.getPrimaryNodeType().getName(), is("mgnl:content"));
-        assertThat(synthetic.getIdentifier(), is(""));
-        assertThat(synthetic.getUUID(), is(""));
-        assertThat(synthetic.getIndex(), is(0));
-        assertThat(synthetic.getDepth(), is(0));
+        assertEquals("virtual", synthetic.getName());
+        assertEquals("/virtual", synthetic.getPath());
+        assertEquals("mgnl:content", synthetic.getPrimaryNodeType().getName());
+        assertEquals("", synthetic.getIdentifier());
+        assertEquals("", synthetic.getUUID());
+        assertEquals(0, synthetic.getIndex());
+        assertEquals(0, synthetic.getDepth());
         assertFalse(synthetic.isNode());
         assertFalse(synthetic.isModified());
         assertFalse(synthetic.isNew());
         assertFalse(synthetic.hasNodes());
         assertFalse(synthetic.hasProperties());
         assertFalse(synthetic.hasProperty("any"));
-        assertThat(synthetic.getNode("child"), nullValue());
-        assertThat(synthetic.getProperty("prop"), nullValue());
+        assertNull(synthetic.getNode("child"));
+        assertNull(synthetic.getProperty("prop"));
         NodeIterator nodes = synthetic.getNodes();
         assertFalse(nodes.hasNext());
         PropertyIterator props = synthetic.getProperties();
         assertFalse(props.hasNext());
-        assertThat(synthetic.toString(), is(""));
+        assertEquals("", synthetic.toString());
     }
 
     @Test
@@ -134,8 +134,8 @@ public class NullableDelegateNodeWrapperTest {
         synthetic.save();
         synthetic.remove();
         synthetic.refresh(false);
-        assertThat(synthetic.getProperty("p"), nullValue());
-        assertThat(synthetic.lock(false, false), nullValue());
+        assertNull(synthetic.getProperty("p"));
+        assertNull(synthetic.lock(false, false));
     }
 
     @Test
@@ -155,8 +155,8 @@ public class NullableDelegateNodeWrapperTest {
         synthetic.removeShare();
         synthetic.removeSharedSet();
         // Assert more default getters still neutral
-        assertThat(synthetic.getAllowedLifecycleTransistions(), nullValue());
-        assertThat(synthetic.getDefinition(), nullValue());
+        assertNull(synthetic.getAllowedLifecycleTransistions());
+        assertNull(synthetic.getDefinition());
     }
 
     @Test
@@ -164,10 +164,10 @@ public class NullableDelegateNodeWrapperTest {
         Node base = mockNode("base", stubProperty("title", "underlying"));
         TestNullableDelegateNodeWrapper wrapper = new TestNullableDelegateNodeWrapper(base);
         assertTrue(wrapper.hasWrappedNode());
-        assertThat(wrapper.getName(), is(base.getName()));
-        assertThat(wrapper.getPath(), is(base.getPath()));
+        assertEquals(base.getName(), wrapper.getName());
+        assertEquals(base.getPath(), wrapper.getPath());
         Property p = wrapper.getProperty("title");
-        assertThat(p.getString(), is("underlying"));
+        assertEquals("underlying", p.getString());
         assertTrue(wrapper.getProperties("title*").hasNext());
     }
 
@@ -202,58 +202,58 @@ public class NullableDelegateNodeWrapperTest {
     @Test
     public void getCorrespondingNodePathSyntheticReturnsNull() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.getCorrespondingNodePath("otherWs"), nullValue());
+        assertNull(synthetic.getCorrespondingNodePath("otherWs"));
     }
 
     @Test
     public void lockAndVersioningReturnsNullSynthetic() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.getBaseVersion(), nullValue());
-        assertThat(synthetic.getVersionHistory(), nullValue());
-        assertThat(synthetic.getLock(), nullValue());
+        assertNull(synthetic.getBaseVersion());
+        assertNull(synthetic.getVersionHistory());
+        assertNull(synthetic.getLock());
     }
 
     @Test
     public void getPrimaryItemNullWhenSynthetic() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.getPrimaryItem(), nullValue());
+        assertNull(synthetic.getPrimaryItem());
     }
 
     @Test
     public void addNodeReturnsNullSynthetic() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.addNode("child"), nullValue());
-        assertThat(synthetic.addNode("child", "nt:unstructured"), nullValue());
+        assertNull(synthetic.addNode("child"));
+        assertNull(synthetic.addNode("child", "nt:unstructured"));
     }
 
     @Test
     public void setPropertyVariousOverloadsReturnNullSynthetic() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.setProperty("p", "v"), nullValue());
-        assertThat(synthetic.setProperty("p", new String[]{"a", "b"}), nullValue());
-        assertThat(synthetic.setProperty("p", new String[]{"a", "b"}, 1), nullValue());
-        assertThat(synthetic.setProperty("p", (Value) null), nullValue());
-        assertThat(synthetic.setProperty("p", (Value[]) null), nullValue());
+        assertNull(synthetic.setProperty("p", "v"));
+        assertNull(synthetic.setProperty("p", new String[]{"a", "b"}));
+        assertNull(synthetic.setProperty("p", new String[]{"a", "b"}, 1));
+        assertNull(synthetic.setProperty("p", (Value) null));
+        assertNull(synthetic.setProperty("p", (Value[]) null));
     }
 
     @Test
     public void syntheticSetPropertyRemainingOverloadsReturnNull() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.setProperty("v1", (Value) null), nullValue());
-        assertThat(synthetic.setProperty("v2", (Value[]) null), nullValue());
-        assertThat(synthetic.setProperty("v3", (Value) null, 1), nullValue());
-        assertThat(synthetic.setProperty("v4", (Value[]) null, 1), nullValue());
-        assertThat(synthetic.setProperty("v5", "str", 1), nullValue());
-        assertThat(synthetic.setProperty("v6", new java.io.ByteArrayInputStream(new byte[0])), nullValue());
+        assertNull(synthetic.setProperty("v1", (Value) null));
+        assertNull(synthetic.setProperty("v2", (Value[]) null));
+        assertNull(synthetic.setProperty("v3", (Value) null, 1));
+        assertNull(synthetic.setProperty("v4", (Value[]) null, 1));
+        assertNull(synthetic.setProperty("v5", "str", 1));
+        assertNull(synthetic.setProperty("v6", new java.io.ByteArrayInputStream(new byte[0])));
         javax.jcr.Binary bin = mock(javax.jcr.Binary.class);
-        assertThat(synthetic.setProperty("v7", bin), nullValue());
-        assertThat(synthetic.setProperty("v8", true), nullValue());
-        assertThat(synthetic.setProperty("v9", 1.23d), nullValue());
-        assertThat(synthetic.setProperty("v10", java.math.BigDecimal.ONE), nullValue());
-        assertThat(synthetic.setProperty("v11", 123L), nullValue());
-        assertThat(synthetic.setProperty("v12", java.util.Calendar.getInstance()), nullValue());
+        assertNull(synthetic.setProperty("v7", bin));
+        assertNull(synthetic.setProperty("v8", true));
+        assertNull(synthetic.setProperty("v9", 1.23d));
+        assertNull(synthetic.setProperty("v10", java.math.BigDecimal.ONE));
+        assertNull(synthetic.setProperty("v11", 123L));
+        assertNull(synthetic.setProperty("v12", java.util.Calendar.getInstance()));
         Node node = mockNode("otherNode");
-        assertThat(synthetic.setProperty("v13", node), nullValue());
+        assertNull(synthetic.setProperty("v13", node));
     }
 
     @Test
@@ -265,7 +265,7 @@ public class NullableDelegateNodeWrapperTest {
         verify(base).getAllowedLifecycleTransistions();
         wrapper.getDefinition();
         verify(base).getDefinition();
-        assertThat(wrapper.getPrimaryNodeType().getName(), is(base.getPrimaryNodeType().getName()));
+        assertEquals(wrapper.getPrimaryNodeType().getName(), base.getPrimaryNodeType().getName());
     }
 
     @Test
@@ -280,13 +280,13 @@ public class NullableDelegateNodeWrapperTest {
     public void delegatedToStringUsesUnderlying() throws Exception {
         Node base = mockNode("base", stubProperty("x", "y"));
         TestNullableDelegateNodeWrapper wrapper = new TestNullableDelegateNodeWrapper(base);
-        assertThat(wrapper.toString(), is(base.toString()));
+        assertEquals(wrapper.toString(), base.toString());
     }
 
     @Test
     public void syntheticGetMixinNodeTypesReturnsNull() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.getMixinNodeTypes(), nullValue());
+        assertNull(synthetic.getMixinNodeTypes());
     }
 
     @Test
@@ -337,7 +337,7 @@ public class NullableDelegateNodeWrapperTest {
     @Test
     public void syntheticGetAncestorReturnsNull() throws Exception {
         TestNullableDelegateNodeWrapper synthetic = new TestNullableDelegateNodeWrapper("virtual", "mgnl:content");
-        assertThat(synthetic.getAncestor(0), nullValue());
+        assertNull(synthetic.getAncestor(0));
     }
 
     @Test
@@ -345,7 +345,7 @@ public class NullableDelegateNodeWrapperTest {
         Node base = mockNode("base", stubProperty("x", "y"));
         String expectedId = base.getIdentifier();
         TestNullableDelegateNodeWrapper wrapper = new TestNullableDelegateNodeWrapper(base);
-        assertThat(wrapper.getIdentifier(), is(expectedId));
+        assertEquals(expectedId, wrapper.getIdentifier());
     }
 
     /**

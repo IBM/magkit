@@ -21,7 +21,7 @@ package de.ibmix.magkit.core.utils;
  */
 
 import de.ibmix.magkit.test.jcr.ValueMockUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Binary;
 import javax.jcr.RepositoryException;
@@ -31,10 +31,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import static de.ibmix.magkit.test.jcr.ValueMockUtils.mockValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.doThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Unit tests for {@link ValueUtils} covering success, null and exception fallback scenarios for every conversion method.
@@ -55,15 +56,15 @@ public class ValueUtilsTest {
      */
     @Test
     public void valueToString() throws RepositoryException {
-        assertThat(ValueUtils.valueToString(null), nullValue());
-        assertThat(ValueUtils.valueToString(null, "fb"), is("fb"));
+        assertNull(ValueUtils.valueToString(null));
+        assertEquals("fb", ValueUtils.valueToString(null, "fb"));
 
         Value v = mockValue("string");
-        assertThat(ValueUtils.valueToString(v, "fb"), is("string"));
+        assertEquals("string", ValueUtils.valueToString(v, "fb"));
 
         doThrow(new RepositoryException("fail")).when(v).getString();
-        assertThat(ValueUtils.valueToString(v, "fb"), is("fb"));
-        assertThat(ValueUtils.valueToString(v), nullValue());
+        assertEquals("fb", ValueUtils.valueToString(v, "fb"));
+        assertNull(ValueUtils.valueToString(v));
     }
 
     /**
@@ -71,19 +72,19 @@ public class ValueUtilsTest {
      */
     @Test
     public void valueToCalendar() throws RepositoryException {
-        assertThat(ValueUtils.valueToCalendar(null), nullValue());
+        assertNull(ValueUtils.valueToCalendar(null));
 
         Calendar fb = new GregorianCalendar(2024, Calendar.DECEMBER, 31);
-        assertThat(ValueUtils.valueToCalendar(null, fb), is(fb));
+        assertEquals(fb, ValueUtils.valueToCalendar(null, fb));
 
         Calendar cal = new GregorianCalendar(2025, Calendar.JANUARY, 1);
         Value v = mockValue(cal);
-        assertThat(ValueUtils.valueToCalendar(v), is(cal));
+        assertEquals(cal, ValueUtils.valueToCalendar(v));
 
         doThrow(new RepositoryException("fail")).when(v).getDate();
-        assertThat(ValueUtils.valueToCalendar(v, fb), is(fb));
+        assertEquals(fb, ValueUtils.valueToCalendar(v, fb));
 
-        assertThat(ValueUtils.valueToCalendar(v), nullValue());
+        assertNull(ValueUtils.valueToCalendar(v));
     }
 
     /**
@@ -91,16 +92,16 @@ public class ValueUtilsTest {
      */
     @Test
     public void valueToLong() throws RepositoryException {
-        assertThat(ValueUtils.valueToLong(null), nullValue());
-        assertThat(ValueUtils.valueToLong(null, 7L), is(7L));
+        assertNull(ValueUtils.valueToLong(null));
+        assertEquals(7L, ValueUtils.valueToLong(null, 7L));
 
         Value v = mockValue(42L);
-        assertThat(ValueUtils.valueToLong(v), is(42L));
-        assertThat(ValueUtils.valueToLong(v, 9L), is(42L));
+        assertEquals(42L, ValueUtils.valueToLong(v));
+        assertEquals(42L, ValueUtils.valueToLong(v, 9L));
 
         doThrow(new RepositoryException("fail")).when(v).getLong();
-        assertThat(ValueUtils.valueToLong(v, 9L), is(9L));
-        assertThat(ValueUtils.valueToLong(v), nullValue());
+        assertEquals(9L, ValueUtils.valueToLong(v, 9L));
+        assertNull(ValueUtils.valueToLong(v));
     }
 
     /**
@@ -108,16 +109,16 @@ public class ValueUtilsTest {
      */
     @Test
     public void valueToDouble() throws RepositoryException {
-        assertThat(ValueUtils.valueToDouble(null), nullValue());
-        assertThat(ValueUtils.valueToDouble(null, 1.1d), is(1.1d));
+        assertNull(ValueUtils.valueToDouble(null));
+        assertEquals(1.1d, ValueUtils.valueToDouble(null, 1.1d));
 
         Value v = mockValue(3.5d);
-        assertThat(ValueUtils.valueToDouble(v), is(3.5d));
-        assertThat(ValueUtils.valueToDouble(v, 1.1d), is(3.5d));
+        assertEquals(3.5d, ValueUtils.valueToDouble(v));
+        assertEquals(3.5d, ValueUtils.valueToDouble(v, 1.1d));
 
         doThrow(new RepositoryException("fail")).when(v).getDouble();
-        assertThat(ValueUtils.valueToDouble(v, 2.2d), is(2.2d));
-        assertThat(ValueUtils.valueToDouble(v), nullValue());
+        assertEquals(2.2d, ValueUtils.valueToDouble(v, 2.2d));
+        assertNull(ValueUtils.valueToDouble(v));
     }
 
     /**
@@ -125,16 +126,16 @@ public class ValueUtilsTest {
      */
     @Test
     public void valueToBoolean() throws RepositoryException {
-        assertThat(ValueUtils.valueToBoolean(null), nullValue());
-        assertThat(ValueUtils.valueToBoolean(null, Boolean.FALSE), is(false));
+        assertNull(ValueUtils.valueToBoolean(null));
+        assertFalse(ValueUtils.valueToBoolean(null, Boolean.FALSE));
 
         Value v = mockValue(true);
-        assertThat(ValueUtils.valueToBoolean(v), is(true));
-        assertThat(ValueUtils.valueToBoolean(v, false), is(true));
+        assertTrue(ValueUtils.valueToBoolean(v));
+        assertTrue(ValueUtils.valueToBoolean(v, false));
 
         doThrow(new RepositoryException("fail")).when(v).getBoolean();
-        assertThat(ValueUtils.valueToBoolean(v, Boolean.TRUE), is(true));
-        assertThat(ValueUtils.valueToBoolean(v), nullValue());
+        assertTrue(ValueUtils.valueToBoolean(v, Boolean.TRUE));
+        assertNull(ValueUtils.valueToBoolean(v));
     }
 
     /**
@@ -143,35 +144,33 @@ public class ValueUtilsTest {
     @Test
     public void valueToBinary() throws RepositoryException {
         Binary fb = ValueMockUtils.mockBinary("fallback binary");
-        assertThat(ValueUtils.valueToBinary(null), nullValue());
-        assertThat(ValueUtils.valueToBinary(null, fb), is(fb));
+        assertNull(ValueUtils.valueToBinary(null));
+        assertEquals(fb, ValueUtils.valueToBinary(null, fb));
 
         Binary bin = ValueMockUtils.mockBinary("binary");
         Value v = mockValue(bin);
-        assertThat(ValueUtils.valueToBinary(v), is(bin));
-        assertThat(ValueUtils.valueToBinary(v, fb), is(bin));
+        assertEquals(bin, ValueUtils.valueToBinary(v));
+        assertEquals(bin, ValueUtils.valueToBinary(v, fb));
 
         doThrow(new RepositoryException("fail")).when(v).getBinary();
-        assertThat(ValueUtils.valueToBinary(v, fb), is(fb));
-        assertThat(ValueUtils.valueToBinary(v), nullValue());
+        assertEquals(fb, ValueUtils.valueToBinary(v, fb));
+        assertNull(ValueUtils.valueToBinary(v));
     }
 
     /**
      * Verifies BigDecimal conversion success and exception fallback.
      */
     @Test
-    public void valueToBigDecimal() throws RepositoryException {
-        BigDecimal fb = new BigDecimal("9.99");
-        assertThat(ValueUtils.valueToBigDecimal(null), nullValue());
-        assertThat(ValueUtils.valueToBigDecimal(null, fb), is(fb));
+    public void valueToDecimal() throws RepositoryException {
+        assertNull(ValueUtils.valueToBigDecimal(null));
+        assertEquals(BigDecimal.TEN, ValueUtils.valueToBigDecimal(null, BigDecimal.TEN));
 
-        BigDecimal dec = new BigDecimal("12.34");
-        Value v = mockValue(12.34d);
-        assertThat(ValueUtils.valueToBigDecimal(v).doubleValue(), is(12.34d));
-        assertThat(ValueUtils.valueToBigDecimal(v, fb).doubleValue(), is(12.34d));
+        Value v = mockValue("12.34");
+        assertEquals(12.34d, ValueUtils.valueToBigDecimal(v).doubleValue());
+        assertEquals(12.34d, ValueUtils.valueToBigDecimal(v, BigDecimal.TEN).doubleValue());
 
         doThrow(new RepositoryException("fail")).when(v).getDecimal();
-        assertThat(ValueUtils.valueToBigDecimal(v, fb), is(fb));
-        assertThat(ValueUtils.valueToBigDecimal(v), nullValue());
+        assertEquals(BigDecimal.TEN, ValueUtils.valueToBigDecimal(v, BigDecimal.TEN));
+        assertNull(ValueUtils.valueToBigDecimal(v));
     }
 }

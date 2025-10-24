@@ -35,9 +35,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.RepositoryException;
 import java.io.File;
@@ -50,10 +50,10 @@ import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mock
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationStubbingOperation.stubDefaultBaseUrl;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubContextPath;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -68,14 +68,14 @@ public class TableAsExcelResourceProviderTest {
     private Table _source;
     private TableAsExcelResourceProvider _resourceProvider;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         _source = mock(Table.class);
         doReturn(new Object[]{"first", "second"}).when(_source).getVisibleColumns();
         _resourceProvider = new TableAsExcelResourceProvider(_source, "test:base file-name", "test title");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }
@@ -89,8 +89,8 @@ public class TableAsExcelResourceProviderTest {
     public void getHeaderStyle() {
         Workbook wb = new XSSFWorkbook();
         CellStyle style = _resourceProvider.getHeaderStyle(wb);
-        assertThat(style, notNullValue());
-        assertThat(((int) style.getFontIndex()), is(1));
+        assertNotNull(style);
+        assertEquals(1, (int) style.getFontIndex());
     }
 
     @Test
@@ -113,48 +113,48 @@ public class TableAsExcelResourceProviderTest {
         Sheet sheet = wb.createSheet("test");
         CellStyle style = _resourceProvider.getHeaderStyle(wb);
         _resourceProvider.renderHeader(sheet, style);
-        assertThat(sheet.getRow(1), notNullValue());
-        assertThat(((int) sheet.getRow(1).getLastCellNum()), is(2));
+        assertNotNull(sheet.getRow(1));
+        assertEquals(2, (int) sheet.getRow(1).getLastCellNum());
         Cell first = sheet.getRow(1).getCell(0);
         Cell second = sheet.getRow(1).getCell(1);
         Cell hidden = sheet.getRow(1).getCell(2);
-        assertThat(first.getStringCellValue(), is("Spalte 1"));
-        assertThat(second.getStringCellValue(), is("Spalte 2"));
-        assertThat(hidden, nullValue());
+        assertEquals("Spalte 1", first.getStringCellValue());
+        assertEquals("Spalte 2", second.getStringCellValue());
+        assertNull(hidden);
     }
 
     @Test
     public void updateColumnWidthTest() {
         int[] colWidth = new int[]{0, 0, 0};
         _resourceProvider.updateColumnWidth(colWidth, null, 1);
-        assertThat(colWidth[0], is(0));
-        assertThat(colWidth[1], is(0));
-        assertThat(colWidth[2], is(0));
+        assertEquals(0, colWidth[0]);
+        assertEquals(0, colWidth[1]);
+        assertEquals(0, colWidth[2]);
 
         _resourceProvider.updateColumnWidth(colWidth, "test", 1);
-        assertThat(colWidth[0], is(0));
-        assertThat(colWidth[1], is(4));
-        assertThat(colWidth[2], is(0));
+        assertEquals(0, colWidth[0]);
+        assertEquals(4, colWidth[1]);
+        assertEquals(0, colWidth[2]);
 
         _resourceProvider.updateColumnWidth(colWidth, "test again", 1);
-        assertThat(colWidth[0], is(0));
-        assertThat(colWidth[1], is(10));
-        assertThat(colWidth[2], is(0));
+        assertEquals(0, colWidth[0]);
+        assertEquals(10, colWidth[1]);
+        assertEquals(0, colWidth[2]);
 
         _resourceProvider.updateColumnWidth(colWidth, "test again", 1);
-        assertThat(colWidth[0], is(0));
-        assertThat(colWidth[1], is(10));
-        assertThat(colWidth[2], is(0));
+        assertEquals(0, colWidth[0]);
+        assertEquals(10, colWidth[1]);
+        assertEquals(0, colWidth[2]);
 
         _resourceProvider.updateColumnWidth(colWidth, "test more", 1);
-        assertThat(colWidth[0], is(0));
-        assertThat(colWidth[1], is(10));
-        assertThat(colWidth[2], is(0));
+        assertEquals(0, colWidth[0]);
+        assertEquals(10, colWidth[1]);
+        assertEquals(0, colWidth[2]);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void addCellStringTestForNull() {
-        _resourceProvider.addCellString(null, null);
+        assertThrows(IllegalArgumentException.class, () -> _resourceProvider.addCellString(null, null));
     }
 
     @Test
@@ -162,59 +162,59 @@ public class TableAsExcelResourceProviderTest {
         Workbook wb = new XSSFWorkbook();
         Row row = wb.createSheet().createRow(0);
         Cell cell = row.createCell(0);
-        assertThat(_resourceProvider.addCellString(null, cell), is(EMPTY));
-        assertThat(_resourceProvider.addCellString("test", cell), is("test"));
+        assertEquals(EMPTY, _resourceProvider.addCellString(null, cell));
+        assertEquals("test", _resourceProvider.addCellString("test", cell));
 
         AbstractComponent value = mock(AbstractComponent.class);
         doReturn("test caption").when(value).getCaption();
-        assertThat(_resourceProvider.addCellString(value, cell), is("test caption"));
+        assertEquals("test caption", _resourceProvider.addCellString(value, cell));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toUrlTestForNull() {
-        _resourceProvider.toUrl(null);
+        assertThrows(IllegalArgumentException.class, () -> _resourceProvider.toUrl(null));
     }
 
     @Test
     public void toUrlTest() throws RepositoryException {
         Link link = mock(Link.class);
-        assertThat(_resourceProvider.toUrl(link), is(EMPTY));
+        assertEquals(EMPTY, _resourceProvider.toUrl(link));
 
         mockServerConfiguration(stubDefaultBaseUrl("https://test.aperto.de"));
         mockWebContext();
         ExternalResource external = mock(ExternalResource.class);
         doReturn(external).when(link).getResource();
-        assertThat(_resourceProvider.toUrl(link), is(EMPTY));
+        assertEquals(EMPTY, _resourceProvider.toUrl(link));
 
         doReturn("/path/to/page.html").when(external).getURL();
-        assertThat(_resourceProvider.toUrl(link), is("https://test.aperto.de/path/to/page.html"));
+        assertEquals("https://test.aperto.de/path/to/page.html", _resourceProvider.toUrl(link));
 
         FileResource fileResource = mock(FileResource.class);
         doReturn(fileResource).when(link).getResource();
-        assertThat(_resourceProvider.toUrl(link), is(EMPTY));
+        assertEquals(EMPTY, _resourceProvider.toUrl(link));
 
         File file = mock(File.class);
         doReturn(file).when(fileResource).getSourceFile();
-        assertThat(_resourceProvider.toUrl(link), is(EMPTY));
+        assertEquals(EMPTY, _resourceProvider.toUrl(link));
 
         doReturn("/path/to/file.pdf").when(file).getAbsolutePath();
-        assertThat(_resourceProvider.toUrl(link), is("https://test.aperto.de/path/to/file.pdf"));
+        assertEquals("https://test.aperto.de/path/to/file.pdf", _resourceProvider.toUrl(link));
     }
 
     @Test
     public void getBaseUrlTest() throws RepositoryException {
         ServerConfiguration serverConfig = mockServerConfiguration(stubDefaultBaseUrl("https://test.aperto.de"));
         WebContext ctx = mockWebContext(stubContextPath(""));
-        assertThat(_resourceProvider.getBaseUrl(), is("https://test.aperto.de"));
+        assertEquals("https://test.aperto.de", _resourceProvider.getBaseUrl());
 
         stubDefaultBaseUrl("https://test.aperto.de/contextPath").of(serverConfig);
-        assertThat(_resourceProvider.getBaseUrl(), is("https://test.aperto.de/contextPath"));
+        assertEquals("https://test.aperto.de/contextPath", _resourceProvider.getBaseUrl());
 
         stubContextPath("/author").of(ctx);
-        assertThat(_resourceProvider.getBaseUrl(), is("https://test.aperto.de/contextPath"));
+        assertEquals("https://test.aperto.de/contextPath", _resourceProvider.getBaseUrl());
 
         stubContextPath("/contextPath").of(ctx);
-        assertThat(_resourceProvider.getBaseUrl(), is("https://test.aperto.de"));
+        assertEquals("https://test.aperto.de", _resourceProvider.getBaseUrl());
     }
 
     @Test
@@ -223,26 +223,26 @@ public class TableAsExcelResourceProviderTest {
         Sheet sheet = wb.createSheet("test sheet");
         Item[] rows = mockVisibleRowItems(Arrays.asList("1", "2", "3"));
         _resourceProvider.renderSheet(sheet);
-        assertThat(sheet.getColumnWidth(0), is(0));
-        assertThat(sheet.getColumnWidth(1), is(0));
-        assertThat(sheet.getRow(2), notNullValue());
-        assertThat(sheet.getRow(3), notNullValue());
-        assertThat(sheet.getRow(4), notNullValue());
+        assertEquals(0, sheet.getColumnWidth(0));
+        assertEquals(0, sheet.getColumnWidth(1));
+        assertNotNull(sheet.getRow(2));
+        assertNotNull(sheet.getRow(3));
+        assertNotNull(sheet.getRow(4));
 
         mockProperties(rows, new String[]{"first value", "invisible value", "second value"}, new String[]{"first", "invisible", "second"});
         _resourceProvider.renderSheet(sheet);
-        assertThat(sheet.getRow(2).getCell(0).getStringCellValue(), is("first value"));
-        assertThat(sheet.getRow(2).getCell(1).getStringCellValue(), is("second value"));
-        assertThat(((int) sheet.getRow(2).getLastCellNum()), is(2));
-        assertThat(sheet.getRow(3).getCell(0).getStringCellValue(), is("first value"));
-        assertThat(sheet.getRow(3).getCell(1).getStringCellValue(), is("second value"));
-        assertThat(((int) sheet.getRow(3).getLastCellNum()), is(2));
-        assertThat(sheet.getRow(4).getCell(0).getStringCellValue(), is("first value"));
-        assertThat(sheet.getRow(4).getCell(1).getStringCellValue(), is("second value"));
-        assertThat(((int) sheet.getRow(4).getLastCellNum()), is(2));
+        assertEquals("first value", sheet.getRow(2).getCell(0).getStringCellValue());
+        assertEquals("second value", sheet.getRow(2).getCell(1).getStringCellValue());
+        assertEquals(2, (int) sheet.getRow(2).getLastCellNum());
+        assertEquals("first value", sheet.getRow(3).getCell(0).getStringCellValue());
+        assertEquals("second value", sheet.getRow(3).getCell(1).getStringCellValue());
+        assertEquals(2, (int) sheet.getRow(3).getLastCellNum());
+        assertEquals("first value", sheet.getRow(4).getCell(0).getStringCellValue());
+        assertEquals("second value", sheet.getRow(4).getCell(1).getStringCellValue());
+        assertEquals(2, (int) sheet.getRow(4).getLastCellNum());
 
-        assertThat(sheet.getColumnWidth(0), is(11 * 256));
-        assertThat(sheet.getColumnWidth(1), is(12 * 256));
+        assertEquals(11 * 256, sheet.getColumnWidth(0));
+        assertEquals(12 * 256, sheet.getColumnWidth(1));
     }
 
     private void mockProperties(Item[] rows, String[] values, String[] propertyIds) {

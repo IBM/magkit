@@ -20,11 +20,10 @@ package de.ibmix.magkit.query.sql2.condition;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for Sql2ConstraintGroup.
@@ -35,47 +34,47 @@ public class Sql2ConstraintGroupTest {
 
     @Test
     public void and() {
-        assertThat(Sql2ConstraintGroup.and().asString(), is(EMPTY));
-        assertThat(Sql2ConstraintGroup.and().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString(), is("[test] = 'value'"));
-        assertThat(Sql2ConstraintGroup.and().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
-            .asString(), is("([test] = 'value' AND [test2] = 'other')"));
+        assertEquals(EMPTY, Sql2ConstraintGroup.and().asString());
+        assertEquals("[test] = 'value'", Sql2ConstraintGroup.and().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString());
+        assertEquals("([test] = 'value' AND [test2] = 'other')", Sql2ConstraintGroup.and().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
+            .asString());
 
-        assertThat(Sql2ConstraintGroup.and()
+        assertEquals("(([test] = 'value' OR [test2] = 'other') AND ([test] = 'value' OR [test2] = 'other'))", Sql2ConstraintGroup.and()
             .matches(
                 Sql2ConstraintGroup.or()
                     .matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other")),
                 Sql2ConstraintGroup.or()
                     .matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
             )
-            .asString(), is("(([test] = 'value' OR [test2] = 'other') AND ([test] = 'value' OR [test2] = 'other'))"));
+            .asString());
     }
 
     @Test
     public void or() {
-        assertThat(Sql2ConstraintGroup.or().asString(), is(EMPTY));
-        assertThat(Sql2ConstraintGroup.or().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString(), is("[test] = 'value'"));
-        assertThat(Sql2ConstraintGroup.or().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
-            .asString(), is("([test] = 'value' OR [test2] = 'other')"));
+        assertEquals(EMPTY, Sql2ConstraintGroup.or().asString());
+        assertEquals("[test] = 'value'", Sql2ConstraintGroup.or().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString());
+        assertEquals("([test] = 'value' OR [test2] = 'other')", Sql2ConstraintGroup.or().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
+            .asString());
 
-        assertThat(Sql2ConstraintGroup.or()
+        assertEquals("(([test] = 'value' AND [test2] = 'other') OR ([test] = 'value' AND [test2] = 'other'))", Sql2ConstraintGroup.or()
             .matches(
                 Sql2ConstraintGroup.and()
                     .matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other")),
                 Sql2ConstraintGroup.and()
                     .matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
             )
-            .asString(), is("(([test] = 'value' AND [test2] = 'other') OR ([test] = 'value' AND [test2] = 'other'))"));
+            .asString());
     }
 
     @Test
     public void not() {
-        assertThat(Sql2ConstraintGroup.and().not().asString(), is(EMPTY));
-        assertThat(Sql2ConstraintGroup.or().not().asString(), is(EMPTY));
-        assertThat(Sql2ConstraintGroup.and().not().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString(), is("not([test] = 'value')"));
-        assertThat(Sql2ConstraintGroup.or().not().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString(), is("not([test] = 'value')"));
-        assertThat(Sql2ConstraintGroup.and().not().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
-            .asString(), is("not([test] = 'value' AND [test2] = 'other')"));
-        assertThat(Sql2ConstraintGroup.or().not().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
-            .asString(), is("not([test] = 'value' OR [test2] = 'other')"));
+        assertEquals(EMPTY, Sql2ConstraintGroup.and().not().asString());
+        assertEquals(EMPTY, Sql2ConstraintGroup.or().not().asString());
+        assertEquals("not([test] = 'value')", Sql2ConstraintGroup.and().not().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString());
+        assertEquals("not([test] = 'value')", Sql2ConstraintGroup.or().not().matches(Sql2StringCondition.property("test").equalsAny().values("value")).asString());
+        assertEquals("not([test] = 'value' AND [test2] = 'other')", Sql2ConstraintGroup.and().not().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
+            .asString());
+        assertEquals("not([test] = 'value' OR [test2] = 'other')", Sql2ConstraintGroup.or().not().matches(Sql2StringCondition.property("test").equalsAny().values("value"), Sql2StringCondition.property("test2").equalsAny().values("other"))
+            .asString());
     }
 }

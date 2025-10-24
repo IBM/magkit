@@ -24,10 +24,10 @@ import de.ibmix.magkit.test.cms.freemarker.FreemarkerTest;
 import info.magnolia.jcr.node2bean.Node2BeanProcessor;
 import info.magnolia.rendering.engine.RenderException;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.RepositoryException;
 import java.io.IOException;
@@ -40,8 +40,7 @@ import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponent
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSiteManager;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the folder Freemarker script.
@@ -51,18 +50,18 @@ import static org.hamcrest.core.Is.is;
  */
 public class FolderTest extends FreemarkerTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws RepositoryException {
         mockSiteManager();
         mockComponentInstance(Node2BeanProcessor.class);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         cleanContext();
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testFolderScriptInEditMode() throws RepositoryException, RenderException, IOException {
         getServerConfiguration().setAdmin(true);
@@ -72,12 +71,12 @@ public class FolderTest extends FreemarkerTest {
         final String expectedResult = IOUtils.toString(new InputStreamReader(expectedResultStream, StandardCharsets.UTF_8));
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testFolderScriptInPreviewMode() throws RepositoryException, RenderException {
         getServerConfiguration().setAdmin(false);
         String renderingResult = getRenderingResult(mockNode("/de"), "/magkit/templates/pages/folder.ftl", null);
-        assertThat(renderingResult, is(""));
+        assertEquals("", renderingResult);
     }
 
     @Override

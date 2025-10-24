@@ -20,14 +20,13 @@ package de.ibmix.magkit.query.sql2.condition;
  * #L%
  */
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for Sql2CalendarCondition.
@@ -38,7 +37,7 @@ public class Sql2CalendarConditionTest {
 
     private final Calendar _date = Calendar.getInstance();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         _date.set(2020, Calendar.MAY, 4, 15, 30, 0);
         _date.set(Calendar.MILLISECOND, 0);
@@ -47,39 +46,39 @@ public class Sql2CalendarConditionTest {
 
     @Test
     public void property() {
-        assertThat(Sql2CalendarCondition.property(null).equalsAll().values(_date).asString(), is(""));
-        assertThat(Sql2CalendarCondition.property("").equalsAll().values(_date).asString(), is(""));
-        assertThat(Sql2CalendarCondition.property("now").equalsAll().values(_date, _date).asString(), is("([now] = cast('2020-05-04T15:30:00.000+02:00' as date) AND [now] = cast('2020-05-04T15:30:00.000+02:00' as date))"));
-        assertThat(Sql2CalendarCondition.property("now").equalsAny().values(_date, _date).asString(), is("([now] = cast('2020-05-04T15:30:00.000+02:00' as date) OR [now] = cast('2020-05-04T15:30:00.000+02:00' as date))"));
-        assertThat(Sql2CalendarCondition.property("now").excludeAll().values(_date, _date).asString(), is("([now] <> cast('2020-05-04T15:30:00.000+02:00' as date) AND [now] <> cast('2020-05-04T15:30:00.000+02:00' as date))"));
-        assertThat(Sql2CalendarCondition.property("now").excludeAny().values(_date, _date).asString(), is("([now] <> cast('2020-05-04T15:30:00.000+02:00' as date) OR [now] <> cast('2020-05-04T15:30:00.000+02:00' as date))"));
-        assertThat(Sql2CalendarCondition.property("now").greaterThan().value(_date).asString(), is("[now] > cast('2020-05-04T15:30:00.000+02:00' as date)"));
-        assertThat(Sql2CalendarCondition.property("now").greaterOrEqualThan().value(_date).asString(), is("[now] >= cast('2020-05-04T15:30:00.000+02:00' as date)"));
-        assertThat(Sql2CalendarCondition.property("now").lowerOrEqualThan().value(_date).asString(), is("[now] <= cast('2020-05-04T15:30:00.000+02:00' as date)"));
-        assertThat(Sql2CalendarCondition.property("now").lowerThan().value(_date).asString(), is("[now] < cast('2020-05-04T15:30:00.000+02:00' as date)"));
+        assertEquals("", Sql2CalendarCondition.property(null).equalsAll().values(_date).asString());
+        assertEquals("", Sql2CalendarCondition.property("").equalsAll().values(_date).asString());
+        assertEquals("([now] = cast('2020-05-04T15:30:00.000+02:00' as date) AND [now] = cast('2020-05-04T15:30:00.000+02:00' as date))", Sql2CalendarCondition.property("now").equalsAll().values(_date, _date).asString());
+        assertEquals("([now] = cast('2020-05-04T15:30:00.000+02:00' as date) OR [now] = cast('2020-05-04T15:30:00.000+02:00' as date))", Sql2CalendarCondition.property("now").equalsAny().values(_date, _date).asString());
+        assertEquals("([now] <> cast('2020-05-04T15:30:00.000+02:00' as date) AND [now] <> cast('2020-05-04T15:30:00.000+02:00' as date))", Sql2CalendarCondition.property("now").excludeAll().values(_date, _date).asString());
+        assertEquals("([now] <> cast('2020-05-04T15:30:00.000+02:00' as date) OR [now] <> cast('2020-05-04T15:30:00.000+02:00' as date))", Sql2CalendarCondition.property("now").excludeAny().values(_date, _date).asString());
+        assertEquals("[now] > cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.property("now").greaterThan().value(_date).asString());
+        assertEquals("[now] >= cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.property("now").greaterOrEqualThan().value(_date).asString());
+        assertEquals("[now] <= cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.property("now").lowerOrEqualThan().value(_date).asString());
+        assertEquals("[now] < cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.property("now").lowerThan().value(_date).asString());
     }
 
     @Test
     public void created() {
-        assertThat(Sql2CalendarCondition.created().lowerOrEqualThan().value(null).asString(), is(""));
-        assertThat(Sql2CalendarCondition.created().lowerOrEqualThan().value(_date).asString(), is("[mgnl:created] <= cast('2020-05-04T15:30:00.000+02:00' as date)"));
+        assertEquals("", Sql2CalendarCondition.created().lowerOrEqualThan().value(null).asString());
+        assertEquals("[mgnl:created] <= cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.created().lowerOrEqualThan().value(_date).asString());
     }
 
     @Test
     public void lastActivated() {
-        assertThat(Sql2CalendarCondition.lastActivated().lowerOrEqualThan().value(null).asString(), is(""));
-        assertThat(Sql2CalendarCondition.lastActivated().lowerOrEqualThan().value(_date).asString(), is("[mgnl:lastActivated] <= cast('2020-05-04T15:30:00.000+02:00' as date)"));
+        assertEquals("", Sql2CalendarCondition.lastActivated().lowerOrEqualThan().value(null).asString());
+        assertEquals("[mgnl:lastActivated] <= cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.lastActivated().lowerOrEqualThan().value(_date).asString());
     }
 
     @Test
     public void lastModified() {
-        assertThat(Sql2CalendarCondition.lastModified().lowerOrEqualThan().value(null).asString(), is(""));
-        assertThat(Sql2CalendarCondition.lastModified().lowerOrEqualThan().value(_date).asString(), is("[mgnl:lastModified] <= cast('2020-05-04T15:30:00.000+02:00' as date)"));
+        assertEquals("", Sql2CalendarCondition.lastModified().lowerOrEqualThan().value(null).asString());
+        assertEquals("[mgnl:lastModified] <= cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.lastModified().lowerOrEqualThan().value(_date).asString());
     }
 
     @Test
     public void deleted() {
-        assertThat(Sql2CalendarCondition.deleted().lowerOrEqualThan().value(null).asString(), is(""));
-        assertThat(Sql2CalendarCondition.deleted().lowerOrEqualThan().value(_date).asString(), is("[mgnl:deleted] <= cast('2020-05-04T15:30:00.000+02:00' as date)"));
+        assertEquals("", Sql2CalendarCondition.deleted().lowerOrEqualThan().value(null).asString());
+        assertEquals("[mgnl:deleted] <= cast('2020-05-04T15:30:00.000+02:00' as date)", Sql2CalendarCondition.deleted().lowerOrEqualThan().value(_date).asString());
     }
 }

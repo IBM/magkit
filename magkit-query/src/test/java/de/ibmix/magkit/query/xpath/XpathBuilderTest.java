@@ -20,12 +20,11 @@ package de.ibmix.magkit.query.xpath;
  * #L%
  */
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author philipp.guettler
@@ -41,113 +40,113 @@ public class XpathBuilderTest {
     private static final String TEST_NAME = "testName";
     private static final String TEST_CONSTRAINT = "testConstraint";
 
-    @Before
+    @BeforeEach
     public void init() {
         _xpath = new XpathBuilder();
     }
 
     @Test
     public void testInitialize() {
-        Assert.assertEquals(_xpath.build(), XpathBuilder.JCR_ROOT_PATH);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH, _xpath.build());
     }
 
     @Test
     public void testPath() {
-        Assert.assertEquals(_xpath.path(TEST_PATH).build(), XpathBuilder.JCR_ROOT_PATH + TEST_PATH);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + TEST_PATH, _xpath.path(TEST_PATH).build());
     }
 
     @Test
     public void testPathWithNumbers() {
-        Assert.assertEquals(_xpath.path("/test/content/00").build(), "/jcr:root/test/content/_x0030_0");
+        assertEquals("/jcr:root/test/content/_x0030_0", _xpath.path("/test/content/00").build());
     }
 
     @Test
     public void testPathDouble() {
-        Assert.assertEquals(_xpath.path(TEST_PATH).path(TEST_PATH).build(), XpathBuilder.JCR_ROOT_PATH + TEST_PATH + TEST_PATH);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + TEST_PATH + TEST_PATH, _xpath.path(TEST_PATH).path(TEST_PATH).build());
     }
 
     @Test
     public void testTypeNull() {
-        Assert.assertEquals(_xpath.type(null, null).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + NULL_STRING + "," + NULL_STRING + ")");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + NULL_STRING + "," + NULL_STRING + ")", _xpath.type(null, null).build());
     }
 
     @Test
     public void testEmptyType() {
-        Assert.assertEquals(_xpath.emptyType().build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_EMPTY);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_EMPTY, _xpath.emptyType().build());
     }
 
     @Test
     public void testEmptyTypeDouble() {
-        Assert.assertEquals(_xpath.emptyType().emptyType().build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_EMPTY + XpathBuilder.SELECTOR_TYPE_EMPTY);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_EMPTY + XpathBuilder.SELECTOR_TYPE_EMPTY, _xpath.emptyType().emptyType().build());
     }
 
     @Test
     public void testType() {
-        Assert.assertEquals(_xpath.type(XpathBuilder.SELECTOR_ALL, TEST_TYPE).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + TEST_TYPE + ")");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + TEST_TYPE + ")", _xpath.type(XpathBuilder.SELECTOR_ALL, TEST_TYPE).build());
     }
 
     @Test
     public void testTypeDouble() {
-        Assert.assertEquals(_xpath.type(XpathBuilder.SELECTOR_ALL, TEST_TYPE).type(XpathBuilder.SELECTOR_ALL, TEST_TYPE).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + TEST_TYPE + ")" + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + TEST_TYPE + ")");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + TEST_TYPE + ")" + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + TEST_TYPE + ")", _xpath.type(XpathBuilder.SELECTOR_ALL, TEST_TYPE).type(XpathBuilder.SELECTOR_ALL, TEST_TYPE).build());
     }
 
     @Test
     public void testTypeAll() {
-        Assert.assertEquals(_xpath.type(XpathBuilder.SELECTOR_ALL, XpathBuilder.SELECTOR_ALL).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + XpathBuilder.SELECTOR_ALL + ")");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + XpathBuilder.SELECTOR_ALL + "," + XpathBuilder.SELECTOR_ALL + ")", _xpath.type(XpathBuilder.SELECTOR_ALL, XpathBuilder.SELECTOR_ALL).build());
     }
 
     @Test
     public void testTypeWithName() {
-        Assert.assertEquals(_xpath.type(TEST_NAME, TEST_TYPE).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + TEST_NAME + "," + TEST_TYPE + ")");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + TEST_NAME + "," + TEST_TYPE + ")", _xpath.type(TEST_NAME, TEST_TYPE).build());
     }
 
     @Test
     public void testPropertyNull() {
-        Assert.assertEquals(_xpath.property((String) null).build(), XpathBuilder.JCR_ROOT_PATH + "[" + NULL_STRING + "]");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + "[" + NULL_STRING + "]", _xpath.property((String) null).build());
     }
 
     @Test
     public void testPropertyEmpty() {
-        Assert.assertEquals(_xpath.property(new ConstraintBuilder()).build(), XpathBuilder.JCR_ROOT_PATH + "[]");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + "[]", _xpath.property(new ConstraintBuilder()).build());
     }
 
     @Test
     public void testProperty() {
-        Assert.assertEquals(_xpath.property(new ConstraintBuilder().add(TEST_CONSTRAINT)).build(), XpathBuilder.JCR_ROOT_PATH + "[" + TEST_CONSTRAINT + "]");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + "[" + TEST_CONSTRAINT + "]", _xpath.property(new ConstraintBuilder().add(TEST_CONSTRAINT)).build());
     }
 
     @Test
     public void testPropertyDouble() {
-        Assert.assertEquals(_xpath.property(new ConstraintBuilder().add(TEST_CONSTRAINT)).property(new ConstraintBuilder().add(TEST_CONSTRAINT)).build(), XpathBuilder.JCR_ROOT_PATH + "[" + TEST_CONSTRAINT + "]" + "[" + TEST_CONSTRAINT + "]");
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + "[" + TEST_CONSTRAINT + "]" + "[" + TEST_CONSTRAINT + "]", _xpath.property(new ConstraintBuilder().add(TEST_CONSTRAINT)).property(new ConstraintBuilder().add(TEST_CONSTRAINT)).build());
     }
 
     @Test
     public void testOrderByNull() {
-        Assert.assertEquals(_xpath.orderBy(null).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY + NULL_STRING);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY + NULL_STRING, _xpath.orderBy(null).build());
     }
 
     @Test
     public void testOrderByEmpty() {
-        Assert.assertEquals(_xpath.orderBy(EMPTY).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY, _xpath.orderBy(EMPTY).build());
     }
 
     @Test
     public void testOrderBy() {
-        Assert.assertEquals(_xpath.orderBy(TEST_TYPE).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE, _xpath.orderBy(TEST_TYPE).build());
     }
 
     @Test
     public void testOrderByDouble() {
-        Assert.assertEquals(_xpath.orderBy(TEST_TYPE).orderBy(TEST_TYPE).build(), XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE);
+        assertEquals(XpathBuilder.JCR_ROOT_PATH + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE, _xpath.orderBy(TEST_TYPE).orderBy(TEST_TYPE).build());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testBuild() {
         final String buildQuery = _xpath.path(TEST_PATH).emptyType().property(new ConstraintBuilder().add(TEST_CONSTRAINT)).path(TEST_PATH).type(TEST_NAME, TEST_TYPE).property(new ConstraintBuilder().add(TEST_CONSTRAINT)).orderBy(TEST_TYPE).build();
         final String expectedQuery = XpathBuilder.JCR_ROOT_PATH + TEST_PATH + XpathBuilder.SELECTOR_TYPE_EMPTY + "[" + TEST_CONSTRAINT + "]" + TEST_PATH + XpathBuilder.SELECTOR_TYPE_ELEMENT + "(" + TEST_NAME + "," + TEST_TYPE + ")[" + TEST_CONSTRAINT + "]" + XpathBuilder.SELECTOR_ORDER_BY + TEST_TYPE;
 
-        assertEquals(buildQuery, expectedQuery);
+        assertEquals(expectedQuery, buildQuery);
         // trigger a npe
-        _xpath.build();
+        assertThrows(NullPointerException.class, () -> _xpath.build());
     }
 }

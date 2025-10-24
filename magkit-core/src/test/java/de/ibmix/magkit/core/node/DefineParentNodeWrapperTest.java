@@ -22,8 +22,8 @@ package de.ibmix.magkit.core.node;
 
 import de.ibmix.magkit.test.jcr.SessionMockUtils;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -34,8 +34,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -48,17 +49,17 @@ import static org.mockito.Mockito.when;
  */
 public class DefineParentNodeWrapperTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         SessionMockUtils.cleanSession();
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void constructorRequiresNonNullParent() throws RepositoryException {
         // build hierarchy for actual
         Node root = mockNode("root");
         Node actual = mockNode("root/actual");
-        new DefineParentNodeWrapper(null, actual);
+        assertThrows(NullPointerException.class, () -> new DefineParentNodeWrapper(null, actual));
     }
 
     @Test
@@ -67,105 +68,95 @@ public class DefineParentNodeWrapperTest {
         Node actual = mockNode("root/actual");
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(syntheticParent, actual);
 
-        assertThat(wrapper.getParent(), is(syntheticParent));
-        assertThat(wrapper.getPath(), is("/root/actual"));
-        assertThat(wrapper.getDepth(), is(syntheticParent.getDepth() + 1));
+        assertEquals(syntheticParent, wrapper.getParent());
+        assertEquals("/root/actual", wrapper.getPath());
+        assertEquals(syntheticParent.getDepth() + 1, wrapper.getDepth());
     }
 
     @Test
     public void getNodeWrapsChildWithThisAsParent() throws RepositoryException {
         Node syntheticParent = mockNode("syntheticParent");
         Node actual = mockNode("root/actual");
-        Node child = mockNode("root/actual/child");
-
+        mockNode("root/actual/child");
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(syntheticParent, actual);
         Node childWrapper = wrapper.getNode("child");
-        assertThat(childWrapper instanceof DefineParentNodeWrapper, is(true));
-        assertThat(childWrapper.getParent(), is(wrapper));
-        assertThat(childWrapper.getPath(), is(wrapper.getPath() + "/child"));
-        assertThat(childWrapper.getDepth(), is(wrapper.getDepth() + 1));
+        assertTrue(childWrapper instanceof DefineParentNodeWrapper);
+        assertEquals(wrapper, childWrapper.getParent());
+        assertEquals(wrapper.getPath() + "/child", childWrapper.getPath());
+        assertEquals(wrapper.getDepth() + 1, childWrapper.getDepth());
     }
 
-    @Test(expected = PathNotFoundException.class)
+    @Test
     public void getNodePropagatesPathNotFound() throws RepositoryException {
         Node syntheticParent = mockNode("root");
         Node actual = mockNode("root/actual");
         when(actual.getNode("missing")).thenThrow(new PathNotFoundException("missing"));
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(syntheticParent, actual);
-        wrapper.getNode("missing");
+        assertThrows(PathNotFoundException.class, () -> wrapper.getNode("missing"));
     }
 
     @Test
     public void getNodesWrapsChildrenAndKeepsAlreadyWrappedOnes() throws RepositoryException {
         Node syntheticParent = mockNode("syntheticParent");
         Node actual = mockNode("root/nodeA");
-
         mockNode("root/nodeA/child1");
         mockNode("root/nodeA/child2");
-
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(syntheticParent, actual);
         NodeIterator wrappedIterator = wrapper.getNodes();
         List<Node> children = toList(wrappedIterator);
-        assertThat(children.size(), is(2));
+        assertEquals(2, children.size());
         DefineParentNodeWrapper first = (DefineParentNodeWrapper) children.get(0);
         DefineParentNodeWrapper second = (DefineParentNodeWrapper) children.get(1);
-        assertThat(first.getParent(), is(wrapper));
-        assertThat(second.getParent(), is(wrapper));
-        assertThat(second.getPath(), is("/syntheticParent/nodeA/child2"));
+        assertEquals(wrapper, first.getParent());
+        assertEquals(wrapper, second.getParent());
+        assertEquals("/syntheticParent/nodeA/child2", second.getPath());
     }
 
     @Test
     public void getNodesByNamePattern() throws RepositoryException {
         Node syntheticParent = mockNode("syntheticRoot");
         Node actual = mockNode("root/node");
-
         Node child = mockNode("root/node/child-a");
         doReturn(new NodeIteratorAdapter(Collections.singletonList(child))).when(actual).getNodes();
-
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(syntheticParent, actual);
         NodeIterator wrappedIterator = wrapper.getNodes("child*");
         List<Node> children = toList(wrappedIterator);
-        assertThat(children.size(), is(1));
-        assertThat(children.get(0) instanceof DefineParentNodeWrapper, is(true));
-        assertThat(children.get(0).getParent(), is(wrapper));
+        assertEquals(1, children.size());
+        assertTrue(children.get(0) instanceof DefineParentNodeWrapper);
+        assertEquals(wrapper, children.get(0).getParent());
     }
 
     @Test
     public void getNodesByGlobs() throws RepositoryException {
         Node syntheticParent = mockNode("syntheticParent");
         Node actual = mockNode("root/actual");
-
-        Node child1 = mockNode("root/actual/child1");
-        Node child2 = mockNode("root/actual/child2");
-
+        mockNode("root/actual/child1");
+        mockNode("root/actual/child2");
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(syntheticParent, actual);
         NodeIterator wrappedIterator = wrapper.getNodes(new String[]{"child1", "child2"});
         List<Node> children = toList(wrappedIterator);
-        assertThat(children.size(), is(2));
-        assertThat(children.get(0) instanceof DefineParentNodeWrapper, is(true));
-        assertThat(children.get(1) instanceof DefineParentNodeWrapper, is(true));
-        assertThat(children.get(0).getParent(), is(wrapper));
-        assertThat(children.get(1).getParent(), is(wrapper));
+        assertEquals(2, children.size());
+        assertTrue(children.get(0) instanceof DefineParentNodeWrapper);
+        assertTrue(children.get(1) instanceof DefineParentNodeWrapper);
+        assertEquals(wrapper, children.get(0).getParent());
+        assertEquals(wrapper, children.get(1).getParent());
     }
 
     @Test
     public void nestedWrappingBuildsConsistentHierarchy() throws RepositoryException {
         Node root = mockNode("newRoot");
         Node actual = mockNode("root/actual");
-        Node child = mockNode("root/actual/child");
-        Node leaf = mockNode("root/actual/child/leaf");
-
+        mockNode("root/actual/child");
+        mockNode("root/actual/child/leaf");
         DefineParentNodeWrapper wrapper = new DefineParentNodeWrapper(root, actual);
         DefineParentNodeWrapper childWrapper = (DefineParentNodeWrapper) wrapper.getNode("child");
         DefineParentNodeWrapper leafWrapper = (DefineParentNodeWrapper) childWrapper.getNode("leaf");
-
-        assertThat(childWrapper.getParent(), is(wrapper));
-        assertThat(childWrapper.getPath(), is("/newRoot/actual/child"));
-        assertThat(childWrapper.getDepth(), is(wrapper.getDepth() + 1));
-
-        assertThat(leafWrapper.getParent(), is(childWrapper));
-        assertThat(leafWrapper.getPath(), is("/newRoot/actual/child/leaf"));
-        assertThat(leafWrapper.getDepth(), is(childWrapper.getDepth() + 1));
+        assertEquals(wrapper, childWrapper.getParent());
+        assertEquals("/newRoot/actual/child", childWrapper.getPath());
+        assertEquals(wrapper.getDepth() + 1, childWrapper.getDepth());
+        assertEquals(childWrapper, leafWrapper.getParent());
+        assertEquals("/newRoot/actual/child/leaf", leafWrapper.getPath());
+        assertEquals(childWrapper.getDepth() + 1, leafWrapper.getDepth());
     }
 
     private List<Node> toList(NodeIterator iterator) {

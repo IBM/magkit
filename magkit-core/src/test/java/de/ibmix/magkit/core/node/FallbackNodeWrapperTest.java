@@ -21,8 +21,8 @@ package de.ibmix.magkit.core.node;
  */
 
 import de.ibmix.magkit.core.utils.PropertyUtils;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
@@ -36,9 +36,11 @@ import java.util.List;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Tests for {@link FallbackNodeWrapper} covering property and node fallback chains, name fallback mapping,
@@ -49,7 +51,7 @@ import static org.hamcrest.core.IsNull.nullValue;
  */
 public class FallbackNodeWrapperTest {
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         cleanContext();
     }
@@ -61,8 +63,8 @@ public class FallbackNodeWrapperTest {
     public void factoryMethodCreatesWrapper() throws Exception {
         Node primary = mockNode("primary", stubProperty("p", "v"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        assertThat(wrapper.getWrappedNode(), is(primary));
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("p")), is("v"));
+        assertEquals(primary, wrapper.getWrappedNode());
+        assertEquals("v", PropertyUtils.getStringValue(wrapper.getProperty("p")));
     }
 
     /**
@@ -73,57 +75,57 @@ public class FallbackNodeWrapperTest {
         Node fallback = mockNode("fallback", stubProperty("title", "fallback-title"));
         FallbackNodeWrapper wrapper = new FallbackNodeWrapper("synthetic", "mgnl:content");
         wrapper.withFallbackNodes(fallback);
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("fallback-title"));
+        assertEquals("fallback-title", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
      * Ensures null property condition raises NPE.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void withPropertyConditionNullThrows() throws Exception {
         Node primary = mockNode("p1");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        wrapper.withPropertyCondition(null);
+        assertThrows(NullPointerException.class, () -> wrapper.withPropertyCondition(null));
     }
 
     /**
      * Ensures null iterator condition raises NPE.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void withIteratorConditionNullThrows() throws Exception {
         Node primary = mockNode("p1");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        wrapper.withIteratorCondition(null);
+        assertThrows(NullPointerException.class, () -> wrapper.withIteratorCondition(null));
     }
 
     /**
      * Ensures null fallback node array raises NPE.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void withFallbackNodesNullThrows() throws Exception {
         Node primary = mockNode("p1");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        wrapper.withFallbackNodes((Node[]) null);
+        assertThrows(NullPointerException.class, () -> wrapper.withFallbackNodes((Node[]) null));
     }
 
     /**
      * Ensures empty property name or fallback names are validated.
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void withPropertyNameFallbacksNullNameThrows() throws Exception {
         Node primary = mockNode("p1");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        wrapper.withPropertyNameFallbacks(null, "alt");
+        assertThrows(NullPointerException.class, () -> wrapper.withPropertyNameFallbacks(null, "alt"));
     }
 
     /**
      * Ensures empty fallback name array is rejected.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void withPropertyNameFallbacksEmptyFallbacksThrows() throws Exception {
         Node primary = mockNode("p1");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        wrapper.withPropertyNameFallbacks("title");
+        assertThrows(IllegalArgumentException.class, () -> wrapper.withPropertyNameFallbacks("title"));
     }
 
     /**
@@ -134,7 +136,7 @@ public class FallbackNodeWrapperTest {
         Node parent = mockNode("root");
         Node child = mockNode("root/child", stubProperty("x", "y"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(parent);
-        assertThat(wrapper.getNode("child"), is(child));
+        assertEquals(child, wrapper.getNode("child"));
     }
 
     /**
@@ -146,7 +148,7 @@ public class FallbackNodeWrapperTest {
         Node fallbackParent = mockNode("fallback");
         Node fb = mockNode("fallback/child", stubProperty("x", "y"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withFallbackNodes(fallbackParent);
-        assertThat(wrapper.getNode("child"), is(fb));
+        assertEquals(fb, wrapper.getNode("child"));
     }
 
     /**
@@ -156,7 +158,7 @@ public class FallbackNodeWrapperTest {
     public void getNodeNoFallbackReturnsNull() throws Exception {
         Node primary = mockNode("primary");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary);
-        assertThat(wrapper.getNode("missing"), nullValue());
+        assertNull(wrapper.getNode("missing"));
     }
 
     /**
@@ -169,7 +171,7 @@ public class FallbackNodeWrapperTest {
         Node child2 = mockNode("fb/child2");
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withFallbackNodes(mockNode("fb"), child1, child2);
         NodeIterator it = wrapper.getNodes();
-        assertThat(it.hasNext(), is(true));
+        assertTrue(it.hasNext());
     }
 
     /**
@@ -185,7 +187,7 @@ public class FallbackNodeWrapperTest {
         while (it.hasNext()) {
             names.add(it.nextNode().getName());
         }
-        assertThat(names.contains("matchOne"), is(true));
+        assertTrue(names.contains("matchOne"));
     }
 
     /**
@@ -201,7 +203,7 @@ public class FallbackNodeWrapperTest {
         while (it.hasNext()) {
             names.add(it.nextNode().getName());
         }
-        assertThat(names.contains("test1"), is(true));
+        assertTrue(names.contains("test1"));
     }
 
     /**
@@ -211,7 +213,7 @@ public class FallbackNodeWrapperTest {
     public void getPropertyPrimaryNoFallback() throws Exception {
         Node primary = mockNode("primary", stubProperty("title", "main"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withFallbackNodes(mockNode("fb", stubProperty("title", "fb")));
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("main"));
+        assertEquals("main", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -222,7 +224,7 @@ public class FallbackNodeWrapperTest {
         Node primary = mockNode("primary");
         Node fb = mockNode("fb", stubProperty("title", "fb-title"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withFallbackNodes(fb);
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("fb-title"));
+        assertEquals("fb-title", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -232,7 +234,7 @@ public class FallbackNodeWrapperTest {
     public void getPropertyNameFallbacksOnSameNode() throws Exception {
         Node primary = mockNode("primary", stubProperty("displayTitle", "DT"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withPropertyNameFallbacks("title", "displayTitle");
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("DT"));
+        assertEquals("DT", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -242,7 +244,7 @@ public class FallbackNodeWrapperTest {
     public void getPropertyNameFallbacksSkipEmptyPrimaryValue() throws Exception {
         Node primary = mockNode("primary", stubProperty("title", ""), stubProperty("displayTitle", "NonEmpty"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withPropertyNameFallbacks("title", "displayTitle");
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("NonEmpty"));
+        assertEquals("NonEmpty", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -252,7 +254,7 @@ public class FallbackNodeWrapperTest {
     public void getPropertyNameFallbacksOrderUsed() throws Exception {
         Node primary = mockNode("primary", stubProperty("altTitle", "ALT"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withPropertyNameFallbacks("title", "displayTitle", "altTitle");
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("ALT"));
+        assertEquals("ALT", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -269,7 +271,7 @@ public class FallbackNodeWrapperTest {
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary)
             .withFallbackNodes(fb)
             .withPropertyCondition(longValuePredicate);
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("long-value"));
+        assertEquals("long-value", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -281,9 +283,9 @@ public class FallbackNodeWrapperTest {
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(mockNode("primary"));
         wrapper.withFallbackNodes(mockNode("fb"));
         NodeIterator nit = wrapper.getNodes();
-        assertThat(nit.hasNext(), is(true));
-        assertThat(primaryChild.getName(), is("a"));
-        assertThat(nit.nextNode().getName(), is("a"));
+        assertTrue(nit.hasNext());
+        assertEquals("a", primaryChild.getName());
+        assertEquals("a", nit.nextNode().getName());
     }
 
     /**
@@ -298,7 +300,7 @@ public class FallbackNodeWrapperTest {
         );
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary)
             .withPropertyNameFallbacks("title", "displayTitle", "altTitle");
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), nullValue());
+        assertNull(PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -311,7 +313,7 @@ public class FallbackNodeWrapperTest {
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary)
             .withFallbackNodes(fb)
             .withPropertyNameFallbacks("title", "displayTitle", "altTitle");
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("title")), is("FB"));
+        assertEquals("FB", PropertyUtils.getStringValue(wrapper.getProperty("title")));
     }
 
     /**
@@ -322,7 +324,7 @@ public class FallbackNodeWrapperTest {
         Node fb = mockNode("fb", stubProperty("x", "y"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(mockNode("primary"))
             .withFallbackNodes(null, fb, null);
-        assertThat(PropertyUtils.getStringValue(wrapper.getProperty("x")), is("y"));
+        assertEquals("y", PropertyUtils.getStringValue(wrapper.getProperty("x")));
     }
 
     /**
@@ -334,7 +336,7 @@ public class FallbackNodeWrapperTest {
         Node fb = mockNode("fb", stubProperty("title", "xyz"));
         Predicate<Property> never = p -> false;
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withFallbackNodes(fb).withPropertyCondition(never);
-        assertThat(wrapper.getProperty("title"), nullValue());
+        assertNull(wrapper.getProperty("title"));
     }
 
     /**
@@ -344,7 +346,7 @@ public class FallbackNodeWrapperTest {
     public void nodeIteratorEmptyWithoutChildrenAnywhere() throws Exception {
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(mockNode("primary"));
         NodeIterator nit = wrapper.getNodes();
-        assertThat(nit.hasNext(), is(false));
+        assertFalse(nit.hasNext());
     }
 
     /**
@@ -354,7 +356,7 @@ public class FallbackNodeWrapperTest {
     public void propertyNameFallbacksNoneExistReturnsNull() throws Exception {
         Node primary = mockNode("primary", stubProperty("unrelated", "value"));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withPropertyNameFallbacks("title", "displayTitle", "altTitle");
-        assertThat(wrapper.getProperty("title"), nullValue());
+        assertNull(wrapper.getProperty("title"));
     }
 
     /**
@@ -368,7 +370,7 @@ public class FallbackNodeWrapperTest {
             .withFallbackNodes(mockNode("fb"), primary, fb)
             .withIteratorCondition(it -> false);
         NodeIterator nit = wrapper.getNodes();
-        assertThat(nit.hasNext(), is(false));
+        assertFalse(nit.hasNext());
     }
 
     /**
@@ -380,7 +382,7 @@ public class FallbackNodeWrapperTest {
         Node fb1 = mockNode("fb1", stubProperty("title", ""));
         Node fb2 = mockNode("fb2", stubProperty("title", ""));
         FallbackNodeWrapper wrapper = FallbackNodeWrapper.forNode(primary).withFallbackNodes(fb1, fb2);
-        assertThat(wrapper.getProperty("title"), nullValue());
+        assertNull(wrapper.getProperty("title"));
     }
 
     /**
@@ -407,7 +409,7 @@ public class FallbackNodeWrapperTest {
         while (pit.hasNext()) {
             names.add(pit.nextProperty().getName());
         }
-        assertThat(names.contains("alpha"), is(true));
+        assertTrue(names.contains("alpha"));
     }
 
     /**
@@ -433,6 +435,6 @@ public class FallbackNodeWrapperTest {
         while (pit.hasNext()) {
             names.add(pit.nextProperty().getName());
         }
-        assertThat(names.contains("beta1"), is(true));
+        assertTrue(names.contains("beta1"));
     }
 }

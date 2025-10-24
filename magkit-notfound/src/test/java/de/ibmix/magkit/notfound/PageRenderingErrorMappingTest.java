@@ -20,21 +20,20 @@ package de.ibmix.magkit.notfound;
  * #L%
  */
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
 import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link PageRenderingErrorMapping} covering constructor component retrieval and response mapping logic.
@@ -59,7 +58,7 @@ public class PageRenderingErrorMappingTest {
     private ErrorService _errorService;
     private PageRenderingErrorMapping _mapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cleanContext();
         _errorService = mockComponentInstance(ErrorService.class);
@@ -67,7 +66,7 @@ public class PageRenderingErrorMappingTest {
         _mapper = new PageRenderingErrorMapping();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }
@@ -78,8 +77,8 @@ public class PageRenderingErrorMappingTest {
         when(_errorService.createEntity(404, "/foo/bar")).thenReturn(errorEntity);
         PageRenderingException exception = new PageRenderingException(404, "/foo/bar");
         Response response = _mapper.toResponse(exception);
-        assertThat(response.getStatus(), equalTo(404));
-        assertThat(response.getEntity(), equalTo(errorEntity));
+        assertEquals(404, response.getStatus());
+        assertEquals(errorEntity, response.getEntity());
         verify(_errorService).createEntity(404, "/foo/bar");
     }
 
@@ -89,8 +88,8 @@ public class PageRenderingErrorMappingTest {
         when(_errorService.createEntity(418, "/tea/pot")).thenReturn(entity418);
         PageRenderingException exception418 = new PageRenderingException(418, "/tea/pot");
         Response response418 = _mapper.toResponse(exception418);
-        assertThat(response418.getStatus(), equalTo(418));
-        assertThat(response418.getEntity(), equalTo(entity418));
+        assertEquals(418, response418.getStatus());
+        assertEquals(entity418, response418.getEntity());
         verify(_errorService).createEntity(418, "/tea/pot");
     }
 
@@ -100,8 +99,8 @@ public class PageRenderingErrorMappingTest {
         when(_errorService.createEntity(400, "/foo/error")).thenReturn(errorEntity);
         PageRenderingException exception = new PageRenderingException(400, "/foo/error");
         Response response = _mapper.toResponse(exception);
-        assertThat(response.getStatus(), equalTo(400));
-        assertThat(response.getEntity(), equalTo(errorEntity));
+        assertEquals(400, response.getStatus());
+        assertEquals(errorEntity, response.getEntity());
         verify(_errorService).createEntity(400, "/foo/error");
     }
 }

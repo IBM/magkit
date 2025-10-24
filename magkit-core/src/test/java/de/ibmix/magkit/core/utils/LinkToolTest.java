@@ -21,9 +21,9 @@ package de.ibmix.magkit.core.utils;
  */
 
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -38,9 +38,10 @@ import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubC
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test the LinkTool class.
@@ -50,89 +51,89 @@ import static org.hamcrest.core.IsNull.nullValue;
  */
 public class LinkToolTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         cleanContext();
     }
 
     @Test
     public void testIsUuid() {
-        assertThat(isUuid(null), is(false));
-        assertThat(isUuid(""), is(false));
-        assertThat(isUuid("www.aperto.de"), is(false));
-        assertThat(isUuid("12345-45454-54545"), is(false));
-        assertThat(isUuid("dc307c08-5a19-4260-a304-a5611d1ca900 1"), is(false));
-        assertThat(isUuid("dc307c08-5a19-4260-a304-a5611d1ca900"), is(true));
+        assertFalse(isUuid(null));
+        assertFalse(isUuid(""));
+        assertFalse(isUuid("www.aperto.de"));
+        assertFalse(isUuid("12345-45454-54545"));
+        assertFalse(isUuid("dc307c08-5a19-4260-a304-a5611d1ca900 1"));
+        assertTrue(isUuid("dc307c08-5a19-4260-a304-a5611d1ca900"));
     }
 
     @Test
     public void isExternalLink() {
-        assertThat(LinkTool.isExternalLink(null), is(false));
-        assertThat(LinkTool.isExternalLink(""), is(false));
-        assertThat(LinkTool.isExternalLink("  \t "), is(false));
-        assertThat(LinkTool.isExternalLink("test"), is(false));
-        assertThat(LinkTool.isExternalLink("/test"), is(false));
-        assertThat(LinkTool.isExternalLink("http://test.aperto.de"), is(true));
-        assertThat(LinkTool.isExternalLink("https://test.aperto.de"), is(true));
-        assertThat(LinkTool.isExternalLink("HTTPS://test.aperto.de"), is(true));
+        assertFalse(LinkTool.isExternalLink(null));
+        assertFalse(LinkTool.isExternalLink(""));
+        assertFalse(LinkTool.isExternalLink("  \t "));
+        assertFalse(LinkTool.isExternalLink("test"));
+        assertFalse(LinkTool.isExternalLink("/test"));
+        assertTrue(LinkTool.isExternalLink("http://test.aperto.de"));
+        assertTrue(LinkTool.isExternalLink("https://test.aperto.de"));
+        assertTrue(LinkTool.isExternalLink("HTTPS://test.aperto.de"));
     }
 
     @Test
     public void isPath() {
-        assertThat(LinkTool.isPath(null), is(false));
-        assertThat(LinkTool.isPath(""), is(false));
-        assertThat(LinkTool.isPath("  \t "), is(false));
-        assertThat(LinkTool.isPath("test"), is(false));
-        assertThat(LinkTool.isPath("/test"), is(true));
-        assertThat(LinkTool.isPath("http://test.aperto.de/test"), is(false));
+        assertFalse(LinkTool.isPath(null));
+        assertFalse(LinkTool.isPath(""));
+        assertFalse(LinkTool.isPath("  \t "));
+        assertFalse(LinkTool.isPath("test"));
+        assertTrue(LinkTool.isPath("/test"));
+        assertFalse(LinkTool.isPath("http://test.aperto.de/test"));
     }
 
     @Test
     public void isAnchor() {
-        assertThat(LinkTool.isAnchor(null), is(false));
-        assertThat(LinkTool.isAnchor(""), is(false));
-        assertThat(LinkTool.isAnchor("  \t "), is(false));
-        assertThat(LinkTool.isAnchor("test"), is(false));
-        assertThat(LinkTool.isAnchor("#test"), is(true));
-        assertThat(LinkTool.isAnchor("/test#anchor"), is(false));
-        assertThat(LinkTool.isAnchor("http://test.aperto.de/test#anchor"), is(false));
+        assertFalse(LinkTool.isAnchor(null));
+        assertFalse(LinkTool.isAnchor(""));
+        assertFalse(LinkTool.isAnchor("  \t "));
+        assertFalse(LinkTool.isAnchor("test"));
+        assertTrue(LinkTool.isAnchor("#test"));
+        assertFalse(LinkTool.isAnchor("/test#anchor"));
+        assertFalse(LinkTool.isAnchor("http://test.aperto.de/test#anchor"));
     }
 
     @Test
     public void createLinkForReference() throws RepositoryException {
-        assertThat(LinkTool.createLinkForReference(null, null, null, null), nullValue());
-        assertThat(LinkTool.createLinkForReference(null, " ", null, null), nullValue());
-        assertThat(LinkTool.createLinkForReference(null, "test", null, null), nullValue());
+        assertNull(LinkTool.createLinkForReference(null, null, null, null));
+        assertNull(LinkTool.createLinkForReference(null, " ", null, null));
+        assertNull(LinkTool.createLinkForReference(null, "test", null, null));
 
         Node source = mockNode("source");
-        assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
+        assertNull(LinkTool.createLinkForReference(source, "link", null, null));
 
         stubProperty("link", "").of(source);
-        assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
+        assertNull(LinkTool.createLinkForReference(source, "link", null, null));
 
         stubProperty("link", "test").of(source);
-        assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
-        assertThat(LinkTool.createLinkForReference(source, "link", null, LinkTool.LinkType.INTERNAL), nullValue());
+        assertNull(LinkTool.createLinkForReference(source, "link", null, null));
+        assertNull(LinkTool.createLinkForReference(source, "link", null, LinkTool.LinkType.INTERNAL));
 
         // External link value unchanged even if LinkType provided
         String external = "https://test.aperto.de";
         stubProperty("link", external).of(source);
-        assertThat(LinkTool.createLinkForReference(source, "link", null, null), is(external));
-        assertThat("External link should be returned unchanged even with LinkType", LinkTool.createLinkForReference(source, "link", null, LinkTool.LinkType.EXTERNAL), is(external));
+        assertEquals(external, LinkTool.createLinkForReference(source, "link", null, null));
+        assertEquals(external, LinkTool.createLinkForReference(source, "link", null, LinkTool.LinkType.EXTERNAL), "External link should be returned unchanged even with LinkType");
 
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
         Node target = mockMgnlNode("test", "target", "aperto:test");
         stubProperty("link", target).of(source);
-        assertThat(LinkTool.createLinkForReference(source, "link", null, null), nullValue());
-        assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.INTERNAL), is("/aperto/target.html"));
-        assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.REDIRECT), is("/target.html"));
-        assertThat(LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.EXTERNAL), is("http://test.aperto.de/target.html"));
+        assertNull(LinkTool.createLinkForReference(source, "link", null, null));
+        assertEquals("/aperto/target.html", LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.INTERNAL));
+        assertEquals("/target.html", LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.REDIRECT));
+        assertEquals("http://test.aperto.de/target.html", LinkTool.createLinkForReference(source, "link", "test", LinkTool.LinkType.EXTERNAL));
     }
 
     @Test
@@ -141,6 +142,6 @@ public class LinkToolTest {
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
         Node site = mockMgnlNode("test", "target", "aperto:test");
         String result = LinkTool.createExternalLinkForPath(site, "/resources/image.png");
-        assertThat(result, is("http://test.aperto.de/aperto/resources/image.png"));
+        assertEquals("http://test.aperto.de/aperto/resources/image.png", result);
     }
 }

@@ -19,13 +19,18 @@ package de.ibmix.magkit.core.utils;
  * limitations under the License.
  * #L% */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link NavigationItem} ensuring full coverage of constructors, mutators and conditional logic:
@@ -44,9 +49,6 @@ import static org.junit.Assert.*;
  */
 public class NavigationItemTest {
 
-    /**
-     * Verifies the default constructor initializes with null sub items and not selected state.
-     */
     @Test
     public void testDefaultConstructor() {
         NavigationItem item = new NavigationItem();
@@ -55,9 +57,6 @@ public class NavigationItemTest {
         assertFalse(item.isSelected());
     }
 
-    /**
-     * Verifies key/value constructor sets inherited fields, leaves sub items null and selection false.
-     */
     @Test
     public void testKeyValueConstructor() {
         NavigationItem item = new NavigationItem("10#home", "/home");
@@ -69,9 +68,6 @@ public class NavigationItemTest {
         assertFalse(item.isSelected());
     }
 
-    /**
-     * Verifies full constructor stores provided sub item list and reports presence via hasSubItems().
-     */
     @Test
     public void testFullConstructorWithSubItems() {
         NavigationItem child = new NavigationItem("child", "/c");
@@ -81,9 +77,6 @@ public class NavigationItemTest {
         assertTrue(parent.hasSubItems());
     }
 
-    /**
-     * Verifies hasSubItems returns false for null and empty lists and true for non-empty lists.
-     */
     @Test
     public void testHasSubItemsVariants() {
         NavigationItem item = new NavigationItem("k", "v");
@@ -99,9 +92,6 @@ public class NavigationItemTest {
         assertTrue(item.hasSubItems());
     }
 
-    /**
-     * Verifies selection flag can be toggled and persists.
-     */
     @Test
     public void testSelectionFlag() {
         NavigationItem item = new NavigationItem("k", "/v");
@@ -112,9 +102,6 @@ public class NavigationItemTest {
         assertFalse(item.isSelected());
     }
 
-    /**
-     * Verifies sub items can be replaced and cleared by setting null.
-     */
     @Test
     public void testSetAndClearSubItems() {
         NavigationItem item = new NavigationItem("k", "/v");
@@ -136,4 +123,3 @@ public class NavigationItemTest {
         assertFalse(item.hasSubItems());
     }
 }
-

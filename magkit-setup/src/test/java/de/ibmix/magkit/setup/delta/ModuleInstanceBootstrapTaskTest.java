@@ -21,9 +21,8 @@ package de.ibmix.magkit.setup.delta;
  */
 
 import info.magnolia.module.InstallContext;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.cleanServerConfiguration;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
@@ -32,7 +31,8 @@ import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.st
 import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubName;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Minimal tests for instance-specific bootstrap filtering.
@@ -45,7 +45,7 @@ public class ModuleInstanceBootstrapTaskTest {
     private ModuleInstanceBootstrapTask _task;
     private InstallContext _ctx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cleanServerConfiguration();
         _task = new ModuleInstanceBootstrapTask();
@@ -56,14 +56,14 @@ public class ModuleInstanceBootstrapTaskTest {
     public void acceptAuthorXmlResource() {
         mockServerConfiguration(stubIsAdmin(true));
 
-        Assert.assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/author/my-module/config.modules.my-module.config.service.xml"));
+        assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/author/my-module/config.modules.my-module.config.service.xml"));
     }
 
     @Test
     public void acceptAuthorYamlResource() {
         mockServerConfiguration(stubIsAdmin(true));
 
-        Assert.assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/author/my-module/config.modules.my-module.config.service.yaml"));
+        assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/author/my-module/config.modules.my-module.config.service.yaml"));
     }
 
     @Test
@@ -84,14 +84,14 @@ public class ModuleInstanceBootstrapTaskTest {
     public void acceptPublicXmlResource() {
         mockServerConfiguration(stubIsAdmin(false));
 
-        Assert.assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/public/my-module/config.modules.my-module.config.service.xml"));
+        assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/public/my-module/config.modules.my-module.config.service.xml"));
     }
 
     @Test
     public void acceptPublicYamlResource() {
         mockServerConfiguration(stubIsAdmin(false));
 
-        Assert.assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/public/my-module/config.modules.my-module.config.service.yaml"));
+        assertTrue(_task.acceptResource(_ctx, "/mgnl-bootstrap/public/my-module/config.modules.my-module.config.service.yaml"));
     }
 
     @Test

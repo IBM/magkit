@@ -21,16 +21,16 @@ package de.ibmix.magkit.setup.urimapping;
  */
 
 import info.magnolia.virtualuri.VirtualUriMapping;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test for {@link VersionNumberVirtualUriMapping}.
@@ -43,7 +43,7 @@ public class VersionNumberVirtualUriMappingTest {
     private VersionNumberVirtualUriMapping _withToUri;
     private VersionNumberVirtualUriMapping _svnMapping;
 
-    @Before
+    @BeforeEach
     public void before() {
         _missingSlashAtTheEnd = new VersionNumberVirtualUriMapping();
         _missingSlashAtTheEnd.setFromPrefix("/templates/theme/gollum");

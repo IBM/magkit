@@ -21,11 +21,10 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 import de.ibmix.magkit.query.sql2.statement.Sql2Statement;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for Sql2NullCondition.
@@ -37,21 +36,21 @@ public class Sql2NullConditionTest {
 
     @Test
     public void isNull() {
-        assertThat(Sql2NullCondition.isNull(null).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNull(EMPTY).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNull("test").asString(), is("[test] IS NULL"));
+        assertEquals(EMPTY, Sql2NullCondition.isNull(null).asString());
+        assertEquals(EMPTY, Sql2NullCondition.isNull(EMPTY).asString());
+        assertEquals("[test] IS NULL", Sql2NullCondition.isNull("test").asString());
     }
 
     @Test
     public void isNotNull() {
-        assertThat(Sql2NullCondition.isNotNull(null).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNotNull(EMPTY).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNotNull("test").asString(), is("[test] IS NOT NULL"));
+        assertEquals(EMPTY, Sql2NullCondition.isNotNull(null).asString());
+        assertEquals(EMPTY, Sql2NullCondition.isNotNull(EMPTY).asString());
+        assertEquals("[test] IS NOT NULL", Sql2NullCondition.isNotNull("test").asString());
     }
 
     @Test
     public void testSelectors() {
         Sql2JoinConstraint condition = Sql2NullCondition.isNull("test");
-        assertThat(Sql2Statement.select("a", "b").from("aperto:test").whereAny(condition).build(), is("SELECT [a],[b] FROM [aperto:test] WHERE [test] IS NULL"));
+        assertEquals("SELECT [a],[b] FROM [aperto:test] WHERE [test] IS NULL", Sql2Statement.select("a", "b").from("aperto:test").whereAny(condition).build());
     }
 }

@@ -26,9 +26,9 @@ import de.ibmix.magkit.query.sql2.query.jcrwrapper.RowsQuery;
 import de.ibmix.magkit.query.sql2.statement.Sql2Builder;
 import de.ibmix.magkit.test.jcr.query.QueryMockUtils;
 import de.ibmix.magkit.test.jcr.query.QueryStubbingOperation;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -39,9 +39,7 @@ import static de.ibmix.magkit.query.sql2.statement.Sql2Statement.select;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQuery;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.Is.isA;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,29 +55,27 @@ public class Sql2RowsQueryBuilderTest {
     private Query _query;
     private final Sql2Builder _statement = select("test", "other").from("mgnl:Page").orderByScore();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         _query = mockQuery("website", Query.JCR_SQL2, _statement.build());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         cleanContext();
     }
 
     @Test
     public void forRows() {
-        assertThat(Sql2QueryBuilder.forRows(), isA(QueryWorkspace.class));
+        assertInstanceOf(QueryWorkspace.class, Sql2QueryBuilder.forRows());
     }
 
     @Test
     public void buildRowsQuery() {
-        assertThat(Sql2QueryBuilder.forRows()
+        assertInstanceOf(RowsQuery.class, Sql2QueryBuilder.forRows()
                 .fromWebsite()
                 .withStatement("test-statement")
-                .buildRowsQuery(),
-            isA(RowsQuery.class)
-        );
+                .buildRowsQuery());
         verify(_query, times(0)).setOffset(anyLong());
         verify(_query, times(0)).setLimit(anyLong());
     }
@@ -92,14 +88,12 @@ public class Sql2RowsQueryBuilderTest {
         String statement = select("test", "other").from("mgnl:Page").orderByScore().build();
         _query = mockQuery("website", Query.JCR_SQL2, statement);
         QueryStubbingOperation.stubResult(result).of(_query);
-        assertThat(Sql2QueryBuilder.forRows()
+        assertEquals(2, Sql2QueryBuilder.forRows()
                 .fromWebsite()
                 .withStatement(statement)
                 .withLimit(5)
                 .withOffset(5)
-                .getResultRows().size(),
-            is(2)
-        );
+                .getResultRows().size());
         verify(_query, times(1)).setOffset(5);
         verify(_query, times(1)).setLimit(5);
     }

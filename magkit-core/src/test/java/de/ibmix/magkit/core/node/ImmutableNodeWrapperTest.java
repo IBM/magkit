@@ -21,8 +21,8 @@ package de.ibmix.magkit.core.node;
  */
 
 import de.ibmix.magkit.test.jcr.SessionMockUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.jcr.Binary;
@@ -36,8 +36,8 @@ import java.util.Calendar;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValue;
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests {@link ImmutableNodeWrapper} ensuring all mutating JCR Node operations throw UnsupportedOperationException
@@ -48,17 +48,7 @@ import static org.hamcrest.core.Is.is;
  */
 public class ImmutableNodeWrapperTest {
 
-    private void assertUnsupported(ThrowingRunnable r) throws Exception {
-        boolean unsupported = false;
-        try {
-            r.run();
-        } catch (UnsupportedOperationException e) {
-            unsupported = true;
-        }
-        assertThat("Operation should be unsupported", unsupported, is(true));
-    }
-
-    @Before
+    @BeforeEach
     public void setup() {
         SessionMockUtils.cleanSession();
     }
@@ -67,7 +57,7 @@ public class ImmutableNodeWrapperTest {
     public void readDelegationWorks() throws Exception {
         Node base = mockNode("base", stubProperty("title", "base-title"));
         ImmutableNodeWrapper wrapper = new ImmutableNodeWrapper(base);
-        assertThat(getStringValue(wrapper.getProperty("title")), is("base-title"));
+        assertEquals("base-title", getStringValue(wrapper.getProperty("title")));
         // underlying still unchanged (delegation test is implicit as we read the original value)
     }
 
@@ -84,49 +74,45 @@ public class ImmutableNodeWrapperTest {
         Version version = Mockito.mock(Version.class);
         Node refNode = mockNode("refNode");
 
-        assertUnsupported(() -> imm.addNode("child"));
-        assertUnsupported(() -> imm.addNode("child", "nt:unstructured"));
-        assertUnsupported(() -> imm.orderBefore("a", "b"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.addNode("child"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.addNode("child", "nt:unstructured"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.orderBefore("a", "b"));
 
-        assertUnsupported(() -> imm.setProperty("a", value));
-        assertUnsupported(() -> imm.setProperty("a", value, 1));
-        assertUnsupported(() -> imm.setProperty("a", values));
-        assertUnsupported(() -> imm.setProperty("a", values, 1));
-        assertUnsupported(() -> imm.setProperty("a", new String[]{"x", "y"}));
-        assertUnsupported(() -> imm.setProperty("a", new String[]{"x", "y"}, 1));
-        assertUnsupported(() -> imm.setProperty("a", "x"));
-        assertUnsupported(() -> imm.setProperty("a", "x", 1));
-        assertUnsupported(() -> imm.setProperty("a", new ByteArrayInputStream(new byte[0])));
-        assertUnsupported(() -> imm.setProperty("a", binary));
-        assertUnsupported(() -> imm.setProperty("a", true));
-        assertUnsupported(() -> imm.setProperty("a", 1.0d));
-        assertUnsupported(() -> imm.setProperty("a", decimal));
-        assertUnsupported(() -> imm.setProperty("a", 2L));
-        assertUnsupported(() -> imm.setProperty("a", cal));
-        assertUnsupported(() -> imm.setProperty("a", refNode));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value, 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", values));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", values, 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}, 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x", 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new ByteArrayInputStream(new byte[0])));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", binary));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", true));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 1.0d));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", decimal));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 2L));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", cal));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", refNode));
 
-        assertUnsupported(() -> imm.setPrimaryType("mgnl:page"));
-        assertUnsupported(() -> imm.addMixin("mix:versionable"));
-        assertUnsupported(() -> imm.removeMixin("mix:versionable"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setPrimaryType("mgnl:page"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.addMixin("mix:versionable"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.removeMixin("mix:versionable"));
 
-        assertUnsupported(imm::checkin);
-        assertUnsupported(imm::checkout);
-        assertUnsupported(() -> imm.doneMerge(version));
-        assertUnsupported(() -> imm.cancelMerge(version));
-        assertUnsupported(() -> imm.update("ws"));
-        assertUnsupported(() -> imm.merge("ws", true));
+        assertThrows(UnsupportedOperationException.class, imm::checkin);
+        assertThrows(UnsupportedOperationException.class, imm::checkout);
+        assertThrows(UnsupportedOperationException.class, () -> imm.doneMerge(version));
+        assertThrows(UnsupportedOperationException.class, () -> imm.cancelMerge(version));
+        assertThrows(UnsupportedOperationException.class, () -> imm.update("ws"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.merge("ws", true));
 
-        assertUnsupported(() -> imm.restore("1.0", true));
-        assertUnsupported(() -> imm.restore(version, true));
-        assertUnsupported(() -> imm.restore(version, "rel", true));
-        assertUnsupported(() -> imm.restoreByLabel("label", true));
+        assertThrows(UnsupportedOperationException.class, () -> imm.restore("1.0", true));
+        assertThrows(UnsupportedOperationException.class, () -> imm.restore(version, true));
+        assertThrows(UnsupportedOperationException.class, () -> imm.restore(version, "rel", true));
+        assertThrows(UnsupportedOperationException.class, () -> imm.restoreByLabel("label", true));
 
-        assertUnsupported(imm::save);
-        assertUnsupported(() -> imm.refresh(false));
-        assertUnsupported(imm::remove);
+        assertThrows(UnsupportedOperationException.class, imm::save);
+        assertThrows(UnsupportedOperationException.class, () -> imm.refresh(false));
+        assertThrows(UnsupportedOperationException.class, imm::remove);
     }
-
-    @FunctionalInterface
-    private interface ThrowingRunnable { void run() throws Exception; }
 }
-

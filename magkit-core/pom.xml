@@ -10,6 +10,7 @@
     <artifactId>magkit-core</artifactId>
 
     <dependencies>
+        <!-- runtime Magnolia dependencies -->
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-core</artifactId>
@@ -36,9 +37,16 @@
             <groupId>de.ibmix.magkit</groupId>
             <artifactId>magkit-test-cms</artifactId>
         </dependency>
+        <!-- JUnit5 (Jupiter) migration: replace legacy junit4 dependency -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

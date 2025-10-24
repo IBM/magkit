@@ -19,7 +19,7 @@ package de.ibmix.magkit.core.utils;
  * limitations under the License.
  * #L% */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Item;
 import javax.jcr.Node;
@@ -31,9 +31,11 @@ import java.util.regex.Pattern;
 
 import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.PropertyMockUtils.mockProperty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests for {@link RegexpChildrenCollector} ensuring pattern filtering, type filtering, collection replacement
@@ -51,27 +53,22 @@ public class RegexpChildrenCollectorTest {
         Node root = mockNode("/root");
         Node child1 = mockNode("/root/child1");
         Node child2 = mockNode("/root/child-x");
-        // should NOT be collected (wrong type)
         Property child2Prop = mockProperty("child2");
 
-        // must NOT be collected
         collector.simulateEnter(root, 0);
-        // should match pattern
         collector.simulateEnter(child1, 1);
-        // should NOT match pattern
         collector.simulateEnter(child2, 1);
-        // ignored due to type filter
         collector.simulateEnter(child2Prop, 1);
 
-        assertThat(result.size(), is(1));
+        assertEquals(1, result.size());
         boolean foundChild1 = false;
         for (Node n : result) {
             if ("child1".equals(n.getName())) {
                 foundChild1 = true;
             }
         }
-        assertThat(foundChild1, is(true));
-        assertThat(collector.getChildNamePattern().pattern(), is("child[0-9]"));
+        assertTrue(foundChild1);
+        assertEquals("child[0-9]", collector.getChildNamePattern().pattern());
     }
 
     @Test
@@ -91,7 +88,7 @@ public class RegexpChildrenCollectorTest {
         // ignored due to type filter
         collector.simulateEnter(val2Node, 1);
 
-        assertThat(result.size(), is(2));
+        assertEquals(2, result.size());
         boolean hasVal0 = false;
         boolean hasVal1 = false;
         boolean hasVal2Node = false;
@@ -105,9 +102,9 @@ public class RegexpChildrenCollectorTest {
                 hasVal2Node = true;
             }
         }
-        assertThat(hasVal0, is(true));
-        assertThat(hasVal1, is(true));
-        assertThat(hasVal2Node, is(false));
+        assertTrue(hasVal0);
+        assertTrue(hasVal1);
+        assertFalse(hasVal2Node);
     }
 
     @Test
@@ -124,18 +121,21 @@ public class RegexpChildrenCollectorTest {
         collector.simulateEnter(node2, 1);
         collector.simulateEnter(prop2, 1);
 
-        assertThat(result.size(), is(2));
-        boolean hasNode1 = false;
-        boolean hasProp1 = false;
-        for (Item i : result) {
-            if ("node1".equals(i.getName())) {
-                hasNode1 = true;
-            } else if ("prop1".equals(i.getName())) {
-                hasProp1 = true;
+        assertEquals(2, result.size());
+        assertTrue(result.stream().anyMatch(i -> {
+            try {
+                return "node1".equals(i.getName());
+            } catch (RepositoryException e) {
+                return false;
             }
-        }
-        assertThat(hasNode1, is(true));
-        assertThat(hasProp1, is(true));
+        }));
+        assertTrue(result.stream().anyMatch(i -> {
+            try {
+                return "prop1".equals(i.getName());
+            } catch (RepositoryException e) {
+                return false;
+            }
+        }));
     }
 
     @Test
@@ -144,25 +144,25 @@ public class RegexpChildrenCollectorTest {
         TestableCollector<Property> collector = new TestableCollector<>(initial, "p[0-9]", false, 3, Property.class);
         Property p1 = mockProperty("p1");
         collector.simulateEnter(p1, 1);
-        assertThat(initial.size(), is(1));
+        assertEquals(1, initial.size());
 
         Collection<Property> replacement = new ArrayList<>();
         collector.setCollectedChildren(replacement);
-        assertThat(replacement.size(), is(0));
+        assertEquals(0, replacement.size());
         Property p2 = mockProperty("p2");
         collector.simulateEnter(p2, 1);
-        assertThat(initial.size(), is(1));
-        assertThat(replacement.size(), is(1));
-        boolean hasP2 = false;
-        for (Property p : replacement) {
-            if ("p2".equals(p.getName())) {
-                hasP2 = true;
+        assertEquals(1, initial.size());
+        assertEquals(1, replacement.size());
+        assertTrue(replacement.stream().anyMatch(p -> {
+            try {
+                return "p2".equals(p.getName());
+            } catch (RepositoryException e) {
+                return false;
             }
-        }
-        assertThat(hasP2, is(true));
-        assertThat(collector.getCollectedChildren(), is(replacement));
-        assertThat(collector.getClassToCollect(), notNullValue());
-        assertThat(collector.getClassToCollect(), is((Class) Property.class));
+        }));
+        assertSame(replacement, collector.getCollectedChildren());
+        assertNotNull(collector.getClassToCollect());
+        assertEquals(Property.class, collector.getClassToCollect());
     }
 
     /**

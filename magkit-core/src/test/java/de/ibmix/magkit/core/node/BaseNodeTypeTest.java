@@ -21,7 +21,7 @@ package de.ibmix.magkit.core.node;
  */
 
 import de.ibmix.magkit.test.jcr.ValueMockUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Value;
 import javax.jcr.nodetype.NodeDefinition;
@@ -29,10 +29,9 @@ import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeIterator;
 import javax.jcr.nodetype.PropertyDefinition;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link BaseNodeType} covering all default-returning methods and ensuring no unexpected behaviour.
@@ -59,12 +58,12 @@ public class BaseNodeTypeTest {
     @Test
     public void nameAndFlags() {
         BaseNodeType type = new BaseNodeType(TYPE_NAME);
-        assertThat(type.getName(), is(TYPE_NAME));
+        assertEquals(TYPE_NAME, type.getName());
         assertFalse(type.isAbstract());
         assertFalse(type.isMixin());
         assertFalse(type.hasOrderableChildNodes());
         assertFalse(type.isQueryable());
-        assertThat(type.getPrimaryItemName(), nullValue());
+        assertNull(type.getPrimaryItemName());
     }
 
     /**
@@ -79,11 +78,11 @@ public class BaseNodeTypeTest {
         NodeTypeIterator declaredSubtypes = type.getDeclaredSubtypes();
         String[] declaredSuperNames = type.getDeclaredSupertypeNames();
 
-        assertThat(supertypes.length, is(0));
-        assertThat(declaredSupertypes.length, is(0));
-        assertThat(declaredSuperNames.length, is(0));
-        assertThat(subtypes, nullValue());
-        assertThat(declaredSubtypes, nullValue());
+        assertEquals(0, supertypes.length);
+        assertEquals(0, declaredSupertypes.length);
+        assertEquals(0, declaredSuperNames.length);
+        assertNull(subtypes);
+        assertNull(declaredSubtypes);
     }
 
     /**
@@ -97,10 +96,10 @@ public class BaseNodeTypeTest {
         NodeDefinition[] childNodes = type.getChildNodeDefinitions();
         NodeDefinition[] declaredChildNodes = type.getDeclaredChildNodeDefinitions();
 
-        assertThat(properties.length, is(0));
-        assertThat(declaredProperties.length, is(0));
-        assertThat(childNodes.length, is(0));
-        assertThat(declaredChildNodes.length, is(0));
+        assertEquals(0, properties.length);
+        assertEquals(0, declaredProperties.length);
+        assertEquals(0, childNodes.length);
+        assertEquals(0, declaredChildNodes.length);
     }
 
     /**

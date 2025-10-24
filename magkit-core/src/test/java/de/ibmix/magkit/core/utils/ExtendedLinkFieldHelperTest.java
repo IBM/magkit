@@ -21,9 +21,9 @@ package de.ibmix.magkit.core.utils;
  */
 
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -40,11 +40,10 @@ import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Philipp Güttler (Aperto AG)
@@ -72,7 +71,7 @@ public class ExtendedLinkFieldHelperTest {
 
     private ExtendedLinkFieldHelper _helper;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         _helper = new ExtendedLinkFieldHelper();
@@ -80,68 +79,67 @@ public class ExtendedLinkFieldHelperTest {
 
     @Test
     public void testGetBase() {
-        assertThat(_helper.getBase(null), nullValue());
-        assertThat(_helper.getBase(EMPTY), nullValue());
-        assertThat(_helper.getBase(PATH), equalTo(PATH));
-        assertThat(_helper.getBase(PATH_WITH_ANCHOR), equalTo(PATH));
-        assertThat(_helper.getBase(PATH_WITH_QUERY), equalTo(PATH));
-        assertThat(_helper.getBase(PATH_WITH_SELECTOR), equalTo(PATH));
-        assertThat(_helper.getBase(PATH_FULL), equalTo(PATH));
-        assertThat(_helper.getBase(UUID), equalTo(UUID));
-        // should we allow this?
-        assertThat(_helper.getBase("#" + ANCHOR), equalTo(EMPTY));
+        assertNull(_helper.getBase(null));
+        assertNull(_helper.getBase(EMPTY));
+        assertEquals(PATH, _helper.getBase(PATH));
+        assertEquals(PATH, _helper.getBase(PATH_WITH_ANCHOR));
+        assertEquals(PATH, _helper.getBase(PATH_WITH_QUERY));
+        assertEquals(PATH, _helper.getBase(PATH_WITH_SELECTOR));
+        assertEquals(PATH, _helper.getBase(PATH_FULL));
+        assertEquals(UUID, _helper.getBase(UUID));
+        assertEquals(EMPTY, _helper.getBase("#" + ANCHOR));
     }
 
     @Test
     public void testGetSelectors() {
-        assertThat(_helper.getSelectors(null), nullValue());
-        assertThat(_helper.getSelectors(EMPTY), nullValue());
-        assertThat(_helper.getSelectors(PATH), nullValue());
-        assertThat(_helper.getSelectors(PATH_WITH_ANCHOR), nullValue());
-        assertThat(_helper.getSelectors(PATH_WITH_QUERY), nullValue());
-        assertThat(_helper.getSelectors(PATH_WITH_SELECTOR), equalTo(SELECTOR_FOO));
-        assertThat(_helper.getSelectors(PATH_FULL), equalTo(SELECTORS));
-        assertThat(_helper.getSelectors("#" + ANCHOR), nullValue());
+        assertNull(_helper.getSelectors(null));
+        assertNull(_helper.getSelectors(EMPTY));
+        assertNull(_helper.getSelectors(PATH));
+        assertNull(_helper.getSelectors(PATH_WITH_ANCHOR));
+        assertNull(_helper.getSelectors(PATH_WITH_QUERY));
+        assertEquals(SELECTOR_FOO, _helper.getSelectors(PATH_WITH_SELECTOR));
+        assertEquals(SELECTORS, _helper.getSelectors(PATH_FULL));
+        assertNull(_helper.getSelectors("#" + ANCHOR));
     }
 
     @Test
     public void testCreateUriToNull() {
-        assertThat(_helper.createUri(null), nullValue());
-        assertThat(_helper.createUri(EMPTY), nullValue());
-        assertThat(_helper.createUri(SELECTORS), nullValue());
+        assertNull(_helper.createUri(null));
+        assertNull(_helper.createUri(EMPTY));
+        assertNull(_helper.createUri(SELECTORS));
     }
 
     @Test
     public void testCreateUri() throws Exception {
-        assertThat(_helper.createUri(PATH), equalTo(new URI(PATH)));
-        assertThat(_helper.createUri(PATH_WITH_ANCHOR), equalTo(new URI(PATH_WITH_ANCHOR)));
-        assertThat(_helper.createUri(PATH_WITH_SELECTOR), equalTo(new URI(PATH_WITH_SELECTOR)));
-        assertThat(_helper.createUri(PATH_WITH_QUERY), equalTo(new URI(PATH_WITH_QUERY)));
-        assertThat(_helper.createUri(PATH_FULL), equalTo(new URI(PATH_FULL)));
-        assertThat(_helper.createUri(UUID), equalTo(new URI("/" + UUID)));
-        assertThat(_helper.createUri("#" + ANCHOR), equalTo(new URI("#" + ANCHOR)));
+        assertEquals(new URI(PATH), _helper.createUri(PATH));
+        assertEquals(new URI(PATH_WITH_ANCHOR), _helper.createUri(PATH_WITH_ANCHOR));
+        assertEquals(new URI(PATH_WITH_SELECTOR), _helper.createUri(PATH_WITH_SELECTOR));
+        assertEquals(new URI(PATH_WITH_QUERY), _helper.createUri(PATH_WITH_QUERY));
+        assertEquals(new URI(PATH_FULL), _helper.createUri(PATH_FULL));
+        assertEquals(new URI("/" + UUID), _helper.createUri(UUID));
+        assertEquals(new URI("#" + ANCHOR), _helper.createUri("#" + ANCHOR));
     }
 
     @Test
     public void testGetAnchor() {
-        assertThat(_helper.getQuery(null), nullValue());
-        assertThat(_helper.getAnchor(PATH), nullValue());
-        assertThat(_helper.getAnchor(PATH_WITH_SELECTOR), nullValue());
-        assertThat(_helper.getAnchor(PATH_WITH_QUERY), nullValue());
-        assertThat(_helper.getAnchor(PATH_WITH_ANCHOR), equalTo(ANCHOR));
-        assertThat(_helper.getAnchor(PATH_FULL), equalTo(ANCHOR));
-        assertThat(_helper.getAnchor("#" + ANCHOR), equalTo(ANCHOR));
+        assertNull(_helper.getQuery(null));
+        assertNull(_helper.getAnchor(PATH));
+        assertNull(_helper.getAnchor(PATH_WITH_SELECTOR));
+        assertNull(_helper.getAnchor(PATH_WITH_QUERY));
+        assertEquals(ANCHOR, _helper.getAnchor(PATH_WITH_ANCHOR));
+        assertEquals(ANCHOR, _helper.getAnchor(PATH_FULL));
+        assertEquals(ANCHOR, _helper.getAnchor("#" + ANCHOR));
     }
 
     @Test
     public void testGetQuery() {
-        assertThat(_helper.getQuery(null), nullValue());
-        assertThat(_helper.getQuery(PATH), nullValue());
-        assertThat(_helper.getQuery(PATH_WITH_ANCHOR), nullValue());
-        assertThat(_helper.getQuery(PATH_WITH_SELECTOR), nullValue());
-        assertThat(_helper.getQuery(PATH_WITH_QUERY), equalTo(QUERY));
-        assertThat(_helper.getQuery(PATH_FULL), equalTo(QUERY));
-        assertThat(_helper.getQuery("#" + ANCHOR), nullValue());
+        assertNull(_helper.getQuery(null));
+        assertNull(_helper.getQuery(PATH));
+        assertNull(_helper.getQuery(PATH_WITH_ANCHOR));
+        assertNull(_helper.getQuery(PATH_WITH_SELECTOR));
+        assertEquals(QUERY, _helper.getQuery(PATH_WITH_QUERY));
+        assertEquals(QUERY, _helper.getQuery(PATH_FULL));
+        assertNull(_helper.getQuery("#" + ANCHOR));
     }
 
     @Test
@@ -158,45 +156,47 @@ public class ExtendedLinkFieldHelperTest {
 
     @Test
     public void testMergeComponentsForPath() {
-        assertThat(_helper.mergeComponents(null, null, null, null), equalTo(EMPTY));
-        assertThat(_helper.mergeComponents(PATH, null, null, null), equalTo(PATH));
-        assertThat(_helper.mergeComponents(PATH, SELECTOR_FOO, null, null), equalTo(PATH_WITH_SELECTOR));
-        assertThat(_helper.mergeComponents(PATH, null, QUERY, null), equalTo(PATH_WITH_QUERY));
-        assertThat(_helper.mergeComponents(PATH, null, null, ANCHOR), equalTo(PATH_WITH_ANCHOR));
-        assertThat(_helper.mergeComponents(null, null, null, ANCHOR), equalTo("#" + ANCHOR));
-        assertThat(_helper.mergeComponents(PATH, SELECTORS, QUERY, ANCHOR), equalTo(PATH_FULL));
+        assertEquals(EMPTY, _helper.mergeComponents(null, null, null, null));
+        assertEquals(PATH, _helper.mergeComponents(PATH, null, null, null));
+        assertEquals(PATH_WITH_SELECTOR, _helper.mergeComponents(PATH, SELECTOR_FOO, null, null));
+        assertEquals(PATH_WITH_QUERY, _helper.mergeComponents(PATH, null, QUERY, null));
+        assertEquals(PATH_WITH_ANCHOR, _helper.mergeComponents(PATH, null, null, ANCHOR));
+        assertEquals("#" + ANCHOR, _helper.mergeComponents(null, null, null, ANCHOR));
+        assertEquals(PATH_FULL, _helper.mergeComponents(PATH, SELECTORS, QUERY, ANCHOR));
     }
 
     @Test
     public void testMergeComponentsForExternalLink() {
-        assertThat(_helper.mergeComponents(null, null, null, null), equalTo(EMPTY));
-        assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, null, null), equalTo(EXTERNAL_LINK));
-        assertThat(_helper.mergeComponents(EXTERNAL_LINK, SELECTORS, null, null), equalTo(EXTERNAL_WITH_SELECTOR));
-        assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, QUERY, null), equalTo(EXTERNAL_WITH_QUERY));
-        assertThat(_helper.mergeComponents(EXTERNAL_LINK, null, null, ANCHOR), equalTo(EXTERNAL_WITH_ANCHOR));
-        assertThat(_helper.mergeComponents(null, null, null, ANCHOR), equalTo("#" + ANCHOR));
-        assertThat(_helper.mergeComponents(EXTERNAL_LINK, SELECTORS, QUERY, ANCHOR), equalTo(EXTERNAL_FULL));
+        assertEquals(EMPTY, _helper.mergeComponents(null, null, null, null));
+        assertEquals(EXTERNAL_LINK, _helper.mergeComponents(EXTERNAL_LINK, null, null, null));
+        assertEquals(EXTERNAL_WITH_SELECTOR, _helper.mergeComponents(EXTERNAL_LINK, SELECTORS, null, null));
+        assertEquals(EXTERNAL_WITH_QUERY, _helper.mergeComponents(EXTERNAL_LINK, null, QUERY, null));
+        assertEquals(EXTERNAL_WITH_ANCHOR, _helper.mergeComponents(EXTERNAL_LINK, null, null, ANCHOR));
+        assertEquals("#" + ANCHOR, _helper.mergeComponents(null, null, null, ANCHOR));
+        assertEquals(EXTERNAL_FULL, _helper.mergeComponents(EXTERNAL_LINK, SELECTORS, QUERY, ANCHOR));
     }
 
     @Test
     public void createExtendedLink() throws RepositoryException {
-        assertThat(_helper.createExtendedLink(null, null, null, null), equalTo(null));
+        assertNull(_helper.createExtendedLink(null, null, null, null));
 
         Node source = mockNode("source");
+        assertNull(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL));
+
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
         Node target = mockMgnlNode("test", "target", "aperto:test");
         stubProperty("link", target).of(source);
-        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target.html"));
+        assertEquals("http://test.aperto.de/target.html", _helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL));
 
         stubProperty("link_selector", SELECTOR_FOO).of(source);
-        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html"));
+        assertEquals("http://test.aperto.de/target~foo=bar~.html", _helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL));
 
         stubProperty("link_anchor", ANCHOR).of(source);
-        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html#anchor"));
+        assertEquals("http://test.aperto.de/target~foo=bar~.html#anchor", _helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL));
 
         stubProperty("link_query", QUERY).of(source);
-        assertThat(_helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL), equalTo("http://test.aperto.de/target~foo=bar~.html?param=value#anchor"));
+        assertEquals("http://test.aperto.de/target~foo=bar~.html?param=value#anchor", _helper.createExtendedLink(source, "link", "test", LinkTool.LinkType.EXTERNAL));
     }
 
     // Additional tests for uncovered branches and edge cases.
@@ -204,54 +204,53 @@ public class ExtendedLinkFieldHelperTest {
     @Test
     public void testGetBaseForUuidWithComponents() {
         String value = UUID + "~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR;
-        assertThat(_helper.getBase(value), equalTo(UUID));
+        assertEquals(UUID, _helper.getBase(value));
     }
 
     @Test
     public void testCreateUriForUuidWithComponents() {
         String value = UUID + "~" + SELECTOR_FOO + "~" + "?" + QUERY + "#" + ANCHOR;
         URI uri = _helper.createUri(value);
-        assertThat(uri, equalTo(URI.create("/" + value)));
+        assertEquals(URI.create("/" + value), uri);
     }
 
     @Test
     public void testMergeComponentsSelectorsOnly() {
-        assertThat(_helper.mergeComponents(null, SELECTOR_FOO, null, null), equalTo("~" + SELECTOR_FOO + "~"));
-        assertThat(_helper.mergeComponents(null, SELECTOR_FOO, QUERY, ANCHOR), equalTo("~" + SELECTOR_FOO + "~" + "?" + QUERY + "#" + ANCHOR));
+        assertEquals("~" + SELECTOR_FOO + "~", _helper.mergeComponents(null, SELECTOR_FOO, null, null));
+        assertEquals("~" + SELECTOR_FOO + "~" + "?" + QUERY + "#" + ANCHOR, _helper.mergeComponents(null, SELECTOR_FOO, QUERY, ANCHOR));
     }
 
     @Test
     public void testGetSelectorsWithExtension() {
         String pathWithSelectorAndExt = "/content/page" + "~" + SELECTOR_FOO + "~" + ".html";
-        assertThat(_helper.getSelectors(pathWithSelectorAndExt), equalTo(SELECTOR_FOO));
+        assertEquals(SELECTOR_FOO, _helper.getSelectors(pathWithSelectorAndExt));
     }
 
     @Test
     public void testCreateExtendedLinkExternalPropertyValue() throws RepositoryException {
         Node source = mockNode("sourceExternal");
-        // External link value should be returned unchanged except for appended components.
         stubProperty("link", EXTERNAL_LINK).of(source);
         stubProperty("link_selector", SELECTORS).of(source);
         stubProperty("link_query", QUERY).of(source);
         stubProperty("link_anchor", ANCHOR).of(source);
         String expected = EXTERNAL_LINK.replace(".html", "~" + SELECTORS + "~.html") + "?" + QUERY + "#" + ANCHOR;
-        assertThat(_helper.createExtendedLink(source, "link", "ignored", LinkTool.LinkType.EXTERNAL), equalTo(expected));
+        assertEquals(expected, _helper.createExtendedLink(source, "link", "ignored", LinkTool.LinkType.EXTERNAL));
     }
 
     @Test
     public void testStripBase() {
-        assertThat(_helper.stripBase(null), equalTo(EMPTY));
-        assertThat(_helper.stripBase(PATH), equalTo(EMPTY));
-        assertThat(_helper.stripBase(PATH_WITH_SELECTOR), equalTo("~" + SELECTOR_FOO + "~"));
-        assertThat(_helper.stripBase(PATH_WITH_QUERY), equalTo("?" + QUERY));
-        assertThat(_helper.stripBase(PATH_WITH_ANCHOR), equalTo("#" + ANCHOR));
-        assertThat(_helper.stripBase(PATH_FULL), equalTo("~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR));
-        assertThat(_helper.stripBase("#" + ANCHOR), equalTo("#" + ANCHOR));
+        assertEquals(EMPTY, _helper.stripBase(null));
+        assertEquals(EMPTY, _helper.stripBase(PATH));
+        assertEquals("~" + SELECTOR_FOO + "~", _helper.stripBase(PATH_WITH_SELECTOR));
+        assertEquals("?" + QUERY, _helper.stripBase(PATH_WITH_QUERY));
+        assertEquals("#" + ANCHOR, _helper.stripBase(PATH_WITH_ANCHOR));
+        assertEquals("~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR, _helper.stripBase(PATH_FULL));
+        assertEquals("#" + ANCHOR, _helper.stripBase("#" + ANCHOR));
         String uuidFull = UUID + "~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR;
-        assertThat(_helper.stripBase(uuidFull), equalTo("~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR));
+        assertEquals("~" + SELECTORS + "~" + "?" + QUERY + "#" + ANCHOR, _helper.stripBase(uuidFull));
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         cleanContext();
     }

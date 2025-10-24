@@ -25,8 +25,8 @@ import de.ibmix.magkit.test.cms.templating.TemplateDefinitionStubbingOperation;
 import de.ibmix.magkit.test.jcr.NodeStubbingOperation;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.repository.RepositoryConstants;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.jcr.Node;
@@ -49,12 +49,10 @@ import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubType;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for node utils.
@@ -68,34 +66,34 @@ public class NodeUtilsTest {
 
     @Test
     public void hasSubComponentsTest() throws RepositoryException {
-        assertThat(hasSubComponents(null, null), is(false));
+        assertFalse(hasSubComponents(null, null));
 
         Node page = mockPageNode("page");
-        assertThat(hasSubComponents(page, null), is(false));
-        assertThat(hasSubComponents(page, "area"), is(false));
+        assertFalse(hasSubComponents(page, null));
+        assertFalse(hasSubComponents(page, "area"));
 
         mockAreaNode("page/area");
-        assertThat(hasSubComponents(page, "area"), is(false));
+        assertFalse(hasSubComponents(page, "area"));
 
         mockAreaNode("page/area/subArea");
-        assertThat(hasSubComponents(page, "area"), is(false));
+        assertFalse(hasSubComponents(page, "area"));
 
         mockComponentNode("page/area/subArea/component");
-        assertThat(hasSubComponents(page, "area"), is(false));
+        assertFalse(hasSubComponents(page, "area"));
 
         mockComponentNode("page/area/component");
-        assertThat(hasSubComponents(page, "area"), is(true));
+        assertTrue(hasSubComponents(page, "area"));
     }
 
     @Test
     public void testPathForIdentifier() throws RepositoryException {
         mockPageNode("one", stubIdentifier("1"));
-        assertThat(getPathForIdentifier(null, null), nullValue());
-        assertThat(getPathForIdentifier("", "1"), nullValue());
-        assertThat(getPathForIdentifier("any", ""), nullValue());
-        assertThat(getPathForIdentifier("any", "x"), nullValue());
-        assertThat(getPathForIdentifier(WEBSITE, "x"), nullValue());
-        assertThat(getPathForIdentifier(WEBSITE, "1"), equalTo("/one"));
+        assertNull(getPathForIdentifier(null, null));
+        assertNull(getPathForIdentifier("", "1"));
+        assertNull(getPathForIdentifier("any", ""));
+        assertNull(getPathForIdentifier("any", "x"));
+        assertNull(getPathForIdentifier(WEBSITE, "x"));
+        assertEquals("/one", getPathForIdentifier(WEBSITE, "1"));
     }
 
     @Test
@@ -112,140 +110,171 @@ public class NodeUtilsTest {
 
     @Test
     public void ancestorWithTemplate() throws RepositoryException {
-        assertThat(getAncestorOrSelfWithTemplate(null, null), nullValue());
+        assertNull(getAncestorOrSelfWithTemplate(null, null));
         mockNode("/root", stubTemplate("test:template"));
         Node result = mockNode("/root/result", stubTemplate("test:template"));
         Node child = mockNode("/root/result/section/test/child");
-        assertThat(getAncestorOrSelfWithTemplate(child, null), nullValue());
-        assertThat(getAncestorOrSelfWithTemplate(child, "test:other"), nullValue());
-        assertThat(getAncestorOrSelfWithTemplate(child, "test:template"), is(result));
-        assertThat(getAncestorOrSelfWithTemplate(result, "test:template"), is(result));
+        assertNull(getAncestorOrSelfWithTemplate(child, null));
+        assertNull(getAncestorOrSelfWithTemplate(child, "test:other"));
+        assertEquals(result, getAncestorOrSelfWithTemplate(child, "test:template"));
+        assertEquals(result, getAncestorOrSelfWithTemplate(result, "test:template"));
     }
 
     @Test
     public void ancestorWithType() throws RepositoryException {
-        assertThat(getAncestorWithPrimaryType(null, null), nullValue());
+        assertNull(getAncestorWithPrimaryType(null, null));
         Node folder = mockMgnlNode(RepositoryConstants.WEBSITE, "/folder", NodeTypes.Folder.NAME);
-        assertThat(getAncestorWithPrimaryType(folder, null), nullValue());
+        assertNull(getAncestorWithPrimaryType(folder, null));
 
         Node page = mockPageNode("/folder/page");
         Node subpage = mockPageNode("/folder/page/subpage");
         Node area = mockAreaNode("/folder/page/subpage/area");
         Node component = mockComponentNode("/folder/page/subpage/area/component");
-        assertThat(getAncestorWithPrimaryType(component, NodeTypes.Area.NAME), is(area));
-        assertThat(getAncestorWithPrimaryType(component, NodeTypes.Page.NAME), is(subpage));
-        assertThat(getAncestorWithPrimaryType(component, NodeTypes.Folder.NAME), is(folder));
+        assertEquals(area, getAncestorWithPrimaryType(component, NodeTypes.Area.NAME));
+        assertEquals(subpage, getAncestorWithPrimaryType(component, NodeTypes.Page.NAME));
+        assertEquals(folder, getAncestorWithPrimaryType(component, NodeTypes.Folder.NAME));
 
-        assertThat(getAncestorWithPrimaryType(subpage, NodeTypes.Page.NAME), is(page));
+        assertEquals(page, getAncestorWithPrimaryType(subpage, NodeTypes.Page.NAME));
     }
 
     @Test
     public void getChildPages() throws RepositoryException {
-        assertThat(NodeUtils.getChildPages(null).size(), is(0));
+        assertEquals(0, NodeUtils.getChildPages(null).size());
 
         Node root = mockPageNode("root");
-        assertThat(NodeUtils.getChildPages(root).size(), is(0));
+        assertEquals(0, NodeUtils.getChildPages(root).size());
 
         mockPageNode("root/page1");
-        assertThat(NodeUtils.getChildPages(root).size(), is(1));
+        assertEquals(1, NodeUtils.getChildPages(root).size());
 
         mockPageNode("root/page2");
         mockPageNode("root/page2/subpage");
         mockAreaNode("root/area");
-        assertThat(NodeUtils.getChildPages(root).size(), is(2));
+        assertEquals(2, NodeUtils.getChildPages(root).size());
     }
 
     @Test
     public void getTemplateType() throws RepositoryException {
-        assertThat(NodeUtils.getTemplateType(null), nullValue());
+        assertNull(NodeUtils.getTemplateType(null));
 
         Node node = mockNode("test");
-        assertThat(NodeUtils.getTemplateType(node), nullValue());
+        assertNull(NodeUtils.getTemplateType(node));
 
         stubTemplate("test:template").of(node);
-        assertThat(NodeUtils.getTemplateType(node), nullValue());
+        assertNull(NodeUtils.getTemplateType(node));
 
         stubTemplate("test:templateWithType", TemplateDefinitionStubbingOperation.stubType("success")).of(node);
-        assertThat(NodeUtils.getTemplateType(node), is("success"));
+        assertEquals("success", NodeUtils.getTemplateType(node));
     }
 
     @Test
     public void getDepthTest() throws RepositoryException {
-        assertThat(NodeUtils.getDepth(null), is(-1));
+        assertEquals(-1, NodeUtils.getDepth(null));
 
         Node node = mockNode("root");
-        assertThat(NodeUtils.getDepth(node), is(1));
+        assertEquals(1, NodeUtils.getDepth(node));
 
         node = mockNode("root/home");
-        assertThat(NodeUtils.getDepth(node), is(2));
+        assertEquals(2, NodeUtils.getDepth(node));
 
         node = mockNode("root/home/page");
-        assertThat(NodeUtils.getDepth(node), is(3));
+        assertEquals(3, NodeUtils.getDepth(node));
 
         Mockito.doThrow(RepositoryException.class).when(node).getDepth();
-        assertThat(NodeUtils.getDepth(node), is(-1));
+        assertEquals(-1, NodeUtils.getDepth(node));
     }
 
     @Test
     public void getNodeByReference() throws RepositoryException {
-        assertThat(NodeUtils.getNodeByReference(null, null), nullValue());
-        assertThat(NodeUtils.getNodeByReference(" ", " "), nullValue());
-        assertThat(NodeUtils.getNodeByReference("test", ""), nullValue());
+        assertNull(NodeUtils.getNodeByReference(null, null));
+        assertNull(NodeUtils.getNodeByReference(" ", " "));
+        assertNull(NodeUtils.getNodeByReference("test", ""));
 
         Node node = mockPageNode("root/test/page", stubIdentifier(UUID.randomUUID().toString()));
-        assertThat(NodeUtils.getNodeByReference("website", "just something"), nullValue());
-        assertThat(NodeUtils.getNodeByReference("website", "/root/test/page"), is(node));
-        assertThat(NodeUtils.getNodeByReference("website", node.getIdentifier()), is(node));
+        assertNull(NodeUtils.getNodeByReference("website", "just something"));
+        assertEquals(node, NodeUtils.getNodeByReference("website", "/root/test/page"));
+        assertEquals(node, NodeUtils.getNodeByReference("website", node.getIdentifier()));
     }
 
     @Test
     public void getIdentifier() throws RepositoryException {
-        assertThat(NodeUtils.getIdentifier(null), nullValue());
+        assertNull(NodeUtils.getIdentifier(null));
         final Node node = mockNode(stubIdentifier("1234"));
-        assertThat(NodeUtils.getIdentifier(node), equalTo("1234"));
+        assertEquals("1234", NodeUtils.getIdentifier(node));
     }
 
     @Test
     public void getPath() throws RepositoryException {
-        assertThat(NodeUtils.getPath(null), nullValue());
+        assertNull(NodeUtils.getPath(null));
         final Node node = mockNode("node");
-        assertThat(NodeUtils.getPath(node), equalTo("/node"));
+        assertEquals("/node", NodeUtils.getPath(node));
     }
 
     @Test
     public void getName() throws RepositoryException {
-        assertThat(NodeUtils.getName(null), nullValue());
+        assertNull(NodeUtils.getName(null));
         final Node node = mockNode("node");
-        assertThat(NodeUtils.getName(node), equalTo("node"));
+        assertEquals("node", NodeUtils.getName(node));
     }
 
     @Test
     public void getNodeByIdentifier() throws RepositoryException {
         Node expected = MagnoliaNodeMockUtils.mockPageNode("test", stubIdentifier("123"));
-        assertThat(NodeUtils.getNodeByIdentifier(null), nullValue());
-        assertThat(NodeUtils.getNodeByIdentifier(EMPTY), nullValue());
-        assertThat(NodeUtils.getNodeByIdentifier("456"), nullValue());
-        assertThat(NodeUtils.getNodeByIdentifier("123"), is(expected));
+        assertNull(NodeUtils.getNodeByIdentifier(null));
+        assertNull(NodeUtils.getNodeByIdentifier(EMPTY));
+        assertNull(NodeUtils.getNodeByIdentifier("456"));
+        assertEquals(expected, NodeUtils.getNodeByIdentifier("123"));
     }
 
     @Test
     public void getChildAssetNodes() throws RepositoryException {
         final Node test = mockNode("node");
-        assertThat(NodeUtils.getChildAssetNodes(null).size(), is(0));
-        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(0));
+        assertEquals(0, NodeUtils.getChildAssetNodes(null).size());
+        assertEquals(0, NodeUtils.getChildAssetNodes(test).size());
 
         MagnoliaNodeMockUtils.mockComponentNode("node/component");
-        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(0));
+        assertEquals(0, NodeUtils.getChildAssetNodes(test).size());
 
         final Node asset = mockNode("node/asset1", NodeStubbingOperation.stubType("mgnl:asset"));
-        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(1));
-        assertThat(NodeUtils.getChildAssetNodes(test).get(0), is(asset));
+        assertEquals(1, NodeUtils.getChildAssetNodes(test).size());
+        assertEquals(asset, NodeUtils.getChildAssetNodes(test).get(0));
 
         mockNode("node/asset2", NodeStubbingOperation.stubType("mgnl:asset"));
-        assertThat(NodeUtils.getChildAssetNodes(test).size(), is(2));
+        assertEquals(2, NodeUtils.getChildAssetNodes(test).size());
     }
 
-    @After
+    @Test
+    public void getNodes() throws RepositoryException {
+        assertNull(NodeUtils.getNodes(null));
+        Node node = mockNode("test");
+        // setting up the Node mock already causes some invocations on this mock. Clear them first.
+        Mockito.clearInvocations(node);
+        assertFalse(NodeUtils.getNodes(node).hasNext());
+        Mockito.verify(node).getNodes();
+    }
+
+    @Test
+    public void getNodesWithNamePattern() throws RepositoryException {
+        assertNull(NodeUtils.getNodes(null, "pattern"));
+        Node node = mockNode();
+        // setting up the Node mock already causes some invocations on this mock. Clear them first.
+        Mockito.clearInvocations(node);
+        assertFalse(NodeUtils.getNodes(node, "pattern").hasNext());
+        Mockito.verify(node).getNodes("pattern");
+    }
+
+    @Test
+    public void getNodesWithNameGlobs() throws RepositoryException {
+        String[] globs = new String[]{"pattern1", "pattern2"};
+        assertNull(NodeUtils.getNodes(null, globs));
+        Node node = mockNode();
+        // setting up the Node mock already causes some invocations on this mock. Clear them first.
+        Mockito.clearInvocations(node);
+        assertFalse(NodeUtils.getNodes(node, globs).hasNext());
+        Mockito.verify(node).getNodes(globs);
+    }
+
+    @AfterEach
     public void tearDown() throws Exception {
         cleanContext();
     }

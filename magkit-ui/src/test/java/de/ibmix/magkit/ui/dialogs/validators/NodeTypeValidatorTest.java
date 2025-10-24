@@ -21,9 +21,9 @@ package de.ibmix.magkit.ui.dialogs.validators;
  */
 
 import de.ibmix.magkit.test.jcr.NodeStubbingOperation;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -32,8 +32,8 @@ import java.util.List;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockMgnlNode;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 public class NodeTypeValidatorTest {
     private NodeTypeValidator _nodeTypeValidator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         NodeTypeValidatorDefinition definition = new NodeTypeValidatorDefinition();
         definition.setErrorMessage("Is not valid!");
@@ -57,17 +57,17 @@ public class NodeTypeValidatorTest {
     public void isValidValueTest() throws RepositoryException {
         Node node = mockMgnlNode("NodeName", "media", "mgnl:podcast", NodeStubbingOperation.stubIdentifier("NodeName"));
         when(node.getMixinNodeTypes()).thenReturn(new NodeType[0]);
-        assertThat(_nodeTypeValidator.isValidValue(node), is(true));
+        assertTrue(_nodeTypeValidator.isValidValue(node));
     }
 
     @Test
     public void isNotValidValueTest() throws RepositoryException {
         Node node = mockMgnlNode("NodeName", "media", "mgnl:video", NodeStubbingOperation.stubIdentifier("NodeName"));
         when(node.getMixinNodeTypes()).thenReturn(new NodeType[0]);
-        assertThat(_nodeTypeValidator.isValidValue(node), is(false));
+        assertFalse(_nodeTypeValidator.isValidValue(node));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }

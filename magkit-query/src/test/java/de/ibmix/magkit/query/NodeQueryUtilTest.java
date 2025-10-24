@@ -22,10 +22,9 @@ package de.ibmix.magkit.query;
 
 import de.ibmix.magkit.query.xpath.ConstraintBuilder;
 import de.ibmix.magkit.query.xpath.XpathBuilder;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -40,6 +39,7 @@ import static de.ibmix.magkit.test.jcr.query.QueryMockUtils.mockQueryManager;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static javax.jcr.query.Query.JCR_SQL2;
 import static javax.jcr.query.Query.XPATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,19 +58,19 @@ public class NodeQueryUtilTest {
     @Test
     public void testReplaceStringBuilderWithXpathBuilder() {
         final ConstraintBuilder builder = new ConstraintBuilder().addTplNameConstraint(TEST_TPL_NAME);
-        Assert.assertEquals("/jcr:root" + TEST_NODE_PATH + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']" + TEST_CUSTOM_XPATH_EXPRESSION, new XpathBuilder().path(TEST_NODE_PATH).type(TEST_TYPE).property(builder).append(TEST_CUSTOM_XPATH_EXPRESSION).build());
+        assertEquals("/jcr:root" + TEST_NODE_PATH + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']" + TEST_CUSTOM_XPATH_EXPRESSION, new XpathBuilder().path(TEST_NODE_PATH).type(TEST_TYPE).property(builder).append(TEST_CUSTOM_XPATH_EXPRESSION).build());
     }
 
     @Test
     public void testReplaceStringBuilderWithXpathBuilderWithoutPath() {
         final ConstraintBuilder builder = new ConstraintBuilder().addTplNameConstraint(TEST_TPL_NAME);
-        Assert.assertEquals("/jcr:root" + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']" + TEST_CUSTOM_XPATH_EXPRESSION, new XpathBuilder().type(TEST_TYPE).property(builder).append(TEST_CUSTOM_XPATH_EXPRESSION).build());
+        assertEquals("/jcr:root" + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']" + TEST_CUSTOM_XPATH_EXPRESSION, new XpathBuilder().type(TEST_TYPE).property(builder).append(TEST_CUSTOM_XPATH_EXPRESSION).build());
     }
 
     @Test
     public void testReplaceStringBuilderWithXpathBuilderWithoutCustomExpression() throws Exception {
         final ConstraintBuilder builder = new ConstraintBuilder().addTplNameConstraint(TEST_TPL_NAME);
-        Assert.assertEquals("/jcr:root" + TEST_NODE_PATH + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']", new XpathBuilder().path(TEST_NODE_PATH).type(TEST_TYPE).property(builder).append("").build());
+        assertEquals("/jcr:root" + TEST_NODE_PATH + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']", new XpathBuilder().path(TEST_NODE_PATH).type(TEST_TYPE).property(builder).append("").build());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class NodeQueryUtilTest {
         verify(_queryManager).createQuery("select * from [mgnl:component] where [mgnl:template] = 'test-case:pages/templateName' and (ISDESCENDANTNODE('/portal/news/node/area1') or ISDESCENDANTNODE('/portal/news/node/area2'))", JCR_SQL2);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws RepositoryException {
         // setup mock context
         mockWebContext(stubJcrSession(WEBSITE));
@@ -116,7 +116,7 @@ public class NodeQueryUtilTest {
         _queryManager = mockQueryManager(WEBSITE);
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         cleanContext();
     }

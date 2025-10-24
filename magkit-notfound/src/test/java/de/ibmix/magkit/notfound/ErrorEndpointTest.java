@@ -27,9 +27,9 @@ import info.magnolia.cms.core.AggregationState;
 import info.magnolia.module.site.ExtendedAggregationState;
 import info.magnolia.module.site.Site;
 import info.magnolia.module.site.SiteManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.RepositoryException;
 import javax.ws.rs.core.Response;
@@ -46,11 +46,11 @@ import static de.ibmix.magkit.test.cms.site.SiteManagerStubbingOperation.stubAss
 import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSite;
 import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSiteManager;
 import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubAttribute;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Test the error endpoint.
@@ -64,7 +64,7 @@ public class ErrorEndpointTest {
     private final NotfoundModule _notfoundModule = new NotfoundModule();
     private AggregationState _aggregationState;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         SiteManager siteManager = mockSiteManager();
@@ -121,26 +121,26 @@ public class ErrorEndpointTest {
     @Test
     public void topLevelErrorPageExists() throws RepositoryException {
         stubOriginalBrowserUri("/notfound").of(_aggregationState);
-        assertThat(_endpoint.getErrorPagePath(404), equalTo("/error/404"));
+        assertEquals("/error/404", _endpoint.getErrorPagePath(404));
     }
 
     @Test
     public void defaultErrorPagePathDoesNotExists() throws RepositoryException {
         stubOriginalBrowserUri("/fr/notfound").of(_aggregationState);
-        assertThat(_endpoint.getErrorPagePath(404), equalTo(""));
+        assertEquals("", _endpoint.getErrorPagePath(404));
     }
 
     @Test
     public void existingDefaultErrorPagePath() throws RepositoryException {
         stubOriginalBrowserUri("/de/notfound").of(_aggregationState);
-        assertThat(_endpoint.getErrorPagePath(404), equalTo("/de/error/404"));
+        assertEquals("/de/error/404", _endpoint.getErrorPagePath(404));
     }
 
     @Test
     public void existingDefaultErrorPageWithDefaultPath() throws RepositoryException {
         _notfoundModule.setDefaultErrorPath("/de");
         stubOriginalBrowserUri("/notfound").of(_aggregationState);
-        assertThat(_endpoint.getErrorPagePath(404), equalTo("/error/404"));
+        assertEquals("/error/404", _endpoint.getErrorPagePath(404));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class ErrorEndpointTest {
         _aggregationState = mock(ExtendedAggregationState.class);
         stubOriginalBrowserUri("/fr/notfound").of(_aggregationState);
         when(((ExtendedAggregationState) _aggregationState).getDomainName()).thenReturn("tenant.fr");
-        assertThat(_endpoint.getErrorPagePath(404), equalTo("/tenant/fr/error/404"));
+        assertEquals("/tenant/fr/error/404", _endpoint.getErrorPagePath(404));
     }
 
     /**
@@ -159,7 +159,7 @@ public class ErrorEndpointTest {
         stubOriginalBrowserUri("/notfound").of(_aggregationState);
         mockWebContext();
         Response response = _endpoint.defaultRendering();
-        assertThat(response, equalTo(null));
+        assertNull(response);
     }
 
     /**
@@ -170,8 +170,8 @@ public class ErrorEndpointTest {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/fr/notfound");
         mockWebContext();
         Response response = _endpoint.defaultRendering();
-        assertThat(response.getStatus(), equalTo(Response.Status.NOT_FOUND.getStatusCode()));
-        assertThat(response.getEntity(), equalTo(null));
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertNull(response.getEntity());
     }
 
     /**
@@ -182,11 +182,11 @@ public class ErrorEndpointTest {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/notfound");
         mockWebContext();
         Response response = _endpoint.headlessRendering();
-        assertThat(response.getStatus(), equalTo(Response.Status.NOT_FOUND.getStatusCode()));
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         @SuppressWarnings("unchecked") Map<String, Object> entity = (Map<String, Object>) response.getEntity();
-        assertThat(entity.get("status"), equalTo(Response.Status.NOT_FOUND.getStatusCode()));
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), entity.get("status"));
         // Aufgrund des doppelten 'error' Segments wird keine Seite gefunden.
-        assertThat(entity.get("page"), equalTo(""));
+        assertEquals("", entity.get("page"));
     }
 
     /**
@@ -197,10 +197,10 @@ public class ErrorEndpointTest {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/notfound");
         mockWebContext(stubAttribute(ERROR_STATUS_CODE, 500));
         Response response = _endpoint.headlessRendering();
-        assertThat(response.getStatus(), equalTo(500));
+        assertEquals(500, response.getStatus());
         @SuppressWarnings("unchecked") Map<String, Object> entity = (Map<String, Object>) response.getEntity();
-        assertThat(entity.get("status"), equalTo(500));
-        assertThat(entity.get("page"), equalTo(""));
+        assertEquals(500, entity.get("status"));
+        assertEquals("", entity.get("page"));
     }
 
     /**
@@ -210,13 +210,13 @@ public class ErrorEndpointTest {
     public void headlessRenderingReturnsEmptyPagePathWhenNotFound() throws Exception {
         when(_aggregationState.getOriginalBrowserURI()).thenReturn("/fr/notfound");
         Response response = _endpoint.headlessRendering();
-        assertThat(response.getStatus(), equalTo(Response.Status.NOT_FOUND.getStatusCode()));
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
         @SuppressWarnings("unchecked") Map<String, Object> entity = (Map<String, Object>) response.getEntity();
         // Fallback error page wird gefunden
-        assertThat(entity.get("page"), equalTo("/error/404"));
+        assertEquals("/error/404", entity.get("page"));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }

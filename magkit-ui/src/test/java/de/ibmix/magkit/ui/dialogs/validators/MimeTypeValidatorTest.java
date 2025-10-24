@@ -22,13 +22,13 @@ package de.ibmix.magkit.ui.dialogs.validators;
 
 import info.magnolia.dam.jcr.JcrAsset;
 import info.magnolia.dam.jcr.JcrFolder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +41,7 @@ public class MimeTypeValidatorTest {
 
     private MimeTypeValidator _mimeTypeValidator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final MimeTypeValidatorDefinition validatorDefinition = new MimeTypeValidatorDefinition();
         validatorDefinition.setErrorMessage("error message");
@@ -51,13 +51,13 @@ public class MimeTypeValidatorTest {
 
     @Test
     public void nullValue() {
-        assertThat(_mimeTypeValidator.isValidValue(null), is(true));
+        assertTrue(_mimeTypeValidator.isValidValue(null));
     }
 
     @Test
     public void folder() {
         final JcrFolder jcrFolder = mock(JcrFolder.class);
-        assertThat(_mimeTypeValidator.isValidValue(jcrFolder), is(false));
+        assertFalse(_mimeTypeValidator.isValidValue(jcrFolder));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class MimeTypeValidatorTest {
         final JcrAsset jcrAsset = mock(JcrAsset.class);
         when(jcrAsset.isAsset()).thenReturn(true);
         when(jcrAsset.getMimeType()).thenReturn("application/pdf");
-        assertThat(_mimeTypeValidator.isValidValue(jcrAsset), is(false));
+        assertFalse(_mimeTypeValidator.isValidValue(jcrAsset));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class MimeTypeValidatorTest {
         final JcrAsset jcrAsset = mock(JcrAsset.class);
         when(jcrAsset.isAsset()).thenReturn(true);
         when(jcrAsset.getMimeType()).thenReturn("image/jpeg");
-        assertThat(_mimeTypeValidator.isValidValue(jcrAsset), is(true));
+        assertTrue(_mimeTypeValidator.isValidValue(jcrAsset));
     }
 
     @Test
@@ -81,6 +81,6 @@ public class MimeTypeValidatorTest {
         final JcrAsset jcrAsset = mock(JcrAsset.class);
         when(jcrAsset.isAsset()).thenReturn(true);
         when(jcrAsset.getMimeType()).thenReturn("image/svg+xml");
-        assertThat(_mimeTypeValidator.isValidValue(jcrAsset), is(true));
+        assertTrue(_mimeTypeValidator.isValidValue(jcrAsset));
     }
 }

@@ -156,9 +156,9 @@ public class DefineParentNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     private NodeIterator toWrappedNodesIterator(NodeIterator nodes) {
-        return new NodeIteratorAdapter((Collection) IteratorUtils.toList(nodes)
+        return new NodeIteratorAdapter(((Collection<Node>) IteratorUtils.toList(nodes))
             .stream()
-            .map(n -> isWrapping((Node) n) ? n : new DefineParentNodeWrapper(this, (Node) n))
+            .map(n -> isWrapping(n) ? n : new DefineParentNodeWrapper(this, n))
             .collect(Collectors.toList()));
     }
 }

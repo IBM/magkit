@@ -20,13 +20,13 @@ package de.ibmix.magkit.query.xpath;
  * #L%
  */
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
 import static de.ibmix.magkit.query.xpath.ConstraintBuilder.Operator.AND;
 import static de.ibmix.magkit.query.xpath.ConstraintBuilder.Operator.OR;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author philipp.guettler
@@ -42,36 +42,36 @@ public class ConstraintBuilderTest {
 
     @Test
     public void testOpenGroup() throws Exception {
-        Assert.assertEquals("(", new ConstraintBuilder().openGroup().build());
-        Assert.assertEquals(STRING_AND + " (", new ConstraintBuilder().openGroup(AND).build());
+        assertEquals("(", new ConstraintBuilder().openGroup().build());
+        assertEquals(STRING_AND + " (", new ConstraintBuilder().openGroup(AND).build());
     }
 
     @Test
     public void testCloseGroup() throws Exception {
-        Assert.assertEquals(")", new ConstraintBuilder().closeGroup().build());
-        Assert.assertEquals("()", new ConstraintBuilder().openGroup().closeGroup().build());
-        Assert.assertEquals(STRING_AND + " ()", new ConstraintBuilder().openGroup(AND).closeGroup().build());
+        assertEquals(")", new ConstraintBuilder().closeGroup().build());
+        assertEquals("()", new ConstraintBuilder().openGroup().closeGroup().build());
+        assertEquals(STRING_AND + " ()", new ConstraintBuilder().openGroup(AND).closeGroup().build());
     }
 
     @Test
     public void testAppend() throws Exception {
-        Assert.assertEquals(TEST_CONSTRAINT, new ConstraintBuilder().add(TEST_CONSTRAINT).build());
-        Assert.assertEquals(STRING_AND + " " + TEST_CONSTRAINT, new ConstraintBuilder().add(AND, TEST_CONSTRAINT).build());
-        Assert.assertEquals(TEST_CONSTRAINT + " " + STRING_AND + " " + TEST_CONSTRAINT, new ConstraintBuilder().add(TEST_CONSTRAINT).add(AND, TEST_CONSTRAINT).build());
-        Assert.assertEquals(TEST_CONSTRAINT + " " + STRING_AND + " (" + TEST_CONSTRAINT + " " + STRING_AND + " " + TEST_CONSTRAINT + ")", new ConstraintBuilder().add(TEST_CONSTRAINT).openGroup(AND).add(AND, TEST_CONSTRAINT).add(AND, TEST_CONSTRAINT).closeGroup().build());
+        assertEquals(TEST_CONSTRAINT, new ConstraintBuilder().add(TEST_CONSTRAINT).build());
+        assertEquals(STRING_AND + " " + TEST_CONSTRAINT, new ConstraintBuilder().add(AND, TEST_CONSTRAINT).build());
+        assertEquals(TEST_CONSTRAINT + " " + STRING_AND + " " + TEST_CONSTRAINT, new ConstraintBuilder().add(TEST_CONSTRAINT).add(AND, TEST_CONSTRAINT).build());
+        assertEquals(TEST_CONSTRAINT + " " + STRING_AND + " (" + TEST_CONSTRAINT + " " + STRING_AND + " " + TEST_CONSTRAINT + ")", new ConstraintBuilder().add(TEST_CONSTRAINT).openGroup(AND).add(AND, TEST_CONSTRAINT).add(AND, TEST_CONSTRAINT).closeGroup().build());
     }
 
     @Test
     public void testAppendUuidConstraint() throws Exception {
-        Assert.assertEquals(String.format("@jcr:uuid='%s'", TEST_UUID), new ConstraintBuilder().addUuidConstraint(TEST_UUID).build());
-        Assert.assertEquals(STRING_AND + " " + String.format("@jcr:uuid='%s'", TEST_UUID), new ConstraintBuilder().addUuidConstraint(AND, TEST_UUID).build());
+        assertEquals(String.format("@jcr:uuid='%s'", TEST_UUID), new ConstraintBuilder().addUuidConstraint(TEST_UUID).build());
+        assertEquals(STRING_AND + " " + String.format("@jcr:uuid='%s'", TEST_UUID), new ConstraintBuilder().addUuidConstraint(AND, TEST_UUID).build());
     }
 
     @Test
     public void testTemplateName() throws Exception {
-        Assert.assertEquals(String.format("@mgnl:template='%s'", TEST_TEMPLATE_NAME), new ConstraintBuilder().addTplNameConstraint(TEST_TEMPLATE_NAME).build());
-        Assert.assertEquals(STRING_AND + " " + String.format("@mgnl:template='%s'", TEST_TEMPLATE_NAME), new ConstraintBuilder().addTplNameConstraint(AND, TEST_TEMPLATE_NAME).build());
-        Assert.assertEquals(STRING_AND + " " + String.format("jcr:like(@mgnl:template, '%s')", TEST_TEMPLATE_PLACEHOLDER), new ConstraintBuilder().addTplNameConstraint(AND, TEST_TEMPLATE_PLACEHOLDER).build());
+        assertEquals(String.format("@mgnl:template='%s'", TEST_TEMPLATE_NAME), new ConstraintBuilder().addTplNameConstraint(TEST_TEMPLATE_NAME).build());
+        assertEquals(STRING_AND + " " + String.format("@mgnl:template='%s'", TEST_TEMPLATE_NAME), new ConstraintBuilder().addTplNameConstraint(AND, TEST_TEMPLATE_NAME).build());
+        assertEquals(STRING_AND + " " + String.format("jcr:like(@mgnl:template, '%s')", TEST_TEMPLATE_PLACEHOLDER), new ConstraintBuilder().addTplNameConstraint(AND, TEST_TEMPLATE_PLACEHOLDER).build());
     }
 
     @Test
@@ -92,6 +92,6 @@ public class ConstraintBuilderTest {
         constraint.closeGroup();
         constraint.add(AND, String.format("./*/*/@categories='%s'", "categoryId"));
 
-        Assert.assertEquals("@mgnl:template='test-case:pages/testTemplate' and (@jcr:uuid='1' or @jcr:uuid='2' or @jcr:uuid='3' or @jcr:uuid='4' or @jcr:uuid='5') and jcr:like(./*/*/@mgnl:template, 'test-case:pages/testTemplate%') and (./*/*/@isPrivateBrand='false' or not(./*/*/@isPrivateBrand='false' or ./*/*/@isPrivateBrand='true')) and ./*/*/@categories='categoryId'", constraint.build());
+        assertEquals("@mgnl:template='test-case:pages/testTemplate' and (@jcr:uuid='1' or @jcr:uuid='2' or @jcr:uuid='3' or @jcr:uuid='4' or @jcr:uuid='5') and jcr:like(./*/*/@mgnl:template, 'test-case:pages/testTemplate%') and (./*/*/@isPrivateBrand='false' or not(./*/*/@isPrivateBrand='false' or ./*/*/@isPrivateBrand='true')) and ./*/*/@categories='categoryId'", constraint.build());
     }
 }

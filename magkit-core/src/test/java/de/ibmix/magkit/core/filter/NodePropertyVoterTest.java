@@ -21,9 +21,9 @@ package de.ibmix.magkit.core.filter;
  */
 
 import info.magnolia.context.SystemContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
@@ -38,8 +38,8 @@ import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static de.ibmix.magkit.test.jcr.SessionMockUtils.mockSession;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
@@ -57,14 +57,14 @@ public class NodePropertyVoterTest {
     public void testMissingConfig() {
         _propertyVoter.setPropertyName("secure");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertThat(voting, is(false));
+        assertFalse(voting);
     }
 
     @Test
     public void testMissingPattern() {
         _propertyVoter.setPattern(".*");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertThat(voting, is(false));
+        assertFalse(voting);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/old.html");
-        assertThat(voting, is(false));
+        assertFalse(voting);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("false");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertThat(voting, is(false));
+        assertFalse(voting);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertThat(voting, is(true));
+        assertTrue(voting);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertThat(voting, is(true));
+        assertTrue(voting);
     }
 
     @Test
@@ -105,10 +105,10 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPropertyName("notexists");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertThat(voting, is(false));
+        assertFalse(voting);
     }
 
-    @Before
+    @BeforeEach
     public void initVoter() throws RepositoryException {
         _propertyVoter = new NodePropertyVoter();
         Session session = mockSession(WEBSITE);
@@ -118,7 +118,7 @@ public class NodePropertyVoterTest {
         _propertyVoter.setSystemContext(systemContext);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         cleanContext();
     }

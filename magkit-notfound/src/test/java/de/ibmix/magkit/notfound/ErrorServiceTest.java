@@ -24,9 +24,9 @@ import info.magnolia.cms.beans.config.URI2RepositoryManager;
 import info.magnolia.cms.beans.config.URI2RepositoryMapping;
 import info.magnolia.module.site.Site;
 import info.magnolia.module.site.SiteManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -39,8 +39,7 @@ import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.cms.site.SiteManagerStubbingOperation.stubAssignedSite;
 import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSiteManager;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +62,7 @@ public class ErrorServiceTest {
     private SiteManager _siteManager;
     private ErrorService _service;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         cleanContext();
         mockWebContext(stubJcrSession(WEBSITE));
@@ -72,7 +71,7 @@ public class ErrorServiceTest {
         _service = new ErrorService(() -> _module, () -> _siteManager);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }
@@ -83,7 +82,7 @@ public class ErrorServiceTest {
         mockUriToRepositoryManager("/de/notfound", "website");
         initSiteManagerWithSite("/de", "/de/notfound", 1);
         mockPageNode("/de/404");
-        assertThat(_service.retrieveErrorPagePath(404, null, "/de/notfound"), equalTo("/de/404"));
+        assertEquals("/de/404", _service.retrieveErrorPagePath(404, null, "/de/notfound"));
     }
 
     @Test
@@ -92,7 +91,7 @@ public class ErrorServiceTest {
         mockUriToRepositoryManager("/de/notfound", "website");
         initSiteManagerWithSite("/de", "/de/notfound", 1);
         mockPageNode("/de/error/not-found");
-        assertThat(_service.retrieveErrorPagePath(404, null, "/de/notfound"), equalTo("/de/error/not-found"));
+        assertEquals("/de/error/not-found", _service.retrieveErrorPagePath(404, null, "/de/notfound"));
     }
 
     @Test
@@ -108,7 +107,7 @@ public class ErrorServiceTest {
         when(site.getParameters()).thenReturn(Map.of(SITE_PARAM_FRAGMENT_LENGTH, 1));
         when(_siteManager.getAssignedSite(null, "/unknown/notfound")).thenReturn(site);
         mockPageNode("/global/unknown/error/404");
-        assertThat(_service.retrieveErrorPagePath(404, null, "/unknown/notfound"), equalTo("/global/unknown/error/404"));
+        assertEquals("/global/unknown/error/404", _service.retrieveErrorPagePath(404, null, "/unknown/notfound"));
     }
 
     @Test
@@ -117,14 +116,14 @@ public class ErrorServiceTest {
         mockUriToRepositoryManager("/de/section/sub/notfound", "website");
         initSiteManagerWithSite("/de", "/de/section/sub/notfound", 2);
         mockPageNode("/de/section/error/404");
-        assertThat(_service.retrieveErrorPagePath(404, null, "/de/section/sub/notfound"), equalTo("/de/section/error/404"));
+        assertEquals("/de/section/error/404", _service.retrieveErrorPagePath(404, null, "/de/section/sub/notfound"));
     }
 
     @Test
     public void errorPageNotExistingReturnsEmptyPath() throws Exception {
         mockUriToRepositoryManager("/de/notfound", "website");
         initSiteManagerWithSite("/de", "/de/notfound", 1);
-        assertThat(_service.retrieveErrorPagePath(500, null, "/de/notfound"), equalTo(""));
+        assertEquals("", _service.retrieveErrorPagePath(500, null, "/de/notfound"));
     }
 
     @Test
@@ -133,7 +132,7 @@ public class ErrorServiceTest {
         mockUriToRepositoryManager("/de/notfound", "website");
         initSiteManagerWithSite("/de", "/de/notfound", 1);
         mockPageNode("/de/errors/404");
-        assertThat(_service.retrieveErrorPagePath(404, null, "/de/notfound"), equalTo("/de/errors/404"));
+        assertEquals("/de/errors/404", _service.retrieveErrorPagePath(404, null, "/de/notfound"));
     }
 
     private void mockUriToRepositoryManager(String handle, String repository) {

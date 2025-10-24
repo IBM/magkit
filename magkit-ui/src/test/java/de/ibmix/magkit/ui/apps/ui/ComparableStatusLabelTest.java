@@ -22,9 +22,9 @@ package de.ibmix.magkit.ui.apps.ui;
 
 import com.vaadin.ui.Label;
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -38,8 +38,8 @@ import static de.ibmix.magkit.test.jcr.NodeMockUtils.mockNode;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.Activated;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.Modified;
 import static info.magnolia.ui.contentapp.column.jcr.JcrStatusColumnDefinition.ActivationStatus.NotActivated;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link ComparableStatusLabel} comparing logic and status mapping.
@@ -52,14 +52,14 @@ public class ComparableStatusLabelTest {
     private ComparableStatusLabel _label;
     private Node _node;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         _node = mockNode("test");
         _label = new ComparableStatusLabel(_node);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         cleanContext();
     }
@@ -67,13 +67,13 @@ public class ComparableStatusLabelTest {
     @Test
     public void constructorTest() throws RepositoryException {
         ComparableStatusLabel label = new ComparableStatusLabel(_node);
-        assertThat(label.getPrimaryStyleName(), is(NotActivated.getStyleName()));
-        assertThat(label.getCaption(), is("not published"));
+        assertEquals(NotActivated.getStyleName(), label.getPrimaryStyleName());
+        assertEquals("not published", label.getCaption());
 
         stubActivationStatus(true).of(_node);
         label = new ComparableStatusLabel(_node);
-        assertThat(label.getPrimaryStyleName(), is(Activated.getStyleName()));
-        assertThat(label.getCaption(), is("published"));
+        assertEquals(Activated.getStyleName(), label.getPrimaryStyleName());
+        assertEquals("published", label.getCaption());
 
         Calendar lastModified = Calendar.getInstance();
         Calendar lastActivated = Calendar.getInstance();
@@ -82,67 +82,67 @@ public class ComparableStatusLabelTest {
         stubLastActivated(lastActivated).of(_node);
 
         label = new ComparableStatusLabel(_node);
-        assertThat(label.getPrimaryStyleName(), is(Modified.getStyleName()));
-        assertThat(label.getCaption(), is("modified"));
+        assertEquals(Modified.getStyleName(), label.getPrimaryStyleName());
+        assertEquals("modified", label.getCaption());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getActivationStatusTestNull() {
-        _label.getActivationStatus(null);
+        assertThrows(IllegalArgumentException.class, () -> _label.getActivationStatus(null));
     }
 
     @Test
     public void getActivationStatus() throws Exception {
-        assertThat(_label.getActivationStatus(_node), is(0));
+        assertEquals(0, _label.getActivationStatus(_node));
         stubActivationStatus(true).of(_node);
-        assertThat(_label.getActivationStatus(_node), is(2));
+        assertEquals(2, _label.getActivationStatus(_node));
     }
 
     @Test
     public void compareTo() {
         Label other = null;
-        assertThat(_label.compareTo(other), is(1));
+        assertEquals(1, _label.compareTo(other));
 
         other = new Label();
-        assertThat(_label.compareTo(other), is(1));
+        assertEquals(1, _label.compareTo(other));
 
         // This label is not activated
         other.setPrimaryStyleName(NotActivated.getStyleName());
-        assertThat(_label.compareTo(other), is(0));
+        assertEquals(0, _label.compareTo(other));
 
         other.setPrimaryStyleName(Modified.getStyleName());
-        assertThat(_label.compareTo(other), is(1));
+        assertEquals(1, _label.compareTo(other));
 
         other.setPrimaryStyleName(Activated.getStyleName());
-        assertThat(_label.compareTo(other), is(1));
+        assertEquals(1, _label.compareTo(other));
 
         // This label is modified
         _label.setPrimaryStyleName(Modified.getStyleName());
-        assertThat(_label.compareTo(other), is(1));
+        assertEquals(1, _label.compareTo(other));
 
         other.setPrimaryStyleName(Modified.getStyleName());
-        assertThat(_label.compareTo(other), is(0));
+        assertEquals(0, _label.compareTo(other));
 
         other.setPrimaryStyleName(NotActivated.getStyleName());
-        assertThat(_label.compareTo(other), is(-1));
+        assertEquals(-1, _label.compareTo(other));
 
         // This label is activated
         _label.setPrimaryStyleName(Activated.getStyleName());
-        assertThat(_label.compareTo(other), is(-1));
+        assertEquals(-1, _label.compareTo(other));
 
         other.setPrimaryStyleName(Modified.getStyleName());
-        assertThat(_label.compareTo(other), is(-1));
+        assertEquals(-1, _label.compareTo(other));
 
         other.setPrimaryStyleName(Activated.getStyleName());
-        assertThat(_label.compareTo(other), is(0));
+        assertEquals(0, _label.compareTo(other));
     }
 
     @Test
     public void toIndex() {
-        assertThat(_label.toIndex(null), is(0));
-        assertThat(_label.toIndex(""), is(0));
-        assertThat(_label.toIndex("any"), is(0));
-        assertThat(_label.toIndex(Modified.getStyleName()), is(1));
-        assertThat(_label.toIndex(NotActivated.getStyleName()), is(2));
+        assertEquals(0, _label.toIndex(null));
+        assertEquals(0, _label.toIndex(""));
+        assertEquals(0, _label.toIndex("any"));
+        assertEquals(1, _label.toIndex(Modified.getStyleName()));
+        assertEquals(2, _label.toIndex(NotActivated.getStyleName()));
     }
 }

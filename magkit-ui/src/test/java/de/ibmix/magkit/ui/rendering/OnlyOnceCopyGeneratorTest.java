@@ -22,9 +22,9 @@ package de.ibmix.magkit.ui.rendering;
 
 import info.magnolia.rendering.engine.RenderException;
 import info.magnolia.rendering.template.AutoGenerationConfiguration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -53,10 +53,12 @@ public class OnlyOnceCopyGeneratorTest {
 
     private OnlyOnceCopyGenerator _generator;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws RepositoryException {
         _area = mockAreaNode("stageArea");
-        _config = mock(AutoGenerationConfiguration.class);
+        @SuppressWarnings("unchecked")
+        AutoGenerationConfiguration<Map<String, Object>> cfg = (AutoGenerationConfiguration<Map<String, Object>>) mock(AutoGenerationConfiguration.class);
+        _config = cfg;
         _generator = new OnlyOnceCopyGenerator(_area);
     }
 
@@ -93,8 +95,8 @@ public class OnlyOnceCopyGeneratorTest {
         verify(_area.getSession(), never()).save();
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    public void tearDown() {
         cleanContext();
     }
 }

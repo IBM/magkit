@@ -25,9 +25,9 @@ import de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils;
 import de.ibmix.magkit.test.jcr.NodeMockUtils;
 import de.ibmix.magkit.test.jcr.ValueMockUtils;
 import org.apache.commons.lang3.NotImplementedException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.jcr.Binary;
@@ -41,10 +41,12 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing StubbingProperty.
@@ -56,13 +58,13 @@ public class StubbingPropertyTest {
 
     private Node _parent;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         _parent = MagnoliaNodeMockUtils.mockPageNode("root/page");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ContextMockUtils.cleanContext();
     }
@@ -70,308 +72,281 @@ public class StubbingPropertyTest {
     @Test
     public void testHierarchy() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "property", "value");
-        assertThat(p.getName(), is("property"));
-        assertThat(p.getPath(), is("/root/page/property"));
-        assertThat(p.getParent(), is(_parent));
-        assertThat(p.getDepth(), is(3));
-        assertThat(p.getAncestor(-1), nullValue());
-        assertThat(p.getAncestor(0).getPath(), is("/"));
-        assertThat(p.getAncestor(1).getPath(), is("/root"));
-        assertThat(p.getAncestor(2).getPath(), is("/root/page"));
-        assertThat(p.getAncestor(3).getPath(), is("/root/page/property"));
-        assertThat(p.getAncestor(4), nullValue());
-        assertThat(p.getSession(), is(_parent.getSession()));
-        // some other static properties:
-        assertThat(p.isNew(), is(false));
-        assertThat(p.isNode(), is(false));
-        assertThat(p.isModified(), is(false));
-        assertThat(p.getDefinition(), nullValue());
+        assertEquals("property", p.getName());
+        assertEquals("/root/page/property", p.getPath());
+        assertEquals(_parent, p.getParent());
+        assertEquals(3, p.getDepth());
+        assertNull(p.getAncestor(-1));
+        assertEquals("/", p.getAncestor(0).getPath());
+        assertEquals("/root", p.getAncestor(1).getPath());
+        assertEquals("/root/page", p.getAncestor(2).getPath());
+        assertEquals("/root/page/property", p.getAncestor(3).getPath());
+        assertNull(p.getAncestor(4));
+        assertEquals(_parent.getSession(), p.getSession());
+        assertFalse(p.isNew());
+        assertFalse(p.isNode());
+        assertFalse(p.isModified());
+        assertNull(p.getDefinition());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void setValueString() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue("test");
+    @Test
+    public void setValueStringUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue("test"));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValue() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(ValueMockUtils.mockValue(0L));
+    @Test
+    public void testSetValueUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(ValueMockUtils.mockValue(0L)));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValues() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(new Value[]{ValueMockUtils.mockValue(0L)});
+    @Test
+    public void testSetValuesUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(new Value[]{ValueMockUtils.mockValue(0L)}));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueStrings() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(new String[]{"test"});
+    @Test
+    public void testSetValueStringsUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(new String[]{"test"}));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueInputStream() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(Mockito.mock(InputStream.class));
+    @Test
+    public void testSetValueInputStreamUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(Mockito.mock(InputStream.class)));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueBinary() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(Mockito.mock(Binary.class));
+    @Test
+    public void testSetValueBinaryUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(Mockito.mock(Binary.class)));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueLong() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(123L);
+    @Test
+    public void testSetValueLongUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(123L));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueDouble() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(123.4D);
+    @Test
+    public void testSetValueDoubleUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(123.4D));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueDecimal() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(BigDecimal.ONE);
+    @Test
+    public void testSetValueDecimalUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(BigDecimal.ONE));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueCalendar() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(Calendar.getInstance());
+    @Test
+    public void testSetValueCalendarUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(Calendar.getInstance()));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValueBoolean() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(true);
+    @Test
+    public void testSetValueBooleanUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(true));
     }
 
     @Test
     public void getValue() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", "value");
-        assertThat(p.getValue(), notNullValue());
-        assertThat(p.isMultiple(), is(false));
+        assertNotNull(p.getValue());
+        assertFalse(p.isMultiple());
 
         p = new StubbingProperty(_parent, "test", "value", "other");
-        assertThat(p.getValue(), notNullValue());
-        assertThat(p.isMultiple(), is(true));
-        assertThat(p.getValue().getString(), is("value"));
+        assertNotNull(p.getValue());
+        assertTrue(p.isMultiple());
+        assertEquals("value", p.getValue().getString());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSetValue10() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").setValue(NodeMockUtils.mockNode("test"));
+    @Test
+    public void testSetValueNodeUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(NodeMockUtils.mockNode("test")));
     }
 
     @Test
     public void getValues() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", "value");
-        assertThat(p.getValues(), notNullValue());
-        assertThat(p.getValues().length, is(1));
-        assertThat(p.isMultiple(), is(false));
+        assertNotNull(p.getValues());
+        assertEquals(1, p.getValues().length);
+        assertFalse(p.isMultiple());
 
         p = new StubbingProperty(_parent, "test", "value", "other");
-        assertThat(p.getValues(), notNullValue());
-        assertThat(p.getValues().length, is(2));
-        assertThat(p.isMultiple(), is(true));
-        assertThat(p.getValue().getString(), is("value"));
+        assertNotNull(p.getValues());
+        assertEquals(2, p.getValues().length);
+        assertTrue(p.isMultiple());
+        assertEquals("value", p.getValue().getString());
     }
 
     @Test
     public void getString() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", "value");
-        assertThat(p.getString(), is("value"));
-        assertThat(p.getType(), is(PropertyType.STRING));
-        assertThat(p.getLength(), is(5L));
+        assertEquals("value", p.getString());
+        assertEquals(PropertyType.STRING, p.getType());
+        assertEquals(5L, p.getLength());
     }
 
     @Test
     public void getStream() throws RepositoryException {
         Binary binary = ValueMockUtils.mockBinary("content");
         Property p = new StubbingProperty(_parent, "test", binary);
-        assertThat(p.getStream(), is(binary.getStream()));
-        assertThat(p.getType(), is(PropertyType.BINARY));
-        assertThat(p.getLength(), is(7L));
+        assertEquals(binary.getStream(), p.getStream());
+        assertEquals(PropertyType.BINARY, p.getType());
+        assertEquals(7L, p.getLength());
     }
 
     @Test
     public void getBinary() throws RepositoryException {
         Binary binary = ValueMockUtils.mockBinary("content äöü");
         Property p = new StubbingProperty(_parent, "test", binary);
-        assertThat(p.getBinary(), is(binary));
-        assertThat(p.getType(), is(PropertyType.BINARY));
-        assertThat(p.getLength(), is(14L));
+        assertEquals(binary, p.getBinary());
+        assertEquals(PropertyType.BINARY, p.getType());
+        assertEquals(14L, p.getLength());
     }
 
     @Test
     public void getLong() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", 123L);
-        assertThat(p.getLong(), is(123L));
-        assertThat(p.getType(), is(PropertyType.LONG));
-        assertThat(p.getLength(), is(3L));
+        assertEquals(123L, p.getLong());
+        assertEquals(PropertyType.LONG, p.getType());
+        assertEquals(3L, p.getLength());
     }
 
     @Test
     public void getDouble() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", 0.123D);
-        assertThat(p.getDouble(), is(0.123D));
-        assertThat(p.getType(), is(PropertyType.DOUBLE));
-        assertThat(p.getLength(), is(5L));
+        assertEquals(0.123D, p.getDouble());
+        assertEquals(PropertyType.DOUBLE, p.getType());
+        assertEquals(5L, p.getLength());
     }
 
     @Test
     public void getDecimal() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", BigDecimal.ZERO);
-        assertThat(p.getDecimal(), is(BigDecimal.ZERO));
-        assertThat(p.getType(), is(PropertyType.DECIMAL));
-        assertThat(p.getLength(), is(1L));
+        assertEquals(BigDecimal.ZERO, p.getDecimal());
+        assertEquals(PropertyType.DECIMAL, p.getType());
+        assertEquals(1L, p.getLength());
     }
 
     @Test
     public void getDate() throws RepositoryException {
         Calendar date = Calendar.getInstance();
         Property p = new StubbingProperty(_parent, "test", date);
-        assertThat(p.getDate(), is(date));
-        assertThat(p.getType(), is(PropertyType.DATE));
+        assertEquals(date, p.getDate());
+        assertEquals(PropertyType.DATE, p.getType());
     }
 
     @Test
     public void getBoolean() throws RepositoryException {
         Property p = new StubbingProperty(_parent, "test", true);
-        assertThat(p.getBoolean(), is(true));
-        assertThat(p.getType(), is(PropertyType.BOOLEAN));
-        assertThat(p.getLength(), is(4L));
+        assertTrue(p.getBoolean());
+        assertEquals(PropertyType.BOOLEAN, p.getType());
+        assertEquals(4L, p.getLength());
     }
 
     @Test
     public void getNode() throws RepositoryException {
         Node n = NodeMockUtils.mockNode("test");
         StubbingProperty p = new StubbingProperty(_parent, "test", n, n);
-        assertThat(p.getString(), is(n.getIdentifier()));
-        assertThat(p.getType(), is(PropertyType.REFERENCE));
-        assertThat(p.getNode(), is(n));
-        assertThat(p.getNodes().length, is(2));
+        assertEquals(n.getIdentifier(), p.getString());
+        assertEquals(PropertyType.REFERENCE, p.getType());
+        assertEquals(n, p.getNode());
+        assertEquals(2, p.getNodes().length);
     }
 
-    @Test(expected = NotImplementedException.class)
-    public void getLengths() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").getLengths();
+    @Test
+    public void getLengthsNotImplemented() throws RepositoryException {
+        assertThrows(NotImplementedException.class, () -> new StubbingProperty(_parent, "test", "value").getLengths());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void accept() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").accept(null);
+    @Test
+    public void acceptUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").accept(null));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void save() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").save();
+    @Test
+    public void saveUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").save());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void refresh() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").refresh(true);
+    @Test
+    public void refreshUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").refresh(true));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void remove() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").remove();
+    @Test
+    public void removeUnsupported() throws RepositoryException {
+        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").remove());
     }
 
-    /**
-     * Verify isSame returns true for two properties with identical underlying value and for self comparison.
-     */
     @Test
     public void isSameTrue() throws RepositoryException {
         StubbingProperty p1 = new StubbingProperty(_parent, "same", "value");
         StubbingProperty p2 = new StubbingProperty(_parent, "same", "value");
-        assertThat(p1.isSame(p1), is(true));
-        assertThat(p1.isSame(p2), is(true));
+        assertTrue(p1.isSame(p1));
+        assertTrue(p1.isSame(p2));
     }
 
-    /**
-     * Verify isSame returns false for properties with different values.
-     */
     @Test
     public void isSameFalse() throws RepositoryException {
         StubbingProperty p1 = new StubbingProperty(_parent, "same", "value");
         StubbingProperty p2 = new StubbingProperty(_parent, "same", "other");
-        assertThat(p1.isSame(p2), is(false));
+        assertFalse(p1.isSame(p2));
     }
 
-    /**
-     * Ensure getProperty throws NotImplementedException.
-     */
-    @Test(expected = NotImplementedException.class)
+    @Test
     public void getPropertyNotImplemented() throws RepositoryException {
-        new StubbingProperty(_parent, "test", "value").getProperty();
+        assertThrows(NotImplementedException.class, () -> new StubbingProperty(_parent, "test", "value").getProperty());
     }
 
-    /**
-     * Test constructor with null vararg (no values) resulting in null single value and non-multiple semantics.
-     */
     @Test
     public void emptyValues() throws RepositoryException {
         StubbingProperty p = new StubbingProperty(_parent, "empty", (String[]) null);
-        assertThat(p.getValue(), nullValue());
-        assertThat(p.getValues().length, is(1));
-        assertThat(p.getValues()[0], nullValue());
-        assertThat(p.isMultiple(), is(false));
+        assertNull(p.getValue());
+        assertEquals(1, p.getValues().length);
+        assertNull(p.getValues()[0]);
+        assertFalse(p.isMultiple());
     }
 
-    /**
-     * Test multi-valued reference property reports isMultiple true.
-     */
     @Test
     public void referenceIsMultiple() throws RepositoryException {
         Node n = NodeMockUtils.mockNode("test");
         StubbingProperty p = new StubbingProperty(_parent, "ref", n, n);
-        assertThat(p.isMultiple(), is(true));
-        assertThat(p.getNode(), is(n));
-        assertThat(p.getNodes().length, is(2));
+        assertTrue(p.isMultiple());
+        assertEquals(n, p.getNode());
+        assertEquals(2, p.getNodes().length);
     }
 
-    /**
-     * Ensure toString returns a non-null string containing the class name.
-     */
     @Test
     public void toStringTest() throws RepositoryException {
         StubbingProperty p = new StubbingProperty(_parent, "test", "value");
         String s = p.toString();
-        assertThat(s, notNullValue());
-        assertThat(s.contains(StubbingProperty.class.getSimpleName()), is(true));
+        assertNotNull(s);
+        assertTrue(s.contains(StubbingProperty.class.getSimpleName()));
     }
 
-    /**
-     * isSame must return false when other item is not a StubbingProperty.
-     */
     @Test
     public void isSameOtherItemFalse() throws RepositoryException {
         StubbingProperty p = new StubbingProperty(_parent, "test", "value");
         Node other = NodeMockUtils.mockNode("other");
-        assertThat(p.isSame(other), is(false));
+        assertFalse(p.isSame(other));
     }
 
-    /**
-     * Single reference property must not be multiple.
-     */
     @Test
     public void referenceSingleNotMultiple() throws RepositoryException {
         Node n = NodeMockUtils.mockNode("single");
         StubbingProperty p = new StubbingProperty(_parent, "ref", n);
-        assertThat(p.isMultiple(), is(false));
-        assertThat(p.getNode(), is(n));
-        assertThat(p.getNodes(), notNullValue());
-        assertThat(p.getNodes().length, is(1));
-        assertThat(p.getNodes()[0], is(n));
+        assertFalse(p.isMultiple());
+        assertEquals(n, p.getNode());
+        assertNotNull(p.getNodes());
+        assertEquals(1, p.getNodes().length);
+        assertEquals(n, p.getNodes()[0]);
     }
 
-    /**
-     * Length for reference property should match identifier length.
-     */
     @Test
     public void referenceLength() throws RepositoryException {
         Node n = NodeMockUtils.mockNode("len");
         StubbingProperty p = new StubbingProperty(_parent, "ref", n);
-        assertThat(p.getType(), is(PropertyType.REFERENCE));
-        assertThat(p.getString(), is(n.getIdentifier()));
-        assertThat(p.getLength(), is((long) n.getIdentifier().length()));
+        assertEquals(PropertyType.REFERENCE, p.getType());
+        assertEquals(n.getIdentifier(), p.getString());
+        assertEquals(n.getIdentifier().length(), p.getLength());
     }
 }
+

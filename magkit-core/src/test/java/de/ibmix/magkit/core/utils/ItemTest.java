@@ -19,11 +19,11 @@ package de.ibmix.magkit.core.utils;
  * limitations under the License.
  * #L% */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link Item} to ensure correct parsing of keys, extraction of positions and comparison behaviour.

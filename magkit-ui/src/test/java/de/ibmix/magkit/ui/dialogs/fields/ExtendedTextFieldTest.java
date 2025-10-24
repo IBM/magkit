@@ -20,10 +20,9 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link ExtendedTextField} remaining-length calculation.
@@ -36,25 +35,25 @@ public class ExtendedTextFieldTest {
     @Test
     public void testJustRecommendedLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(-1, 10), null);
-        assertThat(extendedTextField.determineLabelMaxLength(), is(10));
+        assertEquals(10, extendedTextField.determineLabelMaxLength());
     }
 
     @Test
     public void testJustMaxLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(10, -1), null);
-        assertThat(extendedTextField.determineLabelMaxLength(), is(10));
+        assertEquals(10, extendedTextField.determineLabelMaxLength());
     }
 
     @Test
     public void testMaxGtRecommendedLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(10, 20), null);
-        assertThat(extendedTextField.determineLabelMaxLength(), is(10));
+        assertEquals(10, extendedTextField.determineLabelMaxLength());
     }
 
     @Test
     public void testMaxLtRecommendedLength() {
         final ExtendedTextField extendedTextField = new ExtendedTextField(createDefinition(20, 10), null);
-        assertThat(extendedTextField.determineLabelMaxLength(), is(10));
+        assertEquals(10, extendedTextField.determineLabelMaxLength());
     }
 
     private ExtendedTextFieldDefinition createDefinition(int max, int recommend) {

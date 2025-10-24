@@ -22,9 +22,10 @@ package de.ibmix.magkit.ui.dialogs.fields;
 
 import info.magnolia.ui.datasource.jcr.JcrDatasource;
 import info.magnolia.ui.datasource.jcr.JcrSessionWrapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
@@ -36,10 +37,7 @@ import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +58,7 @@ public class ExtendedLinkConverterTest {
 
     private ExtendedLinkConverter _converter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final JcrDatasource jcrDatasource = mock(JcrDatasource.class);
         final JcrSessionWrapper jcrSessionWrapper = mock(JcrSessionWrapper.class);
@@ -78,47 +76,47 @@ public class ExtendedLinkConverterTest {
 
     @Test
     public void testConvertToModelNull() {
-        _converter.convertToModel(null, null).ifOk(value -> assertThat(value, nullValue()));
+        _converter.convertToModel(null, null).ifOk(Assertions::assertNull);
     }
 
     @Test
     public void testConvertToModelPath() {
-        _converter.convertToModel(PATH, null).ifOk(value -> assertThat(value, equalTo(IDENTIFIER)));
-        assertThat(_converter.convertToModel(PATH_NOT_FOUND, null).isError(), is(true));
+        _converter.convertToModel(PATH, null).ifOk(value -> assertEquals(IDENTIFIER, value));
+        assertTrue(_converter.convertToModel(PATH_NOT_FOUND, null).isError());
     }
 
     @Test
     public void testConvertToModelAnchor() {
-        _converter.convertToModel(ANCHOR, null).ifOk(value -> assertThat(value, equalTo(ANCHOR)));
+        _converter.convertToModel(ANCHOR, null).ifOk(value -> assertEquals(ANCHOR, value));
     }
 
     @Test
     public void testConvertToModelExternalUrl() {
-        _converter.convertToModel(EXTERNAL_URL, null).ifOk(value -> assertThat(value, equalTo(EXTERNAL_URL)));
+        _converter.convertToModel(EXTERNAL_URL, null).ifOk(value -> assertEquals(EXTERNAL_URL, value));
     }
 
     @Test
     public void testConvertToPresentationNull() {
-        assertThat(_converter.convertToPresentation(null, null), nullValue());
+        assertNull(_converter.convertToPresentation(null, null));
     }
 
     @Test
     public void testConvertToPresentationUuid() {
-        assertThat(_converter.convertToPresentation(IDENTIFIER, null), equalTo(PATH));
-        assertThat(_converter.convertToPresentation(IDENTIFIER_NOT_FOUND, null), equalTo(IDENTIFIER_NOT_FOUND));
+        assertEquals(PATH, _converter.convertToPresentation(IDENTIFIER, null));
+        assertEquals(IDENTIFIER_NOT_FOUND, _converter.convertToPresentation(IDENTIFIER_NOT_FOUND, null));
     }
 
     @Test
     public void testConvertToPresentationAnchor() {
-        assertThat(_converter.convertToPresentation(ANCHOR, null), equalTo(ANCHOR));
+        assertEquals(ANCHOR, _converter.convertToPresentation(ANCHOR, null));
     }
 
     @Test
     public void testConvertToPresentationExternalUrl() {
-        assertThat(_converter.convertToPresentation(EXTERNAL_URL, null), equalTo(EXTERNAL_URL));
+        assertEquals(EXTERNAL_URL, _converter.convertToPresentation(EXTERNAL_URL, null));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }

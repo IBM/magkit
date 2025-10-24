@@ -26,17 +26,16 @@ import de.ibmix.magkit.test.cms.context.I18nContentSupportStubbingOperation;
 import de.ibmix.magkit.test.cms.site.SiteMockUtils;
 import de.ibmix.magkit.test.jcr.NodeMockUtils;
 import info.magnolia.module.site.Site;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.Locale;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing LocaleUtil.
@@ -50,78 +49,78 @@ public class LocaleUtilTest {
 
     @Test
     public void getConfiguredLanguages() throws RepositoryException {
-        assertThat(LocaleUtil.getConfiguredLanguages().size(), is(0));
+        assertEquals(0, LocaleUtil.getConfiguredLanguages().size());
         LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.getConfiguredLanguages().size(), is(3));
-        assertThat(LocaleUtil.getConfiguredLanguages().contains("de"), is(true));
-        assertThat(LocaleUtil.getConfiguredLanguages().contains("en"), is(true));
-        assertThat(LocaleUtil.getConfiguredLanguages().contains("fr"), is(true));
+        assertEquals(3, LocaleUtil.getConfiguredLanguages().size());
+        assertTrue(LocaleUtil.getConfiguredLanguages().contains("de"));
+        assertTrue(LocaleUtil.getConfiguredLanguages().contains("en"));
+        assertTrue(LocaleUtil.getConfiguredLanguages().contains("fr"));
     }
 
     @Test
     public void getSiteLocales() throws RepositoryException {
-        assertThat(LocaleUtil.getSiteLocales().size(), is(0));
+        assertEquals(0, LocaleUtil.getSiteLocales().size());
 
         LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.getSiteLocales().size(), is(3));
+        assertEquals(3, LocaleUtil.getSiteLocales().size());
     }
 
     @Test
     public void getDefaultSiteLocale() throws RepositoryException {
-        assertThat(LocaleUtil.getDefaultSiteLocale(), is(Locale.ENGLISH));
+        assertEquals(Locale.ENGLISH, LocaleUtil.getDefaultSiteLocale());
 
         // this method does not return the default locale...
         I18nContentSupportStubbingOperation.stubDefaultLocale(Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.getDefaultSiteLocale(), is(Locale.ENGLISH));
+        assertEquals(Locale.ENGLISH, LocaleUtil.getDefaultSiteLocale());
 
         // ... but the fallback locale:
         I18nContentSupportStubbingOperation.stubFallbackLocale(Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.getDefaultSiteLocale(), is(Locale.FRENCH));
+        assertEquals(Locale.FRENCH, LocaleUtil.getDefaultSiteLocale());
     }
 
     @Test
     public void determineLocaleFromContent() throws RepositoryException {
         Node page = null;
-        assertThat(LocaleUtil.determineLocaleFromContent(page), is("en"));
+        assertEquals("en", LocaleUtil.determineLocaleFromContent(page));
 
         page = NodeMockUtils.mockNode("/it/fr/de/some/path");
-        assertThat(LocaleUtil.determineLocaleFromContent(page), is("en"));
+        assertEquals("en", LocaleUtil.determineLocaleFromContent(page));
 
         I18nContentSupportStubbingOperation.stubFallbackLocale(Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.determineLocaleFromContent(page), is("fr"));
+        assertEquals("fr", LocaleUtil.determineLocaleFromContent(page));
 
         LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.determineLocaleFromContent(page), is("fr"));
+        assertEquals("fr", LocaleUtil.determineLocaleFromContent(page));
 
         LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ITALIAN, Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.determineLocaleFromContent(page), is("it"));
+        assertEquals("it", LocaleUtil.determineLocaleFromContent(page));
     }
 
     @Test
     public void determineLocaleLabelFromNodePath() throws RepositoryException {
         Node page = NodeMockUtils.mockNode("/it/fr/de/some/path");
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ITALIAN, Locale.FRENCH).of(_defaultSite.getI18n());
-        assertThat(LocaleUtil.determineLocaleLabelFromNodePath(page), is("italiano"));
+        assertEquals("italiano", LocaleUtil.determineLocaleLabelFromNodePath(page));
     }
 
     @Test
     public void getAvailableCountries() {
-        assertThat(LocaleUtil.getAvailableCountries().size(), is(251));
+        assertEquals(251, LocaleUtil.getAvailableCountries().size());
         // verify that we removed doublets
         assertTrue(LocaleUtil.getAvailableCountries().size() < Locale.getAvailableLocales().length);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         _defaultSite = SiteMockUtils.mockDefaultSite();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ContextMockUtils.cleanContext();
         LocaleUtil.resetDefaultSiteLocals();
