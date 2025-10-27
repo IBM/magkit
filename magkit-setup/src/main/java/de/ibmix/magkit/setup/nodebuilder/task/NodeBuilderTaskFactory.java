@@ -20,6 +20,7 @@ package de.ibmix.magkit.setup.nodebuilder.task;
  * #L%
  */
 
+import de.ibmix.magkit.assertions.Require;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.nodebuilder.task.ErrorHandling;
 
@@ -74,12 +75,15 @@ public abstract class NodeBuilderTaskFactory {
      *
      * @param taskName name of the task
      * @param description human readable description
-     * @param moduleName module name appended to /modules/ to form root path
+     * @param moduleName module name appended to /modules/ to form root path; leading slash will be removed if present; must not be blank
      * @param operations operations to execute under /modules/<moduleName>
      * @return configured task instance
+     * @throws IllegalArgumentException if moduleName is blank
      */
     public static NodeBuilderTask selectModuleConfig(String taskName, String description, String moduleName, NodeOperation... operations) {
-        return new NodeBuilderTask(taskName, description, ErrorHandling.logging, CONFIG, "/modules/" + moduleName, operations);
+        Require.Argument.notBlank(moduleName, "moduleName");
+        String sanitizedModuleName = moduleName.startsWith("/") ? moduleName.substring(1) : moduleName;
+        return new NodeBuilderTask(taskName, description, ErrorHandling.logging, CONFIG, "/modules/" + sanitizedModuleName, operations);
     }
 
     private NodeBuilderTaskFactory() {
