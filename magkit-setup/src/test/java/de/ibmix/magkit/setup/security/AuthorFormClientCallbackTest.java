@@ -24,6 +24,7 @@ import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import info.magnolia.context.WebContext;
 import info.magnolia.init.MagnoliaConfigurationProperties;
 import info.magnolia.cms.beans.config.ServerConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -45,8 +46,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-
-import de.ibmix.magkit.test.servlet.ServletMockUtils;
 
 /**
  * Unit tests for {@link AuthorFormClientCallback} covering all conditional branches.
@@ -85,6 +84,11 @@ public class AuthorFormClientCallbackTest {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("Failed to inject ServerConfiguration", e);
         }
+    }
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
     }
 
     /**

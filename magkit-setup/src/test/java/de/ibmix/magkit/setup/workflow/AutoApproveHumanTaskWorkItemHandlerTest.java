@@ -96,21 +96,21 @@ public class AutoApproveHumanTaskWorkItemHandlerTest {
     }
 
     static class TestHandler extends AutoApproveHumanTaskWorkItemHandler {
-        private final HumanTaskParameterResolver resolver;
-        private final boolean throwRegistrationException;
+        private final HumanTaskParameterResolver _resolver;
+        private final boolean _throwRegistrationException;
 
         TestHandler(TaskDefinitionRegistry registry, ComponentProvider provider, TasksManager tasksManager, KieSession kieSession, HumanTaskParameterResolver resolver, boolean throwRegistrationException) {
             super(registry, provider, tasksManager, kieSession);
-            this.resolver = resolver;
-            this.throwRegistrationException = throwRegistrationException;
+            _resolver = resolver;
+            _throwRegistrationException = throwRegistrationException;
         }
 
         @Override
         protected HumanTaskParameterResolver getParameterResolver(String taskName, Object... parameters) throws RegistrationException {
-            if (throwRegistrationException) {
+            if (_throwRegistrationException) {
                 throw new RegistrationException("not found");
             }
-            return resolver;
+            return _resolver;
         }
     }
 }

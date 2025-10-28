@@ -27,6 +27,7 @@ import de.ibmix.magkit.test.jcr.NodeMockUtils;
 import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.module.InstallContext;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
@@ -51,6 +52,11 @@ import static org.mockito.Mockito.verify;
  * @since 2025-10-27
  */
 public class RemoveTemplateNodesTaskTest {
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        ContextMockUtils.cleanContext();
+    }
 
     /**
      * Auto-detects component node type when template contains ":components/" and adds descendant clause for base path.

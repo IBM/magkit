@@ -57,12 +57,12 @@ import static org.mockito.Mockito.when;
  */
 public class RemoveResourcesHotfixesTaskTest {
 
-    private InstallContext installContext;
+    private InstallContext _installContext;
 
     @BeforeEach
     public void setUp() throws RepositoryException {
         ContextMockUtils.cleanContext();
-        installContext = mockInstallContext(
+        _installContext = mockInstallContext(
             stubCurrentModuleDefinition(mockModuleDefinition(stubName("my-module-name"))),
             stubJcrSession(RESOURCES_WORKSPACE)
         );
@@ -79,7 +79,7 @@ public class RemoveResourcesHotfixesTaskTest {
         Node n1 = mockNode("resources", basePath + "/hotfix1");
         Node n2 = mockNode("resources", basePath + "/hotfix2");
         ContextMockUtils.mockQueryResult(RESOURCES_WORKSPACE, Query.JCR_SQL2, expectedStatement, n1, n2);
-        task.execute(installContext);
+        task.execute(_installContext);
         verify(n1, times(1)).remove();
         verify(n2, times(1)).remove();
     }
@@ -93,7 +93,7 @@ public class RemoveResourcesHotfixesTaskTest {
         RemoveResourcesHotfixesTask task = new RemoveResourcesHotfixesTask(basePath);
         String expectedStatement = "select * from [" + NodeTypes.Content.NAME + "] where [" + NodeTypes.Renderable.TEMPLATE + "] IS NULL and ISDESCENDANTNODE([" + basePath + "])";
         QueryResult result = ContextMockUtils.mockQueryResult(RESOURCES_WORKSPACE, Query.JCR_SQL2, expectedStatement);
-        task.execute(installContext);
+        task.execute(_installContext);
         assertFalse(result.getNodes().hasNext());
     }
 
@@ -106,7 +106,7 @@ public class RemoveResourcesHotfixesTaskTest {
         RemoveResourcesHotfixesTask task = new RemoveResourcesHotfixesTask(basePath);
         QueryManager qm = ContextMockUtils.mockQueryManager(RESOURCES_WORKSPACE);
         when(qm.createQuery(any(String.class), any(String.class))).thenThrow(new RepositoryException("boom"));
-        assertThrows(TaskExecutionException.class, () -> task.execute(installContext));
+        assertThrows(TaskExecutionException.class, () -> task.execute(_installContext));
         verify(qm).createQuery(any(String.class), any(String.class));
     }
 
@@ -120,7 +120,7 @@ public class RemoveResourcesHotfixesTaskTest {
         Node n1 = mockNode("resources", basePath + "hotfixA");
         String expectedStatement = "select * from [" + NodeTypes.Content.NAME + "] where [" + NodeTypes.Renderable.TEMPLATE + "] IS NULL and ISDESCENDANTNODE([" + basePath + "])";
         ContextMockUtils.mockQueryResult(RESOURCES_WORKSPACE, Query.JCR_SQL2, expectedStatement, n1);
-        task.execute(installContext);
+        task.execute(_installContext);
         verify(n1).remove();
     }
 
