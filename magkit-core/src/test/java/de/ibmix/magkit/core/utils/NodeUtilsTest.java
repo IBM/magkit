@@ -247,8 +247,6 @@ public class NodeUtilsTest {
     public void getNodes() throws RepositoryException {
         assertNull(NodeUtils.getNodes(null));
         Node node = mockNode("test");
-        // setting up the Node mock already causes some invocations on this mock. Clear them first.
-        Mockito.clearInvocations(node);
         assertFalse(NodeUtils.getNodes(node).hasNext());
         Mockito.verify(node).getNodes();
     }
@@ -257,8 +255,6 @@ public class NodeUtilsTest {
     public void getNodesWithNamePattern() throws RepositoryException {
         assertNull(NodeUtils.getNodes(null, "pattern"));
         Node node = mockNode();
-        // setting up the Node mock already causes some invocations on this mock. Clear them first.
-        Mockito.clearInvocations(node);
         assertFalse(NodeUtils.getNodes(node, "pattern").hasNext());
         Mockito.verify(node).getNodes("pattern");
     }
@@ -268,8 +264,6 @@ public class NodeUtilsTest {
         String[] globs = new String[]{"pattern1", "pattern2"};
         assertNull(NodeUtils.getNodes(null, globs));
         Node node = mockNode();
-        // setting up the Node mock already causes some invocations on this mock. Clear them first.
-        Mockito.clearInvocations(node);
         assertFalse(NodeUtils.getNodes(node, globs).hasNext());
         Mockito.verify(node).getNodes(globs);
     }
