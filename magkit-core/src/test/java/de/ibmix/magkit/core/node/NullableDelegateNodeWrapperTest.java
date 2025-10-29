@@ -409,9 +409,9 @@ public class NullableDelegateNodeWrapperTest {
         wrapper.getUUID();
         verify(base).getUUID();
         wrapper.getSession();
-        verify(base, times(6)).getSession();
+        verify(base, times(1)).getSession();
         wrapper.getParent();
-        verify(base, times(16)).getParent();
+        verify(base, times(3)).getParent();
     }
 
     @Test

@@ -126,7 +126,10 @@ public class RowsResult extends ResultWrapper {
         if (isNotBlank(selector)) {
             while (iterator.hasNext()) {
                 try {
-                    result.add(iterator.next().getNode(selector));
+                    Node selected = iterator.next().getNode(selector);
+                    if (selected != null) {
+                        result.add(selected);
+                    }
                 } catch (RepositoryException e) {
                     LOGGER.warn("Failed to get node for selector " + selector + " from result row.", e);
                 }
