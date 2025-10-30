@@ -743,6 +743,16 @@ public final class Sql2 {
             }
 
             /**
+             * Constraint matching any of the given template values.
+             *
+             * @param values template names
+             * @return join constraint
+             */
+            public static Sql2JoinConstraint propertyEquals(final java.lang.String name, java.lang.String... values) {
+                return property(name).equalsAny().values(values);
+            }
+
+            /**
              * Operand for template property.
              *
              * @return dynamic operand for template comparisons

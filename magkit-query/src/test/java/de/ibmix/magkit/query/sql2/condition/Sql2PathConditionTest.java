@@ -91,4 +91,27 @@ public class Sql2PathConditionTest {
         Node node = mockNode("test/path");
         assertEquals("ischildnode('/test/path')", Sql2PathCondition.is().child(node).asString());
     }
+
+    @Test
+    public void selectorsFromAndJoin() {
+        String fromSelector = "fromSel";
+        String joinSelector = "joinSel";
+        assertEquals("ischildnode(fromSel, '/a/b')", Sql2PathCondition.is().child("a/b").asString(fromSelector, joinSelector));
+        assertEquals("ischildnode(joinSel, '/a/b')", Sql2PathCondition.is().child("a/b").forJoin().asString(fromSelector, joinSelector));
+    }
+
+    @Test
+    public void negatedWithJoinSelector() {
+        String fromSelector = "fromSel";
+        String joinSelector = "joinSel";
+        assertEquals("not(issamenode(joinSel, '/a'))", Sql2PathCondition.is().not().same("a").forJoin().asString(fromSelector, joinSelector));
+    }
+
+    @Test
+    public void isNotEmptyStates() {
+        Sql2PathCondition empty = Sql2PathCondition.is();
+        assertFalse(empty.isNotEmpty());
+        assertFalse(Sql2PathCondition.is().not().isNotEmpty());
+        assertTrue(Sql2PathCondition.is().child("a/b").isNotEmpty());
+    }
 }

@@ -71,6 +71,9 @@ public class Sql2StringConditionTest {
         assertEquals("not([mgnl:template] LIKE 'value''\\_10\\%%')", Sql2StringCondition.template().not().startsWithAny().values("value'_10%").asString());
         assertEquals("([mgnl:template] LIKE 'value''\\_10\\%%' OR [mgnl:template] LIKE 'other%')", Sql2StringCondition.template().startsWithAny().values("value'_10%", "other").asString());
         assertEquals("not([mgnl:template] LIKE 'value''\\_10\\%%' OR [mgnl:template] LIKE 'other%')", Sql2StringCondition.template().not().startsWithAny().values("value'_10%", "other").asString());
+        assertEquals(EMPTY, Sql2StringCondition.property("x").startsWithAny().values("").asString());
+        assertEquals("[x] LIKE 'start%'", Sql2StringCondition.property("x").startsWithAny().values("start", null).asString());
+        assertEquals("lower([l]) LIKE '%v%'", Sql2StringCondition.property("l").lowerCase().likeAny().values("v").asString());
     }
 
     @Test
@@ -93,6 +96,7 @@ public class Sql2StringConditionTest {
         assertEquals("not([mgnl:template] LIKE '%value''\\_10\\%%')", Sql2StringCondition.template().not().likeAny().values("value'_10%").asString());
         assertEquals("([mgnl:template] LIKE '%value''\\_10\\%%' OR [mgnl:template] LIKE '%other%')", Sql2StringCondition.template().likeAny().values("value'_10%", "other").asString());
         assertEquals("not([mgnl:template] LIKE '%value''\\_10\\%%' OR [mgnl:template] LIKE '%other%')", Sql2StringCondition.template().not().likeAny().values("value'_10%", "other").asString());
+        assertEquals("(upper([u]) LIKE '%A%' OR upper([u]) LIKE '%B%')", Sql2StringCondition.property("u").upperCase().likeAny().values("A", "B").asString());
     }
 
     @Test
@@ -108,18 +112,74 @@ public class Sql2StringConditionTest {
 
     @Test
     public void length() {
-        // intentionally empty test (existing placeholder)
+        assertNull(Sql2StringCondition.property("test").length());
     }
 
     @Test
     public void lowerCase() {
         assertEquals("lower([test]) = 'value'", Sql2StringCondition.property("test").lowerCase().equalsAny().values("value").asString());
         assertEquals("not(lower([test]) = 'value')", Sql2StringCondition.property("test").lowerCase().not().equalsAny().values("value").asString());
+        assertEquals("(lower([test]) = 'a' OR lower([test]) = 'b')", Sql2StringCondition.property("test").lowerCase().equalsAny().values("a", "b").asString());
     }
 
     @Test
     public void upperCase() {
         assertEquals("upper([test]) = 'value'", Sql2StringCondition.property("test").upperCase().equalsAny().values("value").asString());
         assertEquals("not(upper([test]) = 'value')", Sql2StringCondition.property("test").upperCase().not().equalsAny().values("value").asString());
+    }
+
+    /**
+     * Additional coverage for equalsAll and exclude operators including NOT and AND semantics.
+     */
+    @Test
+    public void equalsAllAndExcludeVariants() {
+        assertEquals("([k] = 'a' AND [k] = 'b')", Sql2StringCondition.property("k").equalsAll().values("a", "b").asString());
+        assertEquals("not([k] = 'a' AND [k] = 'b')", Sql2StringCondition.property("k").not().equalsAll().values("a", "b").asString());
+        assertEquals("([k] <> 'a' OR [k] <> 'b')", Sql2StringCondition.property("k").excludeAny().values("a", "b").asString());
+        assertEquals("([k] <> 'a' AND [k] <> 'b')", Sql2StringCondition.property("k").excludeAll().values("a", "b").asString());
+        assertEquals("not([k] <> 'a' AND [k] <> 'b')", Sql2StringCondition.property("k").not().excludeAll().values("a", "b").asString());
+        assertEquals("[s] <> 'x'", Sql2StringCondition.property("s").excludeAny().values("x").asString());
+    }
+
+    /**
+     * Tests for comparison operators lower/greater and join selector usage.
+     */
+    @Test
+    public void comparisonOperatorsAndJoinSelector() {
+        assertEquals("[a] < 'b'", Sql2StringCondition.property("a").lowerThan().value("b").asString());
+        assertEquals("[a] <= 'b'", Sql2StringCondition.property("a").lowerOrEqualThan().value("b").asString());
+        assertEquals("[a] >= 'b'", Sql2StringCondition.property("a").greaterOrEqualThan().value("b").asString());
+        assertEquals("[a] > 'b'", Sql2StringCondition.property("a").greaterThan().value("b").asString());
+        assertEquals("x.[prop] = 'y'", Sql2StringCondition.property("prop").equalsAny().values("y").asString("x", null));
+        assertEquals("j.[prop] = 'y'", Sql2StringCondition.property("prop").equalsAny().values("y").forJoin().asString("x", "j"));
+        assertEquals("j.[prop] LIKE '%a%'", Sql2StringCondition.property("prop").likeAny().values("a").forJoin().asString("x", "j"));
+        assertEquals("(j.[prop] LIKE '%a%' AND j.[prop] LIKE '%b%')", Sql2StringCondition.property("prop").likeAll().values("a", "b").forJoin().asString("x", "j"));
+    }
+
+    /**
+     * Tests for bind variable rendering including automatic $ prefix and NOT + multi-value parenthesis interaction.
+     */
+    @Test
+    public void bindVariableVariants() {
+        assertEquals("[p] = $var", Sql2StringCondition.property("p").equalsAny().bindVariable("var").asString());
+        assertEquals("[p] = $var", Sql2StringCondition.property("p").equalsAny().bindVariable("$var").asString());
+        assertEquals("s.[p] = $var", Sql2StringCondition.property("p").equalsAny().bindVariable("var").asString("s", null));
+        assertEquals("j.[p] = $var", Sql2StringCondition.property("p").equalsAny().bindVariable("var").forJoin().asString("s", "j"));
+        assertEquals("not([p] = $var)", Sql2StringCondition.property("p").not().equalsAny().bindVariable("var").asString());
+        assertEquals(EMPTY, Sql2StringCondition.property("").equalsAny().bindVariable("var").asString());
+    }
+
+    /**
+     * Tests for null value handling resulting in empty output and isNotEmpty semantics.
+     */
+    @Test
+    public void nullValueHandling() {
+        assertEquals(EMPTY, Sql2StringCondition.property("n").equalsAny().values((String) null).asString());
+        assertEquals("[n] = 'a'", Sql2StringCondition.property("n").equalsAny().values("a", null).asString());
+        assertFalse(Sql2StringCondition.property(" ").equalsAny().values("x").isNotEmpty());
+        assertFalse(Sql2StringCondition.property(null).equalsAny().values("x").isNotEmpty());
+        assertFalse(Sql2StringCondition.property("p").equalsAny().bindVariable("").isNotEmpty());
+        assertEquals(EMPTY, Sql2StringCondition.property("").equalsAny().values("x").asString());
+        assertEquals(EMPTY, Sql2StringCondition.property(null).equalsAny().values("x").asString());
     }
 }

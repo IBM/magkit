@@ -21,6 +21,7 @@ package de.ibmix.magkit.query.sql2;
  */
 
 import de.ibmix.magkit.query.sql2.condition.Sql2JoinConstraint;
+import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 import info.magnolia.jcr.util.NodeTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -285,6 +286,68 @@ public class Sql2FacadeTest {
         String identifierStatement = Sql2.Statement.select().whereAll(Sql2.Condition.String.identifierEquals("uuid-123")).build();
         assertEquals("SELECT * FROM [nt:base] WHERE [mgnl:template] = 'module:tpl'", templateStatement);
         assertEquals("SELECT * FROM [nt:base] WHERE [jcr:uuid] = 'uuid-123'", identifierStatement);
+    }
+
+    @Test
+    public void statementSelectContentNodes() {
+        String statement = Sql2.Statement.selectContentNodes().build();
+        assertEquals("SELECT * FROM [mgnl:contentNode]", statement);
+
+        statement = Sql2.Statement.selectContentNodes("some", "other").build();
+        assertEquals("SELECT [some],[other] FROM [mgnl:contentNode]", statement);
+    }
+
+    @Test
+    public void statementSelectContents() {
+        String statement = Sql2.Statement.selectContents().build();
+        assertEquals("SELECT * FROM [mgnl:content]", statement);
+
+        statement = Sql2.Statement.selectContents("some", "other").build();
+        assertEquals("SELECT [some],[other] FROM [mgnl:content]", statement);
+    }
+
+    @Test
+    public void statementSelectPages() {
+        String statement = Sql2.Statement.selectPages().build();
+        assertEquals("SELECT * FROM [mgnl:page]", statement);
+
+        statement = Sql2.Statement.selectPages("some", "other").build();
+        assertEquals("SELECT [some],[other] FROM [mgnl:page]", statement);
+    }
+
+    @Test
+    public void statementSelectAreas() {
+        String statement = Sql2.Statement.selectAreas().build();
+        assertEquals("SELECT * FROM [mgnl:area]", statement);
+
+        statement = Sql2.Statement.selectAreas("some", "other").build();
+        assertEquals("SELECT [some],[other] FROM [mgnl:area]", statement);
+    }
+
+    @Test
+    public void conditionOr() {
+        String condition = Sql2.Condition.or().asString();
+        assertEquals("", condition);
+
+        condition = Sql2.Condition.or().matches(Sql2.Condition.String.propertyEquals("test", "success"), Sql2.Condition.String.propertyEquals("other", "something", "else")).asString();
+        assertEquals("([test] = 'success' OR ([other] = 'something' OR [other] = 'else'))", condition);
+    }
+
+    @Test
+    public void joinOnSelectedChiledOfJoined() {
+        StringBuilder statement = new StringBuilder();
+        Sql2.JoinOn.selectedChildOfJoined().appendTo(statement, new Sql2SelectorNames() {
+            @Override
+            public String getFromSelectorName() {
+                return "from";
+            }
+
+            @Override
+            public String getJoinSelectorName() {
+                return "join";
+            }
+        });
+        assertEquals("ischildnode(from,join)", statement.toString());
     }
 
     private Calendar calendar(int year, int month, int day, int hour, int minute, int second) {

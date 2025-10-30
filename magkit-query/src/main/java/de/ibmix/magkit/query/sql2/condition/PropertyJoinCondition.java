@@ -52,7 +52,7 @@ public final class PropertyJoinCondition implements Sql2JoinCondition {
      * @param joinedPropertyName name on join selector
      * @return new join condition
      */
-    public PropertyJoinCondition selectedNotEqualsJoined(final String selectedPropertyName, final String joinedPropertyName) {
+    public static PropertyJoinCondition selectedNotEqualsJoined(final String selectedPropertyName, final String joinedPropertyName) {
         return new PropertyJoinCondition(selectedPropertyName, Sql2PropertyCondition.SQL2_OP_NOT_EQUALS, joinedPropertyName);
     }
 
@@ -63,7 +63,7 @@ public final class PropertyJoinCondition implements Sql2JoinCondition {
      * @param joinedPropertyName name on join selector
      * @return new join condition
      */
-    public PropertyJoinCondition selectedLowerJoined(final String selectedPropertyName, final String joinedPropertyName) {
+    public static PropertyJoinCondition selectedLowerJoined(final String selectedPropertyName, final String joinedPropertyName) {
         return new PropertyJoinCondition(selectedPropertyName, Sql2PropertyCondition.SQL2_OP_LOWER, joinedPropertyName);
     }
 
@@ -74,7 +74,7 @@ public final class PropertyJoinCondition implements Sql2JoinCondition {
      * @param joinedPropertyName name on join selector
      * @return new join condition
      */
-    public PropertyJoinCondition selectedLowerOrEqualJoined(final String selectedPropertyName, final String joinedPropertyName) {
+    public static PropertyJoinCondition selectedLowerOrEqualJoined(final String selectedPropertyName, final String joinedPropertyName) {
         return new PropertyJoinCondition(selectedPropertyName, Sql2PropertyCondition.SQL2_OP_LOWER_EQUAL, joinedPropertyName);
     }
 
@@ -85,7 +85,7 @@ public final class PropertyJoinCondition implements Sql2JoinCondition {
      * @param joinedPropertyName name on join selector
      * @return new join condition
      */
-    public PropertyJoinCondition selectedEqualsJoined(final String selectedPropertyName, final String joinedPropertyName) {
+    public static PropertyJoinCondition selectedEqualsJoined(final String selectedPropertyName, final String joinedPropertyName) {
         return new PropertyJoinCondition(selectedPropertyName, Sql2PropertyCondition.SQL2_OP_EQUALS, joinedPropertyName);
     }
 
@@ -96,7 +96,7 @@ public final class PropertyJoinCondition implements Sql2JoinCondition {
      * @param joinedPropertyName name on join selector
      * @return new join condition
      */
-    public PropertyJoinCondition selectedGraterOrEqualJoined(final String selectedPropertyName, final String joinedPropertyName) {
+    public static PropertyJoinCondition selectedGraterOrEqualJoined(final String selectedPropertyName, final String joinedPropertyName) {
         return new PropertyJoinCondition(selectedPropertyName, Sql2PropertyCondition.SQL2_OP_GREATER_EQUAL, joinedPropertyName);
     }
 
@@ -107,7 +107,7 @@ public final class PropertyJoinCondition implements Sql2JoinCondition {
      * @param joinedPropertyName name on join selector
      * @return new join condition
      */
-    public PropertyJoinCondition selectedGraterJoined(final String selectedPropertyName, final String joinedPropertyName) {
+    public static PropertyJoinCondition selectedGraterJoined(final String selectedPropertyName, final String joinedPropertyName) {
         return new PropertyJoinCondition(selectedPropertyName, Sql2PropertyCondition.SQL2_OP_GREATER, joinedPropertyName);
     }
 
