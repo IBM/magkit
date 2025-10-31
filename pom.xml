@@ -24,7 +24,8 @@
         <!-- keep in sync with corresponding versions from magnolia bundle -->
         <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
         <!-- Newer versions throw an error at runtime (method not found at internal classes) -->
-        <version.poi>5.2.2</version.poi>
+        <!-- Updated due to security vulnerabilities in 5.2.2 -->
+        <version.poi>5.4.1</version.poi>
 
         <mockitoVersion>5.20.0</mockitoVersion>
         <juniuit.Version>5.14.0</juniuit.Version>
@@ -58,12 +59,19 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- excel creation, dependency is provided by Magnolia in the correct version -->
+            <!-- excel creation, Updated due to security vulnerabilities in 5.2.2 -->
+            <!-- After upgrading Magnolia check if version provided by magnolia is actual -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${version.poi}</version>
-                <scope>provided</scope>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${version.poi}</version>
+                <scope>compile</scope>
             </dependency>
 
             <dependency>

@@ -63,7 +63,6 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static info.magnolia.objectfactory.Components.getComponent;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
@@ -164,24 +163,56 @@ public class TableAsExcelResourceProvider {
 
     /**
      * Serialize the workbook into a temporary file and return an input stream for download.
+     * Ensures proper closing of the {@link Workbook} to release underlying OPCPackage resources (required for POI >= 5.x).
      *
      * @param wb the workbook to serialize (must not be {@code null})
      * @return input stream positioned at the beginning of the serialized workbook or {@code null} on IO error
      */
     InputStream toInputStream(Workbook wb) {
+        checkArgument(wb != null, "The Workbook must not be null.");
         FileSystemHelper fileSystemHelper = getComponent(FileSystemHelper.class);
-        InputStream in = null;
-        OutputStream out = null;
+        File file = getTempFile(fileSystemHelper.getTempDirectory());
+        InputStream result = null;
+        if (file != null) {
+            boolean success = writeWorkbookToFile(wb, file);
+            if (success) {
+                try {
+                    result = new FileInputStream(file);
+                } catch (IOException e) {
+                    LOGGER.error("Error opening input stream for excel workbook.", e);
+                }
+            }
+        }
+        return result;
+    }
+
+    File getTempFile(File tempDir) {
+        File file = null;
         try {
-            File file = File.createTempFile(_sheetName, EXCEL_FILE_EXTENSION, fileSystemHelper.getTempDirectory());
-            out = new FileOutputStream(file);
+            file = File.createTempFile(_sheetName, EXCEL_FILE_EXTENSION, tempDir);
+        } catch (IOException e) {
+            LOGGER.error("Error creating temporary excel file.", e);
+        }
+        return file;
+    }
+
+    boolean writeWorkbookToFile(Workbook wb, File file) {
+        boolean success = false;
+        try {
+            OutputStream out = new FileOutputStream(file);
             wb.write(out);
-            in = new FileInputStream(file);
+            out.flush();
+            success = true;
         } catch (IOException e) {
             LOGGER.error("Error writing excel workbook to file.", e);
-            closeQuietly(out);
+        } finally {
+            try {
+                wb.close();
+            } catch (IOException e) {
+                LOGGER.warn("Error closing workbook after serialization.", e);
+            }
         }
-        return in;
+        return success;
     }
 
     /**
@@ -225,18 +256,18 @@ public class TableAsExcelResourceProvider {
      */
     void renderSheet(final Sheet sheet) {
         int rowCount = HEADER_ROW_NUMBER;
-        Collection itemIds = _source.getVisibleItemIds();
+        Collection<?> itemIds = _source.getVisibleItemIds();
         CellStyle linkStyle = getLinkStyle(sheet.getWorkbook());
         int[] maxColumnWidth = new int[_visibleColumns.size()];
         for (Object itemId : itemIds) {
             Row row = sheet.createRow(++rowCount);
             Item item = _source.getItem(itemId);
-            Collection propertyIds = item.getItemPropertyIds();
+            Collection<?> propertyIds = item.getItemPropertyIds();
             int cellId = 0;
             for (Object id : propertyIds) {
                 if (_visibleColumns.contains(id)) {
                     Cell cell = row.createCell(cellId++);
-                    Property property = item.getItemProperty(id);
+                    Property<?> property = item.getItemProperty(id);
                     Object value = property != null ? property.getValue() : EMPTY;
                     String valueString = addCellString(value, cell);
                     if (value instanceof Link) {
@@ -359,6 +390,7 @@ public class TableAsExcelResourceProvider {
 
     /**
      * Render title row and column headers. Assumes at least one visible item exists to derive header ordering.
+     * Safely skips merging if there are no visible columns.
      *
      * @param sheet target sheet (must not be {@code null})
      * @param headerStyle style to apply to header cells (must not be {@code null})
@@ -370,10 +402,10 @@ public class TableAsExcelResourceProvider {
         final Cell title = contextRow.createCell(0);
         title.setCellValue(_title);
         title.setCellStyle(getTitleStyle(sheet.getWorkbook()));
-        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, _visibleColumns.size() - 1));
-
-        // getColumnHeaders() may give Headers in wrong order :-(
-        Collection itemIds = _source.getVisibleItemIds();
+        if (!_visibleColumns.isEmpty()) {
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, _visibleColumns.size() - 1));
+        }
+        Collection<?> itemIds = _source.getVisibleItemIds();
         if (!itemIds.isEmpty()) {
             Item item = _source.getItem(itemIds.iterator().next());
             Collection<?> propertyIds = item.getItemPropertyIds();
