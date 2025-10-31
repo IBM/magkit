@@ -42,6 +42,7 @@ import java.util.List;
  * </ul>
  * </p>
  * <p>Null & config handling: If mandatory config values missing, validation returns false (not valid) or treats as valid? Here it's false until properly configured.</p>
+ * <p>Item context handling: If the current item is absent, uniqueness is considered valid only when no matching nodes are found; a single found node without context counts as duplicate.</p>
  * @author frank.sommer
  * @since 2024-03-12
  */
@@ -82,7 +83,7 @@ public class UniqueValueValidator extends AbstractValidator<String> {
             LOGGER.debug("Validate for unique value {} by query [{},{},{}].", value, workspace, nodeType, propertyName);
             final List<Node> foundNodes = new NodesByQuery(workspace, nodeType, propertyName).apply(value);
             final String currentNodeId = NodeUtils.getIdentifier((Node) _itemContext.getSingle().orElse(null));
-            valid = foundNodes.isEmpty() || foundNodes.size() == 1 && currentNodeId.equals(NodeUtils.getIdentifier(foundNodes.get(0)));
+            valid = foundNodes.isEmpty() || (foundNodes.size() == 1 && currentNodeId != null && currentNodeId.equals(NodeUtils.getIdentifier(foundNodes.get(0))));
         }
         return valid;
     }

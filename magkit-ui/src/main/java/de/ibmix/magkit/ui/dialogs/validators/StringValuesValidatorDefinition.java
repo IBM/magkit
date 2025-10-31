@@ -48,6 +48,6 @@ public class StringValuesValidatorDefinition extends ConfiguredFieldValidatorDef
      * @return true if accepted
      */
     public boolean hasAcceptedValue(String value) {
-        return getAcceptedValues().isEmpty() || _acceptedValues.contains(value);
+        return getAcceptedValues().isEmpty() || (value != null && getAcceptedValues().contains(value));
     }
 }

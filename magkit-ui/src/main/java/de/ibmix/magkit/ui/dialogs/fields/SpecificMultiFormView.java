@@ -24,6 +24,7 @@ import com.vaadin.server.ClientConnector;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import info.magnolia.i18nsystem.SimpleTranslator;
 import info.magnolia.ui.contentapp.Datasource;
@@ -31,6 +32,8 @@ import info.magnolia.ui.editor.LocaleContext;
 import info.magnolia.ui.editor.MultiFormDefinition;
 import info.magnolia.ui.editor.MultiFormView;
 import javax.inject.Inject;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * View implementation enforcing a maximum number of child components for multi-form editors.
@@ -86,7 +89,7 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
     /**
      * Initialize maximum component count from definition or fallback.
      */
-    private void initMaxComponents() {
+    void initMaxComponents() {
         _maxComponents = ((SpecificMultiFieldDefinition) _definition).getMaxComponents();
         if (_maxComponents == null) {
             _maxComponents = DEFAULT_MAX;
@@ -96,7 +99,7 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
     /**
      * Initialize root layout and attach/detach listeners for dynamic component management.
      */
-    private void initContent() {
+    void initContent() {
         _rootLayout = (VerticalLayout) asVaadinComponent();
         int componentCount = _rootLayout.getComponentCount();
         _rootLayout.addComponentAttachListener(this);
@@ -145,7 +148,7 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
     /**
      * Enable add button if current number of components is within limit.
      */
-    private void addButtonEnabled() {
+    void addButtonEnabled() {
         Component component = _rootLayout.getComponent(_rootLayout.getComponentCount() - 1);
         if (_rootLayout.getComponentCount() <= _maxComponents) {
             component.setEnabled(true);
@@ -156,12 +159,15 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
      * Disable add button when limit exceeded, optionally showing notification.
      * @param showNotification whether to show i18n notification about limit reached
      */
-    private void addButtonDisabled(boolean showNotification) {
+    void addButtonDisabled(boolean showNotification) {
         Component component = _rootLayout.getComponent(_rootLayout.getComponentCount() - 1);
         if (_rootLayout.getComponentCount() > _maxComponents) {
             component.setEnabled(false);
             if (showNotification) {
-                Notification.show(_i18n.translate("specificMultiField.maxNumber.reached", _maxComponents));
+                String message = _i18n.translate("specificMultiField.maxNumber.reached", _maxComponents);
+                if (isNotEmpty(message) && UI.getCurrent() != null) {
+                    Notification.show(message);
+                }
             }
         }
     }

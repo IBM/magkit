@@ -57,7 +57,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * String outcome = model.execute();
  * </pre>
  *
- * @author diana.racho (06.11.2009)
+ * @author diana.racho@ibmix.de
  * @since 2009-11-06
  */
 public class FolderModel extends RenderingModelImpl<ConfiguredTemplateDefinition> {

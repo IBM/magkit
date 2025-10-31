@@ -20,7 +20,6 @@ package de.ibmix.magkit.ui.dialogs.fields;
  * #L%
  */
 
-import com.machinezoo.noexception.Exceptions;
 import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import info.magnolia.cms.util.SelectorUtil;
@@ -86,12 +85,19 @@ public class ExtendedLinkConverter extends LinkConverter {
      */
     @Override
     public Result<String> convertToModel(String path, ValueContext context) {
-        Result<String> result = null;
+        Result<String> result;
 
         if (isCoveredBySuperConverter(path)) {
             result = super.convertToModel(path, context);
         } else if (isPath(path)) {
-            result = Result.of(() -> Exceptions.wrap().get(() -> convertToIdentifier(path)), Throwable::getMessage);
+            try {
+                String converted = convertToIdentifier(path);
+                result = isBlank(converted) ? Result.error("Path not found: " + path) : Result.ok(converted);
+            } catch (RepositoryException e) {
+                result = Result.error(e.getMessage() != null ? e.getMessage() : "Path not found: " + path);
+            }
+        } else {
+            result = Result.error("Unsupported path format: " + path);
         }
 
         return result;
@@ -122,7 +128,7 @@ public class ExtendedLinkConverter extends LinkConverter {
      * @return identifier+suffix or empty string
      * @throws RepositoryException if JCR lookup fails
      */
-    private String convertToIdentifier(final String pathWithSuffix) throws RepositoryException {
+    protected String convertToIdentifier(final String pathWithSuffix) throws RepositoryException {
         String path = getNodePart(pathWithSuffix);
         String query = pathWithSuffix.replace(path, EMPTY);
         Node node = getNodeByPath(path);
@@ -152,7 +158,7 @@ public class ExtendedLinkConverter extends LinkConverter {
      * @param value raw value
      * @return base node path or identifier segment
      */
-    private static String getNodePart(String value) {
+    protected static String getNodePart(String value) {
         return substringBefore(substringBefore(substringBefore(value, TAG_SELECTOR), TAG_QUERY), TAG_ANCHOR);
     }
 
@@ -161,7 +167,7 @@ public class ExtendedLinkConverter extends LinkConverter {
      * @param path raw input
      * @return true if super converter covers the case
      */
-    private static boolean isCoveredBySuperConverter(String path) {
+    protected static boolean isCoveredBySuperConverter(String path) {
         return isBlank(path) || isExternalLink(path) || isAnchor(path) || !containsAny(path, TAG_ANCHOR, TAG_QUERY, TAG_SELECTOR);
     }
 

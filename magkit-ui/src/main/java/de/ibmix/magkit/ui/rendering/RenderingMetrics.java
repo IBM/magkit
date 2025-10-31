@@ -104,4 +104,9 @@ public class RenderingMetrics extends AbstractRenderingListener {
         }
         return null;
     }
+
+    // For testing purposes
+    int getStackSize() {
+        return _stack.size();
+    }
 }

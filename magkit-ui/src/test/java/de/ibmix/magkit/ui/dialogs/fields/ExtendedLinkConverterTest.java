@@ -116,6 +116,83 @@ public class ExtendedLinkConverterTest {
         assertEquals(EXTERNAL_URL, _converter.convertToPresentation(EXTERNAL_URL, null));
     }
 
+    @Test
+    public void testConvertToModelPathWithSelector() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "detail";
+        final String pathWithSelector = PATH + selectorSuffix;
+        _converter.convertToModel(pathWithSelector, null).ifOk(value -> assertEquals(IDENTIFIER + selectorSuffix, value));
+    }
+
+    @Test
+    public void testConvertToModelPathWithQuery() {
+        final String querySuffix = "?a=b&c=d";
+        final String pathWithQuery = PATH + querySuffix;
+        _converter.convertToModel(pathWithQuery, null).ifOk(value -> assertEquals(IDENTIFIER + querySuffix, value));
+    }
+
+    @Test
+    public void testConvertToModelPathWithSelectorQueryAnchorCompound() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "detail";
+        final String querySuffix = "?a=b";
+        final String anchorSuffix = "#section";
+        final String pathWithCompound = PATH + selectorSuffix + querySuffix + anchorSuffix;
+        _converter.convertToModel(pathWithCompound, null).ifOk(value -> assertEquals(IDENTIFIER + selectorSuffix + querySuffix + anchorSuffix, value));
+    }
+
+    @Test
+    public void testConvertToModelNotFoundWithSelector() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "x";
+        final String pathWithSelectorNotFound = PATH_NOT_FOUND + selectorSuffix;
+        assertTrue(_converter.convertToModel(pathWithSelectorNotFound, null).isError());
+    }
+
+    @Test
+    public void testConvertToPresentationIdentifierWithSelector() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "detail";
+        final String identifierWithSelector = IDENTIFIER + selectorSuffix;
+        assertEquals(PATH + selectorSuffix, _converter.convertToPresentation(identifierWithSelector, null));
+    }
+
+    @Test
+    public void testConvertToPresentationIdentifierWithQuery() {
+        final String querySuffix = "?a=b&c=d";
+        final String identifierWithQuery = IDENTIFIER + querySuffix;
+        assertEquals(PATH + querySuffix, _converter.convertToPresentation(identifierWithQuery, null));
+    }
+
+    @Test
+    public void testConvertToPresentationIdentifierWithSelectorQueryAnchorCompound() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "detail";
+        final String querySuffix = "?a=b";
+        final String anchorSuffix = "#section";
+        final String identifierCompound = IDENTIFIER + selectorSuffix + querySuffix + anchorSuffix;
+        assertEquals(PATH + selectorSuffix + querySuffix + anchorSuffix, _converter.convertToPresentation(identifierCompound, null));
+    }
+
+    @Test
+    public void testGetNodePartExtraction() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "detail";
+        final String querySuffix = "?a=b";
+        final String anchorSuffix = "#sec";
+        final String pathCompound = PATH + selectorSuffix + querySuffix + anchorSuffix;
+        assertEquals(PATH, ExtendedLinkConverter.getNodePart(pathCompound));
+    }
+
+    @Test
+    public void testGetNodePartIdentifierCompound() {
+        final String selectorSuffix = ExtendedLinkConverter.TAG_SELECTOR + "detail";
+        final String querySuffix = "?a=b";
+        final String anchorSuffix = "#sec";
+        final String identifierCompound = IDENTIFIER + selectorSuffix + querySuffix + anchorSuffix;
+        assertEquals(IDENTIFIER, ExtendedLinkConverter.getNodePart(identifierCompound));
+    }
+
+    @Test
+    public void testConvertToModelUnsupportedFormat() {
+        final String unsupported = "path/to/node?x=y";
+        assertTrue(_converter.convertToModel(unsupported, null).isError());
+    }
+
     @AfterEach
     public void tearDown() {
         cleanContext();

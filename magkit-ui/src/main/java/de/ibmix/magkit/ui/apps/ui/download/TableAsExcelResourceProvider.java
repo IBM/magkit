@@ -130,6 +130,7 @@ public class TableAsExcelResourceProvider {
      * @throws IllegalArgumentException if {@code source} is {@code null}
      */
     public TableAsExcelResourceProvider(final Table source, final String fileNameBase, final String title) {
+        checkArgument(source != null, "The Table source must not be null.");
         _source = source;
         _visibleColumns = new HashSet<>(Arrays.asList(_source.getVisibleColumns()));
         _sheetName = fileNameBase.replaceAll("[:,]*", EMPTY).replaceAll("/", "-");
@@ -167,7 +168,7 @@ public class TableAsExcelResourceProvider {
      * @param wb the workbook to serialize (must not be {@code null})
      * @return input stream positioned at the beginning of the serialized workbook or {@code null} on IO error
      */
-    private InputStream toInputStream(Workbook wb) {
+    InputStream toInputStream(Workbook wb) {
         FileSystemHelper fileSystemHelper = getComponent(FileSystemHelper.class);
         InputStream in = null;
         OutputStream out = null;
@@ -188,7 +189,7 @@ public class TableAsExcelResourceProvider {
      *
      * @return populated workbook (never {@code null})
      */
-    private Workbook createExcel() {
+    Workbook createExcel() {
         Workbook wb = new XSSFWorkbook();
         CellStyle headerStyle = getHeaderStyle(wb);
         Sheet sheet = wb.createSheet(_sheetName);
@@ -256,7 +257,7 @@ public class TableAsExcelResourceProvider {
      * @param cell excel cell (must not be {@code null})
      * @param helper POI creation helper (must not be {@code null})
      */
-    private void addCellLink(Link value, Cell cell, CreationHelper helper) {
+    void addCellLink(Link value, Cell cell, CreationHelper helper) {
         checkArgument(cell != null, "The Cell must not be null.");
         checkArgument(helper != null, "The CreationHelper must not be null.");
         Hyperlink link = helper.createHyperlink(HyperlinkType.URL);
@@ -373,15 +374,17 @@ public class TableAsExcelResourceProvider {
 
         // getColumnHeaders() may give Headers in wrong order :-(
         Collection itemIds = _source.getVisibleItemIds();
-        Item item = _source.getItem(itemIds.iterator().next());
-        Collection<?> propertyIds = item.getItemPropertyIds();
-        int cellCount = 0;
-        Row columnHeaders = sheet.createRow(HEADER_ROW_NUMBER);
-        for (Object propertyId : propertyIds) {
-            if (_visibleColumns.contains(propertyId)) {
-                final Cell cell = columnHeaders.createCell(cellCount++);
-                cell.setCellValue(_source.getColumnHeader(propertyId));
-                cell.setCellStyle(headerStyle);
+        if (!itemIds.isEmpty()) {
+            Item item = _source.getItem(itemIds.iterator().next());
+            Collection<?> propertyIds = item.getItemPropertyIds();
+            int cellCount = 0;
+            Row columnHeaders = sheet.createRow(HEADER_ROW_NUMBER);
+            for (Object propertyId : propertyIds) {
+                if (_visibleColumns.contains(propertyId)) {
+                    final Cell cell = columnHeaders.createCell(cellCount++);
+                    cell.setCellValue(_source.getColumnHeader(propertyId));
+                    cell.setCellStyle(headerStyle);
+                }
             }
         }
     }
