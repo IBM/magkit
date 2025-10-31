@@ -148,8 +148,8 @@ public class TableAsExcelResourceProviderTest {
         Property linkProperty = mock(Property.class);
         doReturn(link).when(linkProperty).getValue();
         Property textProperty = mock(Property.class);
-        doReturn("Some text value that is quite long" ).when(textProperty).getValue();
-        doReturn(Arrays.asList("first", "second" )).when(row1).getItemPropertyIds();
+        doReturn("Some text value that is quite long").when(textProperty).getValue();
+        doReturn(Arrays.asList("first", "second")).when(row1).getItemPropertyIds();
         doReturn(linkProperty).when(row1).getItemProperty("first");
         doReturn(textProperty).when(row1).getItemProperty("second");
         Workbook wb = new XSSFWorkbook();
@@ -316,7 +316,8 @@ public class TableAsExcelResourceProviderTest {
             assertNotNull(titleRow);
             assertEquals("test title", titleRow.getCell(0).getStringCellValue());
         } catch (Exception e) {
-            assertNull(e); // should not throw
+            // should not throw
+            assertNull(e);
         }
     }
 

@@ -110,7 +110,7 @@ public class RenderingMetricsTest {
         when(definition.getId()).thenReturn("someId");
         assertNull(metrics.before(null, null, null, null));
         assertEquals(1, metrics.getStackSize());
-        assertThrows(RepositoryException.class, () -> metrics.after(failingNode, definition,null, null));
+        assertThrows(RepositoryException.class, () -> metrics.after(failingNode, definition, null, null));
         verify(failingNode).getPath();
         assertEquals(0, metrics.getStackSize());
     }
