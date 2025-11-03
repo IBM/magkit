@@ -30,6 +30,7 @@
         <mockitoVersion>5.20.0</mockitoVersion>
         <juniuit.Version>5.14.0</juniuit.Version>
         <version.magkit.test>1.0.9-SNAPSHOT</version.magkit.test>
+        <jacocoVersion>0.8.14</jacocoVersion>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +122,41 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!--
+              See
+                https://github.com/SonarSource/sonar-scanning-examples/tree/master/sonarqube-scanner-maven/maven-multimodule
+              Code coverage is aggregated in webapp module, see pom.xml there
+            -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacocoVersion}</version>
+                <executions>
+                    <execution>
+                        <id>agent-for-ut</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <scm>
         <url>https://github.com/IBM/magkit.git</url>
