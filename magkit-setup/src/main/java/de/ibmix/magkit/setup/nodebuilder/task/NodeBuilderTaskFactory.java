@@ -28,18 +28,19 @@ import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**
  * Factory for convenience creation of {@link NodeBuilderTask} instances targeting standard Magnolia configuration
- * locations (root, /server, /modules/<moduleName>). Provides a reduced parameter set with default logging error
+ * locations (root, /server, /modules/&lt;moduleName&gt;). Provides a reduced parameter set with default logging error
  * handling and config workspace selection.
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *     <li>Reduces boilerplate for common install/update tasks needing NodeBuilder operations.</li>
  *     <li>Standardizes use of {@link ErrorHandling#logging} to capture warnings during execution.</li>
  *     <li>Provides module-specific path construction under /modules.</li>
  * </ul>
- * Usage preconditions: Provided taskName and description should be non-null/meaningful; operations may be empty but
+ * <p>Usage preconditions: Provided taskName and description should be non-null/meaningful; operations may be empty but
  * then the task performs no changes. Paths must exist; otherwise NodeBuilder operations may fail depending on their
- * own behavior. Side effects: Creates tasks that mutate JCR content during Magnolia install/update phases.
- * Thread-safety: All methods are stateless and static.
+ * own behavior.</p>
+ * <p>Side effects: Creates tasks that mutate JCR content during Magnolia install/update phases.</p>
+ * <p>Thread-safety: All methods are stateless and static.</p>
  *
  * @author wolf.bubenik
  * @since 2010-09-16
@@ -76,7 +77,7 @@ public abstract class NodeBuilderTaskFactory {
      * @param taskName name of the task
      * @param description human readable description
      * @param moduleName module name appended to /modules/ to form root path; leading slash will be removed if present; must not be blank
-     * @param operations operations to execute under /modules/<moduleName>
+     * @param operations operations to execute under /modules/&lt;moduleName&gt;
      * @return configured task instance
      * @throws IllegalArgumentException if moduleName is blank
      */

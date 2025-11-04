@@ -60,7 +60,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  * String[] encodedParams = EncodingUtils.getUrlEncodedValues(new String[]{"v1", "v2"});
  * String htmlSafe = EncodingUtils.URL_HTML_ESCAPER.escape("&lt;tag&gt\"quote\"&lt;/tag&gt");
  * }</pre>
- * <p>Null & error handling: Invalid Base64 input will decode to an arbitrary string (no explicit validation performed).</p>
+ * <p>Null and error handling: Invalid Base64 input will decode to an arbitrary string (no explicit validation performed).</p>
  * <p>Side effects: Only debug log statements; no external state modifications.</p>
  * <p>Thread-safety: All operations are pure and use only local variables.</p>
  *

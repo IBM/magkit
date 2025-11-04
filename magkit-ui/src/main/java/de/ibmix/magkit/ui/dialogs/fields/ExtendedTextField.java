@@ -37,13 +37,13 @@ import java.util.Optional;
  * of configured max length and recommended length; if neither is positive the label is omitted. Value changes update
  * the label lazily (Vaadin {@link ValueChangeMode#LAZY}).
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Dynamic remaining length indicator.</li>
  *   <li>Transparent delegation of value handling to inner field.</li>
  *   <li>Focus delegation and consistent required/caption handling.</li>
  * </ul>
- * </p>
+ *
  * <p>Usage preconditions: Constructed by {@link ExtendedTextFieldFactory} only when recommended length is set and no max length configured.</p>
  * <p>Thread-safety: Not thread-safe; UI component confined to Vaadin UI thread.</p>
  *

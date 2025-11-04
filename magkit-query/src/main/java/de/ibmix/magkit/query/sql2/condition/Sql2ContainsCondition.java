@@ -105,7 +105,7 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
     /**
      * Add mandatory terms (space separated) with custom boost and fuzzy flag.
      *
-     * @param boost boosting factor (>=1)
+     * @param boost boosting factor (&gt;=1)
      * @param isFuzzy true to apply fuzzy search
      * @param terms terms to add
      * @return this
@@ -127,7 +127,7 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
     /**
      * Add optional (OR) fuzzy terms with boosting.
      *
-     * @param boost boosting factor (>=1)
+     * @param boost boosting factor (&gt;=1)
      * @param isFuzzy fuzzy flag
      * @param terms terms to add
      * @return this
@@ -196,11 +196,11 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
     /**
      * Low level addition of an arbitrary term configuration. Public to allow uncommon combinations.
      *
-     * @param boost boost factor (>=0)
+     * @param boost boost factor (&gt;=0)
      * @param exclude true to mark as exclusion
      * @param optional true for OR semantics
      * @param isFuzzy true for fuzzy search (ignored for phrases)
-     * @param distance proximity distance for phrases (>1)
+     * @param distance proximity distance for phrases (&gt;1)
      * @param escapeQuestionMark whether to escape trailing '?'
      * @param terms raw term strings
      * @return this

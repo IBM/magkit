@@ -42,7 +42,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  *   <li>Builds a target URI either via a provided {@code toUri} format string or by reusing the original prefix.</li>
  *   <li>Exposes a mapping result with a configurable level influencing Magnolia's mapping resolution order.</li>
  * </ul>
- * Key features & details:
+ * Key features and details:
  * <ul>
  *   <li>Supports both git style (e.g. {@code 1.0.0-master-4-d760a70}) and legacy SVN style (e.g. {@code 1.0.1234}) patterns.</li>
  *   <li>Pattern is fully customizable through {@link #setPattern(String)} (falls back to {@link #GIT_PATTERN} if {@code null}).</li>
@@ -54,7 +54,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  *   <li>{@code fromPrefix} must be configured and end with a slash (enforced internally).</li>
  *   <li>{@code toUri} should contain a single {@code %s} placeholder if a custom target format is desired.</li>
  * </ul>
- * Null & error handling:
+ * Null and error handling:
  * <ul>
  *   <li>{@code pattern == null} resets to the default {@link #GIT_PATTERN}.</li>
  *   <li>Invalid or absent version segments result in an empty mapping {@link Optional}.</li>

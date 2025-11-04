@@ -36,28 +36,28 @@ import java.util.Map;
  * Rendering listener that records and logs elapsed rendering time per content element (component, area, page).
  * <p>Purpose: Provide lightweight performance diagnostics during Magnolia rendering by measuring the duration
  * between listener {@code before} and {@code after} callbacks.</p>
- * <p>Main features:
+ * <p>Main features:</p>
  * <ul>
  *     <li>Measures wall-clock time in milliseconds per rendered definition.</li>
  *     <li>Outputs structured DEBUG log lines with identifier and JCR path.</li>
  *     <li>Stack-based timing allowing nested rendering operations.</li>
  *     <li>Zero overhead when DEBUG logging is disabled (no timestamp pushes).</li>
  * </ul>
- * </p>
+ *
  * <p>Usage preconditions: Register the class under {@code config:/server/rendering/engine/listeners} and enable
  * DEBUG level for logger {@code de.ibmix.magkit.ui.rendering.RenderingMetrics}.</p>
  * <p>Side effects: None beyond DEBUG logging.</p>
- * <p>Null & error handling: Returns {@code null} to indicate no alteration of rendering flow. Repository access
+ * <p>Null and error handling: Returns {@code null} to indicate no alteration of rendering flow. Repository access
  * may throw {@link RepositoryException} in {@link #after(Node, RenderableDefinition, Map, OutputProvider)} which is propagated.</p>
  * <p>Thread-safety: Instances are not thread-safe due to internal {@link Deque}; Magnolia typically creates listener
  * instances per rendering engine lifecycle. Do not share across threads without external synchronization.</p>
- * <p>Usage example:
+ * <p>Usage example:</p>
  * <pre>{@code
  * // In configuration (YAML / JCR): add de.ibmix.magkit.ui.rendering.RenderingMetrics as listener.
  * // Enable DEBUG logging:
  * log4j.logger.de.ibmix.magkit.ui.rendering.RenderingMetrics=DEBUG
  * }</pre>
- * </p>
+ *
  *
  * @author Philipp Güttler (Aperto GmbH)
  * @since 2020-04-03

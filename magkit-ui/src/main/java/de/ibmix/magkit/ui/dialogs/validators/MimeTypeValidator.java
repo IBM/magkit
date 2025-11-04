@@ -34,15 +34,15 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
  * simple wildcard replacement (<code>*</code>) translated to <code>.*</code> for regex matching; dots and plus signs
  * are escaped to ensure literal matching before wildcard expansion.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Supports list of accepted MIME type patterns (e.g. <code>image/*</code>, <code>application/pdf</code>).</li>
  *   <li>Gracefully treats <code>null</code> value or empty accepted list as valid.</li>
  *   <li>Ignores non-asset items (folders) unless explicitly configured.</li>
  * </ul>
- * </p>
+ *
  * <p>Usage preconditions: Provide accepted MIME types collection via {@link MimeTypeValidatorDefinition}; may be empty.</p>
- * <p>Null & error handling: <code>null</code> item considered valid; non-asset items return false to avoid false positives.</p>
+ * <p>Null and error handling: <code>null</code> item considered valid; non-asset items return false to avoid false positives.</p>
  * <p>Thread-safety: Stateless apart from immutable definition reference; not thread-safe for concurrent modification.</p>
  *
  * @author frank.sommer

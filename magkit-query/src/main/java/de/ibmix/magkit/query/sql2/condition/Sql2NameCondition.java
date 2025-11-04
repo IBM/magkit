@@ -37,7 +37,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  *     .equalsAny()
  *     .values("Home", "About")
  *     .asString("a", null);
- * // -> "(upper(name(a)) = 'Home' OR upper(name(a)) = 'About')"
+ * // -&gt; "(upper(name(a)) = 'Home' OR upper(name(a)) = 'About')"
  * }</pre>
  * Thread-safety: Not thread safe.
  * Null handling: Empty/blank values are ignored resulting in an empty condition.
@@ -146,7 +146,7 @@ public class Sql2NameCondition implements Sql2NameOperand, Sql2NameCompare, Sql2
     }
 
     /**
-     * Exclude ANY of the provided values (name() <> value OR ... for multi-value).
+     * Exclude ANY of the provided values (name() &lt;&gt; value OR ... for multi-value).
      * @return multi-value step
      */
     @Override
@@ -187,7 +187,7 @@ public class Sql2NameCondition implements Sql2NameOperand, Sql2NameCompare, Sql2
      * Append the rendered name() comparison (including case transformation) to the buffer.
      * Empty or blank values are skipped entirely.
      * @param sql2 target buffer (never null)
-     * @param selectorNames selector name provider (may be null -> no selector prefix)
+     * @param selectorNames selector name provider (may be null -&gt; no selector prefix)
      */
     @Override
     public void appendTo(final StringBuilder sql2, final Sql2SelectorNames selectorNames) {

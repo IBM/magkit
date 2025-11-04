@@ -60,7 +60,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * {@code ERROR_STATUS_CODE} attribute may have been set by the servlet container.</p>
  * <p><strong>Side Effects:</strong> The {@link #defaultRendering()} method may perform a request forward; in that case
  * the returned {@link Response} is {@code null} and response handling continues in the forwarded resource.</p>
- * <p><strong>Null & Error Handling:</strong> If no error page handle can be resolved for a 404 scenario, a NOT_FOUND
+ * <p><strong>Null and Error Handling:</strong> If no error page handle can be resolved for a 404 scenario, a NOT_FOUND
  * {@link Response} with an explanatory message is returned. Status code resolution falls back to 404 when absent.</p>
  * <p><strong>Thread-Safety:</strong> Instances are typically managed by the Magnolia IoC container. No mutable shared
  * state beyond injected dependencies is modified; therefore the class is effectively thread-safe under standard Magnolia
@@ -68,10 +68,10 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * <p><strong>Usage Example:</strong></p>
  * <pre>{@code
  * // In web.xml error mapping
- * &lt;error-page&gt;
- *   &lt;error-code&gt;404&lt;/error-code&gt;
- *   &lt;location&gt;/magnoliaError/error/default&lt;/location&gt;
- * &lt;/error-page&gt;
+ * <error-pag>
+ *   <error-code>404</error-code>
+ *   <location>/magnoliaError/error/default</location>
+ * </error-page>
  * }</pre>
  *
  * @author frank.sommer

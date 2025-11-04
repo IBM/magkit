@@ -42,13 +42,13 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  * reached and optionally showing an i18n notification. The limit is derived from the associated
  * {@link SpecificMultiFieldDefinition} / {@link SpecificMultiValueFieldDefinition}.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Automatic enable/disable of add button based on component count.</li>
  *   <li>I18n notification when max reached (configurable via translator key).</li>
  *   <li>Attach/detach listeners to keep state consistent when components are dynamically added or removed.</li>
  * </ul>
- * </p>
+ *
  * <p>Usage preconditions: Definition must be an instance implementing {@link SpecificMultiDefinition}. The associated
  * layout component must be a {@link VerticalLayout} produced by {@link #asVaadinComponent()}.</p>
  * <p>Thread-safety: Not thread-safe; use within Vaadin UI thread only.</p>
@@ -75,7 +75,7 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
     }
 
     /**
-     * Apply layout and initialize max constraints & listeners.
+     * Apply layout and initialize max constraints and listeners.
      */
     @Override
     public void layout() {

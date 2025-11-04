@@ -38,22 +38,21 @@ import java.util.Calendar;
  * of property values is performed at the node/property level but not when raw {@link Value} objects are accessed
  * directly by utility support classes.
  * </p>
- * <p>
+ *
  * Main functionalities / key features:
  * <ul>
  *   <li>Provides HTML escaping for {@code String} values via {@link #getString()}.</li>
  *   <li>Pass-through decorator for all non-string accessors (stream, binary, numeric, date, boolean, type).</li>
  *   <li>Immutable and therefore thread-safe: all state is set during construction and never mutated.</li>
  * </ul>
- * </p>
- * <p>
+ *
  * Important details:
  * <ul>
  *   <li>Only {@link #getString()} applies escaping; other getters return the unmodified delegated value.</li>
  *   <li>Null arguments to the constructor are rejected with an {@link IllegalArgumentException} (see preconditions).</li>
  *   <li>No caching is performed; escaping is executed on each {@link #getString()} call.</li>
  * </ul>
- * </p>
+ *
  * <p><b>Usage preconditions:</b> Provide a non-null {@link Value} and a non-null {@link HTMLEscapingContentDecorator} instance.
  * The wrapped {@link Value} should represent content that may contain HTML characters needing escaping.</p>
  * <p><b>Side effects:</b> None. The decorator does not alter the underlying repository state; it only transforms

@@ -38,7 +38,7 @@ import javax.jcr.nodetype.PropertyDefinition;
  * Usage preconditions: Construct with a non-empty name. Suitable only for transient/in-memory wrapper scenarios
  * where full node type metadata is unnecessary.
  * Thread-safety: Immutable after construction (name field not reassigned). Safe for concurrent reads.
- * Null & error handling: Methods never throw repository-related exceptions; always return neutral defaults (false,
+ * Null and error handling: Methods never throw repository-related exceptions; always return neutral defaults (false,
  * empty arrays, null for primary item name and subtype iterators).
  * Side effects: None – purely value object used for answering wrapper metadata queries.
  *

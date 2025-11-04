@@ -40,7 +40,7 @@ public interface Sql2StaticOperandMultiple<V> {
     Sql2JoinConstraint values(V... value);
     /**
      * Provide a bind variable dropping any previously set literal values.
-     * @param name variable name (may be null/blank -> ignored)
+     * @param name variable name (may be null/blank -&gt; ignored)
      * @return next step allowing join selector decision
      */
     Sql2JoinConstraint bindVariable(String name);

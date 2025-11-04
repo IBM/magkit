@@ -29,7 +29,7 @@ package de.ibmix.magkit.query.sql2.query;
  *   <li>Fluent limit and offset specification.</li>
  *   <li>Type parameter {@code <T>} preserves concrete builder type for chaining without casts.</li>
  * </ul>
- * <p>Null & error handling: Methods never return {@code null}; they return the concrete builder. Invalid (negative)
+ * <p>Null and error handling: Methods never return {@code null}; they return the concrete builder. Invalid (negative)
  * values are sanitized (treated as 0) by typical implementations.</p>
  * <p>Thread-safety: Not inherently thread-safe; builder instances should be confined to a single thread.</p>
  * <p>Usage example:</p>

@@ -31,13 +31,11 @@ import javax.ws.rs.ClientErrorException;
  * Purpose: Represent situations where a requested page cannot be rendered because it was not found (404) or another
  * client error status code applies.
  * </p>
- * <p>
- * Key Features:
+ * <p>Key Features:</p>
  * <ul>
  *   <li>Stores the requested path that triggered the error for diagnostic purposes.</li>
  *   <li>Provides access to the HTTP status code via the {@link ClientErrorException} superclass.</li>
  * </ul>
- * </p>
  * <p>
  * Usage Preconditions: The provided statusCode should be a valid HTTP 4xx client error code (typically 404).
  * </p>
@@ -52,11 +50,10 @@ import javax.ws.rs.ClientErrorException;
  * Thread-Safety: Immutable state makes this class inherently thread-safe.
  * </p>
  * <p>
- * Example:
+ * Example:</p>
  * <pre>
  *   throw new PageRenderingException(404, requestPath);
  * </pre>
- * </p>
  *
  * @author frank.sommer
  * @since 2023-09-14

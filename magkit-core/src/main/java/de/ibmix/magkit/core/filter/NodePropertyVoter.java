@@ -54,7 +54,7 @@ import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
  * </ul>
  * <p><strong>Usage preconditions:</strong> You must configure both a non blank property name and a non blank pattern
  * string before calling {@link #boolVote(Object)}; otherwise the voter will always return <code>false</code>.</p>
- * <p><strong>Null & error handling:</strong> Repository access exceptions are caught and logged at WARN level; a
+ * <p><strong>Null and error handling:</strong> Repository access exceptions are caught and logged at WARN level; a
  * missing node or property results in a <code>false</code> vote. No exception is propagated to callers.</p>
  * <p><strong>Thread-safety:</strong> This class is <em>not</em> thread-safe due to its mutable configuration state
  * (property name, pattern and compiled regex). Create a dedicated instance per configuration or ensure external

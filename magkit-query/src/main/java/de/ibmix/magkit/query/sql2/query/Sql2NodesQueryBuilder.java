@@ -42,7 +42,7 @@ import java.util.List;
  *   <li>Optional limit/offset for paging.</li>
  *   <li>Graceful error handling returning empty lists on failure.</li>
  * </ul>
- * <p>Null & error handling: Methods never return {@code null}. Repository exceptions during execution are caught and
+ * <p>Null and error handling: Methods never return {@code null}. Repository exceptions during execution are caught and
  * logged at WARN level; empty collections are returned.</p>
  * <p>Thread-safety: NOT thread-safe. Use a new instance per logical query construction.</p>
  * <p>Usage example:</p>

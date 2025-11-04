@@ -1,12 +1,10 @@
 package de.ibmix.magkit.ui.dialogs.validators;
 
-import de.ibmix.magkit.core.utils.NodeUtils;
-
 /*-
  * #%L
  * IBM iX Magnolia Kit UI
  * %%
- * Copyright (C) 2023 - 2024 IBM iX
+ * Copyright (C) 2023 - 2025 IBM iX
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +20,15 @@ import de.ibmix.magkit.core.utils.NodeUtils;
  * #L%
  */
 
+import de.ibmix.magkit.core.utils.NodeUtils;
+
 import javax.jcr.Node;
 
 /**
  * Validator checking that a node's template ID matches one of the accepted values from its definition.
  * <p>Relies on {@link NodeUtils#getTemplate(Node)} to resolve the template metadata.</p>
  * <p>Thread-safety: Not thread-safe; one instance per field usage.</p>
+ *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

@@ -63,7 +63,7 @@ import static org.apache.commons.lang3.Validate.notNull;
  * String name = synthetic.getName(); // "virtual"
  * NodeType type = synthetic.getPrimaryNodeType(); // BaseNodeType("mgnl:content")
  * }</pre>
- * Null & error handling: If a wrapped node exists all repository exceptions propagate unchanged. Without a wrapped
+ * Null and error handling: If a wrapped node exists all repository exceptions propagate unchanged. Without a wrapped
  * node, methods return neutral defaults and do not throw (unless contract requires otherwise, e.g. validation inside
  * constructors). Thread-safety: Not thread-safe; instances should be confined to request scope. Side effects: None –
  * calls never modify repository state when underlying node is absent.

@@ -57,13 +57,13 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
  * </ul>
  * Usage preconditions: Methods expect either a Magnolia path, anchor string, or a raw UUID (optionally followed by extended parts).
  * Side effects: The helper is stateless and does not modify passed {@link Node} instances; it only reads properties.
- * Null & error handling: Invalid or unsupported input strings produce {@code null} results for component getters; merge operations skip null/blank parts gracefully.
+ * Null and error handling: Invalid or unsupported input strings produce {@code null} results for component getters; merge operations skip null/blank parts gracefully.
  * Thread-safety: The class is stateless and annotated {@link Singleton}; all methods are thread-safe.
  * Usage example:
  * <pre>
  *   ExtendedLinkFieldHelper helper = new ExtendedLinkFieldHelper();
- *   String extended = helper.mergeComponents("/my/page", "print.detail", "a=1&b=2", "section");
- *   // Result: /my/page.print.detail.?a=1&b=2#section
+ *   String extended = helper.mergeComponents("/my/page", "print.detail", "a=1&amp;b=2", "section");
+ *   // Result: /my/page.print.detail.?a=1&amp;b=2#section
  * </pre>
  *
  * @author Philipp Güttler (Aperto AG)

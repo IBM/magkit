@@ -50,7 +50,7 @@ import static org.apache.commons.lang3.math.NumberUtils.toInt;
  *   <li>Retrieval of the active paging number with graceful fallback and validation.</li>
  *   <li>Updating, adding, replacing or removing selectors in a given URL while preserving extension and query string.</li>
  * </ul>
- * Key features & important details:
+ * Key features and important details:
  * <ul>
  *   <li>Selector parsing is based on Magnolia's {@link SelectorUtil#SELECTOR_DELIMITER}.</li>
  *   <li>Paging values are validated to be positive integers; defaults to {@link #DEF_PAGE} if missing or invalid.</li>
@@ -61,7 +61,7 @@ import static org.apache.commons.lang3.math.NumberUtils.toInt;
  * <ul>
  *   <li>Magnolia context must be available when calling {@link #retrieveActivePage()} (uses {@link MgnlContext}).</li>
  * </ul>
- * Null & error handling:
+ * Null and error handling:
  * <ul>
  *   <li>Null or blank URL input for {@link #updateSelectors(String, String, String, String...)} results in an empty String.</li>
  *   <li>Blank selector values trigger removal of the selector id from the URL.</li>
@@ -107,7 +107,7 @@ public abstract class SelectorUtils {
      * Retrieve the active page number from Magnolia context (selector value for {@link #SELECTOR_PAGING}).
      * Ensures the returned value is a positive integer; defaults to {@link #DEF_PAGE} if missing or invalid.
      *
-     * @return the active page number (>= {@link #DEF_PAGE})
+     * @return the active page number (&gt;= {@link #DEF_PAGE})
      */
     public static int retrieveActivePage() {
         int actPage = DEF_PAGE;

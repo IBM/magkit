@@ -74,8 +74,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * triggers the download (e.g. by clicking a link or button bound to the resource). The workbook is generated in
  * memory, flushed to a temporary file (due to POI streaming constraints), then streamed back via an {@link InputStream}.
  * </p>
- * <p>
- * Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Supports exporting only currently visible columns (respects user column visibility).</li>
  *   <li>Adds a title row and header row with bold styling, merges the title across all visible columns.</li>
@@ -84,7 +83,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  *   <li>Generates safe sheet and file names by removing unsupported characters and normalizing spaces.</li>
  *   <li>Removes configured Magnolia context path portion from the server base URL for correct public links.</li>
  * </ul>
- * </p>
+ *
  * <p>
  * Usage preconditions: Provide a non-null {@link Table} with initialized visible columns. The table should already be
  * populated; dynamic changes after constructing this provider are not reflected unless a new instance is created.
@@ -94,7 +93,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
  * explicitly deleted here (left to OS temp cleanup). Keeps workbook only for the duration of stream creation.
  * </p>
  * <p>
- * Null & error handling: Methods validate mandatory arguments with {@link IllegalArgumentException}. IO failures during
+ * Null and error handling: Methods validate mandatory arguments with {@link IllegalArgumentException}. IO failures during
  * file creation / writing are logged and result in a {@code null} stream which Vaadin will treat as an empty download.
  * </p>
  * <p>

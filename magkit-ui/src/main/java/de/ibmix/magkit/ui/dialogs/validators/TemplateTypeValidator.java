@@ -28,6 +28,7 @@ import javax.jcr.Node;
  * Validator enforcing accepted template type values for a node.
  * <p>Retrieves template type via {@link NodeUtils#getTemplateType(Node)} and checks against accepted values list.</p>
  * <p>Null handling: A null node is invalid. A null template type is accepted only when accepted values list is empty (wildcard).</p>
+ *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

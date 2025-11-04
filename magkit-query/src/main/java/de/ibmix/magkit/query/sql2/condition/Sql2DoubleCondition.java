@@ -39,7 +39,7 @@ public final class Sql2DoubleCondition extends Sql2PropertyCondition<Sql2DoubleC
 
     /**
      * Start building a condition on the given double property.
-     * @param name property name (may be null/blank -> empty condition later)
+     * @param name property name (may be null/blank -&gt; empty condition later)
      * @return comparison API allowing NOT and operators
      */
     public static Sql2CompareNot<Double> property(final String name) {

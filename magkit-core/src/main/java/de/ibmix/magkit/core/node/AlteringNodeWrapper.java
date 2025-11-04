@@ -64,7 +64,7 @@ import static org.apache.commons.lang3.Validate.notNull;
  *     .immutable();
  * Property title = wrapper.getProperty("title");
  * }</pre>
- * <p>Null & error handling: Builder methods validate required arguments. Repository access exceptions from delegated
+ * <p>Null and error handling: Builder methods validate required arguments. Repository access exceptions from delegated
  * calls propagate unchanged. Hidden elements are simply excluded from merged iterators.</p>
  * <p>Thread-safety: Not thread-safe – internal maps and sets are mutable. Restrict usage to single-threaded request
  * scope or externally synchronize.</p>
@@ -111,7 +111,7 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
      * Stub a String property (single or multi valued).
      *
      * @param name property name (must not be blank)
-     * @param value values to expose (multi-valued if length > 1)
+     * @param value values to expose (multi-valued if length &gt; 1)
      * @return this for fluent chaining
      */
     public AlteringNodeWrapper withProperty(String name, String... value) {

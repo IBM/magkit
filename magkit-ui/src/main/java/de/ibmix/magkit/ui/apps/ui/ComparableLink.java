@@ -34,14 +34,13 @@ import java.util.Locale;
  * {@code null} caption is always considered greater so that links with valid captions appear first when sorted
  * ascending. This behavior supports deterministic sorting in UI tables containing optional link captions.
  * </p>
- * <p>
- * Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Locale specific comparison using a pre-created {@link Collator} (German locale).</li>
  *   <li>Graceful handling of {@code null} links and {@code null} captions without throwing exceptions.</li>
  *   <li>Applies Magnolia/Vaadin label primary style for visual consistency.</li>
  * </ul>
- * </p>
+ *
  * <p>
  * Thread-safety: Not thread-safe; must only be accessed from the Vaadin UI thread.
  * </p>
@@ -67,13 +66,11 @@ public class ComparableLink extends Link implements Comparable<Link> {
 
     /**
      * Compare this link to another link using locale aware caption ordering.
-     * <p>
-     * Ordering rules:
+     * <p>Ordering rules:</p>
      * <ul>
      *   <li>This link with a non-null caption sorts before a {@code null} link or a link with {@code null} caption.</li>
      *   <li>If both captions are non-null, {@link Collator#compare(String, String)} provides the comparison result.</li>
      * </ul>
-     * </p>
      *
      * @param link the other link to compare; may be {@code null}
      * @return negative, zero or positive consistent with the {@link Comparable} contract

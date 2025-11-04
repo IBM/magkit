@@ -53,6 +53,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
  * Utility class providing null-safe helper methods for working with Magnolia JCR {@link Node} instances.
  * <p>
  * Main functionalities and key features:
+ * </p>
  * <ul>
  *   <li>Node lookup by identifier or path (uuid/reference resolution)</li>
  *   <li>Template id and template type resolution with graceful fallback when definitions are missing</li>
@@ -62,29 +63,29 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
  *   <li>Safe accessors for frequently used Node attributes (name, identifier, path, depth)</li>
  *   <li>Wrapping of Java {@link java.util.function.Predicate} into Jackrabbit predicate for Magnolia utilities</li>
  * </ul>
- * </p>
+ *
  * <p>
  * Important details:
+ * </p>
  * <ul>
  *   <li>All methods are defensive: NULL input parameters are accepted and result in NULL/empty outputs instead of exceptions.</li>
  *   <li>Repository-related {@link javax.jcr.RepositoryException} instances are caught and only logged; no exceptions are propagated.</li>
  *   <li>Logging uses INFO for functional fallbacks and DEBUG for stack traces to avoid log flooding.</li>
  * </ul>
- * </p>
+ *
  * <p><strong>Usage Preconditions:</strong> A Magnolia context with the required workspaces (e.g. "website") must be available. The Magnolia component
  * provider must be initialized for template resolution.</p>
- * <p><strong>Null & Error Handling:</strong> Methods return NULL (-1 for depth) or an empty collection/iterator when a node is absent or an error occurs.
+ * <p><strong>Null and Error Handling:</strong> Methods return NULL (-1 for depth) or an empty collection/iterator when a node is absent or an error occurs.
  * This allows callers to chain operations without extensive external null checks.</p>
  * <p><strong>Side Effects:</strong> No state is mutated; only logging occurs.</p>
  * <p><strong>Thread-Safety:</strong> The class is stateless and therefore thread-safe.</p>
- * <p><strong>Example:</strong>
+ * <p><strong>Example:</strong></p>
  * <pre>
  *   Node page = NodeUtils.getNodeByIdentifier("website", uuid);
  *   Node ancestorPage = NodeUtils.getAncestorOrSelf(page, NodeUtils.IS_PAGE);
  *   String templateId = NodeUtils.getTemplate(page);
  *   String templateType = NodeUtils.getTemplateType(page);
  * </pre>
- * </p>
  *
  * @author frank.sommer
  * @since 2026-03-13

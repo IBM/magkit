@@ -43,7 +43,7 @@ import static org.apache.commons.lang3.StringUtils.strip;
 /**
  * Factory/utility extension of Magnolia's {@link Ops} adding idempotent node and property operations and
  * ordering helpers for JCR content setup tasks.
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *     <li>Idempotent creation via addOrGet* methods to avoid duplicate nodes on repeated module updates.</li>
  *     <li>Convenience operations for ordering siblings (orderBefore/orderAfter) wrapping JCR / Magnolia utilities.</li>
@@ -51,9 +51,9 @@ import static org.apache.commons.lang3.StringUtils.strip;
  *     <li>Bulk removal helpers (removeIfExists, removeAllChilds) to clean node subtrees.</li>
  *     <li>Pattern voter node creation for access / configuration logic.</li>
  * </ul>
- * Usage preconditions: All operations expect a valid JCR {@link Node} context supplied by the NodeBuilder execution
+ * <p>Usage preconditions: All operations expect a valid JCR {@link Node} context supplied by the NodeBuilder execution
  * environment. Provided relative paths must not be null or empty; node type validation occurs when an existing node
- * is found with a mismatching type (throws {@link RepositoryException}).
+ * is found with a mismatching type (throws {@link RepositoryException}).</p>
  * <p>Side effects: Node and property modifications are performed directly on the provided session and are not
  * automatically saved; callers rely on Magnolia's installation task lifecycle to persist changes. Removal operations
  * delete items irrevocably in the current transient state until save/rollback.</p>
@@ -61,12 +61,11 @@ import static org.apache.commons.lang3.StringUtils.strip;
  * {@code CreatePathNodeOperation}. Unknown property types are converted using {@link PropertyUtil#createValue(Object, javax.jcr.ValueFactory)}.</p>
  * <p>Thread-safety: All methods are stateless and static. Thread-safe regarding internal state; JCR session / node
  * concurrency must be handled externally.</p>
- * <p>Usage example:
+ * <p>Usage example:</p>
  * <pre>{@code
  * NodeOperation op = NodeOperationFactory.addOrGetContentNode("myModule/config")
  *     .then(NodeOperationFactory.addOrSetProperty("enabled", true));
  * }</pre>
- * </p>
  *
  * @author wolf.bubenik
  * @since 2010-09-16

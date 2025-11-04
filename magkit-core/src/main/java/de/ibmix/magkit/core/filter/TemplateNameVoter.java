@@ -51,7 +51,7 @@ import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
  * </ul>
  * <p><strong>Usage preconditions:</strong> At least one non blank template must be added for meaningful results.
  * Root path is optional; if specified only URIs starting with that prefix are considered.</p>
- * <p><strong>Null & error handling:</strong> A null or blank input value produces a {@code false} vote. Repository
+ * <p><strong>Null and error handling:</strong> A null or blank input value produces a {@code false} vote. Repository
  * exceptions are ignored and treated as non matches.</p>
  * <p><strong>Thread-safety:</strong> Not thread-safe due to internal mutable arrays. Configure once per instance
  * or ensure external synchronization if modified concurrently.</p>

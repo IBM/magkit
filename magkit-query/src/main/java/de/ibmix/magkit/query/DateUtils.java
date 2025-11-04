@@ -47,7 +47,7 @@ import java.util.Date;
  * // Example result: "2025-10-17T14:53:21.123+02:00"
  * </pre>
  *
- * <h2>Null & Error Handling</h2>
+ * <h2>Null and Error Handling</h2>
  * Passing {@code null} to {@link #createQueryDate(Date)} will result in a {@link NullPointerException}
  * thrown by the underlying formatter.
  *

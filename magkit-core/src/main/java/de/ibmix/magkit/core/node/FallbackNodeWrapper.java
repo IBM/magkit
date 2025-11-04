@@ -64,7 +64,7 @@ import java.util.stream.Collectors;
  *     .withPropertyCondition(p -> StringUtils.isNotBlank(PropertyUtils.getStringValue(p)));
  * Property effectiveTitle = wrapper.getProperty("title");
  * }</pre>
- * <p>Null & error handling: Fallback arrays are filtered to non-null nodes. Repository exceptions from delegated calls
+ * <p>Null and error handling: Fallback arrays are filtered to non-null nodes. Repository exceptions from delegated calls
  * propagate unchanged. Missing properties or child nodes simply return null (or empty iterators).</p>
  * <p>Thread-safety: Not thread-safe; internal configuration maps and predicates are mutable. Confine usage to a single
  * request thread or externally synchronize.</p>

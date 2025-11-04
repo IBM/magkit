@@ -34,14 +34,14 @@ import java.util.List;
 /**
  * Validator ensuring a string value is unique among nodes matching workspace/nodeType/property constraints.
  * <p>Executes a query via {@link NodesByQuery} to find nodes with the same property value; allows match with itself.</p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Workspace-scoped uniqueness check.</li>
  *   <li>Property-based filtering across a node type.</li>
  *   <li>Self-update allowance (ignores the current node's own value).</li>
  * </ul>
- * </p>
- * <p>Null & config handling: If mandatory config values missing, validation returns false (not valid) or treats as valid? Here it's false until properly configured.</p>
+ *
+ * <p>Null and config handling: If mandatory config values missing, validation returns false (not valid) or treats as valid? Here it's false until properly configured.</p>
  * <p>Item context handling: If the current item is absent, uniqueness is considered valid only when no matching nodes are found; a single found node without context counts as duplicate.</p>
  * @author frank.sommer
  * @since 2024-03-12

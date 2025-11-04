@@ -45,7 +45,7 @@ import java.util.Calendar;
  * <pre>{@code RowsResult result = new RowsQuery(jcrQuery).bindString("title", "Welcome").bindBoolean("active", true).execute();}</pre>
  * <p>Preconditions: The provided {@link Query} instance must be properly constructed in the associated JCR session.
  * Bind variable names must match those declared in the query.</p>
- * <p>Null & error handling: Binding methods pass values directly; repository-related issues surface as
+ * <p>Null and error handling: Binding methods pass values directly; repository-related issues surface as
  * {@link RepositoryException}. Convenience methods do not accept {@code null} for variable names; underlying JCR
  * implementation may throw {@link IllegalArgumentException} for unknown variable names.</p>
  * <p>Thread-safety: NOT thread-safe. Instances should be used and executed within a single thread. Sharing across

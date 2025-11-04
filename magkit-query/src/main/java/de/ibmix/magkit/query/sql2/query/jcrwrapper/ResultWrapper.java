@@ -37,7 +37,7 @@ import javax.jcr.query.QueryResult;
  *   <li>Safe accessor methods for column and selector names with graceful error handling (exceptions are caught and logged).</li>
  *   <li>Uniform API surface to be extended by concrete result wrappers.</li>
  * </ul>
- * <p>Null & error handling: All accessor methods return an empty array instead of {@code null}; repository exceptions
+ * <p>Null and error handling: All accessor methods return an empty array instead of {@code null}; repository exceptions
  * are logged at WARN level to avoid disrupting calling code.</p>
  * <p>Thread-safety: Instances are NOT thread-safe. A {@code QueryResult} is typically consumed once; do not share a
  * single instance across threads without external synchronization.</p>

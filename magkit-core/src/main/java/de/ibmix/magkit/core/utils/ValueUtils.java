@@ -32,8 +32,7 @@ import java.util.Calendar;
 
 /**
  * Utility methods to handle and convert JCR {@link Value} instances into common Java types.
- * <p>
- * Main functionalities & key features:
+ * <p>Main functionalities and key features:</p>
  * <ul>
  *   <li>Type-safe conversion of {@link Value} to String, Calendar, Long, Double, Boolean, Binary and BigDecimal.</li>
  *   <li>Uniform null and error handling: if the provided value is null or conversion fails, a provided fallback is returned.</li>
@@ -41,12 +40,12 @@ import java.util.Calendar;
  *   <li>Consistent with Jackrabbit {@code BaseValue} conversions (e.g. {@code value.getString()}).</li>
  *   <li>Avoids Magnolia {@code PropertyUtil.getValueString(.)} date formatting differences by relying directly on JCR {@code Value} conversion.</li>
  * </ul>
- * </p>
+ *
  * <p>
  * Usage preconditions: All methods accept {@code null} for the {@code value} parameter; optional fallback may also be {@code null}.
  * </p>
  * <p>
- * Null & error handling: If {@code value} is {@code null} or a {@link RepositoryException} is thrown while converting,
+ * Null and error handling: If {@code value} is {@code null} or a {@link RepositoryException} is thrown while converting,
  * the respective method returns the provided {@code fallback}. If no fallback was provided, {@code null} is returned.
  * </p>
  * <p>
@@ -55,14 +54,12 @@ import java.util.Calendar;
  * <p>
  * Thread-safety: The class is stateless and all methods are pure (aside from logging). It is fully thread-safe.
  * </p>
- * <p>
- * Example usage:
+ * <p>Example usage:</p>
  * <pre>
  *   Value jcrValue = property.getValue();
  *   String asString = ValueUtils.valueToString(jcrValue, "fallback");
  *   Long number = ValueUtils.valueToLong(jcrValue); // may be null if not convertible
  * </pre>
- * </p>
  *
  * @author wolf.bubenik
  * @since 2018-12-20

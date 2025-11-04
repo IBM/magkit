@@ -43,21 +43,21 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
  * Extends {@link LinkConverter} by allowing compound suffixes (selector, query, anchor) to be preserved while converting
  * the path portion to a node identifier. Reverse conversion reconstructs the path with original suffix.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Supports selector (e.g. <code>.detail</code>) via Magnolia's {@link SelectorUtil} delimiter.</li>
  *   <li>Preserves query strings and anchors while resolving the underlying node.</li>
  *   <li>Graceful handling of external URLs/anchors by delegating to super converter.</li>
  * </ul>
- * </p>
- * <p>Usage example (dialog definition):
+ *
+ * <p>Usage example (dialog definition):</p>
  * <pre>
  *  $type: pageLinkField
  *  textInputAllowed: true
  *  converterClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkConverter
  *  fieldBinderClass: de.ibmix.magkit.ui.dialogs.fields.ExtendedLinkBinder
  * </pre>
- * </p>
+ *
  * <p>Thread-safety: Not thread-safe; relies on injected datasource and JCR session.</p>
  *
  * @author frank.sommer

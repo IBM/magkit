@@ -45,7 +45,7 @@ import javax.jcr.query.QueryManager;
  *     .withLimit(10).getResultNodes();}</pre>
  * <p>Preconditions: A workspace and statement must be set prior to calling terminal build/execute methods. The Magnolia
  * context must supply a valid JCR session.</p>
- * <p>Null & error handling: {@link #getQuery()} returns {@code null} on repository errors; callers must guard against
+ * <p>Null and error handling: {@link #getQuery()} returns {@code null} on repository errors; callers must guard against
  * this when constructing wrappers or executing queries. Errors are logged at ERROR level.</p>
  * <p>Thread-safety: NOT thread-safe. Each instance should be used within a single thread.</p>
  * @author wolf.bubenik@ibmix.de

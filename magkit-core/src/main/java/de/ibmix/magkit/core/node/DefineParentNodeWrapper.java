@@ -50,7 +50,7 @@ import static org.apache.commons.lang3.Validate.notNull;
  * DefineParentNodeWrapper wrapped = new DefineParentNodeWrapper(syntheticParent, actual);
  * String path = wrapped.getPath(); // synthetic path below the defined parent
  * }</pre>
- * <p>Null & error handling: The constructor validates that the provided parent is non-null. Standard JCR exceptions
+ * <p>Null and error handling: The constructor validates that the provided parent is non-null. Standard JCR exceptions
  * from delegate calls are propagated unchanged.</p>
  * <p>Thread-safety: Instances are not thread-safe if the wrapped node changes, but immutable with respect to their own
  * parent reference after construction.</p>

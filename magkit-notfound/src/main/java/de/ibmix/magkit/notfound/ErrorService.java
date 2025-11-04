@@ -50,7 +50,7 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  * for a given request context (status code, domain, original URI) by analyzing site mappings, repository handles
  * and configurable module parameters.
  *
- * Key Features:
+ * <p>Key Features:</p>
  * <ul>
  *   <li>Computes an error page path considering site-specific path fragments and configurable relative error path.</li>
  *   <li>Maps status codes to custom error page names via module configuration (fallback to numeric code if unmapped).</li>
@@ -58,27 +58,27 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  *   <li>Provides a simple entity map representation usable for API responses or templating.</li>
  * </ul>
  *
- * Usage Preconditions:
+ * <p>Usage Preconditions:</p>
  * <ul>
  *   <li>Magnolia context must be initialized so that JCR sessions and site resolution work.</li>
  *   <li>Module configuration ({@link NotfoundModule}) must be available through dependency injection.</li>
  * </ul>
  *
- * Null and Error Handling:
+ * <p>Null and Error Handling:</p>
  * <ul>
  *   <li>If an error page cannot be resolved or does not exist, an empty string is returned as path.</li>
  *   <li>JCR access issues are logged and suppressed; methods do not propagate repository exceptions.</li>
  * </ul>
  *
- * Thread-Safety: This service is stateless; providers are thread-safe references. All Magnolia context access
- * assumes Magnolia's own thread confinement model for requests.
+ * <p>Thread-Safety: This service is stateless; providers are thread-safe references. All Magnolia context access
+ * assumes Magnolia's own thread confinement model for requests.</p>
  *
- * Example:
- * <pre>
+ * <p>Example:</p>
+ * <pre>{@code
  *   ErrorService errorService = ...; // injected
  *   String path404 = errorService.retrieveErrorPagePath(404, "www.example.com", "/foo/bar");
  *   Map<String, Object> payload = errorService.createEntity(404, "/foo/bar");
- * </pre>
+ * }</pre>
  *
  * @author frank.sommer
  * @since 15.09.2023

@@ -41,7 +41,7 @@ import java.util.List;
  *   <li>Convenience conversion of the iterator to a {@link List} while preserving iteration order.</li>
  *   <li>Consistent non-null return contracts.</li>
  * </ul>
- * <p>Null & error handling: All accessors return non-null collections (possibly empty). Repository access issues are
+ * <p>Null and error handling: All accessors return non-null collections (possibly empty). Repository access issues are
  * caught and logged at WARN level.</p>
  * <p>Thread-safety: Instances are NOT thread-safe. Consume in a single thread; do not share concurrently without
  * external synchronization.</p>

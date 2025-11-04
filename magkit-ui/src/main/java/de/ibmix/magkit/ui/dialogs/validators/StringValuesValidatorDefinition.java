@@ -28,6 +28,7 @@ import java.util.Collections;
 /**
  * Base definition supplying a collection of accepted string values for derived validators.
  * <p>Used by template id/type validators to centralize list logic.</p>
+ *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

@@ -34,7 +34,7 @@ import java.util.List;
  *   <li>Build a type-safe {@link NodesQuery} wrapper from the configured state.</li>
  *   <li>Execute the query and collect resulting JCR {@link Node} instances.</li>
  * </ul>
- * <p>Null & error handling: Implementations should never return {@code null}; on repository access issues they
+ * <p>Null and error handling: Implementations should never return {@code null}; on repository access issues they
  * typically return an empty list and log a warning.</p>
  * <p>Thread-safety: Implementations are NOT thread-safe; use per request / per operation.</p>
  * <p>Usage example:</p>

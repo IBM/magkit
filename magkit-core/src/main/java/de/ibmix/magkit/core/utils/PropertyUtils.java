@@ -84,8 +84,8 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  * <pre>
  *   Node article = ...;
  *   String title = PropertyUtils.getStringValue(article, "title", "Untitled");
- *   List<String> tags = PropertyUtils.getStringValues(article, "tags");
- *   Collection<String> ordered = PropertyUtils.retrieveOrderedMultiSelectValues(article, "categories");
+ *   List&lt;String&gt; tags = PropertyUtils.getStringValues(article, "tags");
+ *   Collection&lt;String&gt; ordered = PropertyUtils.retrieveOrderedMultiSelectValues(article, "categories");
  * </pre>
  * Important details:
  * <ul>

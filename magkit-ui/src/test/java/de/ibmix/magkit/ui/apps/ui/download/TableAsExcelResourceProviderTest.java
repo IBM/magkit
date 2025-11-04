@@ -120,7 +120,7 @@ public class TableAsExcelResourceProviderTest {
         assertTrue(titleFont.getBold());
         // title vertical alignment center
         assertEquals(VerticalAlignment.CENTER, titleStyle.getVerticalAlignment());
-        // sheet settings landscape & centered
+        // sheet settings landscape and centered
         assertTrue(sheet.getPrintSetup().getLandscape());
         assertTrue(sheet.getHorizontallyCenter());
     }

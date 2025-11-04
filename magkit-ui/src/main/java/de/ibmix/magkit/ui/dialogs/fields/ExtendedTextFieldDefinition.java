@@ -29,12 +29,12 @@ import info.magnolia.ui.field.TextFieldDefinition;
  * When the field has no enforced maximum length but a recommended length is set (&gt; 0), the factory will wrap the
  * underlying Vaadin text field with {@link ExtendedTextField} adding a remaining length indicator label.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Recommended length separate from max length.</li>
  *   <li>Factory-controlled decoration only when max length is not set.</li>
  * </ul>
- * </p>
+ *
  * <p>Thread-safety: Not thread-safe; definition instances are configuration objects.</p>
  *
  * @author Janine.Kleessen

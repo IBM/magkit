@@ -54,7 +54,7 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
 
     /**
      * Start a string condition for the given property name.
-     * @param name property name (may be null/blank -> empty condition later)
+     * @param name property name (may be null/blank -&gt; empty condition later)
      * @return dynamic operand (case transformation) API
      */
     public static Sql2DynamicOperand property(final String name) {

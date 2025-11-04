@@ -44,24 +44,24 @@ import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * Utility class providing static helper methods for working with {@link Locale} and Magnolia i18n configuration.
- * <p>
- * Core functionalities:
+ *
+ * <p>Core functionalities:</p>
  * <ul>
  *   <li>Access to the configured site locales and their ISO language codes.</li>
  *   <li>Determination of a locale (language) from a JCR node or path.</li>
  *   <li>Lookup of display labels for locales based on path information.</li>
- *   <li>Retrieval of available countries mapped (countryName -> countryCode).</li>
+ *   <li>Retrieval of available countries mapped (countryName -&gt; countryCode).</li>
  * </ul>
- * <p>
- * Important details:
+ *
+ * <p>Important details:</p>
  * <ul>
  *   <li>The list of site locales is cached the first time {@link #getSiteLocales()} is called. Subsequent changes
  *       to Magnolia's site configuration will NOT be reflected until {@link #resetDefaultSiteLocals()} is invoked.</li>
  *   <li>If no fallback locale is configured, {@link java.util.Locale#ENGLISH} is used as default.</li>
  *   <li>Locale extraction from a path scans path segments and returns the first segment matching a configured language.</li>
  * </ul>
- * <p>
- * Null and error handling:
+ *
+ * <p>Null and error handling:</p>
  * <ul>
  *   <li>Methods returning language codes may return {@code null} or an empty string when no configured locale is found.</li>
  *   <li>{@link #determineLocaleFromContent(Node)} falls back to the default site locale when none is found in the path.</li>
@@ -71,10 +71,10 @@ import static org.apache.commons.lang3.StringUtils.split;
  * cache initialization is not synchronized; concurrent first access may initialize the cache multiple times with the
  * same logical result. Manual reset via {@link #resetDefaultSiteLocals()} is not thread-safe and should only be used
  * in controlled test scenarios.
- * <p>
- * Side effects: Calling {@link #resetDefaultSiteLocals()} clears the static cache and forces re-reading Magnolia's
+ * </p>
+ * <p>Side effects: Calling {@link #resetDefaultSiteLocals()} clears the static cache and forces re-reading Magnolia's
  * configuration on the next {@link #getSiteLocales()} invocation.
- * <p>
+ * </p>
  * Usage example:
  * <pre>{@code
  * // Obtain configured language codes

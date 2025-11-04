@@ -31,7 +31,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * Module class of the Magkit module.
  * <p>
  * Provides configuration settings for handling "not found" (404 and related) error pages in a Magnolia based
- * installation. It encapsulates three main configurable aspects:
+ * installation. It encapsulates three main configurable aspects:</p>
  * <ul>
  *   <li><b>defaultErrorPath</b>: An absolute or site-root based default path used when no site specific error page
  *       has been defined.</li>
@@ -40,8 +40,8 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  *   <li><b>errorCodeMapping</b>: A mapping from HTTP status codes (e.g. "404", "500") to page names or path fragments
  *       allowing fine grained selection of error pages per status code.</li>
  * </ul>
- * Additionally this module declares the site parameter key {@link #SITE_PARAM_FRAGMENT_LENGTH} which controls how
- * many base path fragments are considered when resolving site specific error pages.
+ * <p>Additionally this module declares the site parameter key {@link #SITE_PARAM_FRAGMENT_LENGTH} which controls how
+ * many base path fragments are considered when resolving site specific error pages.</p>
  * <p>
  * <b>Usage Preconditions:</b> All properties are expected to be initialized by Magnolia module configuration
  * (e.g. via YAML or JCR configuration) before first usage. Defaults ensure non-null values.
@@ -58,8 +58,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  * <p>
  * <b>Side Effects:</b> This class has no side effects; it stores configuration data only.
  * </p>
- * <p>
- * <b>Example Usage:</b>
+ * <p><b>Example Usage:</b></p>
  * <pre>{@code
  * NotfoundModule cfg = new NotfoundModule();
  * cfg.setDefaultErrorPath("/global/error/index");

@@ -69,7 +69,7 @@ import java.util.function.Function;
  * boolean multi = p.isMultiple(); // true
  * String first = p.getString(); // "one"
  * }</pre>
- * <p>Null & error handling: Constructors ignore null value arrays (no values set). Repository exceptions during
+ * <p>Null and error handling: Constructors ignore null value arrays (no values set). Repository exceptions during
  * reference value creation are logged (WARN) and do not propagate. Getter methods may throw standard
  * {@link RepositoryException} if underlying value conversion fails.</p>
  * <p>Thread-safety: Not thread-safe; instances are effectively immutable after construction unless external code

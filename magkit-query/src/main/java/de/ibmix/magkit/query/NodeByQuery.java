@@ -46,7 +46,7 @@ import java.util.function.Function;
  *   <li>The property should be indexed or otherwise efficiently queryable for performance.</li>
  * </ul>
  *
- * Null & error handling:
+ * Null and error handling:
  * <ul>
  *   <li>If the provided value is {@code null} or empty the underlying query may yield no results; {@code null} is returned.</li>
  *   <li>Repository related runtime exceptions are expected to be handled (or propagated) by {@link NodesByQuery}; this class adds no extra error handling.</li>

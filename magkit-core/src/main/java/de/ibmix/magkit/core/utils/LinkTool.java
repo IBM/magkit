@@ -51,7 +51,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
  *   <li>Creation of internal, external or redirect links via {@link LinkType} strategies.</li>
  *   <li>Safe construction of external resource links including context path handling.</li>
  * </ul>
- * Key features & important details:
+ * Key features and important details:
  * <ul>
  *   <li>All methods are static; the class is {@code final} and therefore stateless and thread-safe.</li>
  *   <li>Null-safe checks for link categorisation to avoid {@link NullPointerException}.</li>
@@ -66,7 +66,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
  *   String url = LinkTool.createLinkForReference(sourceNode, "link", "website", LinkTool.LinkType.INTERNAL);
  * </pre>
  * Thread-safety: All operations are side-effect free and do not mutate shared state; safe for concurrent use.
- * Null & error handling: Null inputs are tolerated in classification helpers; URI syntax issues are logged only.
+ * Null and error handling: Null inputs are tolerated in classification helpers; URI syntax issues are logged only.
  *
  * @author Frank Sommer (25.10.2007)
  * @since 2007-10-25

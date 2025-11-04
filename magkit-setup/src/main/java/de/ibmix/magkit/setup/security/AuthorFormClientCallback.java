@@ -40,7 +40,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
  * an author/admin server or the requested URI targets an authorized internal path ("/.magnolia"). For all other paths
  * on public (non-admin) servers, the callback deliberately returns HTTP 404 to avoid exposing the login endpoint.
  *
- * Main functionalities & key features:
+ * Main functionalities and key features:
  * - Delegates normal form handling to {@link FormClientCallback} when authorized.
  * - Suppresses login form exposure for unauthorized public paths by sending a 404 response.
  * - Uses {@link ServerConfiguration} to distinguish author/admin vs public instances.

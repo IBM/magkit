@@ -54,7 +54,7 @@
             <artifactId>magkit-test-cms</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Migrated tests use JUnit Jupiter API & Engine -->
+        <!-- Migrated tests use JUnit Jupiter API and Engine -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

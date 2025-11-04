@@ -27,13 +27,12 @@ import javax.jcr.Node;
 
 /**
  * Factory creating {@link TemplateIdValidator} instances.
- * <p>
- * Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Bridges definition configuration to validator construction.</li>
  *   <li>Stateless aside from holding the definition reference.</li>
  * </ul>
- * </p>
+ *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

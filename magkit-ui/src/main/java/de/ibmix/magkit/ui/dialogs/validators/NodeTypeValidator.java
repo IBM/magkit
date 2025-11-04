@@ -33,12 +33,12 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 /**
  * Validator ensuring a node's primary or mixin type matches any configured accepted types.
  * <p>Checks primary type via {@link Node#isNodeType(String)} and iterates configured accepted types for a match.</p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Supports empty accepted list (treats as always valid).</li>
  *   <li>Graceful exception handling during type inspection – logs and treats as non-match.</li>
  * </ul>
- * </p>
+ *
  * <p>Thread-safety: Not thread-safe; instance per field binding.</p>
  * @author ngoc.tran
  * @since 2024-03-22

@@ -34,7 +34,7 @@ import java.util.List;
  *   <li>Create a type-safe {@link RowsQuery} wrapper from accumulated builder state.</li>
  *   <li>Retrieve all {@link Row} instances or quickly test for existence via {@link #hasResultRows()}.</li>
  * </ul>
- * <p>Null & error handling: Implementations return empty collections or {@code false} instead of throwing on
+ * <p>Null and error handling: Implementations return empty collections or {@code false} instead of throwing on
  * repository errors, logging warnings instead.</p>
  * <p>Thread-safety: NOT thread-safe; use per request / operation.</p>
  * <p>Usage example:</p>

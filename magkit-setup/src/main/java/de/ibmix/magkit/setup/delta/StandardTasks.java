@@ -46,7 +46,6 @@ import static org.apache.commons.lang3.StringUtils.strip;
 
 /**
  * Utility class aggregating common Magnolia module version handler tasks.
- * <p>
  * Provides factory methods for frequently required configuration adjustments during module installation or updates:
  * <ul>
  *     <li>Workflow simplification (auto-approve human tasks, retry action availability)</li>
@@ -54,11 +53,10 @@ import static org.apache.commons.lang3.StringUtils.strip;
  *     <li>Security callback replacement</li>
  *     <li>Version revision classifier comparison helper</li>
  * </ul>
- * Each method returns a {@link Task} ready to be added to a version handler. Where multiple changes need orchestration,
- * an {@link ArrayDelegateTask} sequence is returned.
- * </p>
+ * <p>Each method returns a {@link Task} ready to be added to a version handler. Where multiple changes need orchestration,
+ * an {@link ArrayDelegateTask} sequence is returned.</p>
  * <p>Preconditions: Requires Magnolia configuration repository availability during execution.</p>
- * <p>Side Effects: Modifies nodes below /server/filters, /modules/<module>/workflow-jbpm, /server/filters/securityCallback.</p>
+ * <p>Side Effects: Modifies nodes below /server/filters, /modules/&lt;module&gt;/workflow-jbpm, /server/filters/securityCallback.</p>
  * <p>Error Handling: Individual tasks encapsulate their own exception handling; this class only assembles tasks.</p>
  * <p>Thread-Safety: Stateless; all methods are safe for concurrent invocation.</p>
  * <p>Usage Example: {@code tasks.add(StandardTasks.setSimpleWorkflow());}</p>

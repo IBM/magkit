@@ -257,7 +257,7 @@ public class FolderModelTest {
     }
 
     /**
-     * Handles RepositoryException thrown while setting hideInNav (logs & suppresses) without saving session.
+     * Handles RepositoryException thrown while setting hideInNav (logs and suppresses) without saving session.
      */
     @Test
     public void executeEditModeRepositoryExceptionHandled() throws RepositoryException {

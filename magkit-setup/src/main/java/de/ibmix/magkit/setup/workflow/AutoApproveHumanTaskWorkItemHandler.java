@@ -43,7 +43,7 @@ import java.util.Map;
  * and resolve them without any manual user interaction. After creating the {@link HumanTask} from the provided
  * parameters, the task is added to the {@link TasksManager} and directly resolved with the decision "approve".
  * </p>
- * <p><strong>Main functionalities & key features:</strong></p>
+ * <p><strong>Main functionalities and key features:</strong></p>
  * <ul>
  *   <li>Creates a human task based on work item parameters.</li>
  *   <li>Registers the task in the Magnolia task management system.</li>
@@ -55,7 +55,7 @@ import java.util.Map;
  *   <li>No user assignment or escalation logic is applied because approval is unconditional.</li>
  * </ul>
  * <p><strong>Side effects:</strong> A new task is persisted and resolved right away; listeners observing task lifecycle events will receive both add and resolve events almost instantly.</p>
- * <p><strong>Null & error handling:</strong> Assumes the work item contains a non-null task name parameter mapped to {@link #TASK_NAME}. Missing or invalid task definitions lead to a logged error.</p>
+ * <p><strong>Null and error handling:</strong> Assumes the work item contains a non-null task name parameter mapped to {@link #TASK_NAME}. Missing or invalid task definitions lead to a logged error.</p>
  * <p><strong>Thread-safety:</strong> This handler is not explicitly synchronized. It relies on thread-safety guarantees of {@link TasksManager} and {@link KieSession}. Instances are typically used within the workflow engine's execution context.</p>
  * <p><strong>Usage example:</strong></p>
  * <pre>{@code

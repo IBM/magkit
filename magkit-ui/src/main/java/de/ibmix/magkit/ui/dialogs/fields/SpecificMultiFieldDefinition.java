@@ -29,13 +29,13 @@ import info.magnolia.ui.field.JcrMultiFieldDefinition;
  * The field is intended for structured repeatable groups (e.g. list of teaser composites) where each entry itself can
  * contain multiple subfields. This definition adds sizing constraints beyond the base {@link JcrMultiFieldDefinition}.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Configurable maximum component count (defaults to {@link #DEFAULT_MAX}).</li>
  *   <li>Optional parent count property to relate this multi field to a parent counter.</li>
  *   <li>Uses {@link SpecificMultiFormView} as implementation to enforce add-button enable/disable logic.</li>
  * </ul>
- * </p>
+ *
  * <p>Usage preconditions: Configure the field in a Magnolia dialog definition with type <code>specificMultiField</code>.
  * Provide a composite field definition as the field's field definition so all children are grouped per entry.</p>
  * <p>Thread-safety: Configuration objects are not thread-safe; use only in Magnolia UI initialization phase.</p>

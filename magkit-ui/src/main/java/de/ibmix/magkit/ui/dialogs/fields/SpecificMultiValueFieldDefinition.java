@@ -29,13 +29,13 @@ import info.magnolia.ui.field.JcrMultiValueFieldDefinition;
  * Suitable for lists of primitive values (strings, numbers) rather than composite groups. Adds maximum component
  * configuration similar to {@link SpecificMultiFieldDefinition} but leverages {@link JcrMultiValueFieldDefinition}.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Configurable maximum number of values (defaults to {@link #DEFAULT_MAX}).</li>
  *   <li>Optional parent count property name for contextual constraints.</li>
  *   <li>Uses same view implementation {@link SpecificMultiFormView} for consistent UI behavior.</li>
  * </ul>
- * </p>
+ *
  * <p>Thread-safety: Not thread-safe; configure once during dialog initialization.</p>
  *
  * @author payam.tabrizi

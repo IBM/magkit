@@ -46,7 +46,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  *   <li>Utility accessors for common join scenarios (left/right selector convenience).</li>
  *   <li>Selector-based node extraction from result rows.</li>
  * </ul>
- * <p>Null & error handling: All public accessors return non-null collections (possibly empty). Invalid selector names
+ * <p>Null and error handling: All public accessors return non-null collections (possibly empty). Invalid selector names
  * or repository access issues are logged at WARN level.</p>
  * <p>Thread-safety: Instances are NOT thread-safe. Consume in the creating thread; do not share concurrently without
  * external synchronization.</p>

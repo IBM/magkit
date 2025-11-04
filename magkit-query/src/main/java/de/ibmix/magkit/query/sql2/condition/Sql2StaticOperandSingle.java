@@ -39,7 +39,7 @@ public interface Sql2StaticOperandSingle<V> {
     Sql2JoinConstraint value(V value);
     /**
      * Provide a bind variable (replaces any literal value).
-     * @param name variable name (may be null/blank -> ignored)
+     * @param name variable name (may be null/blank -&gt; ignored)
      * @return next step allowing join selector decision
      */
     Sql2JoinConstraint bindVariable(String name);

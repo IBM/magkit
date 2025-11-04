@@ -33,14 +33,12 @@ import javax.ws.rs.ext.Provider;
  * Purpose: Translates a {@link PageRenderingException} raised during Magnolia page rendering into
  * a JSON (or configured) error entity and appropriate HTTP status code.
  * </p>
- * <p>
- * Main functionalities & key features:
+ * <p>Main functionalities and key features:</p>
  * <ul>
  *   <li>Acts as a JAX-RS {@link Provider} so it is auto-discovered by the runtime.</li>
  *   <li>Extracts HTTP status and failed node path from the thrown {@link PageRenderingException}.</li>
  *   <li>Delegates creation of the response entity to {@link ErrorService} for consistent error payloads.</li>
  * </ul>
- * </p>
  * <p>
  * Usage preconditions: The Magnolia IoC container must be initialized so that {@link Components}
  * can supply an {@link ErrorService} instance. The exception provided must not be {@code null} and
@@ -50,7 +48,7 @@ import javax.ws.rs.ext.Provider;
  * Side effects: None – this mapper is stateless aside from holding a reference to {@link ErrorService}.
  * </p>
  * <p>
- * Null & error handling: Relies on {@link PageRenderingException} delivering a non-null response and path.
+ * Null and error handling: Relies on {@link PageRenderingException} delivering a non-null response and path.
  * If these were null, underlying calls may throw a {@link NullPointerException} (not suppressed here).
  * </p>
  * <p>

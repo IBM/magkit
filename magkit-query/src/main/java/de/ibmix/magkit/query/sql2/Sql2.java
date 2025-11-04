@@ -743,9 +743,10 @@ public final class Sql2 {
             }
 
             /**
-             * Constraint matching any of the given template values.
+             * Constraint matching any of the given property values.
              *
-             * @param values template names
+             * @param name  property name
+             * @param values property values
              * @return join constraint
              */
             public static Sql2JoinConstraint propertyEquals(final java.lang.String name, java.lang.String... values) {

@@ -36,19 +36,19 @@ import static de.ibmix.magkit.core.utils.LinkTool.isExternalLink;
  * anchor references ("#...") and empty values, returning them unchanged. Internal absolute paths are converted to the
  * corresponding node identifiers for storage and vice versa.
  * </p>
- * <p>Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Transparent handling of external links and anchors without repository lookup.</li>
  *   <li>Delegates internal path resolution to Magnolia's JCR converter logic.</li>
  *   <li>Graceful {@code null} input handling (returns {@code null}).</li>
  * </ul>
- * </p>
- * <p>Usage example (dialog definition snippet):
+ *
+ * <p>Usage example (dialog definition snippet):</p>
  * <pre>
  *  textInputAllowed: true
  *  converterClass: de.ibmix.magkit.ui.dialogs.fields.LinkConverter
  * </pre>
- * </p>
+ *
  * <p>Thread-safety: Stateless apart from injected datasource; not thread-safe for concurrent mutation but safe to reuse per UI thread.</p>
  *
  * @author frank.sommer

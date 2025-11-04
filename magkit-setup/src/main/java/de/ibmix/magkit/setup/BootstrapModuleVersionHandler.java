@@ -41,31 +41,29 @@ import static de.ibmix.magkit.setup.delta.StandardTasks.hasModuleNewRevision;
  * that ensure configuration (templates, dialogs, config nodes) and servlet registrations are present after
  * installation or update.
  * </p>
- * <p>
- * Main functionalities / key features:
+ * <p>Main functionalities / key features:</p>
  * <ul>
  *   <li>Adds a complete bootstrap of module configuration on install (all files under <code>/mgnl-bootstrap/install/moduleName</code>).</li>
  *   <li>Adds incremental bootstrap of updated configuration on module updates when the module revision changes.</li>
  *   <li>Ensures all module-provided servlets are registered if missing.</li>
  * </ul>
- * </p>
- * <p>
- * Important details:
+ *
+ * <p>Important details:</p>
  * <ul>
  *   <li>Revision detection is delegated to {@link de.ibmix.magkit.setup.delta.StandardTasks#hasModuleNewRevision(Version, Version)}.</li>
  *   <li>Returned task and delta lists are never {@code null}; Magnolia processes them sequentially.</li>
  *   <li>Errors or exceptions thrown by underlying tasks are handled by Magnolia's installation framework.</li>
  * </ul>
- * </p>
+ *
  * <p><strong>Usage preconditions:</strong> Magnolia will instantiate and invoke this handler automatically when declared in the module descriptor (typically <code>module.xml</code>). Manual instantiation is rarely required.</p>
  * <p><strong>Side effects:</strong> Creates or updates JCR configuration nodes and may register servlet definitions.</p>
  * <p><strong>Thread-safety:</strong> Not designed for concurrent use; Magnolia invokes version handlers in a single-threaded install/update context.</p>
  * <p><strong>Example:</strong></p>
  * <pre>{@code
  * // In module descriptor (module.xml):
- * &lt;versionHandler&gt;de.ibmix.magkit.setup.BootstrapModuleVersionHandler&lt;/versionHandler&gt;
- * }
- * </pre>
+ * <versionHandler>de.ibmix.magkit.setup.BootstrapModuleVersionHandler</versionHandler>;
+ * }</pre>
+ *
  * @author frank.sommer
  * @since 2010-10-26
  */

@@ -47,7 +47,7 @@ import java.util.Calendar;
  * Property p = immutable.getProperty("title"); // works
  * immutable.setProperty("title", "New") // throws UnsupportedOperationException
  * }</pre>
- * Null & error handling: Constructor requires a non-null wrapped node (validated by super-class). Repository
+ * Null and error handling: Constructor requires a non-null wrapped node (validated by super-class). Repository
  * exceptions from delegated read operations propagate unchanged. Side effects: none, no writes. Thread-safety:
  * same as wrapped node (not enforced); wrapper itself is stateless and safe for concurrent reads.
  *

@@ -35,7 +35,7 @@ import java.util.Locale;
  * This class is a lightweight drop-in replacement where translation must reflect the content's locale context (e.g. dialog labels
  * depending on a node's language).
  * </p>
- * <p><strong>Main functionalities & key features:</strong></p>
+ * <p><strong>Main functionalities and key features:</strong></p>
  * <ul>
  *   <li>Delegates locale resolution dynamically to {@link I18nContentSupport#getLocale()}.</li>
  *   <li>Retains all formatting and fallback behavior of {@link SimpleTranslator}.</li>
@@ -45,12 +45,12 @@ import java.util.Locale;
  * <p><strong>Usage preconditions:</strong> Requires an active Magnolia context with properly configured {@link I18nContentSupport}.
  * Inject this class where a {@code SimpleTranslator} would normally be used if content-based locale switching is desired.</p>
  * <p><strong>Side effects:</strong> None. Locale is resolved per invocation; no mutation of global state.</p>
- * <p><strong>Null & error handling:</strong> Assumes {@link I18nContentSupport#getLocale()} returns a non-null {@link Locale}. If it returns
+ * <p><strong>Null and error handling:</strong> Assumes {@link I18nContentSupport#getLocale()} returns a non-null {@link Locale}. If it returns
  * {@code null}, Magnolia's underlying translation service fallback applies (typically default locale).</p>
  * <p><strong>Thread-safety:</strong> Stateless and safe for concurrent use in request/UI threads as with {@link SimpleTranslator}.</p>
  * <p><strong>Usage example:</strong></p>
  * <pre>{@code
- *   @Inject UiTranslator uiTranslator;
+ *   UiTranslator uiTranslator;
  *   String label = uiTranslator.translate("my.module.key");
  * }</pre>
  *
@@ -61,6 +61,7 @@ public class UiTranslator extends SimpleTranslator {
 
     /**
      * Constructs a UI translator bound to the current content locale.
+     *
      * @param translationService Magnolia translation service used for resolving i18n keys.
      * @param i18nContentSupport content support providing the current content {@link Locale}.
      */

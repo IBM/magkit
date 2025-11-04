@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  * <p>
  * Side effects: The passed in collection instance is mutated by adding matching items during traversal.
  * <p>
- * Null & error handling: Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
+ * Null and error handling: Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
  * from underlying JCR operations when accessing item names. Those exceptions are propagated.
  * <p>
  * Thread-safety: Instances are not thread-safe because they mutate the externally supplied collection. Use one
@@ -59,9 +59,9 @@ import java.util.regex.Pattern;
  * <p>
  * Example usage (multi select values):
  * <pre>
- *     RegexpChildrenCollector<Property> collector = new RegexpChildrenCollector<>(new ArrayList<>(), "\\d+", false, 1, Property.class);
+ *     RegexpChildrenCollector&lt;Property&gt; collector = new RegexpChildrenCollector&lt;&gt;(new ArrayList&lt;&gt;(), "child-property-name", false, 1, Property.class);
  *     multiselectNode.accept(collector);
- *     Collection<Property> valueProperties = collector.getCollectedChildren();
+ *     Collection&lt;Property&gt; valueProperties = collector.getCollectedChildren();
  * </pre>
  * <p>
  * @param <T> subclass of {@link Item} that will be collected

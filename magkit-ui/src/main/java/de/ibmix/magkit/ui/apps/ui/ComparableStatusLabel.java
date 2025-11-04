@@ -43,14 +43,13 @@ import static info.magnolia.ui.workbench.column.StatusColumnFormatter.Activation
  * sort before not activated labels. This enables consistent status based sorting inside workbench tables without
  * leaking style name details into calling code.
  * </p>
- * <p>
- * Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Derives activation status safely, logging repository exceptions instead of propagating them.</li>
  *   <li>Provides a stable ordering independent of locale by mapping style names to integer indices.</li>
  *   <li>Immutable caption once constructed; the visual style reflects the captured activation state at construction time.</li>
  * </ul>
- * </p>
+ *
  * <p>
  * Usage preconditions: The provided {@link Node} must be non-null and (optionally) mix:activatable. Nodes lacking
  * activation metadata are treated as not activated. For current status after external updates, create a new instance.

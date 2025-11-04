@@ -27,13 +27,12 @@ import javax.jcr.Node;
 
 /**
  * Factory creating {@link TemplateTypeValidator} instances from {@link TemplateTypeValidatorDefinition}.
- * <p>
- * Key features:
+ * <p>Key features:</p>
  * <ul>
  *   <li>Stateless creation – new validator per field binding.</li>
  *   <li>Encapsulates mapping from definition to concrete validator.</li>
  * </ul>
- * </p>
+ *
  * <p>Thread-safety: Factory instances are not thread-safe; Magnolia creates them per UI usage.</p>
  *
  * @author wolf.bubenik@ibmix.de
