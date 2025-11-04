@@ -66,13 +66,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * state beyond injected dependencies is modified; therefore the class is effectively thread-safe under standard Magnolia
  * request handling assumptions.</p>
  * <p><strong>Usage Example:</strong></p>
- * <pre>{@code
+ * <pre>
  * // In web.xml error mapping
- * <error-pag>
- *   <error-code>404</error-code>
- *   <location>/magnoliaError/error/default</location>
- * </error-page>
- * }</pre>
+ * &lt;error-page&gt;
+ *   &lt;error-code&gt;404&lt;/error-code&gt;
+ *   &lt;location&gt;/magnoliaError/error/default&lt;/location&gt;
+ * &lt;/error-page&gt;
+ * </pre>
  *
  * @author frank.sommer
  * @since 2023-09-04

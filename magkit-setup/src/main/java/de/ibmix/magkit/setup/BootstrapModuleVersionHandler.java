@@ -59,10 +59,10 @@ import static de.ibmix.magkit.setup.delta.StandardTasks.hasModuleNewRevision;
  * <p><strong>Side effects:</strong> Creates or updates JCR configuration nodes and may register servlet definitions.</p>
  * <p><strong>Thread-safety:</strong> Not designed for concurrent use; Magnolia invokes version handlers in a single-threaded install/update context.</p>
  * <p><strong>Example:</strong></p>
- * <pre>{@code
+ * <pre>
  * // In module descriptor (module.xml):
- * <versionHandler>de.ibmix.magkit.setup.BootstrapModuleVersionHandler</versionHandler>;
- * }</pre>
+ * &lt;versionHandler&gt;de.ibmix.magkit.setup.BootstrapModuleVersionHandler&lt;/versionHandler&gt;;
+ * </pre>
  *
  * @author frank.sommer
  * @since 2010-10-26

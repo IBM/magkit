@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests the Encoding Utils.
  *
  * @author oliver.emke, Aperto AG
- * @since 14.03.11
+ * @since 2011-03-14
  */
 public class EncodingUtilsTest {
 
@@ -82,7 +82,7 @@ public class EncodingUtilsTest {
         assertEquals("", getUrlDecoded(null));
         assertEquals("", getUrlDecoded(""));
         assertEquals("unternehmensf?hrung", getUrlDecoded("unternehmensf%3Fhrung"));
-        assertEquals("Candida and Terasuisse", getUrlDecoded("Candida+%26+Terasuisse"));
+        assertEquals("Candida & Terasuisse", getUrlDecoded("Candida+%26+Terasuisse"));
         assertEquals("\r\n", getUrlDecoded("%0D%0A"));
         assertEquals(" ", getUrlDecoded("+"));
     }
@@ -136,7 +136,7 @@ public class EncodingUtilsTest {
         testData.put("M?nchen", "M%3Fnchen");
         testData.put("j??w +--   ///", "j%3F%3Fw+%2B--+++%2F%2F%2F");
         testData.put("#", "%23");
-        testData.put("Candida and Terasuisse", "Candida+%26+Terasuisse");
+        testData.put("Candida & Terasuisse", "Candida+%26+Terasuisse");
         testData.put("\r\n", "%0D%0A");
         return testData;
     }
