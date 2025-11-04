@@ -39,6 +39,7 @@ public class Sql2ConstraintGroupTest {
         }
         @Override
         public void appendTo(StringBuilder sql2, de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames selectorNames) {
+            // Mock implementation does nothing for empty constraint.
         }
         @Override
         public boolean isNotEmpty() {

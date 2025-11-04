@@ -59,10 +59,6 @@ public class Sql2NodesQueryBuilderTest {
 
     private static final String SELECT_ALL = "SELECT * FROM [nt:base]";
 
-    @BeforeEach
-    public void setUp() throws Exception {
-    }
-
     @AfterEach
     public void tearDown() throws Exception {
         cleanContext();
