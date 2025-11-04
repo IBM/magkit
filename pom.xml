@@ -23,7 +23,6 @@
         <version.magnolia>6.2.45</version.magnolia>
         <!-- keep in sync with corresponding versions from magnolia bundle -->
         <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
-        <!-- Newer versions throw an error at runtime (method not found at internal classes) -->
         <!-- Updated due to security vulnerabilities in 5.2.2 -->
         <version.poi>5.4.1</version.poi>
 
