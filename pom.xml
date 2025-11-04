@@ -29,7 +29,7 @@
 
         <mockitoVersion>5.20.0</mockitoVersion>
         <juniuit.Version>5.14.0</juniuit.Version>
-        <version.magkit.test>1.0.9-SNAPSHOT</version.magkit.test>
+        <version.magkit.test>1.0.10</version.magkit.test>
         <jacocoVersion>0.8.14</jacocoVersion>
     </properties>
 
