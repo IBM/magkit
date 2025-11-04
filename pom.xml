@@ -168,7 +168,7 @@
         <repository>
             <id>magnolia.enterprise</id>
             <name>Magnolia Enterprise Group</name>
-            <url>https://nexus.magnolia-cms.com/content/groups/enterprise/</url>
+            <url>https://nexus.magnolia-cms.com/repository/enterprise/</url>
         </repository>
     </repositories>
 </project>
