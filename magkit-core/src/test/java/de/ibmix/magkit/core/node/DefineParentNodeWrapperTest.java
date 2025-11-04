@@ -57,7 +57,6 @@ public class DefineParentNodeWrapperTest {
     @Test
     public void constructorRequiresNonNullParent() throws RepositoryException {
         // build hierarchy for actual
-        Node root = mockNode("root");
         Node actual = mockNode("root/actual");
         assertThrows(NullPointerException.class, () -> new DefineParentNodeWrapper(null, actual));
     }
