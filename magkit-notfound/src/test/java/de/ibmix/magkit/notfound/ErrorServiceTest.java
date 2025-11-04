@@ -97,11 +97,9 @@ public class ErrorServiceTest {
     @Test
     public void fallbackToDefaultErrorPathWhenNoMappingMatches() throws Exception {
         _module.setDefaultErrorPath("/global");
-//        mockUriToRepositoryManager("/unknown/notfound", "website");
         URI2RepositoryManager uri2RepositoryManager = mockComponentInstance(URI2RepositoryManager.class);
         when(uri2RepositoryManager.getHandle("/unknown/notfound")).thenReturn("/unknown/notfound");
         when(uri2RepositoryManager.getRepository("/unknown/notfound")).thenReturn("website");
-//        initSiteManagerWithSite(null, "/unknown/notfound", 1);
         Site site = mock(Site.class);
         when(site.getMappings()).thenReturn(Map.of());
         when(site.getParameters()).thenReturn(Map.of(SITE_PARAM_FRAGMENT_LENGTH, 1));
