@@ -21,17 +21,15 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test Sql2ContainsCondition.
- *
+ * Tests for Sql2ContainsCondition.
  * @author wolf.bubenik@ibmix.de
- * @since 3.5.2 (05.01.21)
+ * @since 2021-01-05
  */
 public class Sql2ContainsConditionTest {
     private static final Sql2SelectorNames SELECTOR_NAMES = new Sql2SelectorNames() {
@@ -48,7 +46,7 @@ public class Sql2ContainsConditionTest {
 
     private Sql2ContainsCondition _containsCondition;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         _containsCondition = new Sql2ContainsCondition();
     }
@@ -56,15 +54,15 @@ public class Sql2ContainsConditionTest {
     @Test
     public void empty() {
         StringBuilder sql2 = new StringBuilder();
-        assertThat(_containsCondition.isNotEmpty(), is(false));
+        assertFalse(_containsCondition.isNotEmpty());
         _containsCondition.appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is(""));
+        assertEquals("", sql2.toString());
 
         _containsCondition.all("").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is(""));
+        assertEquals("", sql2.toString());
 
         _containsCondition.all("   ").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is(""));
+        assertEquals("", sql2.toString());
     }
 
     @Test
@@ -74,44 +72,44 @@ public class Sql2ContainsConditionTest {
             .all(0, false, "ignoreInRating")
             .all(1, true, "fuzzy")
             .appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'first second ignoreInRating^0 fuzzy~')"));
+        assertEquals("contains(from.*, 'first second ignoreInRating^0 fuzzy~')", sql2.toString());
 
         sql2.setLength(0);
         _containsCondition.all(2, true, "ignore fuzzy on phrase").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'first second ignoreInRating^0 fuzzy~ \"ignore fuzzy on phrase\"^2')"));
+        assertEquals("contains(from.*, 'first second ignoreInRating^0 fuzzy~ \"ignore fuzzy on phrase\"^2')", sql2.toString());
     }
 
     @Test
     public void excludeAll() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.excludeAll("first", "second").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, '-first -second')"));
+        assertEquals("contains(from.*, '-first -second')", sql2.toString());
 
         sql2.setLength(0);
         _containsCondition.excludeAll(2, true, "boosted").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, '-first -second -boosted~^2')"));
+        assertEquals("contains(from.*, '-first -second -boosted~^2')", sql2.toString());
     }
 
     @Test
     public void any() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.any("first", "second").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'first OR second')"));
+        assertEquals("contains(from.*, 'first OR second')", sql2.toString());
 
         sql2.setLength(0);
         _containsCondition.any(3, true, "ignore fuzzy on phrase").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'first OR second OR \"ignore fuzzy on phrase\"^3')"));
+        assertEquals("contains(from.*, 'first OR second OR \"ignore fuzzy on phrase\"^3')", sql2.toString());
     }
 
     @Test
     public void excludeAny() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.excludeAny("first", "second").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, '-first OR -second')"));
+        assertEquals("contains(from.*, '-first OR -second')", sql2.toString());
 
         sql2.setLength(0);
         _containsCondition.excludeAny(3, true, "boosted").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, '-first OR -second OR -boosted~^3')"));
+        assertEquals("contains(from.*, '-first OR -second OR -boosted~^3')", sql2.toString());
     }
 
     @Test
@@ -121,7 +119,7 @@ public class Sql2ContainsConditionTest {
             .all(0, false, "ignoreInRating")
             .all(1, false, "noBoost")
             .all(2, false, "boost").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'ignoreInRating^0 noBoost boost^2')"));
+        assertEquals("contains(from.*, 'ignoreInRating^0 noBoost boost^2')", sql2.toString());
     }
 
     @Test
@@ -129,41 +127,41 @@ public class Sql2ContainsConditionTest {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.addTerm(1, false, false, false, 10, true, "this and that?").appendTo(sql2, SELECTOR_NAMES);
         // Note that in phrases the question mark will never be escaped by \
-        assertThat(sql2.toString(), is("contains(from.*, '\"this and that?\"~10')"));
+        assertEquals("contains(from.*, '\"this and that?\"~10')", sql2.toString());
 
         sql2.setLength(0);
         _containsCondition.addTerm(1, false, false, false, 0, true, "ignore zero distance!").appendTo(sql2, SELECTOR_NAMES);
         // Note that in phrases the question mark will never be escaped by \
-        assertThat(sql2.toString(), is("contains(from.*, '\"this and that?\"~10 \"ignore zero distance!\"')"));
+        assertEquals("contains(from.*, '\"this and that?\"~10 \"ignore zero distance!\"')", sql2.toString());
     }
 
     @Test
     public void ignoreProximityOnSimpleTerm() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.addTerm(1, false, false, false, 10, false, "this").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'this')"));
+        assertEquals("contains(from.*, 'this')", sql2.toString());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void startWithQuestionMark() {
-        _containsCondition.excludeAny("?first");
+        assertThrows(IllegalArgumentException.class, () -> _containsCondition.excludeAny("?first"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void startWithStar() {
-        _containsCondition.excludeAny("*first");
+        assertThrows(IllegalArgumentException.class, () -> _containsCondition.excludeAny("*first"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void missingSelector() {
-        _containsCondition.any("first").asString();
+        assertThrows(IllegalStateException.class, () -> _containsCondition.any("first").asString());
     }
 
     @Test
     public void excludeForJoin() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.excludeAny("first").forJoin().appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(join.*, '-first')"));
+        assertEquals("contains(join.*, '-first')", sql2.toString());
     }
 
     @Test
@@ -171,52 +169,52 @@ public class Sql2ContainsConditionTest {
         // (:^[]{}! and ? if specified
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.any("test(").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\(')"));
+        assertEquals("contains(from.*, 'test\\(')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test:").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\:')"));
+        assertEquals("contains(from.*, 'test\\:')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test[").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\[')"));
+        assertEquals("contains(from.*, 'test\\[')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test]").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\]')"));
+        assertEquals("contains(from.*, 'test\\]')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test{").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\{')"));
+        assertEquals("contains(from.*, 'test\\{')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test}").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\}')"));
+        assertEquals("contains(from.*, 'test\\}')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test'").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test''')"));
+        assertEquals("contains(from.*, 'test''')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().any("test?").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test?')"));
+        assertEquals("contains(from.*, 'test?')", sql2.toString());
 
         sql2.setLength(0);
         new Sql2ContainsCondition().addTerm(1, false, false, false, 0, true, "test?").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, 'test\\?')"));
+        assertEquals("contains(from.*, 'test\\?')", sql2.toString());
     }
 
     @Test
     public void rangeInclusive() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.range(true, "alpha", "omega").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, '[alpha TO omega]')"));
+        assertEquals("contains(from.*, '[alpha TO omega]')", sql2.toString());
     }
 
     @Test
     public void rangeExclusive() {
         StringBuilder sql2 = new StringBuilder();
         _containsCondition.range(false, "alpha", "omega").appendTo(sql2, SELECTOR_NAMES);
-        assertThat(sql2.toString(), is("contains(from.*, '{alpha TO omega}')"));
+        assertEquals("contains(from.*, '{alpha TO omega}')", sql2.toString());
     }
 }

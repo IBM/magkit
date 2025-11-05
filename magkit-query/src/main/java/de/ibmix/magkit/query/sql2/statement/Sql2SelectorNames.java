@@ -21,12 +21,24 @@ package de.ibmix.magkit.query.sql2.statement;
  */
 
 /**
- * TODO: Comment.
+ * Accessor interface exposing the selector names used in a built SQL2 statement.
+ * <p>The primary selector name originates from the {@link Sql2As#as(String)} step; the join selector
+ * from {@link Sql2JoinAs#joinAs(String)}. Implementations return null if a selector name was not provided.</p>
+ * <p>Usage: Mainly intended for downstream processing (e.g. condition objects needing selector context).</p>
+ * <p>Thread-safety: Implementations are not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-18
  */
 public interface Sql2SelectorNames {
+    /**
+     * Get the selector name for the FROM part or null if none was supplied.
+     * @return the primary selector name or null
+     */
     String getFromSelectorName();
+    /**
+     * Get the selector name for the JOIN part or null if none was supplied.
+     * @return the join selector name or null
+     */
     String getJoinSelectorName();
 }

@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Basic ValidatorDefinition for a Collection of valid String values.
+ * Base definition supplying a collection of accepted string values for derived validators.
+ * <p>Used by template id/type validators to centralize list logic.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
@@ -42,7 +43,12 @@ public class StringValuesValidatorDefinition extends ConfiguredFieldValidatorDef
         _acceptedValues = acceptedNodeTypes;
     }
 
+    /**
+     * Check if value is among accepted values or list empty (wildcard acceptance).
+     * @param value value to test
+     * @return true if accepted
+     */
     public boolean hasAcceptedValue(String value) {
-        return getAcceptedValues().isEmpty() || _acceptedValues.contains(value);
+        return getAcceptedValues().isEmpty() || (value != null && getAcceptedValues().contains(value));
     }
 }

@@ -21,8 +21,8 @@ package de.ibmix.magkit.core.utils;
  */
 
 import info.magnolia.cms.core.AggregationState;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.RepositoryException;
 
@@ -30,13 +30,13 @@ import static de.ibmix.magkit.core.utils.SelectorUtils.DEF_PAGE;
 import static de.ibmix.magkit.core.utils.SelectorUtils.SELECTOR_PAGING;
 import static de.ibmix.magkit.core.utils.SelectorUtils.updateSelectors;
 import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubSelector;
-import static de.ibmix.magkit.test.cms.context.ContextMockUtils.*;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockAggregationState;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubAttribute;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test of the resource utils.
@@ -49,122 +49,122 @@ public class SelectorUtilsTest {
     @Test
     public void isPagingView() throws RepositoryException {
         AggregationState aggregationState = mockAggregationState();
-        assertThat(SelectorUtils.isPagingView(), is(false));
+        assertFalse(SelectorUtils.isPagingView());
 
         stubSelector("pid").of(aggregationState);
-        assertThat(SelectorUtils.isPagingView(), is(true));
+        assertTrue(SelectorUtils.isPagingView());
 
         stubSelector("pid=3").of(aggregationState);
-        assertThat(SelectorUtils.isPagingView(), is(true));
+        assertTrue(SelectorUtils.isPagingView());
 
         stubSelector("test=pid").of(aggregationState);
-        assertThat(SelectorUtils.isPagingView(), is(false));
+        assertFalse(SelectorUtils.isPagingView());
     }
 
     @Test
     public void isPrintView() throws RepositoryException {
         AggregationState aggregationState = mockAggregationState();
-        assertThat(SelectorUtils.isPrintView(), is(false));
+        assertFalse(SelectorUtils.isPrintView());
 
         stubSelector("print").of(aggregationState);
-        assertThat(SelectorUtils.isPrintView(), is(true));
+        assertTrue(SelectorUtils.isPrintView());
 
         stubSelector("print=true").of(aggregationState);
-        assertThat(SelectorUtils.isPrintView(), is(false));
+        assertFalse(SelectorUtils.isPrintView());
     }
 
     @Test
     public void selectorContains() throws RepositoryException {
         AggregationState aggregationState = mockAggregationState();
-        assertThat(SelectorUtils.selectorContains("test", true), is(false));
+        assertFalse(SelectorUtils.selectorContains("test", true));
 
         stubSelector("key=value~other").of(aggregationState);
-        assertThat(SelectorUtils.selectorContains("test", true), is(false));
-        assertThat(SelectorUtils.selectorContains("test", false), is(false));
+        assertFalse(SelectorUtils.selectorContains("test", true));
+        assertFalse(SelectorUtils.selectorContains("test", false));
 
         stubSelector("key=value~other~test=true").of(aggregationState);
-        assertThat(SelectorUtils.selectorContains("test", true), is(true));
-        assertThat(SelectorUtils.selectorContains("test", false), is(false));
+        assertTrue(SelectorUtils.selectorContains("test", true));
+        assertFalse(SelectorUtils.selectorContains("test", false));
 
         stubSelector("key=value~other~test").of(aggregationState);
-        assertThat(SelectorUtils.selectorContains("test", true), is(true));
-        assertThat(SelectorUtils.selectorContains("test", false), is(true));
+        assertTrue(SelectorUtils.selectorContains("test", true));
+        assertTrue(SelectorUtils.selectorContains("test", false));
 
         stubSelector("key=value~other~issue=test").of(aggregationState);
-        assertThat(SelectorUtils.selectorContains("test", true), is(false));
-        assertThat(SelectorUtils.selectorContains("test", false), is(false));
+        assertFalse(SelectorUtils.selectorContains("test", true));
+        assertFalse(SelectorUtils.selectorContains("test", false));
     }
 
     @Test
     public void retrieveActivePageWithNoValue() throws RepositoryException {
         mockWebContext(stubAttribute(SELECTOR_PAGING, null));
-        assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
+        assertEquals(DEF_PAGE, SelectorUtils.retrieveActivePage());
     }
 
     @Test
     public void retrieveActivePageWithLetterValue() throws RepositoryException {
         mockWebContext(stubAttribute(SELECTOR_PAGING, "abc"));
-        assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
+        assertEquals(DEF_PAGE, SelectorUtils.retrieveActivePage());
     }
 
     @Test
     public void retrieveActivePageWithInvalidValue() throws RepositoryException {
         mockWebContext(stubAttribute(SELECTOR_PAGING, "-5"));
-        assertThat(SelectorUtils.retrieveActivePage(), is(DEF_PAGE));
+        assertEquals(DEF_PAGE, SelectorUtils.retrieveActivePage());
     }
 
     @Test
     public void retrieveActivePageWithValidValue() throws RepositoryException {
         mockWebContext(stubAttribute(SELECTOR_PAGING, "5"));
-        assertThat(SelectorUtils.retrieveActivePage(), is(5));
+        assertEquals(5, SelectorUtils.retrieveActivePage());
     }
 
     @Test
     public void testWithNullUrl() {
-        assertThat(updateSelectors(null, "pid", "1"), equalTo(""));
+        assertEquals("", updateSelectors(null, "pid", "1"));
     }
 
     @Test
     public void testWithEmptyUrl() {
-        assertThat(updateSelectors("", "pid", "1"), equalTo(""));
+        assertEquals("", updateSelectors("", "pid", "1"));
     }
 
     @Test
     public void testWithWhitespaceUrl() {
-        assertThat(updateSelectors(" \t ", "pid", "1"), equalTo(""));
+        assertEquals("", updateSelectors(" \t ", "pid", "1"));
     }
 
     @Test
     public void addSelectorWithNoExtension() {
-        assertThat(updateSelectors("/test", "pid", "1"), equalTo("/test~pid=1~.html"));
+        assertEquals("/test~pid=1~.html", updateSelectors("/test", "pid", "1"));
     }
 
     @Test
     public void addSelectorWithNoExtensionButQueryString() {
-        assertThat(updateSelectors("/test?123", "pid", "1"), equalTo("/test~pid=1~.html?123"));
+        assertEquals("/test~pid=1~.html?123", updateSelectors("/test?123", "pid", "1"));
     }
 
     @Test
     public void addSelectorWithExtensionAndQueryString() {
-        assertThat(updateSelectors("/test.xml?123", "pid", "1"), equalTo("/test~pid=1~.xml?123"));
+        assertEquals("/test~pid=1~.xml?123", updateSelectors("/test.xml?123", "pid", "1"));
     }
 
     @Test
     public void addSelectorWithEncoding() {
-        assertThat(updateSelectors("/test.html", "pid", "\u00FC"), equalTo("/test~pid=%C3%BC~.html"));
+        assertEquals("/test~pid=%C3%BC~.html", updateSelectors("/test.html", "pid", "\u00FC"));
     }
 
     @Test
     public void updateSelector() {
-        assertThat(updateSelectors("/test~kid=1~pid=2~.html", "pid", "1"), equalTo("/test~kid=1~pid=1~.html"));
+        assertEquals("/test~kid=1~pid=1~.html", updateSelectors("/test~kid=1~pid=2~.html", "pid", "1"));
     }
 
     @Test
     public void removeSelector() {
-        assertThat(updateSelectors("/test~kid=1~pid=2~.html", "pid", "1", "kid"), equalTo("/test~pid=1~.html"));
+        assertEquals("/test~pid=1~.html", updateSelectors("/test~kid=1~pid=2~.html", "pid", "1", "kid"));
     }
 
-    @Before
+    @BeforeEach
     public void createMgnlContext() {
         cleanContext();
     }

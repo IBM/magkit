@@ -24,9 +24,9 @@ import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import info.magnolia.jcr.util.NodeNameHelper;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.model.ModuleDefinition;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -40,17 +40,16 @@ import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockServletDefinition;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the re-installation of the module servlets.
+ * Minimal tests for servlet re-registration task.
  *
  * @author frank.sommer
- * @since 03.01.2019
+ * @since 2019-01-03
  */
 public class CheckModuleServletsTaskTest {
 
@@ -58,7 +57,7 @@ public class CheckModuleServletsTaskTest {
     private InstallContext _installContext;
     private ModuleDefinition _moduleDefinition;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ContextMockUtils.cleanContext();
         _moduleDefinition = mockModuleDefinition(stubName("TestModule"));
@@ -75,8 +74,8 @@ public class CheckModuleServletsTaskTest {
     public void noModuleServlets() throws Exception {
         _servletsTask.execute(_installContext);
 
-        assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
-        assertThat(_servletsTask.toString(), equalTo("[]"));
+        assertEquals("Registers servlets for this module.", _servletsTask.getDescription());
+        assertEquals("[]", _servletsTask.toString());
     }
 
     @Test
@@ -84,8 +83,8 @@ public class CheckModuleServletsTaskTest {
         stubServlet(mockServletDefinition("new-servlet")).of(_moduleDefinition);
         _servletsTask.execute(_installContext);
 
-        assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
-        assertThat(_servletsTask.toString(), equalTo("[task: Servlet new-servlet]"));
+        assertEquals("Registers servlets for this module.", _servletsTask.getDescription());
+        assertEquals("[task: Servlet new-servlet]", _servletsTask.toString());
     }
 
     @Test
@@ -97,8 +96,8 @@ public class CheckModuleServletsTaskTest {
         stubServlet(mockServletDefinition("existing-servlet")).of(_moduleDefinition);
         _servletsTask.execute(_installContext);
 
-        assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
-        assertThat(_servletsTask.toString(), equalTo("[task: Remove servlet configuration, task: Servlet new-servlet, task: Servlet existing-servlet]"));
+        assertEquals("Registers servlets for this module.", _servletsTask.getDescription());
+        assertEquals("[task: Remove servlet configuration, task: Servlet new-servlet, task: Servlet existing-servlet]", _servletsTask.toString());
     }
 
     @Test
@@ -108,12 +107,12 @@ public class CheckModuleServletsTaskTest {
         when(session.itemExists(anyString())).thenThrow(new RepositoryException("Exception on item exists."));
         _servletsTask.execute(_installContext);
 
-        assertThat(_servletsTask.getDescription(), equalTo("Registers servlets for this module."));
-        assertThat(_servletsTask.toString(), equalTo("[]"));
+        assertEquals("Registers servlets for this module.", _servletsTask.getDescription());
+        assertEquals("[]", _servletsTask.toString());
         verify(_installContext).warn("Unable to access workspace config to check on servlet definitions for module 'TestModule'.");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }

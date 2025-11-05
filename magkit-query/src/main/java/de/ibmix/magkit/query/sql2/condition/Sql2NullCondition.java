@@ -25,7 +25,11 @@ import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * The builder for a sql2 null condition.
+ * Builder for a SQL2 NULL / NOT NULL property existence condition. Produces fragments like
+ * {@code selector.[prop] IS NULL} or {@code selector.[prop] IS NOT NULL} depending on creation method.
+ *
+ * Thread-safety: Not thread safe.
+ * Null handling: Blank property names yield an empty condition (ignored on render).
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-18
@@ -50,14 +54,31 @@ public final class Sql2NullCondition implements Sql2JoinConstraint {
         return isNotBlank(_name);
     }
 
+    /**
+     * Create an IS NULL condition for the given property.
+     *
+     * @param propertyName property name
+     * @return join-capable condition
+     */
     public static Sql2JoinConstraint isNull(final String propertyName) {
         return new Sql2NullCondition(propertyName, false);
     }
 
+    /**
+     * Create an IS NOT NULL condition for the given property.
+     *
+     * @param propertyName property name
+     * @return join-capable condition
+     */
     public static Sql2JoinConstraint isNotNull(final String propertyName) {
         return new Sql2NullCondition(propertyName, true);
     }
 
+    /**
+     * Append the NULL / NOT NULL fragment to the buffer if non-empty.
+     * @param sql2 target buffer (never null)
+     * @param selectorNames selector name provider (may supply from/join selector names)
+     */
     @Override
     public void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames) {
         if (isNotEmpty()) {
@@ -73,6 +94,10 @@ public final class Sql2NullCondition implements Sql2JoinConstraint {
         }
     }
 
+    /**
+     * Switch to using the join selector name during rendering.
+     * @return this for fluent chaining
+     */
     @Override
     public Sql2JoinConstraint forJoin() {
         _forJoin = true;

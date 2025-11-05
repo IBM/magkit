@@ -32,11 +32,13 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 /**
- * Custom binder for avoiding mgnl changes. Used with {@link ExtendedLinkConverter} in page link fields.
- *
+ * Custom {@link FieldBinder} ensuring default converters for link fields when Magnolia would not configure one.
+ * Works together with {@link ExtendedLinkConverter} to provide flexible link editing without core modifications.
+ * Falls back to {@link SelectFieldSupport#defaultConverter()} when super implementation yields none.
+ * Thread-safety: Not thread-safe; used during field binding in UI initialization.
  * @param <T> field value type
  * @author sebastian.bauch
- * @since 04.03.2022
+ * @since 2022-03-04
  */
 public class ExtendedLinkBinder<T> extends FieldBinder.Default<T> {
 
@@ -48,10 +50,29 @@ public class ExtendedLinkBinder<T> extends FieldBinder.Default<T> {
         _selectFieldSupport = selectFieldSupport;
     }
 
+    /**
+     * Wrapper for {@link FieldBinder.Default#createConfiguredConverter(FieldDefinition, HasValue)} to allow overriding in tests.
+     * Production code does not override this method; it exists only to support deterministic unit testing of fallback behavior.
+     * @param definition field definition
+     * @param field Vaadin field component
+     * @param <PT> property type
+     * @return optional converter (may be empty when Magnolia provides none)
+     */
+    protected <PT> Optional<Converter<PT, ?>> superCreateConfiguredConverter(FieldDefinition<PT> definition, HasValue<?> field) {
+        return super.createConfiguredConverter(definition, field);
+    }
+
+    /**
+     * Provide configured or fallback converter for the field definition.
+     * @param definition field definition
+     * @param field Vaadin field component
+     * @return optional converter (never empty)
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     protected <PT> Optional<Converter<PT, ?>> createConfiguredConverter(FieldDefinition<PT> definition, HasValue<?> field) {
-        Converter configuredConverter = super.createConfiguredConverter(definition, field).orElse(null);
+        Optional<Converter<PT, ?>> superResult = superCreateConfiguredConverter(definition, field);
+        Converter configuredConverter = superResult.orElse(null);
         if (configuredConverter == null) {
             configuredConverter = _selectFieldSupport.defaultConverter();
         }

@@ -42,9 +42,41 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 
 /**
- * Util class for handle with magnolia selectors.
+ * Utility class providing helper functions to work with Magnolia URL selectors (e.g. paging or print views).
+ * <p>
+ * Main functionalities:
+ * <ul>
+ *   <li>Detection of specific selectors (print, paging).</li>
+ *   <li>Retrieval of the active paging number with graceful fallback and validation.</li>
+ *   <li>Updating, adding, replacing or removing selectors in a given URL while preserving extension and query string.</li>
+ * </ul>
+ * Key features and important details:
+ * <ul>
+ *   <li>Selector parsing is based on Magnolia's {@link SelectorUtil#SELECTOR_DELIMITER}.</li>
+ *   <li>Paging values are validated to be positive integers; defaults to {@link #DEF_PAGE} if missing or invalid.</li>
+ *   <li>Not allowed selectors can be filtered out during update operations.</li>
+ *   <li>URL extension and query parameters are preserved when manipulating selectors.</li>
+ * </ul>
+ * Usage preconditions:
+ * <ul>
+ *   <li>Magnolia context must be available when calling {@link #retrieveActivePage()} (uses {@link MgnlContext}).</li>
+ * </ul>
+ * Null and error handling:
+ * <ul>
+ *   <li>Null or blank URL input for {@link #updateSelectors(String, String, String, String...)} results in an empty String.</li>
+ *   <li>Blank selector values trigger removal of the selector id from the URL.</li>
+ * </ul>
+ * Side effects: None (all methods are stateless and operate only on provided input or Magnolia context attributes).
+ * Thread-safety: Fully thread-safe; methods are stateless and only read Magnolia context or operate on local data.
+ * <p>
+ * Usage example:
+ * <pre>
+ *   String updated = SelectorUtils.updateSelectors("/news.pid=2.print.html", "pid", "3", "print");
+ *   // Result: /news.pid=3.html
+ * </pre>
  *
  * @author frank.sommer (29.05.2008)
+ * @since 2008-05-29
  */
 public abstract class SelectorUtils {
     public static final int DEF_PAGE = 1;
@@ -54,27 +86,28 @@ public abstract class SelectorUtils {
     private static final String DEF_EXTENSION = "html";
 
     /**
-     * Checks, if a print selector is given.
+     * Determines whether the current selector string contains the print selector.
      *
-     * @return true if print selector found
+     * @return true if the print selector is present; false otherwise
      */
     public static boolean isPrintView() {
         return selectorContains(SELECTOR_PRINT, false);
     }
 
     /**
-     * Checks a paging selector is given.
+     * Determines whether the current selector string contains a paging selector (e.g. pid=...).
      *
-     * @return true if paging selector found
+     * @return true if a paging selector starting with {@link #SELECTOR_PAGING} exists; false otherwise
      */
     public static boolean isPagingView() {
         return selectorContains(SELECTOR_PAGING, true);
     }
 
     /**
-     * Retrieve the actual page number from selector. Default is {@link #DEF_PAGE}.
+     * Retrieve the active page number from Magnolia context (selector value for {@link #SELECTOR_PAGING}).
+     * Ensures the returned value is a positive integer; defaults to {@link #DEF_PAGE} if missing or invalid.
      *
-     * @return positiv integer value of the page selector.
+     * @return the active page number (&gt;= {@link #DEF_PAGE})
      */
     public static int retrieveActivePage() {
         int actPage = DEF_PAGE;
@@ -87,11 +120,11 @@ public abstract class SelectorUtils {
     }
 
     /**
-     * Checks, if the selector contains the search term.
+     * Checks whether the Magnolia selector string contains a specific term.
      *
-     * @param search     search term
-     * @param startsWith selector starts only with search term
-     * @return true if selector contains search
+     * @param search     the search term (selector id or full selector token)
+     * @param startsWith if true, matches by prefix (e.g. for key=value selectors); if false, matches case-insensitively by equality
+     * @return true if the selector string contains the given term according to the matching rule
      */
     public static boolean selectorContains(String search, boolean startsWith) {
         boolean contains = false;
@@ -112,15 +145,15 @@ public abstract class SelectorUtils {
     }
 
     /**
-     * Add or replace the selector with the id and value for the given url.
-     * If the value is blank, the selector id will be removed.
-     * Not allowed selectors are removed.
+     * Adds or replaces a selector (id=value) within the provided URL. Removes the selector if the value is blank.
+     * Filters out not allowed selector ids. Preserves file extension and query string.
+     * If the URL is null or blank an empty String is returned.
      *
-     * @param url                 url to manipulate
-     * @param id                  id of the selector, e.g. 'pid'
-     * @param value               Value of the selector id
-     * @param notAllowedSelectors array of not allowed selector ids
-     * @return url with updated selectors or empty string if url is null or empty
+     * @param url                 the original URL to modify
+     * @param id                  the selector id (e.g. "pid")
+     * @param value               the selector value; blank value removes the selector
+     * @param notAllowedSelectors selector ids to exclude from the result
+     * @return the updated URL with modified selectors or an empty String if input URL is blank
      */
     public static String updateSelectors(String url, String id, String value, String... notAllowedSelectors) {
         String result = trimToEmpty(url);
@@ -156,6 +189,16 @@ public abstract class SelectorUtils {
         return result;
     }
 
+    /**
+     * Internal helper that builds the new selector list by replacing or adding the specified id=value pair
+     * and filtering out not allowed selector ids.
+     *
+     * @param id                  selector id to add/replace
+     * @param encodedSelectorValue URL-encoded selector value
+     * @param selectors           existing selector tokens
+     * @param notAllowedSelectors ids to remove from the result
+     * @return list of resulting selector tokens
+     */
     private static List<String> createNewSelectors(final String id, final String encodedSelectorValue, final String[] selectors, final String[] notAllowedSelectors) {
         List<String> newSelectors = new ArrayList<>();
         boolean selectorFound = false;

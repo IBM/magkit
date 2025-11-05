@@ -24,14 +24,18 @@ import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.field.factory.TextFieldFactory;
-
 import javax.inject.Inject;
 
 /**
- * Factory for {@link ExtendedTextField}.
+ * Factory creating either a plain Vaadin text field or an {@link ExtendedTextField} with remaining-length indicator.
+ * <p>
+ * Decoration occurs only when <code>maxLength &lt; 1</code> and <code>recommendedLength &gt; 0</code> are configured, thus
+ * leaving standard Magnolia behavior intact otherwise.
+ * </p>
+ * <p>Thread-safety: Not thread-safe; instances used per field creation.</p>
  *
  * @author Janine.Kleessen
- * @since 17.02.2021
+ * @since 2021-02-17
  */
 public class ExtendedTextFieldFactory extends TextFieldFactory {
 
@@ -44,7 +48,8 @@ public class ExtendedTextFieldFactory extends TextFieldFactory {
     }
 
     /**
-     * Wraps the defined text field as extended text field.
+     * Create field component; wraps in {@link ExtendedTextField} when conditions met.
+     * @return component instance (plain or extended)
      */
     @Override
     public Component createFieldComponent() {

@@ -26,9 +26,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Unique value validator definition.
+ * Definition for a validator ensuring uniqueness of a string property across nodes of a given type/workspace.
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Targets a specific property (e.g. "title") within nodes of a configured JCR node type.</li>
+ *   <li>Restricts search scope to a specified workspace for performance and clarity.</li>
+ *   <li>Works together with {@link UniqueValueValidatorFactory} / {@link UniqueValueValidator} to execute a query.</li>
+ * </ul>
+ *
+ * <p>Usage preconditions: Configure <code>propertyName</code>, <code>nodeType</code> and <code>workspace</code>; missing values disable validation logic.</p>
+ * <p>Null and error handling: Missing configuration values are treated gracefully by the validator (validation passes).</p>
+ * <p>Thread-safety: Definition instances are configuration objects; not thread-safe, use only at initialization.</p>
  *
  * @author frank.sommer
+ * @since 2024-03-12
  */
 @Setter
 @Getter

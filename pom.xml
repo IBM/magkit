@@ -20,11 +20,16 @@
     </modules>
 
     <properties>
+        <version.magnolia>6.3.17</version.magnolia>
         <!-- keep in sync with corresponding versions from magnolia bundle -->
-        <version.magnolia.workflow>7.0.1</version.magnolia.workflow>
-        <version.poi>5.2.2</version.poi>
+        <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
+        <!-- Updated due to security vulnerabilities in 5.2.2 -->
+        <version.poi>5.4.1</version.poi>
 
+        <mockitoVersion>5.20.0</mockitoVersion>
+        <juniuit.Version>5.14.0</juniuit.Version>
         <version.magkit.test>1.1.0-SNAPSHOT</version.magkit.test>
+        <jacocoVersion>0.8.14</jacocoVersion>
     </properties>
 
     <dependencyManagement>
@@ -54,12 +59,19 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- excel creation, dependency is provided by Magnolia in the correct version -->
+            <!-- excel creation, Updated due to security vulnerabilities in 5.2.2 -->
+            <!-- After upgrading Magnolia check if version provided by magnolia is actual -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${version.poi}</version>
-                <scope>provided</scope>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${version.poi}</version>
+                <scope>compile</scope>
             </dependency>
 
             <dependency>
@@ -71,11 +83,23 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.28</version>
+                <version>1.18.42</version>
                 <scope>provided</scope>
             </dependency>
 
             <!-- Test Scope Dependencies -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <scope>test</scope>
+                <version>${mockitoVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockitoVersion}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>de.ibmix.magkit</groupId>
                 <artifactId>magkit-test-cms</artifactId>
@@ -94,8 +118,50 @@
                 <version>${version.magkit.test}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junitVersion}</version>
+                <type>pom</type>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!--
+              See
+                https://github.com/SonarSource/sonar-scanning-examples/tree/master/sonarqube-scanner-maven/maven-multimodule
+              Code coverage is aggregated in webapp module, see pom.xml there
+            -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacocoVersion}</version>
+                <executions>
+                    <execution>
+                        <id>agent-for-ut</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <scm>
         <url>https://github.com/IBM/magkit.git</url>
@@ -108,7 +174,7 @@
         <repository>
             <id>magnolia.enterprise</id>
             <name>Magnolia Enterprise Group</name>
-            <url>https://nexus.magnolia-cms.com/content/groups/enterprise/</url>
+            <url>https://nexus.magnolia-cms.com/repository/enterprise/</url>
         </repository>
     </repositories>
 </project>

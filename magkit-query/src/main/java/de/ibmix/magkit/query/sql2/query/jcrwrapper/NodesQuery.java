@@ -25,8 +25,17 @@ import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 
 /**
- * A wrapper for javax.jcr.query.Query to separate Row and Node queries.
- *
+ * Fluent wrapper around a JCR {@link javax.jcr.query.Query} producing {@link NodesResult} for direct node iteration.
+ * <p>Purpose: Provide convenience methods to bind typed variables and execute the query yielding a node-centric result.
+ * Complements {@link RowsQuery} for row-based consumption scenarios.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Typed fluent bind methods inherited from {@link QueryWrapper}.</li>
+ *   <li>Single-step {@link #execute()} returning a {@link NodesResult} iterator abstraction.</li>
+ * </ul>
+ * <p>Thread-safety: NOT thread-safe. Confine to a single thread.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code NodesResult nodes = new NodesQuery(query).bindBoolean("active", true).execute();}</pre>
  * @author wolf.bubenik@ibmix.de
  * @since 2020-08-21
  */
@@ -42,17 +51,11 @@ public class NodesQuery extends QueryWrapper<NodesQuery> {
     }
 
     /**
-     * Executes this query and returns a <code>{@link NodesResult}</code>
-     * object.
-     * <p>
-     * If this <code>Query</code> contains a variable (see {@link
-     * javax.jcr.query.qom.BindVariableValue BindVariableValue}) which has not
-     * been bound to a value (see {@link Query#bindValue}) then this method
-     * throws an <code>InvalidQueryException</code>.
-     *
-     * @return a <code>QueryResult</code> object
-     * @throws InvalidQueryException if the query contains an unbound variable.
-     * @throws RepositoryException   if another error occurs.
+     * Execute the underlying JCR query returning a {@link NodesResult} for direct node iteration.
+     * Unbound variables trigger an {@link InvalidQueryException}.
+     * @return non-null {@link NodesResult}
+     * @throws InvalidQueryException if an unbound variable exists
+     * @throws RepositoryException for other repository access issues
      */
     public NodesResult execute() throws RepositoryException {
         return new NodesResult(getQuery().execute());

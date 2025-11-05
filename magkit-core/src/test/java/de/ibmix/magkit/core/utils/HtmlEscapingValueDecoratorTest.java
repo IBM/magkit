@@ -23,7 +23,7 @@ package de.ibmix.magkit.core.utils;
 
 import de.ibmix.magkit.test.jcr.ValueMockUtils;
 import info.magnolia.jcr.wrapper.HTMLEscapingContentDecorator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Binary;
 import javax.jcr.PropertyType;
@@ -32,8 +32,8 @@ import javax.jcr.Value;
 
 import java.util.Calendar;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing HTMLEscapingContentDecorator.
@@ -48,59 +48,59 @@ public class HtmlEscapingValueDecoratorTest {
     @Test
     public void getString() throws RepositoryException {
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue("<h1>test</h1>"), _decorator);
-        assertThat(value.getString(), is("&lt;h1&gt;test&lt;/h1&gt;"));
-        assertThat(value.getType(), is(PropertyType.STRING));
+        assertEquals("&lt;h1&gt;test&lt;/h1&gt;", value.getString());
+        assertEquals(PropertyType.STRING, value.getType());
     }
 
     @Test
     public void getStream() throws RepositoryException {
         Binary binary = ValueMockUtils.mockBinary("test");
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(binary), _decorator);
-        assertThat(value.getStream(), is(binary.getStream()));
-        assertThat(value.getType(), is(PropertyType.BINARY));
+        assertEquals(binary.getStream(), value.getStream());
+        assertEquals(PropertyType.BINARY, value.getType());
     }
 
     @Test
     public void getBinary() throws RepositoryException {
         Binary binary = ValueMockUtils.mockBinary("test");
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(binary), _decorator);
-        assertThat(value.getBinary(), is(binary));
-        assertThat(value.getType(), is(PropertyType.BINARY));
+        assertEquals(binary, value.getBinary());
+        assertEquals(PropertyType.BINARY, value.getType());
     }
 
     @Test
     public void getLong() throws RepositoryException {
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(123L), _decorator);
-        assertThat(value.getLong(), is(123L));
-        assertThat(value.getType(), is(PropertyType.LONG));
+        assertEquals(123L, value.getLong());
+        assertEquals(PropertyType.LONG, value.getType());
     }
 
     @Test
     public void getDouble() throws RepositoryException {
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(0.123D), _decorator);
-        assertThat(value.getDouble(), is(0.123D));
-        assertThat(value.getType(), is(PropertyType.DOUBLE));
+        assertEquals(0.123D, value.getDouble());
+        assertEquals(PropertyType.DOUBLE, value.getType());
     }
 
     @Test
     public void getDecimal() throws RepositoryException {
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(456L), _decorator);
-        assertThat(value.getDecimal().longValue(), is(456L));
-        assertThat(value.getType(), is(PropertyType.LONG));
+        assertEquals(456L, value.getDecimal().longValue());
+        assertEquals(PropertyType.LONG, value.getType());
     }
 
     @Test
     public void getDate() throws RepositoryException {
         Calendar date = Calendar.getInstance();
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(date), _decorator);
-        assertThat(value.getDate(), is(date));
-        assertThat(value.getType(), is(PropertyType.DATE));
+        assertEquals(date, value.getDate());
+        assertEquals(PropertyType.DATE, value.getType());
     }
 
     @Test
     public void getBoolean() throws RepositoryException {
         Value value = new HtmlEscapingValueDecorator(ValueMockUtils.mockValue(true), _decorator);
-        assertThat(value.getBoolean(), is(true));
-        assertThat(value.getType(), is(PropertyType.BOOLEAN));
+        assertTrue(value.getBoolean());
+        assertEquals(PropertyType.BOOLEAN, value.getType());
     }
 }

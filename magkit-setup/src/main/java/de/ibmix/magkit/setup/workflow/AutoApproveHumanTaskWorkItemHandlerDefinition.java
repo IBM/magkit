@@ -23,13 +23,27 @@ package de.ibmix.magkit.setup.workflow;
 import info.magnolia.module.workflow.jbpm.humantask.handler.definition.HumanTaskWorkItemHandlerDefinition;
 
 /**
- * Definition for human task handler with auto approval.
+ * Work item handler definition that configures a human task handler to automatically approve tasks
+ * without requiring manual user interaction. It simply sets the implementation class to {@link AutoApproveHumanTaskWorkItemHandler}.
+ * <p>
+ * Key features:
+ * <ul>
+ *     <li>Auto-approval of human tasks to streamline workflow execution.</li>
+ *     <li>No additional configuration required beyond registration of this definition.</li>
+ * </ul>
+ * Usage preconditions: Magnolia workflow module must be present and the referenced handler class must be available.
+ * Side effects: Human tasks using this handler are completed automatically; no user assignment or escalation occurs.
+ * Null and error handling: This definition performs only a static class binding and does not execute logic that can produce runtime errors here.
+ * Thread-safety: Instances are immutable after construction and thus thread-safe.
  *
  * @author frank.sommer
- * @since 05.09.2016
+ * @since 2016-09-05
  */
 public class AutoApproveHumanTaskWorkItemHandlerDefinition extends HumanTaskWorkItemHandlerDefinition {
 
+    /**
+     * Creates the definition and binds it to {@link AutoApproveHumanTaskWorkItemHandler} for auto approval behavior.
+     */
     public AutoApproveHumanTaskWorkItemHandlerDefinition() {
         setImplementationClass(AutoApproveHumanTaskWorkItemHandler.class);
     }

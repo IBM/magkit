@@ -24,7 +24,7 @@ import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.Delta;
 import info.magnolia.module.model.ModuleDefinition;
 import info.magnolia.module.model.Version;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -34,8 +34,7 @@ import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
 import static info.magnolia.module.model.Version.parseVersion;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test the module update handling with custom revision classifiers.
@@ -48,43 +47,43 @@ public class ModuleVersionHandlerUpdateTest {
     @Test
     public void testModuleWoClassifiers() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.1", "1.0.1");
-        assertThat(updateDeltas.size(), is(0));
+        assertEquals(0, updateDeltas.size());
     }
 
     @Test
     public void testModuleWoClassifiersUpdate() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.0", "1.0.1");
-        assertThat(updateDeltas.size(), is(1));
+        assertEquals(1, updateDeltas.size());
     }
 
     @Test
     public void testReleasedModuleUpdate() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.1-rabcde", "1.0.1");
-        assertThat(updateDeltas.size(), is(1));
+        assertEquals(1, updateDeltas.size());
     }
 
     @Test
     public void testSameModuleVersion() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.1-rabcde", "1.0.1-rabcde");
-        assertThat(updateDeltas.size(), is(0));
+        assertEquals(0, updateDeltas.size());
     }
 
     @Test
     public void testNewModuleVersion() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.0-rabcde", "1.0.1-r1234");
-        assertThat(updateDeltas.size(), is(1));
+        assertEquals(1, updateDeltas.size());
     }
 
     @Test
     public void testOldModuleVersion() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.1-rabcde", "1.0.0-r1234");
-        assertThat(updateDeltas.size(), is(0));
+        assertEquals(0, updateDeltas.size());
     }
 
     @Test
     public void testNewClassifierVersion() {
         List<Delta> updateDeltas = doTestWithVersions("1.0.1-rabcde", "1.0.1-r1234");
-        assertThat(updateDeltas.size(), is(1));
+        assertEquals(1, updateDeltas.size());
     }
 
     private List<Delta> doTestWithVersions(final String from, final String to) {

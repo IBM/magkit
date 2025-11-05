@@ -23,8 +23,8 @@ package de.ibmix.magkit.ui.dialogs.validators;
 import info.magnolia.ui.field.ValidatorType;
 
 /**
- * Definition for the TemplateIdValidator.
- *
+ * Definition for validator verifying template ID matches an accepted value.
+ * <p>Uses acceptedValues from {@link StringValuesValidatorDefinition}.</p>
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

@@ -23,13 +23,15 @@ package de.ibmix.magkit.core.utils;
 import de.ibmix.magkit.test.jcr.NodeStubbingOperation;
 import info.magnolia.jcr.decoration.ContentDecoratorPropertyWrapper;
 import info.magnolia.jcr.wrapper.HTMLEscapingPropertyWrapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.jackrabbit.JcrConstants;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import java.util.Calendar;
@@ -37,6 +39,7 @@ import java.util.Collection;
 import java.util.TimeZone;
 
 import static de.ibmix.magkit.core.utils.PropertyUtils.PROPERTY_NAME_COMPARATOR;
+import static de.ibmix.magkit.core.utils.PropertyUtils.exists;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBinaryValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBinaryValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getBooleanValue;
@@ -47,10 +50,12 @@ import static de.ibmix.magkit.core.utils.PropertyUtils.getDoubleValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getDoubleValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getLongValues;
+import static de.ibmix.magkit.core.utils.PropertyUtils.getProperties;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getProperty;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValue;
 import static de.ibmix.magkit.core.utils.PropertyUtils.getStringValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.retrieveMultiSelectProperties;
+import static de.ibmix.magkit.core.utils.PropertyUtils.retrieveMultiSelectValues;
 import static de.ibmix.magkit.core.utils.PropertyUtils.retrieveOrderedMultiSelectValues;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
@@ -59,10 +64,12 @@ import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubProperty;
 import static de.ibmix.magkit.test.jcr.PropertyMockUtils.mockProperty;
 import static de.ibmix.magkit.test.jcr.PropertyStubbingOperation.stubValues;
 import static de.ibmix.magkit.test.jcr.ValueMockUtils.mockBinary;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -75,12 +82,12 @@ import static org.mockito.Mockito.doThrow;
  */
 public class PropertyUtilsTest {
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cleanContext();
     }
@@ -89,19 +96,18 @@ public class PropertyUtilsTest {
     public void propertyNameComparatorTest() throws RepositoryException {
         Property p1 = mockProperty("01-test");
         Property p2 = mockProperty("1-test");
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(null, null), is(0));
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(null, p1), is(-7));
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(p1, null), is(7));
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(p1, p1), is(0));
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(p1, p2), is(-1));
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(p2, p2), is(0));
-        assertThat(PROPERTY_NAME_COMPARATOR.compare(p2, p1), is(1));
+        assertEquals(0, PROPERTY_NAME_COMPARATOR.compare(null, null));
+        assertEquals(-7, PROPERTY_NAME_COMPARATOR.compare(null, p1));
+        assertEquals(7, PROPERTY_NAME_COMPARATOR.compare(p1, null));
+        assertEquals(0, PROPERTY_NAME_COMPARATOR.compare(p1, p1));
+        assertEquals(-1, PROPERTY_NAME_COMPARATOR.compare(p1, p2));
+        assertEquals(0, PROPERTY_NAME_COMPARATOR.compare(p2, p2));
+        assertEquals(1, PROPERTY_NAME_COMPARATOR.compare(p2, p1));
     }
 
     @Test
     public void testRetrieveOrderedMultiSelectValues() throws Exception {
-        assertThat(retrieveOrderedMultiSelectValues(null).size(), is(0));
-
+        assertEquals(0, retrieveOrderedMultiSelectValues(null).size());
         Node node = mockPageNode("/node/subNode",
             stubProperty("jcr:created", "2012"),
             stubProperty("1", "zwei1"),
@@ -110,23 +116,21 @@ public class PropertyUtilsTest {
             stubProperty("2", "drei2")
         );
         Collection<String> values = retrieveOrderedMultiSelectValues(node);
-        assertThat(values.size(), is(3));
+        assertEquals(3, values.size());
         int i = 0;
         for (String value : values) {
-            assertThat(value.endsWith(String.valueOf(i)), is(true));
+            assertTrue(value.endsWith(String.valueOf(i)));
             i++;
         }
     }
 
     @Test
     public void testRetrieveOrderedMultiSelectValuesSubNode() throws Exception {
-        assertThat(retrieveMultiSelectProperties(null, null).size(), is(0));
-
+        assertEquals(0, retrieveMultiSelectProperties(null, null).size());
         Node node = mockPageNode("/node");
-        assertThat(retrieveMultiSelectProperties(node, null).size(), is(0));
-        assertThat(retrieveMultiSelectProperties(node, " ").size(), is(0));
-        assertThat(retrieveMultiSelectProperties(node, "subNode").size(), is(0));
-
+        assertEquals(0, retrieveMultiSelectProperties(node, null).size());
+        assertEquals(0, retrieveMultiSelectProperties(node, " ").size());
+        assertEquals(0, retrieveMultiSelectProperties(node, "subNode").size());
         mockPageNode("/node/subNode",
             stubProperty("jcr:created", "2012"),
             stubProperty("1", "zwei1"),
@@ -134,100 +138,91 @@ public class PropertyUtilsTest {
             stubProperty("title", "title"),
             stubProperty("2", "drei2")
         );
-        assertThat(retrieveMultiSelectProperties(node, null).size(), is(0));
-        assertThat(retrieveMultiSelectProperties(node, " ").size(), is(0));
+        assertEquals(0, retrieveMultiSelectProperties(node, null).size());
+        assertEquals(0, retrieveMultiSelectProperties(node, " ").size());
         Collection<String> values = retrieveOrderedMultiSelectValues(node, "subNode");
-        assertThat(values.size(), is(3));
+        assertEquals(3, values.size());
         int i = 0;
         for (String value : values) {
-            assertThat(value.endsWith(String.valueOf(i)), is(true));
+            assertTrue(value.endsWith(String.valueOf(i)));
             i++;
         }
     }
 
     @Test
     public void getPropertyTest() throws RepositoryException {
-        assertThat(getProperty(null, null), nullValue());
-
+        assertNull(getProperty(null, null));
         Node node = mockNode("test");
-        assertThat(getProperty(node, null), nullValue());
-        assertThat(getProperty(node, ""), nullValue());
-        assertThat(getProperty(node, "   "), nullValue());
-        assertThat(getProperty(node, "prop"), nullValue());
-
+        assertNull(getProperty(node, null));
+        assertNull(getProperty(node, ""));
+        assertNull(getProperty(node, "   "));
+        assertNull(getProperty(node, "prop"));
         NodeStubbingOperation.stubProperty("prop", "test").of(node);
-        assertThat(getProperty(node, "prop"), notNullValue());
-
+        assertNotNull(getProperty(node, "prop"));
         doThrow(RepositoryException.class).when(node).getProperty(anyString());
-        assertThat(getProperty(node, "prop"), nullValue());
+        assertNull(getProperty(node, "prop"));
     }
 
     @Test
     public void getStringValueTest() throws RepositoryException {
-        assertThat(getStringValue(null), nullValue());
-        assertThat(getStringValue(mockProperty("test")), nullValue());
-        assertThat(getStringValue(mockProperty("test", "first")), is("first"));
-        assertThat(getStringValue(mockProperty("test", "first", "second")), is("first"));
+        assertNull(getStringValue(null));
+        assertNull(getStringValue(mockProperty("test")));
+        assertEquals("first", getStringValue(mockProperty("test", "first")));
+        assertEquals("first", getStringValue(mockProperty("test", "first", "second")));
     }
 
     @Test
     public void getStringValueFromNode() throws RepositoryException {
-        assertThat(getStringValue((Node) null, null), nullValue());
-
+        assertNull(getStringValue((Node) null, null));
         Node node = mockPageNode("test");
-        assertThat(getStringValue(node, "name"), nullValue());
-
+        assertNull(getStringValue(node, "name"));
         Property p = new HTMLEscapingPropertyWrapper(mockProperty("name", "<h1>test</h1>"), true);
         NodeStubbingOperation.stubProperty(p).of(node);
-        assertThat(getStringValue(node, "name"), is("&lt;h1&gt;test&lt;/h1&gt;"));
+        assertEquals("&lt;h1&gt;test&lt;/h1&gt;", getStringValue(node, "name"));
     }
 
     @Test
     public void getStringValuesTestString() throws RepositoryException {
-        assertThat(getStringValues(null).size(), is(0));
-
+        assertEquals(0, getStringValues(null).size());
         Property p = mockProperty("test");
-        assertThat(getStringValues(p).size(), is(0));
-
+        assertEquals(0, getStringValues(p).size());
         p = mockProperty("test", "<h1>first</h1>");
-        assertThat(getStringValues(p).size(), is(1));
-        assertThat(getStringValues(p).get(0), is("<h1>first</h1>"));
-
+        assertEquals(1, getStringValues(p).size());
+        assertEquals("<h1>first</h1>", getStringValues(p).get(0));
         p = mockProperty("test", "<h1>first</h1>", null, "second");
-        assertThat(getStringValues(p).size(), is(2));
-        assertThat(getStringValues(p).get(0), is("<h1>first</h1>"));
-        assertThat(getStringValues(p).get(1), is("second"));
+        assertEquals(2, getStringValues(p).size());
+        assertEquals("<h1>first</h1>", getStringValues(p).get(0));
+        assertEquals("second", getStringValues(p).get(1));
     }
 
     @Test
     public void getStringValuesTestStringWithHtmlEncoding() throws RepositoryException {
         Property p = new HTMLEscapingPropertyWrapper(mockProperty("test", "<h1>test</h1>"), true);
-        assertThat(getStringValues(p).size(), is(1));
-        assertThat(getStringValues(p).get(0), is("&lt;h1&gt;test&lt;/h1&gt;"));
-
+        assertEquals(1, getStringValues(p).size());
+        assertEquals("&lt;h1&gt;test&lt;/h1&gt;", getStringValues(p).get(0));
         p = new HTMLEscapingPropertyWrapper(mockProperty("test", null, "<h1>test</h1>", "<h2>test</h2>"), true);
-        assertThat(getStringValues(p).size(), is(2));
-        assertThat(getStringValues(p).get(0), is("&lt;h1&gt;test&lt;/h1&gt;"));
-        assertThat(getStringValues(p).get(1), is("&lt;h2&gt;test&lt;/h2&gt;"));
+        assertEquals(2, getStringValues(p).size());
+        assertEquals("&lt;h1&gt;test&lt;/h1&gt;", getStringValues(p).get(0));
+        assertEquals("&lt;h2&gt;test&lt;/h2&gt;", getStringValues(p).get(1));
     }
 
     @Test
     public void getStringValuesTestDouble() throws RepositoryException {
         Property p = mockProperty("test", 2.3D);
-        assertThat(getStringValues(p).get(0), is("2.3"));
+        assertEquals("2.3", getStringValues(p).get(0));
     }
 
     @Test
     public void getStringValuesTestLong() throws RepositoryException {
         Property p = mockProperty("test", 23L);
-        assertThat(getStringValues(p).get(0), is("23"));
+        assertEquals("23", getStringValues(p).get(0));
     }
 
     @Test
     public void getStringValuesTestBoolean() throws RepositoryException {
         Property p = mockProperty("test", true, false);
-        assertThat(getStringValues(p).get(0), is("true"));
-        assertThat(getStringValues(p).get(1), is("false"));
+        assertEquals("true", getStringValues(p).get(0));
+        assertEquals("false", getStringValues(p).get(1));
     }
 
     @Test
@@ -236,259 +231,300 @@ public class PropertyUtilsTest {
         cal.setTimeInMillis(0);
         cal.setTimeZone(TimeZone.getTimeZone("UK/London"));
         Property p = mockProperty("test", cal);
-        assertThat(getStringValues(p).get(0), is("1970-01-01T00:00:00.000Z"));
+        assertEquals("1970-01-01T00:00:00.000Z", getStringValues(p).get(0));
     }
 
     @Test
     public void getCalenderValueTest() throws RepositoryException {
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
-        assertThat(getCalendarValue(null), nullValue());
-        assertThat(getCalendarValue(mockProperty("test")), nullValue());
-        assertThat(getCalendarValue(mockProperty("test", cal1)), is(cal1));
-        assertThat(getCalendarValue(mockProperty("test", cal1, cal2)), is(cal1));
+        assertNull(getCalendarValue(null));
+        assertNull(getCalendarValue(mockProperty("test")));
+        assertEquals(cal1, getCalendarValue(mockProperty("test", cal1)));
+        assertEquals(cal1, getCalendarValue(mockProperty("test", cal1, cal2)));
     }
 
     @Test
     public void getCalendarValueFromNode() throws RepositoryException {
-        assertThat(getCalendarValue((Node) null, null), nullValue());
-
+        assertNull(getCalendarValue((Node) null, null));
         Node node = mockPageNode("test");
-        assertThat(getCalendarValue(node, "date"), nullValue());
-
+        assertNull(getCalendarValue(node, "date"));
         Calendar date = Calendar.getInstance();
         NodeStubbingOperation.stubProperty("date", date).of(node);
-        assertThat(getCalendarValue(node, "date"), is(date));
+        assertEquals(date, getCalendarValue(node, "date"));
     }
 
     @Test
     public void getCalenderValuesTest() throws RepositoryException {
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
-        assertThat(getCalendarValues(null).size(), is(0));
-        assertThat(getCalendarValues(mockProperty("test")).size(), is(0));
-        assertThat(getCalendarValues(mockProperty("test", cal1)).size(), is(1));
-        assertThat(getCalendarValues(mockProperty("test", cal1, null, cal2)).size(), is(2));
-        assertThat(getCalendarValues(mockProperty("test", cal1, cal2)).get(0), is(cal1));
-        assertThat(getCalendarValues(mockProperty("test", cal1, cal2)).get(1), is(cal2));
+        assertEquals(0, getCalendarValues(null).size());
+        assertEquals(0, getCalendarValues(mockProperty("test")).size());
+        assertEquals(1, getCalendarValues(mockProperty("test", cal1)).size());
+        assertEquals(2, getCalendarValues(mockProperty("test", cal1, null, cal2)).size());
+        assertEquals(cal1, getCalendarValues(mockProperty("test", cal1, cal2)).get(0));
+        assertEquals(cal2, getCalendarValues(mockProperty("test", cal1, cal2)).get(1));
     }
 
     @Test
     public void getCalendarValuesFromNode() throws RepositoryException {
-        assertThat(getCalendarValues((Node) null, null), notNullValue());
-        assertThat(getCalendarValues((Node) null, null).size(), is(0));
-
+        assertEquals(0, getCalendarValues((Node) null, null).size());
         Node node = mockPageNode("test");
-        assertThat(getCalendarValues(node, null).size(), is(0));
-        assertThat(getCalendarValues(node, "date").size(), is(0));
-
+        assertEquals(0, getCalendarValues(node, null).size());
+        assertEquals(0, getCalendarValues(node, "date").size());
         Calendar date1 = Calendar.getInstance();
         Calendar date2 = Calendar.getInstance();
         NodeStubbingOperation.stubProperty("date", date1, date2).of(node);
-        assertThat(getCalendarValues(node, "date").size(), is(2));
-        assertThat(getCalendarValues(node, "date").get(0), is(date1));
-        assertThat(getCalendarValues(node, "date").get(1), is(date2));
+        assertEquals(2, getCalendarValues(node, "date").size());
+        assertEquals(date1, getCalendarValues(node, "date").get(0));
+        assertEquals(date2, getCalendarValues(node, "date").get(1));
     }
 
     @Test
     public void getDoubleValueTest() throws RepositoryException {
-        assertThat(getDoubleValue(null), nullValue());
-        assertThat(getDoubleValue(mockProperty("test")), nullValue());
-        assertThat(getDoubleValue(mockProperty("test", 1.1D)), is(1.1D));
-        assertThat(getDoubleValue(mockProperty("test", 1.1D, 1.2D)), is(1.1D));
+        assertNull(getDoubleValue(null));
+        assertNull(getDoubleValue(mockProperty("test")));
+        assertEquals(1.1D, getDoubleValue(mockProperty("test", 1.1D)));
+        assertEquals(1.1D, getDoubleValue(mockProperty("test", 1.1D, 1.2D)));
     }
 
     @Test
     public void getDoubleValueFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getDoubleValue((Node) null, null), nullValue());
-
+        assertNull(PropertyUtils.getDoubleValue((Node) null, null));
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getDoubleValue(node, "double"), nullValue());
-
+        assertNull(PropertyUtils.getDoubleValue(node, "double"));
         NodeStubbingOperation.stubProperty("double", 1.23D).of(node);
-        assertThat(PropertyUtils.getDoubleValue(node, "double"), is(1.23D));
+        assertEquals(1.23D, PropertyUtils.getDoubleValue(node, "double"));
     }
 
     @Test
     public void getDoubleValuesFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getDoubleValues((Node) null, null), notNullValue());
-        assertThat(PropertyUtils.getDoubleValues((Node) null, null).size(), is(0));
-
+        assertEquals(0, PropertyUtils.getDoubleValues((Node) null, null).size());
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getDoubleValues(node, "double").size(), is(0));
-
+        assertEquals(0, PropertyUtils.getDoubleValues(node, "double").size());
         NodeStubbingOperation.stubProperty("double", 1.23D, 4.56D).of(node);
-        assertThat(PropertyUtils.getDoubleValues(node, "double").size(), is(2));
-        assertThat(PropertyUtils.getDoubleValues(node, "double").get(0), is(1.23D));
-        assertThat(PropertyUtils.getDoubleValues(node, "double").get(1), is(4.56D));
+        assertEquals(2, PropertyUtils.getDoubleValues(node, "double").size());
+        assertEquals(1.23D, PropertyUtils.getDoubleValues(node, "double").get(0));
+        assertEquals(4.56D, PropertyUtils.getDoubleValues(node, "double").get(1));
     }
 
     @Test
     public void getDoubleValuesTest() throws RepositoryException {
-        assertThat(getDoubleValues(null).size(), is(0));
-        assertThat(getDoubleValues(mockProperty("test")).size(), is(0));
-        assertThat(getDoubleValues(mockProperty("test", 2.2)).size(), is(1));
-        assertThat(getDoubleValues(mockProperty("test", 2.3D, 1.0D)).size(), is(2));
-        assertThat(getDoubleValues(mockProperty("test", 2.3D, 0.6D)).get(0), is(2.3D));
-        assertThat(getDoubleValues(mockProperty("test", 2.3D, 0.6D)).get(1), is(0.6D));
+        assertEquals(0, getDoubleValues(null).size());
+        assertEquals(0, getDoubleValues(mockProperty("test")).size());
+        assertEquals(1, getDoubleValues(mockProperty("test", 2.2)).size());
+        assertEquals(2, getDoubleValues(mockProperty("test", 2.3D, 1.0D)).size());
+        assertEquals(2.3D, getDoubleValues(mockProperty("test", 2.3D, 0.6D)).get(0));
+        assertEquals(0.6D, getDoubleValues(mockProperty("test", 2.3D, 0.6D)).get(1));
     }
 
     @Test
     public void getLongValueTest() throws RepositoryException {
-        assertThat(getLongValue(null), nullValue());
-        assertThat(getLongValue(mockProperty("test")), nullValue());
-        assertThat(getLongValue(mockProperty("test", 1L)), is(1L));
-        assertThat(getLongValue(mockProperty("test", 6L, 1L)), is(6L));
+        assertNull(getLongValue(null));
+        assertNull(getLongValue(mockProperty("test")));
+        assertEquals(1L, getLongValue(mockProperty("test", 1L)));
+        assertEquals(6L, getLongValue(mockProperty("test", 6L, 1L)));
     }
 
     @Test
     public void getLongValueFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getLongValue((Node) null, null), nullValue());
-
+        assertNull(PropertyUtils.getLongValue((Node) null, null));
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getLongValue(node, "long"), nullValue());
-
+        assertNull(PropertyUtils.getLongValue(node, "long"));
         NodeStubbingOperation.stubProperty("long", 123L).of(node);
-        assertThat(PropertyUtils.getLongValue(node, "long"), is(123L));
+        assertEquals(123L, PropertyUtils.getLongValue(node, "long"));
     }
 
     @Test
     public void getLongValuesFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getLongValues((Node) null, null), notNullValue());
-        assertThat(PropertyUtils.getLongValues((Node) null, null).size(), is(0));
-
+        assertEquals(0, PropertyUtils.getLongValues((Node) null, null).size());
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getLongValues(node, "long").size(), is(0));
-
+        assertEquals(0, PropertyUtils.getLongValues(node, "long").size());
         NodeStubbingOperation.stubProperty("long", 123L, 456L).of(node);
-        assertThat(PropertyUtils.getLongValues(node, "long").size(), is(2));
-        assertThat(PropertyUtils.getLongValues(node, "long").get(0), is(123L));
-        assertThat(PropertyUtils.getLongValues(node, "long").get(1), is(456L));
+        assertEquals(2, PropertyUtils.getLongValues(node, "long").size());
+        assertEquals(123L, PropertyUtils.getLongValues(node, "long").get(0));
+        assertEquals(456L, PropertyUtils.getLongValues(node, "long").get(1));
     }
 
     @Test
     public void getLongValuesTest() throws RepositoryException {
-        assertThat(getLongValues(null).size(), is(0));
-        assertThat(getLongValues(mockProperty("test")).size(), is(0));
-        assertThat(getLongValues(mockProperty("test", 2L)).size(), is(1));
-        assertThat(getLongValues(mockProperty("test", 2L, 1L)).size(), is(2));
-        assertThat(getLongValues(mockProperty("test", 2L, 0L)).get(0), is(2L));
-        assertThat(getLongValues(mockProperty("test", 2L, 0L)).get(1), is(0L));
+        assertEquals(0, getLongValues(null).size());
+        assertEquals(0, getLongValues(mockProperty("test")).size());
+        assertEquals(1, getLongValues(mockProperty("test", 2L)).size());
+        assertEquals(2, getLongValues(mockProperty("test", 2L, 1L)).size());
+        assertEquals(2L, getLongValues(mockProperty("test", 2L, 0L)).get(0));
+        assertEquals(0L, getLongValues(mockProperty("test", 2L, 0L)).get(1));
     }
 
     @Test
     public void getBooleanValueTest() throws RepositoryException {
-        assertThat(getBooleanValue(null), nullValue());
-        assertThat(getBooleanValue(mockProperty("test")), nullValue());
-        assertThat(getBooleanValue(mockProperty("test", false)), is(false));
-        assertThat(getBooleanValue(mockProperty("test", true, false)), is(true));
+        assertNull(getBooleanValue(null));
+        assertNull(getBooleanValue(mockProperty("test")));
+        assertFalse(getBooleanValue(mockProperty("test", false)));
+        assertTrue(getBooleanValue(mockProperty("test", true, false)));
     }
 
     @Test
     public void getBooleanValueFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getBooleanValue((Node) null, null), nullValue());
-
+        assertNull(PropertyUtils.getBooleanValue((Node) null, null));
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getBooleanValue(node, "boolean"), nullValue());
-
+        assertNull(PropertyUtils.getBooleanValue(node, "boolean"));
         NodeStubbingOperation.stubProperty("boolean", true).of(node);
-        assertThat(PropertyUtils.getBooleanValue(node, "boolean"), is(true));
+        assertTrue(PropertyUtils.getBooleanValue(node, "boolean"));
     }
 
     @Test
     public void getBooleanValuesFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getBooleanValues((Node) null, null), notNullValue());
-        assertThat(PropertyUtils.getBooleanValues((Node) null, null).size(), is(0));
-
+        assertEquals(0, PropertyUtils.getBooleanValues((Node) null, null).size());
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getBooleanValues(node, "boolean").size(), is(0));
-
+        assertEquals(0, PropertyUtils.getBooleanValues(node, "boolean").size());
         NodeStubbingOperation.stubProperty("boolean", true, false).of(node);
-        assertThat(PropertyUtils.getBooleanValues(node, "boolean").size(), is(2));
-        assertThat(PropertyUtils.getBooleanValues(node, "boolean").get(0), is(true));
-        assertThat(PropertyUtils.getBooleanValues(node, "boolean").get(1), is(false));
+        assertEquals(2, PropertyUtils.getBooleanValues(node, "boolean").size());
+        assertTrue(PropertyUtils.getBooleanValues(node, "boolean").get(0));
+        assertFalse(PropertyUtils.getBooleanValues(node, "boolean").get(1));
     }
 
     @Test
     public void getBooleanValuesTest() throws RepositoryException {
-        assertThat(getBooleanValues(null).size(), is(0));
-        assertThat(getBooleanValues(mockProperty("test")).size(), is(0));
-        assertThat(getBooleanValues(mockProperty("test", true)).size(), is(1));
-        assertThat(getBooleanValues(mockProperty("test", false, true)).size(), is(2));
-        assertThat(getBooleanValues(mockProperty("test", false, true)).get(0), is(false));
-        assertThat(getBooleanValues(mockProperty("test", false, true)).get(1), is(true));
+        assertEquals(0, getBooleanValues(null).size());
+        assertEquals(0, getBooleanValues(mockProperty("test")).size());
+        assertEquals(1, getBooleanValues(mockProperty("test", true)).size());
+        assertEquals(2, getBooleanValues(mockProperty("test", false, true)).size());
+        assertFalse(getBooleanValues(mockProperty("test", false, true)).get(0));
+        assertTrue(getBooleanValues(mockProperty("test", false, true)).get(1));
     }
 
     @Test
     public void getBinaryValueTest() throws RepositoryException {
         Binary a = mockBinary("a");
         Binary b = mockBinary("b");
-        assertThat(getBinaryValue(null), nullValue());
-        assertThat(getBinaryValue(mockProperty("test")), nullValue());
-        assertThat(getBinaryValue(mockProperty("test", b)), is(b));
-        assertThat(getBinaryValue(mockProperty("test", a, b)), is(a));
+        assertNull(getBinaryValue(null));
+        assertNull(getBinaryValue(mockProperty("test")));
+        assertEquals(b, getBinaryValue(mockProperty("test", b)));
+        assertEquals(a, getBinaryValue(mockProperty("test", a, b)));
     }
 
     @Test
     public void getBinaryValueFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getBinaryValue((Node) null, null), nullValue());
-
+        assertNull(PropertyUtils.getBinaryValue((Node) null, null));
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getBinaryValue(node, "binary"), nullValue());
-
+        assertNull(PropertyUtils.getBinaryValue(node, "binary"));
         Binary a = mockBinary("a");
         NodeStubbingOperation.stubProperty("binary", a).of(node);
-        assertThat(PropertyUtils.getBinaryValue(node, "binary"), is(a));
+        assertEquals(a, PropertyUtils.getBinaryValue(node, "binary"));
     }
 
     @Test
     public void getBinaryValuesFromNode() throws RepositoryException {
-        assertThat(PropertyUtils.getBinaryValues((Node) null, null), notNullValue());
-        assertThat(PropertyUtils.getBinaryValues((Node) null, null).size(), is(0));
-
+        assertEquals(0, PropertyUtils.getBinaryValues((Node) null, null).size());
         Node node = mockPageNode("test");
-        assertThat(PropertyUtils.getBinaryValues(node, "binary").size(), is(0));
-
+        assertEquals(0, PropertyUtils.getBinaryValues(node, "binary").size());
         Binary a = mockBinary("a");
         Binary b = mockBinary("b");
         NodeStubbingOperation.stubProperty("binary", a, b).of(node);
-        assertThat(PropertyUtils.getBinaryValues(node, "binary").size(), is(2));
-        assertThat(PropertyUtils.getBinaryValues(node, "binary").get(0), is(a));
-        assertThat(PropertyUtils.getBinaryValues(node, "binary").get(1), is(b));
+        assertEquals(2, PropertyUtils.getBinaryValues(node, "binary").size());
+        assertEquals(a, PropertyUtils.getBinaryValues(node, "binary").get(0));
+        assertEquals(b, PropertyUtils.getBinaryValues(node, "binary").get(1));
     }
 
     @Test
     public void getBinaryValuesTest() throws RepositoryException {
         Binary a = mockBinary("a");
         Binary b = mockBinary("b");
-        assertThat(getBinaryValues(null).size(), is(0));
-        assertThat(getBinaryValues(mockProperty("test")).size(), is(0));
-        assertThat(getBinaryValues(mockProperty("test", b)).size(), is(1));
-        assertThat(getBinaryValues(mockProperty("test", b, a)).size(), is(2));
-        assertThat(getBinaryValues(mockProperty("test", b, a)).get(0), is(b));
-        assertThat(getBinaryValues(mockProperty("test", b, a)).get(1), is(a));
+        assertEquals(0, getBinaryValues(null).size());
+        assertEquals(0, getBinaryValues(mockProperty("test")).size());
+        assertEquals(1, getBinaryValues(mockProperty("test", b)).size());
+        assertEquals(2, getBinaryValues(mockProperty("test", b, a)).size());
+        assertEquals(b, getBinaryValues(mockProperty("test", b, a)).get(0));
+        assertEquals(a, getBinaryValues(mockProperty("test", b, a)).get(1));
     }
 
     @Test
     public void getValue() throws RepositoryException {
-        assertThat(PropertyUtils.getValue(null), nullValue());
-
+        assertNull(PropertyUtils.getValue(null));
         Property p = mockProperty("test");
-        assertThat(PropertyUtils.getValue(p), nullValue());
-
-        // Test nor exception on empty multi value property:
+        assertNull(PropertyUtils.getValue(p));
         stubValues(new Value[0]).of(p);
         doReturn(true).when(p).isMultiple();
-        assertThat(PropertyUtils.getValue(p), nullValue());
-
+        assertNull(PropertyUtils.getValue(p));
         stubValues("first").of(p);
-        assertThat(PropertyUtils.getValue(p).getString(), is("first"));
-
+        assertEquals("first", PropertyUtils.getValue(p).getString());
         stubValues("first", "second", "third").of(p);
-        assertThat(PropertyUtils.getValue(p).getString(), is("first"));
-
-        // Test no NullPointerException on empty PropertyWrapper:
+        assertEquals("first", PropertyUtils.getValue(p).getString());
         Property wrapper = new ContentDecoratorPropertyWrapper<>(null, null);
-        assertThat(PropertyUtils.getValue(wrapper), nullValue());
+        assertNull(PropertyUtils.getValue(wrapper));
+    }
+
+    // --- Additional tests for uncovered branches and fallbacks ---
+
+    @Test
+    public void existsMethodVariants() throws RepositoryException {
+        assertFalse(exists(null));
+        Property plain = mockProperty("plain", "x");
+        assertTrue(exists(plain));
+        Property emptyWrapper = new ContentDecoratorPropertyWrapper<>(null, null);
+        assertFalse(exists(emptyWrapper));
+    }
+
+    @Test
+    public void retrieveMultiSelectValuesVariants() throws RepositoryException {
+        Node node = mockPageNode("/multi",
+            stubProperty("2", "zwei"),
+            stubProperty("0", "eins"),
+            stubProperty("1", "drei"),
+            stubProperty("title", "ignore")
+        );
+        Collection<String> unordered = retrieveMultiSelectValues(node);
+        assertEquals(3, unordered.size());
+        assertTrue(unordered.contains("eins") && unordered.contains("zwei") && unordered.contains("drei"));
+        Node parent = mockPageNode("/parent");
+        mockPageNode("/parent/sub",
+            stubProperty("0", "a"),
+            stubProperty("1", "b"),
+            stubProperty("5", "c")
+        );
+        Collection<String> bySub = retrieveMultiSelectValues(parent, "sub");
+        assertEquals(3, bySub.size());
+        assertTrue(bySub.contains("a") && bySub.contains("b") && bySub.contains("c"));
+    }
+
+    @Test
+    public void fallbackGetterVariants() throws RepositoryException {
+        Node node = mockPageNode("/fallback");
+        assertEquals("fb", PropertyUtils.getStringValue(node, "missing", "fb"));
+        Calendar fbCal = Calendar.getInstance();
+        assertEquals(fbCal, PropertyUtils.getCalendarValue(node, "missingCal", fbCal));
+        assertEquals(42L, PropertyUtils.getLongValue(node, "missingLong", 42L));
+        assertEquals(3.14D, PropertyUtils.getDoubleValue(node, "missingDouble", 3.14D));
+        assertTrue(PropertyUtils.getBooleanValue(node, "missingBool", Boolean.TRUE));
+        Binary fbBin = mockBinary("bin");
+        assertEquals(fbBin, PropertyUtils.getBinaryValue(node, "missingBin", fbBin));
+        NodeStubbingOperation.stubProperty("long", 123L).of(node);
+        assertEquals(123L, PropertyUtils.getLongValue(node, "long", 999L));
+        NodeStubbingOperation.stubProperty("str", "value").of(node);
+        assertEquals("value", PropertyUtils.getStringValue(node, "str", "other"));
+    }
+
+    @Test
+    public void getPropertiesVariants() throws RepositoryException {
+        assertNull(getProperties((Node) null));
+        assertNull(getProperties((Node) null, "*"));
+        assertNull(getProperties((Node) null, new String[]{"*"}));
+        Node node = mockNode(stubProperty("prop", "v"));
+        PropertyIterator iter = PropertyUtils.getProperties(node);
+        assertEquals(node.getProperty(JcrConstants.JCR_PRIMARYTYPE), iter.nextProperty());
+        assertEquals(node.getProperty("prop"), iter.nextProperty());
+        iter = PropertyUtils.getProperties(node, "prop*");
+        assertEquals(node.getProperty(JcrConstants.JCR_PRIMARYTYPE), iter.nextProperty());
+        assertEquals(node.getProperty("prop"), iter.nextProperty());
+        iter = PropertyUtils.getProperties(node, new String[]{"prop*"});
+        assertEquals(node.getProperty(JcrConstants.JCR_PRIMARYTYPE), iter.nextProperty());
+        assertEquals(node.getProperty("prop"), iter.nextProperty());
+        doThrow(new RepositoryException()).when(node).getProperties();
+        doThrow(new RepositoryException()).when(node).getProperties(anyString());
+        doThrow(new RepositoryException()).when(node).getProperties(any(String[].class));
+        assertNull(getProperties(node));
+        assertNull(getProperties(node, "*"));
+        assertNull(getProperties(node, new String[]{"*"}));
     }
 }

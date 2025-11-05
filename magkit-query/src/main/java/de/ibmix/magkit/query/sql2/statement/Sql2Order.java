@@ -22,11 +22,25 @@ package de.ibmix.magkit.query.sql2.statement;
 
 /**
  * SQL2 statement builder interface for fluent API: Optional ordering step.
+ * <p>Allows specifying one or multiple attributes for ordering or the JCR full text relevance score.
+ * Subsequent calls to {@link #orderBy(String...)} override previously set order attributes. The direction defaults
+ * to descending unless changed via {@link Sql2OrderDirection#ascending()}.</p>
+ * <p>Null/empty handling: Passing null or an empty array results in an empty ORDER BY clause (ignored).</p>
+ * <p>Thread-safety: Implementations are not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-15
  */
 public interface Sql2Order extends Sql2Builder {
+    /**
+     * Define the attributes used for ordering the result set.
+     * @param attribute one or more JCR property names
+     * @return next step allowing setting the order direction
+     */
     Sql2OrderDirection orderBy(String... attribute);
+    /**
+     * Convenience method ordering by the JCR search score attribute.
+     * @return next step allowing setting the order direction
+     */
     Sql2OrderDirection orderByScore();
 }

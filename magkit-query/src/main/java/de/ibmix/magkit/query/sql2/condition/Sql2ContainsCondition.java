@@ -33,14 +33,18 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
- * Builder for a sql2 fulltext condition with contains().
- * Supports simple terms and phrases, exclusion, boosting as well as fuzzy, proximity and range queries.
+ * Builder for a sql2 fulltext condition with {@code contains()} on a property or any property ("*").
+ * <p>
+ * Supports simple terms and phrases, exclusion, boosting as well as fuzzy, proximity and range queries. Terms are
+ * internally wrapped as {@link Term} implementations that know how to append themselves. Chaining methods adds terms
+ * that are later concatenated when {@link #appendTo(StringBuilder, Sql2SelectorNames)} is invoked.
+ * </p>
  * Terms are processed as follows:
  * <ul>
  *     <li>trim: leading and tailing ' ' will be removed</li>
  *     <li>empty/missing: empty or null terms will be ignored</li>
  *     <li>phrases: terms containing blanks (' ') will be surrounded by " and treated as phrases</li>
- *     <li>escape: ' will be replaced by '' and in simple terms (no phrases) XPath search chars at last position will be escaped by \. The '?' will be escaped only if specified and treated as wildcard by default.</li>
+ *     <li>escape: ' will be replaced by '' and in simple terms (no phrases) XPath search chars at last position will be escaped by \\ The '?' will be escaped only if specified and treated as wildcard by default.</li>
  *     <li>exclude: terms to exclude will be prefixed by -</li>
  *     <li>fuzzy: fuzzy terms will be suffixed by ~. Defining a "Damerau-Levenshtein Distance" is not supported by magnolia/Jackrabbit. Fuzzy search is ignored for phrases.</li>
  *     <li>proximity: phrases with given distance d will be suffixed by ~d (\"two words\"~2). Will be ignored for simple terms (one word) and values lower than 1.</li>
@@ -48,6 +52,18 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  *     <li>and: multiple mandatory terms will be concatenated by spaces (' ')</li>
  *     <li>or: multiple optional terms will be concatenated by OR</li>
  * </ul>
+ * <p>
+ * Usage example:
+ * <pre>{@code
+ * Sql2ContainsCondition c = new Sql2ContainsCondition("title")
+ *     .all("hello")
+ *     .excludeAny("draft")
+ *     .any(2, true, "world");
+ * String fragment = c.asString("a", null);
+ * }</pre>
+ * Thread-safety: Not thread safe.
+ * Null handling: Null / empty term arrays are ignored.
+ * Side effects: Builder is stateful; methods mutate internal term list.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2021-01-04
@@ -60,51 +76,135 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
     private boolean _forJoin;
     private final List<Term> _terms = new ArrayList<>();
 
+    /**
+     * Create a condition matching across all properties ("*").
+     */
     public Sql2ContainsCondition() {
         this("*");
     }
 
+    /**
+     * Create a condition for the given property or all properties if the supplied name is blank.
+     *
+     * @param property property name or null/empty for "*"
+     */
     public Sql2ContainsCondition(String property) {
         _property = isEmpty(property) ? "*" : property;
     }
 
+    /**
+     * Add mandatory terms (space separated) optionally fuzzy with given boost.
+     *
+     * @param terms terms to add
+     * @return this
+     */
     public Sql2ContainsCondition all(String... terms) {
         return all(1, false, terms);
     }
 
+    /**
+     * Add mandatory terms (space separated) with custom boost and fuzzy flag.
+     *
+     * @param boost boosting factor (&gt;=1)
+     * @param isFuzzy true to apply fuzzy search
+     * @param terms terms to add
+     * @return this
+     */
     public Sql2ContainsCondition all(int boost, final boolean isFuzzy, String... terms) {
         return addTerm(boost, false, false, isFuzzy, 0, false, terms);
     }
 
+    /**
+     * Add optional terms (OR separated).
+     *
+     * @param terms terms to add
+     * @return this
+     */
     public Sql2ContainsCondition any(String... terms) {
         return any(1, false, terms);
     }
 
+    /**
+     * Add optional (OR) fuzzy terms with boosting.
+     *
+     * @param boost boosting factor (&gt;=1)
+     * @param isFuzzy fuzzy flag
+     * @param terms terms to add
+     * @return this
+     */
     public Sql2ContainsCondition any(int boost, final boolean isFuzzy, String... terms) {
         return addTerm(boost, false, true, isFuzzy, 0, false, terms);
     }
 
+    /**
+     * Add mandatory excluding terms.
+     *
+     * @param terms terms to exclude
+     * @return this
+     */
     public Sql2ContainsCondition excludeAll(final String... terms) {
         return excludeAll(1, false, terms);
     }
 
+    /**
+     * Add mandatory excluding terms with fuzzy option.
+     *
+     * @param boost boost factor
+     * @param isFuzzy fuzzy flag
+     * @param terms terms
+     * @return this
+     */
     public Sql2ContainsCondition excludeAll(final int boost, final boolean isFuzzy, final String... terms) {
         return addTerm(boost, true, false, isFuzzy, 0, false, terms);
     }
 
+    /**
+     * Add optional excluding terms (OR semantics).
+     *
+     * @param terms terms to exclude optionally
+     * @return this
+     */
     public Sql2ContainsCondition excludeAny(final String... terms) {
         return excludeAny(1, false, terms);
     }
 
+    /**
+     * Add optional excluding terms with fuzzy option.
+     *
+     * @param boost boost factor
+     * @param isFuzzy fuzzy flag
+     * @param terms terms
+     * @return this
+     */
     public Sql2ContainsCondition excludeAny(final int boost, final boolean isFuzzy, final String... terms) {
         return addTerm(boost, true, true, isFuzzy, 0, false, terms);
     }
 
+    /**
+     * Add an inclusive or exclusive range term.
+     *
+     * @param inclusive true to use [from TO to] else {from TO to}
+     * @param from lower bound (may be null)
+     * @param to upper bound (may be null)
+     * @return this
+     */
     public Sql2JoinConstraint range(final boolean inclusive, final String from, final String to) {
         _terms.add(new RangeTerm(false, inclusive, from, to));
         return me();
     }
 
+    /**
+     * Low level addition of an arbitrary term configuration. Public to allow uncommon combinations.
+     *
+     * @param boost boost factor (&gt;=0)
+     * @param exclude true to mark as exclusion
+     * @param optional true for OR semantics
+     * @param isFuzzy true for fuzzy search (ignored for phrases)
+     * @param distance proximity distance for phrases (&gt;1)
+     * @param escapeQuestionMark whether to escape trailing '?'
+     * @param terms raw term strings
+     * @return this
+     */
     public Sql2ContainsCondition addTerm(final int boost, final boolean exclude, final boolean optional, final boolean isFuzzy, final int distance, final boolean escapeQuestionMark, final String... terms) {
         if (ArrayUtils.isNotEmpty(terms)) {
             _terms.addAll(Arrays.stream(terms).map(StringUtils::trim).filter(StringUtils::isNotEmpty).map(t -> new DefaultTerm(t, boost, exclude, optional, isFuzzy, distance, escapeQuestionMark)).collect(Collectors.toList()));
@@ -112,12 +212,11 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
         return me();
     }
 
-
     /**
-     * Append this condition to the query string.
+     * Append this condition to the query string using the provided selector names.
      *
-     * @param sql2 the sql2 query
-     * @param selectorNames the selector names
+     * @param sql2 the target buffer
+     * @param selectorNames selector name provider
      */
     @Override
     public void appendTo(StringBuilder sql2, Sql2SelectorNames selectorNames) {
@@ -143,17 +242,30 @@ public class Sql2ContainsCondition implements Sql2JoinConstraint {
         }
     }
 
+    /**
+     * Indicates whether any terms were supplied and thus rendering would produce output.
+     * @return true if at least one term exists, false otherwise
+     */
     @Override
     public boolean isNotEmpty() {
         return !_terms.isEmpty();
     }
 
+    /**
+     * Use join selector name when rendering contains() function.
+     * @return this for fluent chaining
+     */
     @Override
     public Sql2JoinConstraint forJoin() {
         _forJoin = true;
         return me();
     }
 
+    /**
+     * Self reference for fluent API returning the more concrete type.
+     *
+     * @return this
+     */
     public Sql2ContainsCondition me() {
         return this;
     }

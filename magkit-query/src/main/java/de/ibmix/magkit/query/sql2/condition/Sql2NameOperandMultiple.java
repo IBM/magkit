@@ -21,12 +21,21 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * Generic interface name conditions. Declares methods for the step that provides the values.
- * Allows providing one or more values to be used for comparison. Bind variable names are not supported here.
+ * Generic interface for name conditions declaring the multi value step.
+ * Allows providing one or more literal values that will be combined using the comparison
+ * operator semantics established earlier in the chain.
+ * Thread-safety: Not thread safe.
+ * Null handling: Null / empty arrays result in an empty condition.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-11-11
  */
 public interface Sql2NameOperandMultiple {
+    /**
+     * Provide one or more node names to compare with.
+     *
+     * @param value one or more names (null values ignored)
+     * @return next step (join selector decision)
+     */
     Sql2JoinConstraint values(String... value);
 }

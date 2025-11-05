@@ -21,37 +21,120 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 import de.ibmix.magkit.query.sql2.statement.Sql2Statement;
-import org.junit.Test;
+import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
+import org.junit.jupiter.api.Test;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
- * Test Sql2NullCondition.
+ * Tests for Sql2NullCondition.
  *
  * @author wolf.bubenik@ibmix.de
- * @since (17.06.20)
+ * @since 2020-06-17
  */
 public class Sql2NullConditionTest {
 
+    /**
+     * Verify isNull creation renders correctly and ignores blank names.
+     */
     @Test
     public void isNull() {
-        assertThat(Sql2NullCondition.isNull(null).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNull(EMPTY).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNull("test").asString(), is("[test] IS NULL"));
+        assertEquals(EMPTY, Sql2NullCondition.isNull(null).asString());
+        assertEquals(EMPTY, Sql2NullCondition.isNull(EMPTY).asString());
+        assertEquals("[test] IS NULL", Sql2NullCondition.isNull("test").asString());
     }
 
+    /**
+     * Verify isNotNull creation renders correctly and ignores blank names.
+     */
     @Test
     public void isNotNull() {
-        assertThat(Sql2NullCondition.isNotNull(null).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNotNull(EMPTY).asString(), is(EMPTY));
-        assertThat(Sql2NullCondition.isNotNull("test").asString(), is("[test] IS NOT NULL"));
+        assertEquals(EMPTY, Sql2NullCondition.isNotNull(null).asString());
+        assertEquals(EMPTY, Sql2NullCondition.isNotNull(EMPTY).asString());
+        assertEquals("[test] IS NOT NULL", Sql2NullCondition.isNotNull("test").asString());
     }
 
+    /**
+     * Verify integration with Sql2Statement builder without selector aliases.
+     */
     @Test
     public void testSelectors() {
         Sql2JoinConstraint condition = Sql2NullCondition.isNull("test");
-        assertThat(Sql2Statement.select("a", "b").from("aperto:test").whereAny(condition).build(), is("SELECT [a],[b] FROM [aperto:test] WHERE [test] IS NULL"));
+        assertEquals("SELECT [a],[b] FROM [aperto:test] WHERE [test] IS NULL", Sql2Statement.select("a", "b").from("aperto:test").whereAny(condition).build());
+    }
+
+    /**
+     * Verify appendTo adds the from selector name prefix when provided.
+     */
+    @Test
+    public void appendToWithFromSelector() {
+        Sql2JoinConstraint condition = Sql2NullCondition.isNull("prop");
+        StringBuilder sb = new StringBuilder();
+        condition.appendTo(sb, mockSelectorNames("f", null));
+        assertEquals("f.[prop] IS NULL", sb.toString());
+    }
+
+    /**
+     * Verify appendTo uses the join selector when forJoin was called and renders IS NOT NULL.
+     */
+    @Test
+    public void appendToWithJoinSelector() {
+        Sql2JoinConstraint condition = Sql2NullCondition.isNotNull("prop").forJoin();
+        StringBuilder sb = new StringBuilder();
+        condition.appendTo(sb, mockSelectorNames("f", "j"));
+        assertEquals("j.[prop] IS NOT NULL", sb.toString());
+    }
+
+    /**
+     * Verify appendTo ignores empty property names (builder content unchanged).
+     */
+    @Test
+    public void appendToBlankProperty() {
+        Sql2JoinConstraint condition = Sql2NullCondition.isNull(null);
+        StringBuilder sb = new StringBuilder("X");
+        condition.appendTo(sb, mockSelectorNames("f", "j"));
+        assertEquals("X", sb.toString());
+    }
+
+    /**
+     * Verify appendTo without any selector names renders property only.
+     */
+    @Test
+    public void appendToWithoutSelector() {
+        Sql2JoinConstraint condition = Sql2NullCondition.isNull("prop");
+        StringBuilder sb = new StringBuilder();
+        condition.appendTo(sb, mockSelectorNames(null, null));
+        assertEquals("[prop] IS NULL", sb.toString());
+    }
+
+    /**
+     * Verify appendTo for join when join selector name is blank falls back to no prefix.
+     */
+    @Test
+    public void appendToForJoinWithoutJoinSelector() {
+        Sql2JoinConstraint condition = Sql2NullCondition.isNotNull("prop").forJoin();
+        StringBuilder sb = new StringBuilder();
+        condition.appendTo(sb, mockSelectorNames("from", null));
+        assertEquals("[prop] IS NOT NULL", sb.toString());
+    }
+
+    /**
+     * Verify isNotEmpty returns expected values for blank and non blank property names.
+     */
+    @Test
+    public void isNotEmpty() {
+        assertFalse(Sql2NullCondition.isNull(null).isNotEmpty());
+        assertFalse(Sql2NullCondition.isNull(EMPTY).isNotEmpty());
+        assertTrue(Sql2NullCondition.isNull("prop").isNotEmpty());
+    }
+
+    private Sql2SelectorNames mockSelectorNames(String fromName, String joinName) {
+        Sql2SelectorNames selectorNames = mock(Sql2SelectorNames.class);
+        when(selectorNames.getFromSelectorName()).thenReturn(fromName);
+        when(selectorNames.getJoinSelectorName()).thenReturn(joinName);
+        return selectorNames;
     }
 }

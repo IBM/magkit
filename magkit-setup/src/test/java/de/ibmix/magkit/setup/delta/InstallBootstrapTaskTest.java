@@ -22,26 +22,28 @@ package de.ibmix.magkit.setup.delta;
 
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import info.magnolia.module.InstallContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static de.ibmix.magkit.test.cms.module.InstallContextStubbingOperation.stubCurrentModuleDefinition;
 import static de.ibmix.magkit.test.cms.module.ModuleDefinitionStubbingOperation.stubName;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockInstallContext;
 import static de.ibmix.magkit.test.cms.module.ModuleMockUtils.mockModuleDefinition;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
+ * Minimal tests for bootstrap installation path filtering.
+ *
  * @author Philipp Güttler (Aperto GmbH - An IBM Company)
- * @since 03.05.2018
+ * @since 2018-05-03
  */
 public class InstallBootstrapTaskTest {
 
     private InstallBootstrapTask _task;
     private InstallContext _ctx;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ContextMockUtils.cleanContext();
         _task = new InstallBootstrapTask();

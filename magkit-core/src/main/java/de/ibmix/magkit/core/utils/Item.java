@@ -23,27 +23,57 @@ package de.ibmix.magkit.core.utils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 /**
- * An item class to capsulate key value pairs.
+ * Represents a simple key/value pair that optionally encodes a sortable numeric position in the key.
+ * <p>
+ * A key may start with an integer followed by {@link #KEY_SORTING_DELIMITER} (e.g. "10#myKey"). If present, the integer
+ * portion defines the position for ordering. The {@code getKey()} method returns the textual part after the delimiter,
+ * while {@code getPosition()} returns the numeric prefix or {@code -1} if none exists. Instances can be compared using
+ * {@link #compareTo(Item)}: if a position is encoded, comparison is done by raw key (thus by position first then the
+ * remainder); otherwise comparison falls back to value, then key for tie-breaking.
+ * </p>
+ * <h3>Usage Preconditions</h3>
+ * Keys and values should be non-null. Supplying a null key will lead to a {@link NullPointerException} in several
+ * accessor methods.
+ * <h3>Null Handling</h3>
+ * This class does not internally guard against null keys or values. Callers must ensure non-null inputs.
+ * <h3>Side Effects</h3>
+ * The class is mutable via {@link #setKey(String)} and {@link #setValue(String)}; mutating after insertion into a sorted
+ * collection may invalidate ordering assumptions.
+ * <h3>Thread-Safety</h3>
+ * Not thread-safe; synchronize externally if instances are shared across threads and mutated.
+ * <h3>Example</h3>
+ * <pre>{@code
+ * Item positioned = new Item("10#title", "Title");
+ * Item plain = new Item("identifier", "Display");
+ * List<Item> list = Arrays.asList(positioned, plain);
+ * Collections.sort(list); // positioned will come first due to numeric prefix
+ * }</pre>
  *
  * @author frank.sommer (11.12.2007)
+ * @since 2007-12-11
  */
-public class Item implements Comparable {
+public class Item implements Comparable<Item> {
+    /**
+     * Delimiter separating an optional numeric position prefix from the logical key text.
+     */
+    public static final String KEY_SORTING_DELIMITER = "#";
+
     private String _key;
     private String _value;
 
-    public static final String KEY_SORTING_DELIMITER = "#";
-
     /**
-     * Constructor.
+     * Default constructor creating an empty Item. Key and value must be set before meaningful use.
      */
     public Item() {
         super();
     }
 
     /**
-     * Constructor with key and value.
-     * @param key Key of pair.
-     * @param value Value of pair.
+     * Constructs an Item with the provided key and value.
+     * The key may optionally contain a numeric prefix followed by {@link #KEY_SORTING_DELIMITER} to define ordering.
+     *
+     * @param key the key, optionally with position prefix (must be non-null)
+     * @param value the value (must be non-null)
      */
     public Item(String key, String value) {
         _key = key;
@@ -51,8 +81,10 @@ public class Item implements Comparable {
     }
 
     /**
-     * if used with xxx# notation to enable sorting through ResourceBundles.
-     * @return key
+     * Returns the logical key without any leading position prefix when the {@code position#key} notation is used.
+     * If no delimiter is present the raw key is returned.
+     *
+     * @return the logical key text (never null if key was non-null)
      */
     public String getKey() {
         String result = _key;
@@ -63,8 +95,10 @@ public class Item implements Comparable {
     }
 
     /**
-     * Gets the position, if one is given in the key, else -1.
-     * @return position
+     * Returns the numeric position encoded at the start of the key or {@code -1} if none exists.
+     * The position must be a valid integer prior to the first {@link #KEY_SORTING_DELIMITER}.
+     *
+     * @return the position or -1 if no position is encoded
      */
     public int getPosition() {
         int position = -1;
@@ -75,33 +109,55 @@ public class Item implements Comparable {
         return position;
     }
 
+    /**
+     * Sets the raw key. May include a position prefix. Must be non-null.
+     *
+     * @param key the new key
+     */
     public void setKey(String key) {
         _key = key;
     }
 
+    /**
+     * Returns the stored value.
+     *
+     * @return the value (may be null if not yet assigned)
+     */
     public String getValue() {
         return _value;
     }
 
+    /**
+     * Sets the value.
+     *
+     * @param value the new value
+     */
     public void setValue(String value) {
         _value = value;
     }
 
     /**
-     * Implementation for comparing.
-     * Compares by position in the keys or alphabetically by value and key.
+     * Compares this item to another. If this item encodes a position (numeric prefix), comparison is performed on the
+     * raw key strings (thereby using the numeric ordering then lexicographic for the remainder). Otherwise comparison
+     * uses the value lexicographically; ties are broken by the key. A {@code null} argument will cause a
+     * {@link NullPointerException}.
+     *
+     * @param item the other item (must be non-null)
+     * @return negative, zero, or positive per standard {@link Comparable} contract
+     * @throws NullPointerException if item is null
      */
-    public int compareTo(Object o) {
-        int returnValue = 0;
-        if (Item.class.equals(o.getClass())) {
-            Item item = (Item) o;
-            if (getPosition() > -1) {
+    @Override
+    public int compareTo(Item item) {
+        if (item == null) {
+            throw new NullPointerException("Item to compare must not be null");
+        }
+        int returnValue;
+        if (getPosition() > -1) {
+            returnValue = _key.compareTo(item._key);
+        } else {
+            returnValue = _value.compareTo(item._value);
+            if (returnValue == 0) {
                 returnValue = _key.compareTo(item._key);
-            } else {
-                returnValue = _value.compareTo(item._value);
-                if (returnValue == 0) {
-                    returnValue = _key.compareTo(item._key);
-                }
             }
         }
         return returnValue;

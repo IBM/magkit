@@ -220,7 +220,7 @@ public class ConstraintBuilder {
         AND, OR, NOT;
 
         public String toXpathString() {
-            return toString().replaceAll("_", " ").toLowerCase();
+            return toString().replace('_', ' ').toLowerCase();
         }
     }
 }

@@ -42,11 +42,40 @@ import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * Endpoint for rendering http error code handling.
- * This endpoint should be referenced in the error-mapping of the web.xml.
+ * Endpoint for rendering HTTP error code handling in Magnolia.
+ * <p>
+ * Provides two modes of error representation: a default page forward (HTML rendering) and a headless JSON variant.
+ * It resolves the target error page path based on status code, domain and original request URI using {@link ErrorService}.
+ * This endpoint should be referenced in the error-mapping of the web.xml so that container dispatched error requests
+ * reach the appropriate rendering logic.
+ * </p>
+ * <p><strong>Key Features:</strong></p>
+ * <ul>
+ *   <li>Determines error status code from servlet request attributes.</li>
+ *   <li>Resolves page handle for site/domain-aware error pages.</li>
+ *   <li>Forwards to configured page or returns a 404 response if no mapping exists.</li>
+ *   <li>Offers headless JSON representation for API consumers.</li>
+ * </ul>
+ * <p><strong>Usage Preconditions:</strong> Must be invoked in the context of a Magnolia web request where an
+ * {@code ERROR_STATUS_CODE} attribute may have been set by the servlet container.</p>
+ * <p><strong>Side Effects:</strong> The {@link #defaultRendering()} method may perform a request forward; in that case
+ * the returned {@link Response} is {@code null} and response handling continues in the forwarded resource.</p>
+ * <p><strong>Null and Error Handling:</strong> If no error page handle can be resolved for a 404 scenario, a NOT_FOUND
+ * {@link Response} with an explanatory message is returned. Status code resolution falls back to 404 when absent.</p>
+ * <p><strong>Thread-Safety:</strong> Instances are typically managed by the Magnolia IoC container. No mutable shared
+ * state beyond injected dependencies is modified; therefore the class is effectively thread-safe under standard Magnolia
+ * request handling assumptions.</p>
+ * <p><strong>Usage Example:</strong></p>
+ * <pre>
+ * // In web.xml error mapping
+ * &lt;error-page&gt;
+ *   &lt;error-code&gt;404&lt;/error-code&gt;
+ *   &lt;location&gt;/magnoliaError/error/default&lt;/location&gt;
+ * &lt;/error-page&gt;
+ * </pre>
  *
  * @author frank.sommer
- * @since 04.09.2023
+ * @since 2023-09-04
  */
 @Slf4j
 @Path("/error")
@@ -54,6 +83,13 @@ public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefini
     private final ErrorService _errorService;
     private final Provider<AggregationState> _aggregationStateProvider;
 
+    /**
+     * Creates a new error endpoint.
+     *
+     * @param endpointDefinition Magnolia endpoint definition configuration instance
+     * @param errorService service for resolving error page paths and building headless entities
+     * @param aggregationStateProvider provider supplying current {@link AggregationState} for domain and original URI
+     */
     @Inject
     public ErrorEndpoint(ConfiguredNodeEndpointDefinition endpointDefinition, ErrorService errorService, Provider<AggregationState> aggregationStateProvider) {
         super(endpointDefinition);
@@ -61,6 +97,12 @@ public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefini
         _aggregationStateProvider = aggregationStateProvider;
     }
 
+    /**
+     * Renders the error by forwarding to the resolved error page path (HTML use case).
+     * If no path can be resolved a NOT_FOUND response is returned containing an explanatory message.
+     *
+     * @return {@code null} when a forward was performed successfully; otherwise a NOT_FOUND {@link Response}
+     */
     @Path("/default")
     @GET
     public Response defaultRendering() {
@@ -74,6 +116,11 @@ public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefini
         return response;
     }
 
+    /**
+     * Provides a headless JSON representation of the error including resolved page path information.
+     *
+     * @return a {@link Response} with the appropriate HTTP status code and JSON entity body
+     */
     @Path("/headless")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -82,6 +129,12 @@ public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefini
         return Response.status(statusCode).entity(_errorService.createEntity(statusCode, getErrorPagePath(statusCode))).build();
     }
 
+    /**
+     * Resolves the error page path for a given status code considering domain and original request URI.
+     *
+     * @param statusCode HTTP error status code to resolve a path for
+     * @return the page path/handle or {@code null} if none can be determined
+     */
     protected String getErrorPagePath(int statusCode) {
         AggregationState aggregationState = _aggregationStateProvider.get();
         // can not use site from aggregation state, because the current request is on the redirect servlet
@@ -92,6 +145,12 @@ public class ErrorEndpoint extends AbstractEndpoint<ConfiguredNodeEndpointDefini
         return _errorService.retrieveErrorPagePath(statusCode, domain, originalUri);
     }
 
+    /**
+     * Retrieves the error status code from the servlet request (attribute {@code ERROR_STATUS_CODE}).
+     * Falls back to {@code 404} if the attribute is absent.
+     *
+     * @return resolved HTTP status code or 404 if not present
+     */
     private static int getErrorStatusCode() {
         return Optional.ofNullable(MgnlContext.getWebContext().getRequest().getAttribute(ERROR_STATUS_CODE))
             .map(obj -> (int) obj)

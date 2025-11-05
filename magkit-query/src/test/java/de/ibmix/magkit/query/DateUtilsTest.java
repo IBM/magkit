@@ -20,13 +20,12 @@ package de.ibmix.magkit.query;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
 import static de.ibmix.magkit.query.DateUtils.createQueryDate;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringRegularExpression.matchesRegex;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test for DateUtils.
@@ -41,6 +40,6 @@ public class DateUtilsTest {
         Date date = new Date(1234567890);
         String queryDate = createQueryDate(date);
         // use regex to prevent time zone difference on build server
-        assertThat(queryDate, matchesRegex("1970-01-15T0(6|7):56:07\\.890\\+0(0|1):00"));
+        assertTrue(queryDate.matches("1970-01-15T0(6|7):56:07\\.890\\+0(0|1):00"));
     }
 }

@@ -22,11 +22,22 @@ package de.ibmix.magkit.query.sql2.statement;
 
 /**
  * SQL2 statement builder interface for fluent API: Optional order direction step.
+ * <p>Defaults to descending order; choose {@link #ascending()} to override. After setting the direction the
+ * builder can proceed to build the statement.</p>
+ * <p>Thread-safety: Implementations are not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-15
  */
 public interface Sql2OrderDirection extends Sql2Builder {
+    /**
+     * Use descending order for previously defined order attributes (default).
+     * @return final builder step to build the SQL2 string
+     */
     Sql2Builder descending();
+    /**
+     * Use ascending order for previously defined order attributes.
+     * @return final builder step to build the SQL2 string
+     */
     Sql2Builder ascending();
 }

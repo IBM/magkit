@@ -23,7 +23,10 @@ package de.ibmix.magkit.query.sql2.condition;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * Builder class for double property conditions.
+ * Builder for floating point (double) property comparisons equivalently to {@link Sql2LongCondition} but using
+ * double precision values. All comparison operators (=&lt;&gt; etc.) are supported.
+ * Thread-safety: Not thread safe.
+ * Null handling: Null values produce no output fragment.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-08
@@ -34,6 +37,11 @@ public final class Sql2DoubleCondition extends Sql2PropertyCondition<Sql2DoubleC
         super(property);
     }
 
+    /**
+     * Start building a condition on the given double property.
+     * @param name property name (may be null/blank -&gt; empty condition later)
+     * @return comparison API allowing NOT and operators
+     */
     public static Sql2CompareNot<Double> property(final String name) {
         return new Sql2DoubleCondition(name);
     }

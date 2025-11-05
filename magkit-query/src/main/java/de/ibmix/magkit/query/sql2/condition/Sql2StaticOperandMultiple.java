@@ -21,8 +21,10 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * Generic interface for all property conditions. Declared methods for the step that declares the value.
- * Allows providing one or more values to be used for comparison or a bind variable name.
+ * Generic interface for all property conditions (multi value step). Declares methods to supply one or
+ * more static values or a single bind variable name. Choosing bind variable discards previously set literal values.
+ * Thread-safety: Implementations not thread safe.
+ * Null handling: Null / empty arrays produce an empty condition.
  *
  * @param <V> the type of the value
  *
@@ -30,6 +32,16 @@ package de.ibmix.magkit.query.sql2.condition;
  * @since 2020-05-20
  */
 public interface Sql2StaticOperandMultiple<V> {
+    /**
+     * Provide one or more literal values for comparison.
+     * @param value values (may contain nulls / be empty)
+     * @return next step allowing join selector decision
+     */
     Sql2JoinConstraint values(V... value);
+    /**
+     * Provide a bind variable dropping any previously set literal values.
+     * @param name variable name (may be null/blank -&gt; ignored)
+     * @return next step allowing join selector decision
+     */
     Sql2JoinConstraint bindVariable(String name);
 }

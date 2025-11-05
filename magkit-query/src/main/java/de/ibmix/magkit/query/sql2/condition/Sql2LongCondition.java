@@ -23,7 +23,15 @@ package de.ibmix.magkit.query.sql2.condition;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * Builder class for long property conditions.
+ * Builder for numeric (long) property comparisons. Supports all comparison operators defined in
+ * {@link Sql2PropertyCondition}. Example:
+ * <pre>{@code
+ * String constraint = Sql2LongCondition.property("views")
+ *     .greaterThan().value(100L)
+ *     .asString();
+ * }</pre>
+ * Thread-safety: Not thread safe.
+ * Null handling: Null values are ignored (no output produced).
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-08
@@ -34,6 +42,12 @@ public final class Sql2LongCondition extends Sql2PropertyCondition<Sql2LongCondi
         super(property);
     }
 
+    /**
+     * Start a condition on the given property.
+     *
+     * @param name property name
+     * @return comparison API
+     */
     public static Sql2CompareNot<Long> property(final String name) {
         return new Sql2LongCondition(name);
     }

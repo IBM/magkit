@@ -24,11 +24,24 @@ import de.ibmix.magkit.query.sql2.condition.Sql2JoinConstraint;
 
 /**
  * SQL2 statement builder interface for fluent API: Optional where step.
+ * <p>Allows adding constraint groups combined by logical AND (all must match) or logical OR (any may match).
+ * Constraints can refer to properties, paths or templates. Passing an empty array results in no WHERE clause.</p>
+ * <p>Thread-safety: Implementations are not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-15
  */
 public interface Sql2Where extends Sql2Order {
+    /**
+     * Add a WHERE clause matching all provided constraints (logical AND).
+     * @param constraints one or more constraints (ignored if empty)
+     * @return next step allowing ordering
+     */
     Sql2Order whereAll(Sql2JoinConstraint... constraints);
+    /**
+     * Add a WHERE clause matching any provided constraints (logical OR).
+     * @param constraints one or more constraints (ignored if empty)
+     * @return next step allowing ordering
+     */
     Sql2Order whereAny(Sql2JoinConstraint... constraints);
 }

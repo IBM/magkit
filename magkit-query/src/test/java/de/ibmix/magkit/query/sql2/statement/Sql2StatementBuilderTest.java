@@ -24,110 +24,110 @@ import de.ibmix.magkit.query.sql2.condition.Sql2PathCondition;
 import de.ibmix.magkit.query.sql2.condition.Sql2PathJoinCondition;
 import de.ibmix.magkit.query.sql2.condition.Sql2StringCondition;
 import org.apache.jackrabbit.JcrConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test Sql2StatementBuilder.
- *
+ * Tests for Sql2Statement builder.
  * @author wolf.bubenik@ibmix.de
- * @since 06.04.2020
+ * @since 2020-04-06
  */
 public class Sql2StatementBuilderTest {
     private static final Logger LOG = LoggerFactory.getLogger(Sql2StatementBuilderTest.class);
 
     @Test
     public void selectAll() {
-        assertThat(Sql2Statement.select().build(), is("SELECT * FROM [nt:base]"));
+        assertEquals("SELECT * FROM [nt:base]", Sql2Statement.select().build());
     }
 
     @Test
     public void selectAttributes() {
-        assertThat(Sql2Statement.select().build(), is("SELECT * FROM [nt:base]"));
-        assertThat(Sql2Statement.select("test").build(), is("SELECT [test] FROM [nt:base]"));
-        assertThat(Sql2Statement.select("test", "other").build(), is("SELECT [test],[other] FROM [nt:base]"));
+        assertEquals("SELECT * FROM [nt:base]", Sql2Statement.select().build());
+        assertEquals("SELECT [test] FROM [nt:base]", Sql2Statement.select("test").build());
+        assertEquals("SELECT [test],[other] FROM [nt:base]", Sql2Statement.select("test", "other").build());
     }
 
     @Test
     public void from() {
-        assertThat(Sql2Statement.select().from(null).build(), is("SELECT * FROM [nt:base]"));
-        assertThat(Sql2Statement.select().from("").build(), is("SELECT * FROM [nt:base]"));
-        assertThat(Sql2Statement.select().from("mgnl:page").build(), is("SELECT * FROM [mgnl:page]"));
+        assertEquals("SELECT * FROM [nt:base]", Sql2Statement.select().from(null).build());
+        assertEquals("SELECT * FROM [nt:base]", Sql2Statement.select().from("").build());
+        assertEquals("SELECT * FROM [mgnl:page]", Sql2Statement.select().from("mgnl:page").build());
     }
 
     @Test
     public void selectAs() {
-        // DO not prefix select attributes by selector name if we have only one selector:
-        assertThat(Sql2Statement.select().as("s").whereAll(
-            Sql2PathCondition.is().descendant("/some/root/path"),
-            Sql2StringCondition.property("title").equalsAny().values("test")
-        ).build(),
-            is("SELECT * FROM [nt:base] AS s WHERE (isdescendantnode(s, '/some/root/path') AND s.[title] = 'test')")
+        assertEquals("SELECT * FROM [nt:base] AS s WHERE (isdescendantnode(s, '/some/root/path') AND s.[title] = 'test')",
+            Sql2Statement.select().as("s").whereAll(
+                Sql2PathCondition.is().descendant("/some/root/path"),
+                Sql2StringCondition.property("title").equalsAny().values("test")
+            ).build()
         );
     }
 
     @Test
     public void innerJoin() {
-        assertThat(Sql2Statement.select().as("s")
-            .innerJoin("nt:base").joinAs("j").on(Sql2PathJoinCondition.isJoinedDescendantOfSelected())
-            .whereAll(
-                Sql2StringCondition.template().equalsAll().values("selected.template.id"),
-                Sql2StringCondition.template().equalsAll().values("joined.template.id").forJoin()
-            ).build(),
-            is("SELECT s.*,j.* FROM [nt:base] AS s INNER JOIN [nt:base] AS j ON isdescendantnode(j,s) WHERE (s.[mgnl:template] = 'selected.template.id' AND j.[mgnl:template] = 'joined.template.id')")
+        assertEquals("SELECT s.*,j.* FROM [nt:base] AS s INNER JOIN [nt:base] AS j ON isdescendantnode(j,s) WHERE (s.[mgnl:template] = 'selected.template.id' AND j.[mgnl:template] = 'joined.template.id')",
+            Sql2Statement.select().as("s")
+                .innerJoin("nt:base").joinAs("j").on(Sql2PathJoinCondition.isJoinedDescendantOfSelected())
+                .whereAll(
+                    Sql2StringCondition.template().equalsAll().values("selected.template.id"),
+                    Sql2StringCondition.template().equalsAll().values("joined.template.id").forJoin()
+                ).build()
         );
     }
 
     @Test
     public void whereAll() {
-        assertThat(Sql2Statement.select().whereAll(
-            Sql2PathCondition.is().descendant("/some/path"),
-            Sql2StringCondition.property("test").equalsAny().values("value")
-        ).build(), is("SELECT * FROM [nt:base] WHERE (isdescendantnode('/some/path') AND [test] = 'value')"));
+        assertEquals("SELECT * FROM [nt:base] WHERE (isdescendantnode('/some/path') AND [test] = 'value')",
+            Sql2Statement.select().whereAll(
+                Sql2PathCondition.is().descendant("/some/path"),
+                Sql2StringCondition.property("test").equalsAny().values("value")
+            ).build());
     }
 
     @Test
     public void whereAny() {
-        assertThat(Sql2Statement.select().whereAny(
-            Sql2PathCondition.is().descendant("/some/path"),
-            Sql2StringCondition.property("test").equalsAny().values("value")
-        ).build(), is("SELECT * FROM [nt:base] WHERE (isdescendantnode('/some/path') OR [test] = 'value')"));
+        assertEquals("SELECT * FROM [nt:base] WHERE (isdescendantnode('/some/path') OR [test] = 'value')",
+            Sql2Statement.select().whereAny(
+                Sql2PathCondition.is().descendant("/some/path"),
+                Sql2StringCondition.property("test").equalsAny().values("value")
+            ).build());
     }
 
     @Test
     public void orderDescBy() {
-        assertThat(Sql2Statement.select().whereAll(
-            Sql2PathCondition.is().descendant("/some/path")
-        ).orderBy("test").toString(), is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC"));
+        assertEquals("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC",
+            Sql2Statement.select().whereAll(
+                Sql2PathCondition.is().descendant("/some/path")
+            ).orderBy("test").toString());
 
-        assertThat(Sql2Statement.select().orderBy("test1", "test2", "test3").toString(), is("SELECT * FROM [nt:base] ORDER BY [test1] DESC, [test2] DESC, [test3] DESC"));
+        assertEquals("SELECT * FROM [nt:base] ORDER BY [test1] DESC, [test2] DESC, [test3] DESC",
+            Sql2Statement.select().orderBy("test1", "test2", "test3").toString());
     }
 
     @Test
     public void orderDescByScore() {
-        assertThat(Sql2Statement.select().whereAll(
+        assertEquals("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [jcr:score] DESC",
+            Sql2Statement.select().whereAll(
                 Sql2PathCondition.is().descendant("/some/path")
-        ).orderByScore().toString(), is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [jcr:score] DESC"));
+            ).orderByScore().toString());
     }
 
     @Test
     public void descending() {
-        assertThat(Sql2Statement.select().whereAny(
+        assertEquals("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC",
+            Sql2Statement.select().whereAny(
                 Sql2PathCondition.is().descendant("/some/path")
-            ).orderBy("test").descending().build(),
-            is("SELECT * FROM [nt:base] WHERE isdescendantnode('/some/path') ORDER BY [test] DESC")
-        );
+            ).orderBy("test").descending().build());
     }
 
     @Test
     public void ascending() {
-        assertThat(Sql2Statement.select().as("p").orderBy("test1", "test2").ascending().build(),
-            is("SELECT * FROM [nt:base] AS p ORDER BY [test1] ASC, [test2] ASC")
-        );
+        assertEquals("SELECT * FROM [nt:base] AS p ORDER BY [test1] ASC, [test2] ASC",
+            Sql2Statement.select().as("p").orderBy("test1", "test2").ascending().build());
     }
 
     @Test
