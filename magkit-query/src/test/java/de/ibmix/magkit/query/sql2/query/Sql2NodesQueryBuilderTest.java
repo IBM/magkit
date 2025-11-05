@@ -21,7 +21,6 @@ package de.ibmix.magkit.query.sql2.query;
  */
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
