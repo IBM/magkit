@@ -92,6 +92,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
  */
 public final class NodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeUtils.class);
+    private static final String MESSAGE_UNABLE_TO_GET_CHILDREN = "Unable to get children for node [{}]";
 
     public static final Predicate<Node> IS_FOLDER = n -> isNodeType(n, NodeTypes.Folder.NAME);
     public static final Predicate<Node> IS_PAGE = n -> isNodeType(n, NodeTypes.Page.NAME);
@@ -468,7 +469,7 @@ public final class NodeUtils {
             try {
                 result = NodeUtil.getNodes(node, toJackRabbitPredicate(predicate));
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
@@ -487,7 +488,7 @@ public final class NodeUtils {
             try {
                 result = node.getNodes();
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
@@ -507,7 +508,7 @@ public final class NodeUtils {
             try {
                 result = node.getNodes(namePattern);
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
@@ -527,7 +528,7 @@ public final class NodeUtils {
             try {
                 result = node.getNodes(nameGlobs);
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }

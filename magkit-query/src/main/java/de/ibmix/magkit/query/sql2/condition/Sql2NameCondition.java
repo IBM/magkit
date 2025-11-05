@@ -220,7 +220,7 @@ public class Sql2NameCondition implements Sql2NameOperand, Sql2NameCompare, Sql2
 
     private void appendValueConstraint(final StringBuilder sql2, final String selectorName, final String value) {
         if (StringUtils.isNotEmpty(value)) {
-            final String cleanValue = value.replaceAll("'", "''");
+            final String cleanValue = value.replace("'", "''");
 
             if (StringUtils.isNotEmpty(_operandMethod)) {
                 sql2.append(_operandMethod).append('(');

@@ -112,6 +112,7 @@ public class Sql2StringConditionTest {
 
     @Test
     public void length() {
+        // Test for null because the length() method is not implemented and returns null deliberately.
         assertNull(Sql2StringCondition.property("test").length());
     }
 

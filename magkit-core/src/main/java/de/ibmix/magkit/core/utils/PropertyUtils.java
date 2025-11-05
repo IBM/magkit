@@ -98,6 +98,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  */
 public final class PropertyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertyUtils.class);
+    private static final String MESSAGE_CANNOT_RETRIEVE_PROPERTIES = "Error retrieving properties from node {}.";
 
     static final Function<Property, String> TO_STRING_VALUE_DEFAULT_EMPTY = p -> StringUtils.defaultString(getStringValue(p));
 
@@ -145,7 +146,7 @@ public final class PropertyUtils {
             try {
                 result = node.getProperties();
             } catch (RepositoryException e) {
-                LOGGER.debug("Error retrieving properties from node {}.", NodeUtils.getPath(node), e);
+                LOGGER.debug(MESSAGE_CANNOT_RETRIEVE_PROPERTIES, NodeUtils.getPath(node), e);
             }
         }
         return result;
@@ -164,7 +165,7 @@ public final class PropertyUtils {
             try {
                 result = node.getProperties(namePattern);
             } catch (RepositoryException e) {
-                LOGGER.debug("Error retrieving properties from node {}.", NodeUtils.getPath(node), e);
+                LOGGER.debug(MESSAGE_CANNOT_RETRIEVE_PROPERTIES, NodeUtils.getPath(node), e);
             }
         }
         return result;
@@ -183,7 +184,7 @@ public final class PropertyUtils {
             try {
                 result = node.getProperties(nameGlobs);
             } catch (RepositoryException e) {
-                LOGGER.debug("Error retrieving properties from node {}.", NodeUtils.getPath(node), e);
+                LOGGER.debug(MESSAGE_CANNOT_RETRIEVE_PROPERTIES, NodeUtils.getPath(node), e);
             }
         }
         return result;

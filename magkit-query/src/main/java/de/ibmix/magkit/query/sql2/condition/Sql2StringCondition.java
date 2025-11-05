@@ -77,7 +77,7 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
         return property(JcrConstants.JCR_UUID);
     }
 
-    // Implement the abstract-me()-trick to have special return types on methods of parent class.
+    // Implement the abstract-me()-pattern to have special return types on methods of parent class.
     @Override
     protected Sql2StringCondition me() {
         return this;
@@ -87,6 +87,7 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
      * Negate the upcoming comparison sequence (wrap output in not(...)).
      * @return narrowed API without another not()
      */
+    @Override
     public Sql2CompareString not() {
         super.not();
         return me();
@@ -164,10 +165,10 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
 
     @Override
     protected void appendValueConstraint(final StringBuilder sql2, final String selectorName, final String name, final String value) {
-        if (value != null && (!_isLike || StringUtils.isNotEmpty(value))) {
+        if (isAddConstraint(value)) {
             final String end = (_startsWith || _contains) ? "%'" : "'";
             final String begin = (_endsWith || _contains) ? "'%" : "'";
-            final String cleanValue = _isLike ? value.replaceAll("'", "''").replaceAll("%", "\\\\%").replaceAll("_", "\\\\_") : value.replaceAll("'", "''");
+            final String cleanValue = _isLike ? value.replace("'", "''").replaceAll("%", "\\\\%").replaceAll("_", "\\\\_") : value.replace("'", "''");
 
             if (StringUtils.isNotEmpty(_operandMethod)) {
                 sql2.append(_operandMethod).append('(');
@@ -184,6 +185,10 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
 
             sql2.append(getCompareOperator()).append(begin).append(cleanValue).append(end);
         }
+    }
+
+    private boolean isAddConstraint(final String value) {
+        return value != null && (!_isLike || StringUtils.isNotEmpty(value));
     }
 
     @Override

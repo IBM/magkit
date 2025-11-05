@@ -199,16 +199,6 @@ public class StubbingProperty implements Property {
         init(values, DecimalValue::new);
     }
 
-    private <T, R extends BaseValue> void init(T[] values, Function<T, R> toValue) {
-        if (values != null && values.length > 0) {
-            _value = toValue.apply(values[0]);
-            _values = new Value[values.length];
-            for (int i = 0; i < values.length; i++) {
-                _values[i] = toValue.apply(values[i]);
-            }
-        }
-    }
-
     /**
      * Internal base constructor storing parent and property name. All public constructors delegate here.
      * Avoids duplication of assignment logic.
@@ -219,6 +209,16 @@ public class StubbingProperty implements Property {
     private StubbingProperty(Node parent, String name) {
         _parent = parent;
         _name = name;
+    }
+
+    private <T, R extends BaseValue> void init(T[] values, Function<T, R> toValue) {
+        if (values != null && values.length > 0) {
+            _value = toValue.apply(values[0]);
+            _values = new Value[values.length];
+            for (int i = 0; i < values.length; i++) {
+                _values[i] = toValue.apply(values[i]);
+            }
+        }
     }
 
     /**

@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import static de.ibmix.magkit.query.xpath.ConstraintBuilder.Operator.AND;
 import static de.ibmix.magkit.query.xpath.ConstraintBuilder.Operator.OR;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author philipp.guettler

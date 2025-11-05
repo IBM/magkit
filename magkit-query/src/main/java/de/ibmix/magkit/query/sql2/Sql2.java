@@ -38,8 +38,7 @@ import de.ibmix.magkit.query.sql2.query.NodesQueryBuilder;
 import de.ibmix.magkit.query.sql2.query.QueryNodesStatement;
 import de.ibmix.magkit.query.sql2.query.QueryRowsStatement;
 import de.ibmix.magkit.query.sql2.query.RowsQueryBuilder;
-import de.ibmix.magkit.query.sql2.query.Sql2NodesQueryBuilder;
-import de.ibmix.magkit.query.sql2.query.Sql2RowsQueryBuilder;
+import de.ibmix.magkit.query.sql2.query.Sql2QueryBuilder;
 import de.ibmix.magkit.query.sql2.statement.Sql2As;
 import de.ibmix.magkit.query.sql2.statement.Sql2From;
 import de.ibmix.magkit.query.sql2.statement.Sql2Statement;
@@ -171,7 +170,7 @@ public final class Sql2 {
          * @return nodes query statement builder
          */
         public static QueryNodesStatement<NodesQueryBuilder> nodesFrom(final String workspace) {
-            return Sql2NodesQueryBuilder.forNodes().fromWorkspace(workspace);
+            return Sql2QueryBuilder.forNodes().fromWorkspace(workspace);
         }
 
         /**
@@ -180,7 +179,7 @@ public final class Sql2 {
          * @return nodes query statement builder for website
          */
         public static QueryNodesStatement<NodesQueryBuilder> nodesFromWebsite() {
-            return Sql2NodesQueryBuilder.forNodes().fromWebsite();
+            return Sql2QueryBuilder.forNodes().fromWebsite();
         }
 
         /**
@@ -190,7 +189,7 @@ public final class Sql2 {
          * @return rows query statement builder
          */
         public static QueryRowsStatement<RowsQueryBuilder> rowsFrom(final String workspace) {
-            return Sql2RowsQueryBuilder.forRows().fromWorkspace(workspace);
+            return Sql2QueryBuilder.forRows().fromWorkspace(workspace);
         }
 
         /**
@@ -199,7 +198,7 @@ public final class Sql2 {
          * @return rows query statement builder for website
          */
         public static QueryRowsStatement<RowsQueryBuilder> rowsFromWebsite() {
-            return Sql2RowsQueryBuilder.forRows().fromWebsite();
+            return Sql2QueryBuilder.forRows().fromWebsite();
         }
 
         /**

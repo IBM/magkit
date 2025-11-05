@@ -131,7 +131,7 @@ public class TableAsExcelResourceProvider {
         checkArgument(source != null, "The Table source must not be null.");
         _source = source;
         _visibleColumns = new HashSet<>(Arrays.asList(_source.getVisibleColumns()));
-        _sheetName = fileNameBase.replaceAll("[:,]*", EMPTY).replaceAll("/", "-");
+        _sheetName = fileNameBase.replaceAll("[:,]*", EMPTY).replace('/', '-');
         _fileName = _sheetName.replace(' ', '_') + EXCEL_FILE_EXTENSION;
         _title = title;
     }

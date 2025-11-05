@@ -262,6 +262,10 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
         return hasFromSelector() && hasJoinSelector();
     }
 
+    private boolean hasJoin() {
+        return isNotBlank(_joinMethod) && isNotBlank(_joinNodeType) && hasJoinSelector();
+    }
+
     /**
      * Render the final SQL2 statement.
      * @return SQL2 query string
@@ -279,7 +283,7 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             result.append(AS).append(_fromSelectorName);
         }
 
-        if (isNotBlank(_joinMethod) && isNotBlank(_joinNodeType) && hasJoinSelector()) {
+        if (hasJoin()) {
             result.append(_joinMethod).append('[').append(_joinNodeType).append(']').append(AS).append(_joinSelectorName).append(ON);
             _joinCondition.appendTo(result, this);
         }
@@ -288,19 +292,8 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             result.append(WHERE);
             _constraintGroup.appendTo(result, this);
         }
-        if (ArrayUtils.isNotEmpty(_orderAttributes)) {
-            result.append(ORDER_BY);
-            for (String attribute : _orderAttributes) {
-                if (hasTwoSelectors()) {
-                    //TODO: handle ordering on join attributes
-                    result.append(_fromSelectorName).append('.');
-                }
-                result.append('[').append(attribute).append(']').append(_orderDirection);
-                if (ArrayUtils.indexOf(_orderAttributes, attribute) < _orderAttributes.length - 1) {
-                    result.append(", ");
-                }
-            }
-        }
+        appendOrderAttributes(result);
+
         return result.toString();
     }
 
@@ -336,6 +329,22 @@ public final class Sql2Statement implements Sql2From, Sql2As, Sql2Join, Sql2Join
             result.append('*');
         } else if (!hasFromSelector()) {
             result.append('*');
+        }
+    }
+
+    private void appendOrderAttributes(final StringBuilder result) {
+        if (ArrayUtils.isNotEmpty(_orderAttributes)) {
+            result.append(ORDER_BY);
+            for (String attribute : _orderAttributes) {
+                if (hasTwoSelectors()) {
+                    //TODO: handle ordering on join attributes
+                    result.append(_fromSelectorName).append('.');
+                }
+                result.append('[').append(attribute).append(']').append(_orderDirection);
+                if (ArrayUtils.indexOf(_orderAttributes, attribute) < _orderAttributes.length - 1) {
+                    result.append(", ");
+                }
+            }
         }
     }
 

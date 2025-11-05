@@ -116,25 +116,21 @@ public class RegexpChildrenCollector<T extends Item> extends TraversingItemVisit
     @Override
     protected void entering(Node node, int level) throws RepositoryException {
         super.entering(node, level);
-        if (level > 0) {
-            if (getClassToCollect().isInstance(node)) {
-                if (isItemNameMatching(node)) {
-                    getCollectedChildren().add(getClassToCollect().cast(node));
-                }
-            }
+        if (isCollectableChild(node, level)) {
+            getCollectedChildren().add(getClassToCollect().cast(node));
         }
     }
 
     @Override
     protected void entering(Property property, int level) throws RepositoryException {
         super.entering(property, level);
-        if (level > 0) {
-            if (getClassToCollect().isInstance(property)) {
-                if (isItemNameMatching(property)) {
-                    getCollectedChildren().add(getClassToCollect().cast(property));
-                }
-            }
+        if (isCollectableChild(property, level)) {
+            getCollectedChildren().add(getClassToCollect().cast(property));
         }
+    }
+
+    private boolean isCollectableChild(Item item, int level) throws RepositoryException {
+        return level > 0 && getClassToCollect().isInstance(item) && isItemNameMatching(item);
     }
 
     /**
