@@ -25,13 +25,28 @@ import com.vaadin.data.ValueContext;
 import com.vaadin.data.validator.AbstractValidator;
 import info.magnolia.dam.api.Asset;
 import info.magnolia.dam.api.Item;
-
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 /**
- * Validator for asset mimetypes.
+ * Validator for accepted asset MIME types.
+ * <p>
+ * Determines validity by checking if the asset's MIME type matches any configured accepted pattern. Patterns support
+ * simple wildcard replacement (<code>*</code>) translated to <code>.*</code> for regex matching; dots and plus signs
+ * are escaped to ensure literal matching before wildcard expansion.
+ * </p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Supports list of accepted MIME type patterns (e.g. <code>image/*</code>, <code>application/pdf</code>).</li>
+ *   <li>Gracefully treats <code>null</code> value or empty accepted list as valid.</li>
+ *   <li>Ignores non-asset items (folders) unless explicitly configured.</li>
+ * </ul>
+ *
+ * <p>Usage preconditions: Provide accepted MIME types collection via {@link MimeTypeValidatorDefinition}; may be empty.</p>
+ * <p>Null and error handling: <code>null</code> item considered valid; non-asset items return false to avoid false positives.</p>
+ * <p>Thread-safety: Stateless apart from immutable definition reference; not thread-safe for concurrent modification.</p>
  *
  * @author frank.sommer
+ * @since 2024-01-24
  */
 public class MimeTypeValidator extends AbstractValidator<Item> {
 
@@ -42,6 +57,11 @@ public class MimeTypeValidator extends AbstractValidator<Item> {
         _definition = definition;
     }
 
+    /**
+     * Check validity of the given DAM item.
+     * @param item DAM item (may be null)
+     * @return true if valid under configured MIME type rules
+     */
     public boolean isValidValue(Item item) {
         boolean valid = true;
         if (item != null) {
@@ -62,6 +82,12 @@ public class MimeTypeValidator extends AbstractValidator<Item> {
         return false;
     }
 
+    /**
+     * Apply validation according to Vaadin's validator contract.
+     * @param value DAM item value
+     * @param context value context
+     * @return validation result
+     */
     @Override
     public ValidationResult apply(Item value, ValueContext context) {
         return toResult(value, isValidValue(value));

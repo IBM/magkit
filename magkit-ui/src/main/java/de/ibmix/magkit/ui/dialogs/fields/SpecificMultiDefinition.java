@@ -21,15 +21,26 @@ package de.ibmix.magkit.ui.dialogs.fields;
  */
 
 /**
- * Interface for common specific multi field definitions.
+ * Common contract for multi field definitions with size constraints.
+ * <p>
+ * Provides accessors used by {@link SpecificMultiFormView} to determine allowed component counts and optional linkage
+ * to a parent component property for advanced counting logic.
+ * </p>
+ * <p>Implementations: {@link SpecificMultiFieldDefinition}, {@link SpecificMultiValueFieldDefinition}.</p>
  *
  * @author frank.sommer
- * @since 05.03.2021
+ * @since 2021-03-05
  */
 public interface SpecificMultiDefinition {
     long DEFAULT_MAX = 3;
 
+    /**
+     * @return maximum allowed components (null indicates default)
+     */
     Long getMaxComponents();
 
+    /**
+     * @return optional parent component property name for contextual counting
+     */
     String getParentComponentProperty();
 }

@@ -25,9 +25,10 @@ import info.magnolia.dam.api.Item;
 import info.magnolia.ui.field.AbstractFieldValidatorFactory;
 
 /**
- * Mime type validator factory.
- *
+ * Factory creating {@link MimeTypeValidator} instances.
+ * <p>Delegate class used by Magnolia field binding to supply validation for DAM asset MIME types.</p>
  * @author frank.sommer
+ * @since 2024-01-24
  */
 public class MimeTypeValidatorFactory extends AbstractFieldValidatorFactory<MimeTypeValidatorDefinition, Item> {
 

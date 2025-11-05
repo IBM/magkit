@@ -21,11 +21,20 @@ package de.ibmix.magkit.query.sql2.statement;
  */
 
 /**
- * TODO: Comment.
+ * Fluent API step for assigning a selector name to the primary (FROM) node type.
+ * <p>Selector names allow referencing attributes and functions scoped to a particular selector
+ * especially in JOIN or PATH conditions. If omitted, attributes are output without selector prefix.</p>
+ * <p>Null/blank handling: A null or blank value results in no selector name being stored.</p>
+ * <p>Thread-safety: Not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-15
  */
 public interface Sql2As extends Sql2Where {
+    /**
+     * Assign a selector name to the primary FROM node type.
+     * @param selectorName the selector alias (may be null/blank to skip)
+     * @return next step enabling joins and where clauses
+     */
     Sql2Join as(String selectorName);
 }

@@ -23,8 +23,9 @@ package de.ibmix.magkit.ui.dialogs.validators;
 import info.magnolia.ui.field.ValidatorType;
 
 /**
- * Definition for the TemplateTypeValidator.
- *
+ * Definition for validator checking template type of a node against accepted string values.
+ * <p>Delegates accepted value logic to {@link StringValuesValidatorDefinition}.</p>
+ * <p>Usage: Configure <code>acceptedValues</code> list and error message. Used with type <code>templateTypeValidator</code>.</p>
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */

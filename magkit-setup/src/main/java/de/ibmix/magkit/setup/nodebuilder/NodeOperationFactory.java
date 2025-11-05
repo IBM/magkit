@@ -41,60 +41,78 @@ import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.strip;
 
 /**
- * An Utility class that extends info.magnolia.nodebuilder.Ops.
- * It provides additional methods for getOrCreate operations and ordering operations.
+ * Factory/utility extension of Magnolia's {@link Ops} adding idempotent node and property operations and
+ * ordering helpers for JCR content setup tasks.
+ * <p>Key features:</p>
+ * <ul>
+ *     <li>Idempotent creation via addOrGet* methods to avoid duplicate nodes on repeated module updates.</li>
+ *     <li>Convenience operations for ordering siblings (orderBefore/orderAfter) wrapping JCR / Magnolia utilities.</li>
+ *     <li>Simplified property mutation ignoring previous value (addOrSetProperty).</li>
+ *     <li>Bulk removal helpers (removeIfExists, removeAllChilds) to clean node subtrees.</li>
+ *     <li>Pattern voter node creation for access / configuration logic.</li>
+ * </ul>
+ * <p>Usage preconditions: All operations expect a valid JCR {@link Node} context supplied by the NodeBuilder execution
+ * environment. Provided relative paths must not be null or empty; node type validation occurs when an existing node
+ * is found with a mismatching type (throws {@link RepositoryException}).</p>
+ * <p>Side effects: Node and property modifications are performed directly on the provided session and are not
+ * automatically saved; callers rely on Magnolia's installation task lifecycle to persist changes. Removal operations
+ * delete items irrevocably in the current transient state until save/rollback.</p>
+ * <p>Null and error handling: Methods avoid returning null. Type mismatches cause a {@link RepositoryException} in
+ * {@code CreatePathNodeOperation}. Unknown property types are converted using {@link PropertyUtil#createValue(Object, javax.jcr.ValueFactory)}.</p>
+ * <p>Thread-safety: All methods are stateless and static. Thread-safe regarding internal state; JCR session / node
+ * concurrency must be handled externally.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code
+ * NodeOperation op = NodeOperationFactory.addOrGetContentNode("myModule/config")
+ *     .then(NodeOperationFactory.addOrSetProperty("enabled", true));
+ * }</pre>
  *
  * @author wolf.bubenik
- * @since 16.09.2010
+ * @since 2010-09-16
  */
 public abstract class NodeOperationFactory extends Ops {
     public static final String PATH_SEPARATOR = "/";
 
     /**
-     * New Operation to solve problems with duplicating of nodes on repeated updates.
-     * Creates node with given name, if it does not exist already.
-     * If such node exists, the existing node will be returned.
+     * Creates or returns a child node with the given name if it already exists.
+     * Idempotent convenience wrapper delegating to {@link #addOrGetNode(String, String)} with no explicit type.
      *
-     * @param name the node name as String
-     * @return the new or existing node with the given name
+     * @param name the node name (single segment)
+     * @return operation that yields the existing or newly created node
      */
     public static NodeOperation addOrGetNode(final String name) {
         return addOrGetNode(name, null);
     }
 
     /**
-     * New Operation to solve problems with dublicating of nodes on repeated updates.
-     * Creates node with given name and nodetype {@link info.magnolia.jcr.util.NodeTypes.ContentNode#NAME},
-     * if it does not exist allready.
-     * If such node exists, the existing node will be returned.
+     * Creates or returns a child content node (type {@link info.magnolia.jcr.util.NodeTypes.ContentNode#NAME}).
+     * Accepts a relative path; intermediate nodes are created as content nodes as needed.
      *
-     * @param relPath the node name or relative node path as String
-     * @return the new or existing node with the given name
+     * @param relPath node name or relative path
+     * @return operation that yields the existing or newly created node
      */
     public static NodeOperation addOrGetContentNode(final String relPath) {
         return addOrGetNode(relPath, NodeTypes.ContentNode.NAME);
     }
 
     /**
-     * New Operation to solve problems with duplicating of nodes on repeated updates.
-     * Creates nodes with given name (relPath).
+     * Creates missing path segments and returns the terminal node. If an existing terminal node has a different
+     * primary type than specified, a {@link RepositoryException} is raised.
      *
-     * @param relPath the node name or relative node path as String
-     * @param type    type
-     * @return NodeOperation with created node.
-     * @see CreatePathNodeOperation
+     * @param relPath relative path ("segment/segment"), trimmed of leading/trailing slashes
+     * @param type optional expected node type; if null Magnolia's {@link NodeTypes.Content#NAME} is used for creation
+     * @return node operation producing the final node
      */
     public static NodeOperation addOrGetNode(final String relPath, final String type) {
         return new CreatePathNodeOperation(relPath, type);
     }
 
     /**
-     * Moves the named node before its sibling.
-     * Wrapper for {@link javax.jcr.Node#orderBefore(String, String)}
+     * Orders a sibling so that the node named {@code nodeName} appears directly before {@code orderBeforeNodeName}.
      *
-     * @param nodeName            the name of the node to be moved
-     * @param orderBeforeNodeName the name of the node sibling that should be ordered behind the named node
-     * @return the NodeOperation performing the ordering operation
+     * @param nodeName name of node to move
+     * @param orderBeforeNodeName name of sibling that will follow the moved node
+     * @return ordering operation
      */
     public static NodeOperation orderBefore(final String nodeName, final String orderBeforeNodeName) {
         return new AbstractNodeOperation() {
@@ -107,12 +125,11 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Moves the named node after its sibling.
-     * Wrapper for {@link info.magnolia.jcr.util.NodeUtil#orderAfter(Node, String)}
+     * Orders a sibling so that the node named {@code nodeName} appears directly after {@code orderAfterNodeName}.
      *
-     * @param nodeName           the name of the node to be moved
-     * @param orderAfterNodeName the name of the node sibling that should be ordered after the named node
-     * @return the NodeOperation performing the ordering operation
+     * @param nodeName name of node to move
+     * @param orderAfterNodeName name of sibling that will precede the moved node
+     * @return ordering operation
      */
     public static NodeOperation orderAfter(final String nodeName, final String orderAfterNodeName) {
         return new AbstractNodeOperation() {
@@ -125,12 +142,11 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Sets the value of an existing property, ignoring its current value.
-     * If the property does not exist it will be created. No Exception will be thrown.
+     * Sets or creates a property with the provided value regardless of any existing value.
      *
-     * @param name     the name of the node to be moved
-     * @param newValue the name of the node sibling that should be ordered behind the named node
-     * @return the NodeOperation performing the operation
+     * @param name property name
+     * @param newValue value to set (converted via Magnolia PropertyUtil)
+     * @return operation performing mutation
      */
     public static NodeOperation addOrSetProperty(final String name, final Object newValue) {
         return new AbstractNodeOperation() {
@@ -144,10 +160,10 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Checks the name before try to delete.
+     * Removes a node or property if it exists, silently ignoring absent items.
      *
-     * @param name node or property name
-     * @return node operation
+     * @param name child node or property name
+     * @return operation performing conditional removal
      */
     public static NodeOperation removeIfExists(final String name) {
         return new AbstractNodeOperation() {
@@ -162,9 +178,9 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Removes all child nodes.
+     * Removes all direct child nodes of the current context node.
      *
-     * @return node operation
+     * @return operation performing bulk removal
      */
     public static NodeOperation removeAllChilds() {
         return new AbstractNodeOperation() {
@@ -183,23 +199,23 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Creates an uri pattern voter node operation.
+     * Adds a URI pattern voter configuration node with a pattern.
      *
-     * @param voterName voter name
-     * @param pattern   pattern
-     * @return node operation
+     * @param voterName node name for voter configuration
+     * @param pattern matching pattern string
+     * @return operation building voter node
      */
     public static NodeOperation addUriPatternVoter(final String voterName, final String pattern) {
         return addPatternVoter(voterName, URIPatternVoter.class.getName(), pattern);
     }
 
     /**
-     * Creates a pattern voter node operation with given voter class.
+     * Adds a generic pattern voter configuration node.
      *
-     * @param voterName  voter name
-     * @param voterClass voter class
-     * @param pattern    pattern
-     * @return node operation
+     * @param voterName node name
+     * @param voterClass fully qualified voter implementation class name
+     * @param pattern matching pattern string
+     * @return operation building voter node
      */
     public static NodeOperation addPatternVoter(final String voterName, final String voterClass, final String pattern) {
         return addOrGetContentNode(voterName).then(addOrSetProperty(StandardTasks.PN_CLASS, voterClass), addOrSetProperty(StandardTasks.PN_PATTERN, pattern));
@@ -209,7 +225,8 @@ public abstract class NodeOperationFactory extends Ops {
     }
 
     /**
-     * Operation to create node path by given type. Adds only missing nodes in the path.
+     * Internal operation creating a path of nodes using either the provided type or Magnolia's content type.
+     * Performs type validation on existing terminal node.
      *
      * @author frank.sommer
      * @since 21.02.2014

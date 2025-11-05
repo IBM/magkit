@@ -43,12 +43,26 @@ import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
- * Install task for load groovy scripts in scripts workspace.
+ * Installation task that imports Groovy resources into the Magnolia "scripts" workspace.
+ * <p>
+ * Depending on the constructor parameters it either creates a script node (property {@code script=true}) or a plain
+ * Groovy file node (e.g. for class definitions) with the file content stored in the {@code text} property. The target
+ * node hierarchy is created if missing using {@link Folder} node types for intermediate folders and {@link Content}
+ * nodes for the script itself.
+ * </p>
+ * <p>Preconditions: The resource path must exist on the classpath; the scripts workspace must be accessible.</p>
+ * <p>Side Effects: Creates nodes and properties in the {@code scripts} workspace if they do not exist yet.</p>
+ * <p>Error Handling: Any {@link RepositoryException} or {@link IOException} is wrapped in a {@link TaskExecutionException}.</p>
+ * <p>Thread-Safety: Intended for execution during single-threaded module installation.</p>
+ * <p>Usage Example:</p>
  * <pre>
- * new ScriptInstallTask("/täst.groovy"); = create groovy script in root
- * new ScriptInstallTask("/täst.groovy", "/folder"); = create groovy script in folder
- * new ScriptInstallTask("/täst.groovy", "/folder2", false); = create groovy file (e.g. class) in folder2
+ * new ScriptInstallTask("/myScript.groovy");                // installs under root
+ * new ScriptInstallTask("/myScript.groovy", "/util");      // installs under /util
+ * new ScriptInstallTask("/MyClass.groovy", "/classes", false); // installs non-script groovy file
  * </pre>
+ * <p>
+ * Deprecated: Use {@code info.magnolia.module.groovy.setup.InstallGroovyFile} instead for newer Magnolia versions.
+ * </p>
  *
  * @deprecated use info.magnolia.module.groovy.setup.InstallGroovyFile instead
  * @author diana.racho
@@ -63,18 +77,45 @@ public class ScriptInstallTask extends AbstractTask {
     private final String _basePath;
     private final boolean _script;
 
+    /**
+     * Creates an installation task for a Groovy script stored at root.
+     *
+     * @param resource classpath resource path (e.g. /myScript.groovy)
+     */
     public ScriptInstallTask(final String resource) {
         this(resource, "/");
     }
 
+    /**
+     * Creates an installation task for a Groovy script stored below the given base path.
+     *
+     * @param resource classpath resource path
+     * @param basePath repository folder path (will be created if missing)
+     */
     public ScriptInstallTask(final String resource, final String basePath) {
         this(resource, basePath, true);
     }
 
+    /**
+     * Creates an installation task for a Groovy resource which may be either a runnable script or a plain Groovy file.
+     *
+     * @param resource classpath resource path
+     * @param basePath repository folder path (will be created if missing)
+     * @param script true to mark it as script, false for plain groovy file
+     */
     public ScriptInstallTask(final String resource, final String basePath, final boolean script) {
         this("Install script", "Install script (if not already there): " + resource + " below " + basePath, resource, basePath, script);
     }
 
+    /**
+     * Protected constructor allowing custom task name/description.
+     *
+     * @param taskName readable task name
+     * @param taskDescription readable description
+     * @param resource classpath resource path
+     * @param basePath repository folder path
+     * @param script true if script
+     */
     protected ScriptInstallTask(final String taskName, final String taskDescription, final String resource, final String basePath, final boolean script) {
         super(taskName, taskDescription);
         _resource = resource;
@@ -82,6 +123,13 @@ public class ScriptInstallTask extends AbstractTask {
         _script = script;
     }
 
+    /**
+     * Executes the installation: validates the node name, ensures folder path exists, creates content node and sets
+     * script metadata and text properties unless the node already exists.
+     *
+     * @param installContext current install context (unused but part of signature)
+     * @throws TaskExecutionException on repository or IO issues
+     */
     @Override
     public void execute(final InstallContext installContext) throws TaskExecutionException {
         String validNodeName = Components.getComponent(NodeNameHelper.class).getValidatedName(getBaseName(_resource));
@@ -104,6 +152,12 @@ public class ScriptInstallTask extends AbstractTask {
         }
     }
 
+    /**
+     * Reads the classpath resource content into a String using UTF-8.
+     *
+     * @return resource content
+     * @throws IOException if reading fails
+     */
     protected String getText() throws IOException {
         String text;
         try (InputStream is = ClasspathResourcesUtil.getStream(_resource)) {

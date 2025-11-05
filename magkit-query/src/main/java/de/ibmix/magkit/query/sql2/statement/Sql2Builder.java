@@ -22,10 +22,17 @@ package de.ibmix.magkit.query.sql2.statement;
 
 /**
  * The interface for the last step of query statement building: Build the query string.
+ * <p>Calling {@link #build()} renders the accumulated builder state into a JCR SQL2 statement.
+ * Multiple invocations typically return identical results unless the underlying mutable builder changed.</p>
+ * <p>Thread-safety: Not thread-safe.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-02-28
  */
 public interface Sql2Builder {
+    /**
+     * Render and return the final SQL2 query string.
+     * @return the SQL2 statement (never null)
+     */
     String build();
 }

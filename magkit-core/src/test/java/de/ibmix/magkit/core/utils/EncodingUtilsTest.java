@@ -20,24 +20,24 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.ibmix.magkit.core.utils.EncodingUtils.URL_HTML_ESCAPER;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Decoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getBase64Encoded;
+import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlDecoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncoded;
 import static de.ibmix.magkit.core.utils.EncodingUtils.getUrlEncodedValues;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the Encoding Utils.
  *
  * @author oliver.emke, Aperto AG
- * @since 14.03.11
+ * @since 2011-03-14
  */
 public class EncodingUtilsTest {
 
@@ -45,7 +45,7 @@ public class EncodingUtilsTest {
     public void testGetBase64Encoded() {
         Map<String, String> testData = createBase64EncodeTestData();
         for (Map.Entry<String, String> entrySet : testData.entrySet()) {
-            assertEquals("Testing [" + entrySet.getKey() + "] ...", entrySet.getValue(), getBase64Encoded(entrySet.getKey()));
+            assertEquals(entrySet.getValue(), getBase64Encoded(entrySet.getKey()), "Testing [" + entrySet.getKey() + "] ...");
         }
     }
 
@@ -53,15 +53,46 @@ public class EncodingUtilsTest {
     public void encodeDecodeUnterschleissheim() {
         String value = "Unterschlei\u00dfheim";
         String base64Encoded = getBase64Encoded(value);
-        assertThat(value, equalTo(getBase64Decoded(base64Encoded)));
+        assertEquals(value, getBase64Decoded(base64Encoded));
+    }
+
+    @Test
+    public void testGetBase64DecodedEdgeCases() {
+        assertEquals("", getBase64Decoded(null));
+        assertEquals("", getBase64Decoded(""));
+        assertEquals("", getBase64Decoded("   "));
+        assertEquals("hello world", getBase64Decoded("aGVsbG8gd29ybGQ="));
     }
 
     @Test
     public void testGetUrlEncoded() {
         Map<String, String> testData = createUrlEncodeTestData();
         for (Map.Entry<String, String> entrySet : testData.entrySet()) {
-            assertEquals("Testing [" + entrySet.getKey() + "] ...", entrySet.getValue(), getUrlEncoded(entrySet.getKey()));
+            assertEquals(entrySet.getValue(), getUrlEncoded(entrySet.getKey()), "Testing [" + entrySet.getKey() + "] ...");
         }
+    }
+
+    @Test
+    public void testGetUrlEncodedBlankSpace() {
+        assertEquals("+", getUrlEncoded(" "));
+    }
+
+    @Test
+    public void testGetUrlDecoded() {
+        assertEquals("", getUrlDecoded(null));
+        assertEquals("", getUrlDecoded(""));
+        assertEquals("unternehmensf?hrung", getUrlDecoded("unternehmensf%3Fhrung"));
+        assertEquals("Candida & Terasuisse", getUrlDecoded("Candida+%26+Terasuisse"));
+        assertEquals("\r\n", getUrlDecoded("%0D%0A"));
+        assertEquals(" ", getUrlDecoded("+"));
+    }
+
+    @Test
+    public void testUrlHtmlEscaper() {
+        String input = "<&>\"'";
+        // and is not escaped by the reduced escaper
+        String expected = "&lt;&&gt;&quot;&#39;";
+        assertEquals(expected, URL_HTML_ESCAPER.escape(input));
     }
 
     @Test
@@ -71,7 +102,7 @@ public class EncodingUtilsTest {
         String[] values = testData.values().toArray(new String[0]);
         String[] result = getUrlEncodedValues(keys);
         for (int i = 0; i < keys.length; i++) {
-            assertEquals("Testing [" + keys[i] + "] ...", values[i], result[i]);
+            assertEquals(values[i], result[i], "Testing [" + keys[i] + "] ...");
         }
     }
 

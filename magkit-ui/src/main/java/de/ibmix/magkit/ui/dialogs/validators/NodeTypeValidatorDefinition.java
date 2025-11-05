@@ -22,13 +22,13 @@ package de.ibmix.magkit.ui.dialogs.validators;
 
 import info.magnolia.ui.field.ConfiguredFieldValidatorDefinition;
 import info.magnolia.ui.field.ValidatorType;
-
 import java.util.Collection;
 
 /**
- * Node type validator definition.
- *
+ * Definition specifying accepted JCR node types for {@link NodeTypeValidator}.
+ * <p>Provides a collection of type names; empty collection permits any type.</p>
  * @author ngoc.tran
+ * @since 2024-03-22
  */
 @ValidatorType("nodeTypeValidator")
 public class NodeTypeValidatorDefinition extends ConfiguredFieldValidatorDefinition {

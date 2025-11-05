@@ -35,25 +35,44 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * A wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
- * Provides methods to access Row results.
- *
+ * Specialized {@link ResultWrapper} exposing row-oriented access to a {@link javax.jcr.query.QueryResult}.
+ * <p>Purpose: Provide convenience methods to iterate and collect {@link javax.jcr.query.Row} objects as well as
+ * resolve {@link javax.jcr.Node} instances from individual row selectors ("left" / "right" join sides or arbitrary
+ * selector names).</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Graceful error handling: JCR {@link javax.jcr.RepositoryException} is caught and logged; empty iterators/lists
+ *       are returned instead of {@code null}.</li>
+ *   <li>Utility accessors for common join scenarios (left/right selector convenience).</li>
+ *   <li>Selector-based node extraction from result rows.</li>
+ * </ul>
+ * <p>Null and error handling: All public accessors return non-null collections (possibly empty). Invalid selector names
+ * or repository access issues are logged at WARN level.</p>
+ * <p>Thread-safety: Instances are NOT thread-safe. Consume in the creating thread; do not share concurrently without
+ * external synchronization.</p>
+ * <p>Side effects: Only logging; underlying result is read-only.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code List<Node> leftNodes = new RowsQuery(query).execute().getLeftRowNodeList();}</pre>
  * @author wolf.bubenik@ibmix.de
  * @since 2020-08-21
  */
 public class RowsResult extends ResultWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(RowsResult.class);
 
+    /**
+     * Create a new row-oriented result wrapper.
+     * @param result underlying JCR query result
+     */
     public RowsResult(QueryResult result) {
         super(result);
     }
 
     /**
-     * Returns an iterator over the <code>Row</code>s of the result table. The
-     * rows are returned according to the ordering specified in the query.
-     *
-     * @return a <code>Iterator&lt;Row&gt;</code>, never null
+     * Obtain an iterator over all {@link Row} objects in their query-defined order.
+     * Returns an empty iterator if the underlying JCR call fails.
+     * @return non-null iterator of rows (possibly empty)
      */
+    @SuppressWarnings("unchecked")
     public Iterator<Row> getRows() {
         Iterator<Row> rows = Collections.emptyIterator();
         try {
@@ -65,9 +84,8 @@ public class RowsResult extends ResultWrapper {
     }
 
     /**
-     * Accessor for the query result as List&lt;Node&gt;.
-     *
-     * @return the query result as javax.jcr.Node list, never null
+     * Collects all {@link Row} objects into a {@link List} preserving iteration order.
+     * @return non-null list of rows (possibly empty)
      */
     public List<Row> getRowList() {
         Iterator<Row> iterator = getRows();
@@ -79,11 +97,8 @@ public class RowsResult extends ResultWrapper {
     }
 
     /**
-     * Accessor for the 'left' query result as List&lt;Node&gt;.
-     * Provides the Nodes for the first selector name given by the query result.
-     * Note that 'left' is the normal select name and comes as first name from the query result.
-     *
-     * @return the query result as javax.jcr.Node list or an empty list, never null
+     * Convenience accessor for nodes belonging to the first selector name ("left" side of a join).
+     * @return non-null list of nodes (possibly empty)
      */
     public List<Node> getLeftRowNodeList() {
         String[] selectors = getSelectorNames();
@@ -91,11 +106,8 @@ public class RowsResult extends ResultWrapper {
     }
 
     /**
-     * Accessor for the 'right' query result as List&lt;Node&gt;.
-     * Provides the Nodes for the second selector name given by the query result.
-     * Note that 'right' is the join select name and comes as second name from the query result.
-     *
-     * @return the query result as javax.jcr.Node list or an empty list, never null
+     * Convenience accessor for nodes belonging to the second selector name ("right" side of a join).
+     * @return non-null list of nodes (possibly empty)
      */
     public List<Node> getRightRowNodeList() {
         String[] selectors = getSelectorNames();
@@ -103,11 +115,10 @@ public class RowsResult extends ResultWrapper {
     }
 
     /**
-     * Accessor for the query result as List&lt;Node&gt;.
-     * Provides the Nodes for the given selector name.
-     *
-     * @param selector selector
-     * @return the query result as javax.jcr.Node list or an empty list, never null
+     * Resolve nodes for a given selector name across all result rows.
+     * If the selector is blank, an empty list is returned.
+     * @param selector selector name (must match query selector)
+     * @return non-null list of nodes (possibly empty)
      */
     public List<Node> getRowNodeListFor(String selector) {
         Iterator<Row> iterator = getRows();
@@ -115,7 +126,10 @@ public class RowsResult extends ResultWrapper {
         if (isNotBlank(selector)) {
             while (iterator.hasNext()) {
                 try {
-                    result.add(iterator.next().getNode(selector));
+                    Node selected = iterator.next().getNode(selector);
+                    if (selected != null) {
+                        result.add(selected);
+                    }
                 } catch (RepositoryException e) {
                     LOGGER.warn("Failed to get node for selector " + selector + " from result row.", e);
                 }

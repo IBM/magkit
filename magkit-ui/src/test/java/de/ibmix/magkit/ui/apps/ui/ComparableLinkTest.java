@@ -22,20 +22,21 @@ package de.ibmix.magkit.ui.apps.ui;
 
 import com.google.common.collect.ImmutableList;
 import com.vaadin.ui.Link;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests {@link ComparableLink}.
+ * Unit tests for {@link ComparableLink} ordering and equality behavior.
  *
  * @author oliver.emke
- * @since 27.01.17
+ * @since 2017-01-27
  */
 public class ComparableLinkTest {
 
@@ -51,13 +52,13 @@ public class ComparableLinkTest {
         final Link labelEmpty = new ComparableLink(labelValueEmpty, null);
         final Link nullLabel = new ComparableLink(null, null);
 
-        assertThat(labelOne.equals(labelOne), is(true));
-        assertThat(labelOneSameLabelText.equals(labelOneSameLabelText), is(true));
-        assertThat(labelOne.equals(labelTwo), is(false));
-        assertThat(labelTwo.equals(labelOne), is(false));
-        assertThat(labelEmpty.equals(labelEmpty), is(true));
-        assertThat(nullLabel.equals(nullLabel), is(true));
-        assertThat(nullLabel.equals(labelEmpty), is(false));
+        assertTrue(labelOne.equals(labelOne));
+        assertTrue(labelOneSameLabelText.equals(labelOneSameLabelText));
+        assertFalse(labelOne.equals(labelTwo));
+        assertFalse(labelTwo.equals(labelOne));
+        assertTrue(labelEmpty.equals(labelEmpty));
+        assertTrue(nullLabel.equals(nullLabel));
+        assertFalse(nullLabel.equals(labelEmpty));
     }
 
     @Test
@@ -74,10 +75,10 @@ public class ComparableLinkTest {
         labels.addAll(ImmutableList.of(third, first, second, nullCaptionLink));
         Collections.shuffle(labels);
         Collections.sort(labels);
-        assertThat(labels.get(0), is(nullCaptionLink));
-        assertThat(labels.get(1), is(first));
-        assertThat(labels.get(2), is(second));
-        assertThat(labels.get(3), is(third));
+        assertEquals(nullCaptionLink, labels.get(0));
+        assertEquals(first, labels.get(1));
+        assertEquals(second, labels.get(2));
+        assertEquals(third, labels.get(3));
     }
 
 }

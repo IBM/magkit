@@ -21,8 +21,8 @@ package de.ibmix.magkit.core.utils;
  */
 
 import info.magnolia.context.MgnlContext;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
  */
 public class CacheUtilsTest {
 
-    @After
+    @AfterEach
     public void tearDown() {
         cleanContext();
     }

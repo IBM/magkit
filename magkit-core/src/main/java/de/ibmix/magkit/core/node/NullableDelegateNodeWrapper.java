@@ -45,9 +45,28 @@ import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 /**
- * Base NodeWrapper for fake nodes that do not wrap a real node.
- * Adds null checks before delegation to wrapped node method calls.
- * Even a null node should at lease have a name and a primary NodeType. Therefor there is no default constructor.
+ * Abstract base for Node wrappers that MAY wrap a real JCR {@link Node} but can also operate without one (nullable).
+ * It centralises defensive null checking before delegating to the wrapped node and supplies safe defaults when
+ * no underlying node exists. This enables creation of transient in-memory node graphs for view/model logic without
+ * persisting or requiring repository state.
+ * <ul>
+ *   <li>Graceful degradation: All read operations return neutral defaults (null, empty iterator, empty strings, 0 index)</li>
+ *   <li>Write operations simply no-op when no wrapped node exists (unless overridden by subclasses)</li>
+ *   <li>Hierarchy metadata (name, type) can be provided synthetically via constructor</li>
+ *   <li>Extensible: concrete subclasses add overlay/fallback/immutability behaviour</li>
+ * </ul>
+ * Usage example:
+ * <pre>{@code
+ * NullableDelegateNodeWrapper synthetic = new NullableDelegateNodeWrapper("virtual", "mgnl:content") {
+ *     // implement additional behaviour here
+ * };
+ * String name = synthetic.getName(); // "virtual"
+ * NodeType type = synthetic.getPrimaryNodeType(); // BaseNodeType("mgnl:content")
+ * }</pre>
+ * Null and error handling: If a wrapped node exists all repository exceptions propagate unchanged. Without a wrapped
+ * node, methods return neutral defaults and do not throw (unless contract requires otherwise, e.g. validation inside
+ * constructors). Thread-safety: Not thread-safe; instances should be confined to request scope. Side effects: None –
+ * calls never modify repository state when underlying node is absent.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-15
@@ -57,6 +76,13 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     private String _name;
     private NodeType _primaryNodeType;
 
+    /**
+     * Construct a purely synthetic wrapper without a backing node. Name and primary node type are mandatory so that
+     * hierarchy and type related JCR API calls can respond safely.
+     *
+     * @param name synthetic node name (must not be empty)
+     * @param primaryNodeType technical name of the primary node type (must not be empty)
+     */
     protected NullableDelegateNodeWrapper(String name, String primaryNodeType) {
         super();
         notEmpty(name);
@@ -65,11 +91,21 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
         _primaryNodeType = new BaseNodeType(primaryNodeType);
     }
 
+    /**
+     * Construct wrapper for a real JCR node. All operations will delegate to this node.
+     *
+     * @param node real node to wrap (must not be null)
+     */
     protected NullableDelegateNodeWrapper(Node node) {
         super(node);
         notNull(node);
     }
     
+    /**
+     * Indicates whether a real wrapped node exists. Useful for subclasses deciding delegation or fallback logic.
+     *
+     * @return true if a non-null wrapped node is present
+     */
     public boolean hasWrappedNode() {
         return getWrappedNode() != null;
     }

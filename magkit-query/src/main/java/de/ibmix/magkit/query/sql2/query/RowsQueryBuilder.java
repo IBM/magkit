@@ -26,13 +26,40 @@ import javax.jcr.query.Row;
 import java.util.List;
 
 /**
- * The RowsQueryBuilder interface declaring methods for the last building step.
- *
+ * Final builder step interface for creating and executing row-oriented SQL2 queries.
+ * <p>Purpose: Defines terminal operations to build a {@link RowsQuery} and obtain row results, optionally checking for
+ * emptiness. Complements {@link NodesQueryBuilder} for node-centric retrieval.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Create a type-safe {@link RowsQuery} wrapper from accumulated builder state.</li>
+ *   <li>Retrieve all {@link Row} instances or quickly test for existence via {@link #hasResultRows()}.</li>
+ * </ul>
+ * <p>Null and error handling: Implementations return empty collections or {@code false} instead of throwing on
+ * repository errors, logging warnings instead.</p>
+ * <p>Thread-safety: NOT thread-safe; use per request / operation.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code List<Row> rows = Sql2QueryBuilder.forRows().fromWebsite().withStatement("SELECT * FROM [mgnl:page]")
+ *     .withLimit(100).buildRowsQuery().execute().getRowList();}</pre>
  * @author wolf.bubenik@ibmix.de
  * @since 2020-04-27
  */
 public interface RowsQueryBuilder extends QueryLimit<RowsQueryBuilder> {
+    /**
+     * Build a {@link RowsQuery} instance from the accumulated builder configuration.
+     * @return non-null {@link RowsQuery} ready for execution
+     */
     RowsQuery buildRowsQuery();
+
+    /**
+     * Execute the query and return all resulting {@link Row} objects.
+     * Implementations return an empty list if execution fails.
+     * @return non-null list of rows (possibly empty)
+     */
     List<Row> getResultRows();
+
+    /**
+     * Execute the query and check if any {@link Row} exists.
+     * @return {@code true} if at least one row is present; {@code false} otherwise or on error
+     */
     boolean hasResultRows();
 }

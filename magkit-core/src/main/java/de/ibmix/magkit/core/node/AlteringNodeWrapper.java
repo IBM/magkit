@@ -44,7 +44,31 @@ import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
 
 /**
- * A NodeWrapper that allows to override properties and child nodes as desired by the user.
+ * A flexible {@link NullableDelegateNodeWrapper} allowing callers to overlay (override, hide, add) properties
+ * and child nodes on top of a real wrapped JCR {@link Node} without persisting changes to the repository.
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Programmatic stubbing of single- or multi-valued properties across supported JCR types.</li>
+ *   <li>Ability to hide existing properties or child nodes from read operations.</li>
+ *   <li>Injection of synthetic child nodes while preserving hierarchical semantics via {@link DefineParentNodeWrapper}.</li>
+ *   <li>Fallback chaining to ancestor or referenced nodes for graceful content resolution.</li>
+ *   <li>Conversion to immutable view via {@link #immutable()} for defensive exposure.</li>
+ * </ul>
+ * <p>Usage example:</p>
+ * <pre>{@code
+ * AlteringNodeWrapper wrapper = new AlteringNodeWrapper(node)
+ *     .withProperty("title", "Custom Title")
+ *     .withHiddenProperty("internalFlag")
+ *     .withChildNode("virtual", someOtherNode)
+ *     .withFallbackToPage()
+ *     .immutable();
+ * Property title = wrapper.getProperty("title");
+ * }</pre>
+ * <p>Null and error handling: Builder methods validate required arguments. Repository access exceptions from delegated
+ * calls propagate unchanged. Hidden elements are simply excluded from merged iterators.</p>
+ * <p>Thread-safety: Not thread-safe – internal maps and sets are mutable. Restrict usage to single-threaded request
+ * scope or externally synchronize.</p>
+ * <p>Side effects: No writes are performed to the underlying JCR repository; all alterations are in-memory only.</p>
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2019-05-19
@@ -55,8 +79,11 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     private final Set<String> _hiddenProperties;
     private final Set<String> _hiddenChildNodes;
 
-
-
+    /**
+     * Construct a wrapper overlaying an existing node.
+     *
+     * @param nodeToWrap the underlying JCR node (must not be null)
+     */
     public AlteringNodeWrapper(Node nodeToWrap) {
         super(nodeToWrap);
         notNull(nodeToWrap);
@@ -66,6 +93,12 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         _hiddenChildNodes = new HashSet<>();
     }
 
+    /**
+     * Construct a purely synthetic node wrapper using a given name and primary node type.
+     *
+     * @param name node name
+     * @param primaryNodeType primary node type name
+     */
     public AlteringNodeWrapper(String name, String primaryNodeType) {
         super(name, primaryNodeType);
         _properties = new LinkedHashMap<>();
@@ -74,6 +107,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         _hiddenChildNodes = new HashSet<>();
     }
 
+    /**
+     * Stub a String property (single or multi valued).
+     *
+     * @param name property name (must not be blank)
+     * @param value values to expose (multi-valued if length &gt; 1)
+     * @return this for fluent chaining
+     */
     public AlteringNodeWrapper withProperty(String name, String... value) {
         notEmpty(name);
         StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
@@ -81,6 +121,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
+    /**
+     * Stub a Boolean property (single or multi valued).
+     *
+     * @param name property name
+     * @param value boolean values
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withProperty(String name, Boolean... value) {
         notEmpty(name);
         StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
@@ -88,6 +135,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
+    /**
+     * Stub a Long property (single or multi valued).
+     *
+     * @param name property name
+     * @param value long values
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withProperty(String name, Long... value) {
         notEmpty(name);
         StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
@@ -95,6 +149,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
+    /**
+     * Stub a Double property (single or multi valued).
+     *
+     * @param name property name
+     * @param value double values
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withProperty(String name, Double... value) {
         notEmpty(name);
         StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
@@ -102,6 +163,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
+    /**
+     * Stub a Calendar property (single or multi valued).
+     *
+     * @param name property name
+     * @param value calendar values
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withProperty(String name, Calendar... value) {
         notEmpty(name);
         StubbingProperty property = new StubbingProperty(getWrappedNode(), name, value);
@@ -109,17 +177,36 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
+    /**
+     * Convenience stub for the Magnolia template property.
+     *
+     * @param templateId template identifier value
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withTemplate(String templateId) {
         notEmpty(templateId);
         return withProperty(NodeTypes.Renderable.TEMPLATE, templateId);
     }
 
+    /**
+     * Hide one or more existing or stubbed properties from subsequent read access. Null names are ignored.
+     *
+     * @param names property names to hide
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withHiddenProperty(String... names) {
         notEmpty(names);
-        Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenProperties::add);
+        Arrays.stream(names).filter(Objects::nonNull).forEach(_hiddenProperties::add);
         return this;
     }
 
+    /**
+     * Inject a synthetic child node (wrapped to maintain hierarchy semantics).
+     *
+     * @param name child node name
+     * @param childNode real JCR node to wrap
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withChildNode(String name, Node childNode) {
         notEmpty(name);
         notNull(childNode);
@@ -127,32 +214,66 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return this;
     }
 
+    /**
+     * Hide child nodes by name from iterators and direct resolution. Null names are ignored.
+     *
+     * @param names child node names to hide
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper withHiddenNode(String... names) {
         notEmpty(names);
-        Arrays.stream(names).filter(Objects::isNull).forEach(_hiddenChildNodes::add);
+        Arrays.stream(names).filter(Objects::nonNull).forEach(_hiddenChildNodes::add);
         return this;
     }
 
+    /**
+     * Attach a generic fallback chain wrapper (initially containing only the current wrapped node).
+     *
+     * @return created fallback wrapper (also set as new wrapped node)
+     */
     public FallbackNodeWrapper withFallback() {
         FallbackNodeWrapper result = new FallbackNodeWrapper(getWrappedNode());
         setWrappedNode(result);
         return result;
     }
 
+    /**
+     * Convenience: configure fallback chain to nearest ancestor page (Magnolia Page node).
+     *
+     * @return configured fallback wrapper
+     */
     public FallbackNodeWrapper withFallbackToPage() {
         return withFallbackToAncestor(NodeUtils.IS_PAGE);
     }
 
+    /**
+     * Configure fallback chain to the first ancestor (or self) matching predicate.
+     *
+     * @param ancestorPredicate predicate selecting target ancestor
+     * @return configured fallback wrapper
+     */
     public FallbackNodeWrapper withFallbackToAncestor(final Predicate<Node> ancestorPredicate) {
         Node fallbackNode = NodeUtils.getAncestorOrSelf(getWrappedNode(), ancestorPredicate);
         return withFallback().withFallbackNodes(fallbackNode);
     }
 
+    /**
+     * Configure fallback chain using a referenced node id stored in a property.
+     *
+     * @param workspace Magnolia workspace name of the reference
+     * @param linkPropertyName property holding the referenced node identifier
+     * @return configured fallback wrapper
+     */
     public FallbackNodeWrapper withFallbackToReference(final String workspace, final String linkPropertyName) {
         String nodeId = PropertyUtils.getStringValue(getWrappedNode(), linkPropertyName);
         return withFallback().withFallbackNodes(NodeUtils.getNodeByReference(workspace, nodeId));
     }
 
+    /**
+     * Convert underlying view to immutable wrapper (mutating operations will throw).
+     *
+     * @return fluent API instance
+     */
     public AlteringNodeWrapper immutable() {
         setWrappedNode(new ImmutableNodeWrapper(getWrappedNode()));
         return this;
@@ -216,7 +337,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
         return mergeAndFilterNodes(super.getNodes(nameGlobs));
     }
 
-    // TODO: add filter predicate to method (name patterns) and filter custom nodes accordingly
+    /**
+     * Merge original child node iterator with injected synthetic child nodes and filter out hidden ones.
+     *
+     * @param nodes base iterator from underlying wrapped node
+     * @return merged iterator excluding hidden names
+     * @throws RepositoryException propagation from iterator consumption
+     */
     private NodeIterator mergeAndFilterNodes(NodeIterator nodes) throws RepositoryException {
         Map<String, Node> mergedNodes = new LinkedHashMap<>();
         while (nodes.hasNext()) {
@@ -225,12 +352,21 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
                 mergedNodes.put(n.getName(), n);
             }
         }
-
-        mergedNodes.putAll(_childNodes);
+        for (Map.Entry<String, Node> entry : _childNodes.entrySet()) {
+            if (!_hiddenChildNodes.contains(entry.getKey())) {
+                mergedNodes.put(entry.getKey(), entry.getValue());
+            }
+        }
         return new NodeIteratorAdapter(mergedNodes.values());
     }
 
-    // TODO: add filter predicate to method (name patterns) and filter custom properties accordingly
+    /**
+     * Merge original property iterator with stubbed properties while removing hidden ones.
+     *
+     * @param properties base iterator from underlying wrapped node
+     * @return merged iterator excluding hidden names
+     * @throws RepositoryException propagation from iterator consumption
+     */
     private PropertyIterator mergeAndFilterProperties(final PropertyIterator properties) throws RepositoryException {
         Map<String, Property> nodeProperties = new LinkedHashMap<>();
         while (properties.hasNext()) {
@@ -239,7 +375,11 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
                 nodeProperties.put(property.getName(), property);
             }
         }
-        nodeProperties.putAll(_properties);
+        for (Map.Entry<String, Property> entry : _properties.entrySet()) {
+            if (!_hiddenProperties.contains(entry.getKey())) {
+                nodeProperties.put(entry.getKey(), entry.getValue());
+            }
+        }
         return new PropertyIteratorAdapter(nodeProperties.values());
     }
 

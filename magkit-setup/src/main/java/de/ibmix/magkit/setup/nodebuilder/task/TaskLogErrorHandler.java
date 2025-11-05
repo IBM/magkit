@@ -24,19 +24,38 @@ import info.magnolia.jcr.nodebuilder.AbstractErrorHandler;
 import info.magnolia.module.InstallContext;
 
 /**
- * An ErrorHandler which logs handled errors to the InstallContext
- * as warnings, and wraps unhandled exceptions in NodeOperationException.
+ * Error handler implementation forwarding non-fatal NodeBuilder issues as WARN log entries into the Magnolia
+ * {@link InstallContext}. Used to continue execution while surfacing problems to administrators during module
+ * installation or update. Unhandled exceptions are escalated by base class behavior (see {@link AbstractErrorHandler}).
+ * <p>Key features:
+ * <ul>
+ *     <li>Converts reported errors into install context warnings.</li>
+ *     <li>Simple, stateless handling relying on Magnolia task logging pipeline.</li>
+ * </ul>
+ * Usage preconditions: A non-null {@link InstallContext} must be provided. Thread-safety: Instances hold a reference
+ * to the context but perform no mutable shared state changes; suitable for single-threaded task execution.
  *
  * @author frank.sommer
+ * @since 2010
  * @see info.magnolia.jcr.nodebuilder.task.TaskLogErrorHandler
  */
 public class TaskLogErrorHandler extends AbstractErrorHandler {
     private final InstallContext _installCtx;
 
+    /**
+     * Creates a logging error handler writing warnings to the given install context.
+     *
+     * @param installCtx current Magnolia install context
+     */
     public TaskLogErrorHandler(InstallContext installCtx) {
         _installCtx = installCtx;
     }
 
+    /**
+     * Reports a handled issue as a warning.
+     *
+     * @param message warning text
+     */
     @Override
     public void report(String message) {
         _installCtx.warn(message);

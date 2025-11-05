@@ -20,9 +20,9 @@ package de.ibmix.magkit.core.filter;
  * #L%
  */
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -31,14 +31,16 @@ import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubJcrSession;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
-import static de.ibmix.magkit.test.cms.node.MagnoliaNodeStubbingOperation.stubTemplate;
+import static de.ibmix.magkit.test.cms.node.PageNodeStubbingOperation.stubTemplate;
 import static info.magnolia.repository.RepositoryConstants.WEBSITE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Test TemplateNameVoter.
+ * Unit tests for {@link TemplateNameVoter} validating template collection handling, root path filtering
+ * and template matching scenarios.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2024-01-05
@@ -47,81 +49,81 @@ public class TemplateNameVoterTest {
 
     private TemplateNameVoter _voter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         cleanContext();
         mockWebContext(stubJcrSession(WEBSITE));
         _voter = new TemplateNameVoter();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         cleanContext();
     }
 
     @Test
     public void addTemplate() {
-        assertThat(_voter.getTemplates(), notNullValue());
-        assertThat(_voter.getTemplates().length, is(0));
+        assertNotNull(_voter.getTemplates());
+        assertEquals(0, _voter.getTemplates().length);
 
         _voter.addTemplate("template-1");
-        assertThat(_voter.getTemplates().length, is(1));
-        assertThat(_voter.getTemplates()[0], is("template-1"));
+        assertEquals(1, _voter.getTemplates().length);
+        assertEquals("template-1", _voter.getTemplates()[0]);
 
         _voter.addTemplate("template-2");
-        assertThat(_voter.getTemplates().length, is(2));
-        assertThat(_voter.getTemplates()[0], is("template-1"));
-        assertThat(_voter.getTemplates()[1], is("template-2"));
+        assertEquals(2, _voter.getTemplates().length);
+        assertEquals("template-1", _voter.getTemplates()[0]);
+        assertEquals("template-2", _voter.getTemplates()[1]);
 
         _voter.addTemplate(null);
         _voter.addTemplate("");
         _voter.addTemplate("  \n\t  ");
         _voter.addTemplate("  template-3   ");
-        assertThat(_voter.getTemplates().length, is(3));
-        assertThat(_voter.getTemplates()[2], is("template-3"));
+        assertEquals(3, _voter.getTemplates().length);
+        assertEquals("template-3", _voter.getTemplates()[2]);
     }
 
     @Test
     public void boolVoteNoRootPath() throws RepositoryException {
-        assertThat(_voter.boolVote(null), is(false));
-        assertThat(_voter.boolVote(""), is(false));
-        assertThat(_voter.boolVote("   "), is(false));
+        assertFalse(_voter.boolVote(null));
+        assertFalse(_voter.boolVote(""));
+        assertFalse(_voter.boolVote("   "));
         // test not existing page node
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
         // test page without template
         Node page = mockPageNode("/root/page");
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
         // test page with not matching template
         stubTemplate("test-template").of(page);
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
         // test page with matching template
         _voter.addTemplate("template-1");
         _voter.addTemplate("test-template");
-        assertThat(_voter.boolVote("/root/page.html"), is(true));
+        assertTrue(_voter.boolVote("/root/page.html"));
     }
 
     @Test
     public void boolVoteWithRootPath() throws RepositoryException {
         // test wrong root path:
         _voter.setRootPath("/wrong");
-        assertThat(_voter.boolVote(null), is(false));
-        assertThat(_voter.boolVote(""), is(false));
-        assertThat(_voter.boolVote("   "), is(false));
+        assertFalse(_voter.boolVote(null));
+        assertFalse(_voter.boolVote(""));
+        assertFalse(_voter.boolVote("   "));
         // test not existing page node
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
         // test page without template
         Node page = mockPageNode("/root/page");
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
         // test page with not matching template
         stubTemplate("test-template").of(page);
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
         // test page with matching template
         _voter.addTemplate("template-1");
         _voter.addTemplate("test-template");
-        assertThat(_voter.boolVote("/root/page.html"), is(false));
+        assertFalse(_voter.boolVote("/root/page.html"));
 
         // test correct root path:
         _voter.setRootPath("/root");
-        assertThat(_voter.boolVote("/root/page.html"), is(true));
+        assertTrue(_voter.boolVote("/root/page.html"));
     }
 }

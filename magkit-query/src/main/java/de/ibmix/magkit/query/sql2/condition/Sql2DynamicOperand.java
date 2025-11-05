@@ -21,13 +21,26 @@ package de.ibmix.magkit.query.sql2.condition;
  */
 
 /**
- * Builder Interface for String conditions that declares usage of jcr methods for strings.
+ * Extension to {@link Sql2CompareStringNot} adding JCR dynamic operand functions usable for string properties.
+ * Allows wrapping the property with lower(), upper() or length() before applying comparisons.
+ *
+ * Usage example:
+ * <pre>{@code
+ * Sql2StringCondition.property("title").lowerCase().equalsAny().values("hello");
+ * }</pre>
+ * Thread-safety: Not thread safe.
  *
  * @author wolf.bubenik@ibmix.de
  * @since 2020-05-20
  */
 public interface Sql2DynamicOperand extends Sql2CompareStringNot {
+    /** Apply lower() to the property value.
+     * @return comparison API still allowing not() */
     Sql2CompareStringNot lowerCase();
+    /** Apply upper() to the property value.
+     * @return comparison API still allowing not() */
     Sql2CompareStringNot upperCase();
+    /** Switch to a length() numeric comparison context.
+     * @return numeric comparison API */
     Sql2CompareNot<Long> length();
 }

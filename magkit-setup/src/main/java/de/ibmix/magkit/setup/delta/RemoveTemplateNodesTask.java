@@ -41,6 +41,16 @@ import static org.apache.commons.lang3.StringUtils.length;
 
 /**
  * Task to remove all nodes with a specific template.
+ * <p>
+ * Executes a JCR-SQL2 query selecting either page or component nodes (auto-detected if {@code queryType} is null) by
+ * matching the {@link NodeTypes.Renderable#TEMPLATE} property and optional base path constraint. Nodes are removed in
+ * batches with periodic {@link Session#save()} calls to avoid excessive memory use.
+ * </p>
+ * <p>Preconditions: Template id must exist; workspace WEBSITE must be accessible.</p>
+ * <p>Side Effects: Permanently deletes matched nodes and their subtree content.</p>
+ * <p>Error Handling: Individual node removal issues are logged and skipped; query / session issues propagate.</p>
+ * <p>Thread-Safety: Designed for single-threaded execution; concurrent modifications can lead to state exceptions.</p>
+ * <p>Usage Example: {@code tasks.add(new RemoveTemplateNodesTask("app:pages/obsolete"));}</p>
  *
  * @author frank.sommer
  * @since 2.0.1
@@ -66,8 +76,8 @@ public class RemoveTemplateNodesTask extends AbstractRepositoryTask {
      * Remove nodes with current template id in website workspace.
      *
      * @param currentTemplate template id to search for
-     * @param basePath        base path for replacement
-     * @param queryType       query node type
+     * @param basePath base path for replacement
+     * @param queryType query node type
      */
     public RemoveTemplateNodesTask(String currentTemplate, String basePath, String queryType) {
         this(currentTemplate, basePath, queryType, createTaskName(currentTemplate));
@@ -77,9 +87,9 @@ public class RemoveTemplateNodesTask extends AbstractRepositoryTask {
      * Remove nodes with current template id in website repository.
      *
      * @param currentTemplate template id to search for
-     * @param basePath        base path for replacement
-     * @param queryType       query node type
-     * @param taskName        name of the task
+     * @param basePath base path for replacement
+     * @param queryType query node type
+     * @param taskName name of the task
      */
     public RemoveTemplateNodesTask(String currentTemplate, String basePath, String queryType, String taskName) {
         super(taskName, taskName);
@@ -110,6 +120,13 @@ public class RemoveTemplateNodesTask extends AbstractRepositoryTask {
         doNodeOperations(session, nodes);
     }
 
+    /**
+     * Iterates query results performing node operations and batching session saves after a threshold.
+     *
+     * @param session website session
+     * @param nodes iterator over matched nodes
+     * @throws RepositoryException on session save issues
+     */
     protected void doNodeOperations(final Session session, final NodeIterator nodes) throws RepositoryException {
         int counter = 0;
         while (nodes.hasNext()) {
@@ -130,6 +147,12 @@ public class RemoveTemplateNodesTask extends AbstractRepositoryTask {
         }
     }
 
+    /**
+     * Performs removal of a single node, logging and skipping if already removed or invalid state.
+     *
+     * @param node node to remove
+     * @throws RepositoryException if removal fails unexpectedly
+     */
     protected void doNodeOperation(final Node node) throws RepositoryException {
         try {
             node.remove();
@@ -139,12 +162,25 @@ public class RemoveTemplateNodesTask extends AbstractRepositoryTask {
         }
     }
 
+    /**
+     * Executes the JCR-SQL2 query returning matching nodes.
+     *
+     * @param session website session
+     * @param statement query statement
+     * @return iterator of matching nodes
+     * @throws RepositoryException if query manager fails
+     */
     protected NodeIterator executeQuery(final Session session, final String statement) throws RepositoryException {
         final Query query = session.getWorkspace().getQueryManager().createQuery(statement, Query.JCR_SQL2);
         final QueryResult result = query.execute();
         return result.getNodes();
     }
 
+    /**
+     * Builds the SQL2 query string matching the template property and optional base path.
+     *
+     * @return SQL2 statement
+     */
     protected String buildQueryStatement() {
         String queryNodeType = _queryType;
         if (isEmpty(queryNodeType)) {

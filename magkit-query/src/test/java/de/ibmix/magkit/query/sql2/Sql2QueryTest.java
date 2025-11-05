@@ -27,9 +27,9 @@ import de.ibmix.magkit.query.sql2.query.jcrwrapper.RowsQuery;
 import de.ibmix.magkit.query.sql2.statement.Sql2Builder;
 import de.ibmix.magkit.query.sql2.statement.Sql2Statement;
 import info.magnolia.context.MgnlContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -45,9 +45,7 @@ import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockQueryResult;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
 import static de.ibmix.magkit.test.jcr.query.QueryStubbingOperation.stubResult;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.Is.isA;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -65,12 +63,12 @@ public class Sql2QueryTest {
     private Query _query;
     private final Sql2Builder _statement = select("test", "other").from("mgnl:Page").orderByScore();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         _query = mockQuery("website", Query.JCR_SQL2, _statement.build());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         cleanContext();
     }
@@ -81,10 +79,10 @@ public class Sql2QueryTest {
         mockQuery("website", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubResult(result1));
 
         NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement(Sql2Statement.select());
-        assertThat(builder.buildNodesQuery(), isA(NodesQuery.class));
-        assertThat(builder.buildNodesQuery().getStatement(), is("SELECT * FROM [nt:base]"));
-        assertThat(builder.getResultNodes().size(), is(1));
-        assertThat(builder.getResultNodes().get(0), is(result1));
+        assertInstanceOf(NodesQuery.class, builder.buildNodesQuery());
+        assertEquals("SELECT * FROM [nt:base]", builder.buildNodesQuery().getStatement());
+        assertEquals(1, builder.getResultNodes().size());
+        assertEquals(result1, builder.getResultNodes().get(0));
     }
 
     @Test
@@ -94,9 +92,9 @@ public class Sql2QueryTest {
         mockQuery("my-workspace", Query.JCR_SQL2, "SELECT * FROM [nt:base]", stubResult(result1, result2));
 
         NodesQueryBuilder builder = Sql2.Query.nodesFrom("my-workspace").withStatement(Sql2.Statement.select()).withLimit(10).withOffset(5);
-        assertThat(builder.getResultNodes().size(), is(2));
-        assertThat(builder.getResultNodes().get(0), is(result1));
-        assertThat(builder.getResultNodes().get(1), is(result2));
+        assertEquals(2, builder.getResultNodes().size());
+        assertEquals(result1, builder.getResultNodes().get(0));
+        assertEquals(result2, builder.getResultNodes().get(1));
     }
 
     @Test
@@ -106,12 +104,12 @@ public class Sql2QueryTest {
         // don't execute query when no ids are given
         verify(MgnlContext.getJCRSession("test").getWorkspace().getQueryManager(), never()).createQuery(anyString(), anyString());
         // just return empty result
-        assertThat(result.isEmpty(), is(true));
+        assertTrue(result.isEmpty());
 
         result = Sql2.Query.nodesByIdentifiers("test", "123");
         verify(MgnlContext.getJCRSession("test").getWorkspace().getQueryManager(), times(1))
             .createQuery("SELECT * FROM [nt:base] WHERE [jcr:uuid] = '123'", Query.JCR_SQL2);
-        assertThat(result.size(), is(0));
+        assertEquals(0, result.size());
 
         mockQueryResult("test", Query.JCR_SQL2,
             "SELECT * FROM [nt:base] WHERE ([jcr:uuid] = '123' OR [jcr:uuid] = '456')",
@@ -120,7 +118,7 @@ public class Sql2QueryTest {
         result = Sql2.Query.nodesByIdentifiers("test", "123", "456");
         verify(MgnlContext.getJCRSession("test").getWorkspace().getQueryManager(), times(1))
             .createQuery("SELECT * FROM [nt:base] WHERE ([jcr:uuid] = '123' OR [jcr:uuid] = '456')", Query.JCR_SQL2);
-        assertThat(result.size(), is(2));
+        assertEquals(2, result.size());
     }
 
     @Test
@@ -130,12 +128,12 @@ public class Sql2QueryTest {
         // don't execute query when no ids are given
         verify(MgnlContext.getJCRSession("website").getWorkspace().getQueryManager(), never()).createQuery(anyString(), anyString());
         // just return empty result
-        assertThat(result.isEmpty(), is(true));
+        assertTrue(result.isEmpty());
 
         result = Sql2.Query.nodesByTemplates("/root", "temp1");
         verify(MgnlContext.getJCRSession("website").getWorkspace().getQueryManager(), times(1))
             .createQuery("SELECT * FROM [nt:base] WHERE (isdescendantnode('/root') AND [mgnl:template] = 'temp1')", Query.JCR_SQL2);
-        assertThat(result.size(), is(0));
+        assertEquals(0, result.size());
 
         mockQueryResult("website", Query.JCR_SQL2,
             "SELECT * FROM [nt:base] WHERE (isdescendantnode('/root') AND ([mgnl:template] = 'temp1' OR [mgnl:template] = 'temp2'))",
@@ -144,41 +142,39 @@ public class Sql2QueryTest {
         result = Sql2.Query.nodesByTemplates("/root", "temp1", "temp2");
         verify(MgnlContext.getJCRSession("website").getWorkspace().getQueryManager(), times(1))
             .createQuery("SELECT * FROM [nt:base] WHERE (isdescendantnode('/root') AND ([mgnl:template] = 'temp1' OR [mgnl:template] = 'temp2'))", Query.JCR_SQL2);
-        assertThat(result.size(), is(2));
+        assertEquals(2, result.size());
     }
 
     @Test
     public void fromWebsite() {
-        assertThat(Sql2.Query.rowsFromWebsite(), isA(QueryRowsStatement.class));
+        assertInstanceOf(QueryRowsStatement.class, Sql2.Query.rowsFromWebsite());
     }
 
     @Test
     public void fromWorkspace() {
-        assertThat(Sql2.Query.rowsFrom("test"), isA(QueryRowsStatement.class));
+        assertInstanceOf(QueryRowsStatement.class, Sql2.Query.rowsFrom("test"));
     }
 
     @Test
     public void withStatement() {
-        assertThat(Sql2.Query.rowsFromWebsite().withStatement(_statement).buildRowsQuery(), isA(RowsQuery.class));
+        assertInstanceOf(RowsQuery.class, Sql2.Query.rowsFromWebsite().withStatement(_statement).buildRowsQuery());
         verify(_query, times(0)).setLimit(anyLong());
         verify(_query, times(0)).setOffset(anyLong());
     }
 
     @Test
     public void withLimit() {
-        assertThat(Sql2.Query.rowsFromWebsite().withStatement(_statement).withLimit(5).buildRowsQuery(), isA(RowsQuery.class));
+        assertInstanceOf(RowsQuery.class, Sql2.Query.rowsFromWebsite().withStatement(_statement).withLimit(5).buildRowsQuery());
         verify(_query, times(1)).setLimit(5L);
         verify(_query, times(0)).setOffset(anyLong());
     }
 
     @Test
     public void withOffset() {
-        assertThat(Sql2.Query.rowsFromWebsite()
+        assertInstanceOf(RowsQuery.class, Sql2.Query.rowsFromWebsite()
                 .withStatement(_statement)
                 .withLimit(5)
-                .withOffset(5).buildRowsQuery(),
-            isA(RowsQuery.class)
-        );
+                .withOffset(5).buildRowsQuery());
         verify(_query, times(1)).setLimit(5L);
         verify(_query, times(1)).setOffset(5L);
     }

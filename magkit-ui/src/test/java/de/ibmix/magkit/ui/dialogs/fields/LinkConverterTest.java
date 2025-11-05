@@ -22,9 +22,9 @@ package de.ibmix.magkit.ui.dialogs.fields;
 
 import info.magnolia.ui.datasource.jcr.JcrDatasource;
 import info.magnolia.ui.datasource.jcr.JcrSessionWrapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -32,14 +32,12 @@ import javax.jcr.RepositoryException;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.jcr.NodeStubbingOperation.stubIdentifier;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Test the {@link LinkConverter}.
+ * Unit tests for {@link LinkConverter} basic path/external/anchor conversion behavior.
  *
  * @author frank.sommer
  * @since 3.1.3
@@ -50,25 +48,25 @@ public class LinkConverterTest {
 
     @Test
     public void testConvertToModel() {
-        _linkConverter.convertToModel(null, null).ifOk(value -> assertThat(value, nullValue()));
-        _linkConverter.convertToModel("", null).ifOk(value -> assertThat(value, nullValue()));
-        _linkConverter.convertToModel("#test", null).ifOk(value -> assertThat(value, equalTo("#test")));
-        _linkConverter.convertToModel("http://www.aperto.de", null).ifOk(value -> assertThat(value, equalTo("http://www.aperto.de")));
-        _linkConverter.convertToModel("https://www.aperto.de", null).ifOk(value -> assertThat(value, equalTo("https://www.aperto.de")));
-        _linkConverter.convertToModel("/path/to/page", null).ifOk(value -> assertThat(value, equalTo("123-133")));
+        _linkConverter.convertToModel(null, null).ifOk(value -> assertNull(value));
+        _linkConverter.convertToModel("", null).ifOk(value -> assertNull(value));
+        _linkConverter.convertToModel("#test", null).ifOk(value -> assertEquals("#test", value));
+        _linkConverter.convertToModel("http://www.aperto.de", null).ifOk(value -> assertEquals("http://www.aperto.de", value));
+        _linkConverter.convertToModel("https://www.aperto.de", null).ifOk(value -> assertEquals("https://www.aperto.de", value));
+        _linkConverter.convertToModel("/path/to/page", null).ifOk(value -> assertEquals("123-133", value));
     }
 
     @Test
     public void testConvertToPresentation() {
-        assertThat(_linkConverter.convertToPresentation(null, null), nullValue());
-        assertThat(_linkConverter.convertToPresentation("", null), nullValue());
-        assertThat(_linkConverter.convertToPresentation("#test", null), equalTo("#test"));
-        assertThat(_linkConverter.convertToPresentation("http://www.aperto.de", null), equalTo("http://www.aperto.de"));
-        assertThat(_linkConverter.convertToPresentation("https://www.aperto.de", null), equalTo("https://www.aperto.de"));
-        assertThat(_linkConverter.convertToPresentation("123-133", null), equalTo("/path/to/page"));
+        assertNull(_linkConverter.convertToPresentation(null, null));
+        assertNull(_linkConverter.convertToPresentation("", null));
+        assertEquals("#test", _linkConverter.convertToPresentation("#test", null));
+        assertEquals("http://www.aperto.de", _linkConverter.convertToPresentation("http://www.aperto.de", null));
+        assertEquals("https://www.aperto.de", _linkConverter.convertToPresentation("https://www.aperto.de", null));
+        assertEquals("/path/to/page", _linkConverter.convertToPresentation("123-133", null));
     }
 
-    @Before
+    @BeforeEach
     public void prepareMgnl() throws RepositoryException {
         final JcrDatasource jcrDatasource = mock(JcrDatasource.class);
         final JcrSessionWrapper jcrSessionWrapper = mock(JcrSessionWrapper.class);
@@ -79,7 +77,7 @@ public class LinkConverterTest {
         _linkConverter = new LinkConverter(jcrDatasource);
     }
 
-    @After
+    @AfterEach
     public void cleanMgnl() {
         cleanContext();
     }

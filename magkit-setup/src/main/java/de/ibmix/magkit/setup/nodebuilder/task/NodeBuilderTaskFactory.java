@@ -20,55 +20,71 @@ package de.ibmix.magkit.setup.nodebuilder.task;
  * #L%
  */
 
+import de.ibmix.magkit.assertions.Require;
 import info.magnolia.jcr.nodebuilder.NodeOperation;
 import info.magnolia.jcr.nodebuilder.task.ErrorHandling;
 
 import static info.magnolia.repository.RepositoryConstants.CONFIG;
 
 /**
- * A task using the NodeBuilder API, applying operations on a given path.
- * Added some factory static methods.
+ * Factory for convenience creation of {@link NodeBuilderTask} instances targeting standard Magnolia configuration
+ * locations (root, /server, /modules/&lt;moduleName&gt;). Provides a reduced parameter set with default logging error
+ * handling and config workspace selection.
+ * <p>Key features:</p>
+ * <ul>
+ *     <li>Reduces boilerplate for common install/update tasks needing NodeBuilder operations.</li>
+ *     <li>Standardizes use of {@link ErrorHandling#logging} to capture warnings during execution.</li>
+ *     <li>Provides module-specific path construction under /modules.</li>
+ * </ul>
+ * <p>Usage preconditions: Provided taskName and description should be non-null/meaningful; operations may be empty but
+ * then the task performs no changes. Paths must exist; otherwise NodeBuilder operations may fail depending on their
+ * own behavior.</p>
+ * <p>Side effects: Creates tasks that mutate JCR content during Magnolia install/update phases.</p>
+ * <p>Thread-safety: All methods are stateless and static.</p>
  *
  * @author wolf.bubenik
- * @since 16.09.2010
+ * @since 2010-09-16
  */
 public abstract class NodeBuilderTaskFactory {
 
     /**
-     * Creates a NodeBuilderTask with ErrorHandling.logging and RepositoryConstants.CONFIG.
+     * Creates a NodeBuilderTask for the config workspace root path "/" using logging error handling.
      *
-     * @param taskName    The name of the task
-     * @param description A description
-     * @param operations  A list of operations to be performed on the config repository root node (path: /)
-     * @return the new NodeBuilderTask instance
+     * @param taskName name of the task
+     * @param description human readable description
+     * @param operations operations to execute at root path
+     * @return configured task instance
      */
     public static NodeBuilderTask selectConfig(String taskName, String description, NodeOperation... operations) {
         return new NodeBuilderTask(taskName, description, ErrorHandling.logging, CONFIG, operations);
     }
 
     /**
-     * Creates a NodeBuilderTask with ErrorHandling.logging and RepositoryConstants.CONFIG for the server config node.
+     * Creates a NodeBuilderTask for the server configuration path "/server".
      *
-     * @param taskName    The name of the task
-     * @param description A description
-     * @param operations  A list of operations to be performed on the server config repository root node (path: /server)
-     * @return the new NodeBuilderTask instance
+     * @param taskName name of the task
+     * @param description human readable description
+     * @param operations operations to execute under /server
+     * @return configured task instance
      */
     public static NodeBuilderTask selectServerConfig(String taskName, String description, NodeOperation... operations) {
         return new NodeBuilderTask(taskName, description, ErrorHandling.logging, CONFIG, "/server", operations);
     }
 
     /**
-     * Creates a NodeBuilderTask with ErrorHandling.logging and RepositoryConstants.CONFIG for the config node of the named module.
+     * Creates a NodeBuilderTask for a specific module configuration path under /modules.
      *
-     * @param taskName    The name of the task
-     * @param description A description
-     * @param moduleName  The name of the module that should be configurated
-     * @param operations  A list of operations to be performed on the module config repository root node (path: /modules/moduleName)
-     * @return the new NodeBuilderTask instance
+     * @param taskName name of the task
+     * @param description human readable description
+     * @param moduleName module name appended to /modules/ to form root path; leading slash will be removed if present; must not be blank
+     * @param operations operations to execute under /modules/&lt;moduleName&gt;
+     * @return configured task instance
+     * @throws IllegalArgumentException if moduleName is blank
      */
     public static NodeBuilderTask selectModuleConfig(String taskName, String description, String moduleName, NodeOperation... operations) {
-        return new NodeBuilderTask(taskName, description, ErrorHandling.logging, CONFIG, "/modules/" + moduleName, operations);
+        Require.Argument.notBlank(moduleName, "moduleName");
+        String sanitizedModuleName = moduleName.startsWith("/") ? moduleName.substring(1) : moduleName;
+        return new NodeBuilderTask(taskName, description, ErrorHandling.logging, CONFIG, "/modules/" + sanitizedModuleName, operations);
     }
 
     private NodeBuilderTaskFactory() {

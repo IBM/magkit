@@ -27,8 +27,20 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
- * Base condition builder class for all value types.
+ * Base condition builder class for all value types providing comparison operator selection (including NOT),
+ * multi-value handling with OR/AND semantics and optional bind variable support. Subclasses are responsible
+ * for rendering the literal value representation via {@link #appendValueConstraint(StringBuilder, String, String, Object)}.
  *
+ * Features:
+ * <ul>
+ *   <li>NOT support (single application only) via {@link #not()}</li>
+ *   <li>AND/OR combination for equals/excludes via {@link #equalsAll()} / {@link #excludeAll()}</li>
+ *   <li>Bind variable support ({@link #bindVariable(String)}) with automatic $ prefix insertion</li>
+ *   <li>Selector aware output for joins via {@link #forJoin()}</li>
+ * </ul>
+ * Thread-safety: Not thread safe.
+ * Null handling: Null property name or missing values produce an empty condition. Null values in an array
+ * truncate multi-value handling after the first null occurrence.
  * @param <T> the implementing type of this
  * @param <V> the type of the property (String, Long, Double, Calendar)
  *
@@ -61,81 +73,146 @@ public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V
         _name = name;
     }
 
+    /**
+     * Indicates whether the condition holds effective state (values or bind variable) and a non-blank property name.
+     * @return true when rendering would produce output, false otherwise
+     */
     @Override
     public boolean isNotEmpty() {
         return isNotBlank(_name) && (_hasValues || _hasBindVariable);
     }
 
+    /**
+     * Negate the upcoming comparison (logical NOT). Only one NOT application is allowed per instance.
+     * @return comparison API without another not() method
+     */
     public Sql2Compare<V> not() {
         _not = true;
         return me();
     }
 
+    /**
+     * Start a strictly lower-than comparison.
+     * @return single-value operand step
+     */
     public final Sql2StaticOperandSingle<V> lowerThan() {
         _compareOperator = SQL2_OP_LOWER;
         return me();
     }
 
+    /**
+     * Start a lower-or-equal-than comparison.
+     * @return single-value operand step
+     */
     public final Sql2StaticOperandSingle<V> lowerOrEqualThan() {
         _compareOperator = SQL2_OP_LOWER_EQUAL;
         return me();
     }
 
+    /**
+     * Expect ANY of the provided values (OR semantics) using equals operator.
+     * @return multi-value operand step
+     */
     public final Sql2StaticOperandMultiple<V> equalsAny() {
         _compareOperator = SQL2_OP_EQUALS;
         return me();
     }
 
+    /**
+     * Expect ALL provided values (AND semantics) using equals operator.
+     * @return multi-value operand step
+     */
     public final Sql2StaticOperandMultiple<V> equalsAll() {
         _compareOperator = SQL2_OP_EQUALS;
         _joinOperator = SQL2_OP_AND;
         return me();
     }
 
+    /**
+     * Start a greater-or-equal-than comparison.
+     * @return single-value operand step
+     */
     public Sql2StaticOperandSingle<V> greaterOrEqualThan() {
         _compareOperator = SQL2_OP_GREATER_EQUAL;
         return me();
     }
 
+    /**
+     * Start a strictly greater-than comparison.
+     * @return single-value operand step
+     */
     public final Sql2StaticOperandSingle<V> greaterThan() {
         _compareOperator = SQL2_OP_GREATER;
         return me();
     }
 
+    /**
+     * Exclude ANY of the provided values (OR semantics) using not equals.
+     * @return multi-value operand step
+     */
     public final Sql2StaticOperandMultiple<V> excludeAny() {
         _compareOperator = SQL2_OP_NOT_EQUALS;
         return me();
     }
 
+    /**
+     * Exclude ALL provided values (AND semantics) using not equals.
+     * @return multi-value operand step
+     */
     public final Sql2StaticOperandMultiple<V> excludeAll() {
         _compareOperator = SQL2_OP_NOT_EQUALS;
         _joinOperator = SQL2_OP_AND;
         return me();
     }
 
+    /**
+     * Provide one or more literal values for comparison. Null values stop multi-value handling at first null position.
+     * @param values values to compare with (may be null / empty)
+     * @return next step allowing join selector decision
+     */
     @SafeVarargs
     public final Sql2JoinConstraint values(V... values) {
         withValues(values);
         return me();
     }
 
+    /**
+     * Provide a single literal value for comparison.
+     * @param value value to compare (may be null)
+     * @return next step allowing join selector decision
+     */
     public Sql2JoinConstraint value(V value) {
         withValues(value);
         return me();
     }
 
+    /**
+     * Use a bind variable instead of literal values. Leading $ is added if missing.
+     * @param name bind variable name (trimmed) – may be null/blank (ignored)
+     * @return next step allowing join selector decision
+     */
     public Sql2JoinConstraint bindVariable(String name) {
         _bindVariableName = trim(name);
         _hasBindVariable = isNotBlank(_bindVariableName);
         return me();
     }
 
+    /**
+     * Render using the join selector name instead of the from selector.
+     * @return this for fluent chaining
+     */
     @Override
     public Sql2JoinConstraint forJoin() {
         _forJoin = true;
         return me();
     }
 
+    /**
+     * Append this property condition to the buffer if non-empty. Handles NOT, multi-value parenthesis and bind variables.
+     * @param sql2 accumulating SQL2 buffer (never null)
+     * @param selectorNames selector name provider
+     */
+    @Override
     public void appendTo(StringBuilder sql2, final Sql2SelectorNames selectorNames) {
         if (isNotEmpty()) {
             if (_not) {
@@ -195,7 +272,18 @@ public abstract class Sql2PropertyCondition<T extends Sql2PropertyCondition<T, V
         return _compareOperator;
     }
 
+    /**
+     * Self reference for fluent API (covariant typing).
+     * @return this instance cast to implementing type
+     */
     abstract T me();
 
+    /**
+     * Append a single literal value constraint (implemented by subclasses to adapt literal formatting).
+     * @param sql2 buffer
+     * @param selectorName selector name or null
+     * @param name property name
+     * @param value literal value
+     */
     abstract void appendValueConstraint(StringBuilder sql2, String selectorName, String name, V value);
 }

@@ -28,30 +28,50 @@ import javax.jcr.RepositoryException;
 import javax.jcr.query.QueryResult;
 
 /**
- * Base wrapper for javax.jcr.query.QueryResult to separate Row and Node queries.
- * Provides methods to access column and selector names.
- *
+ * Base abstraction wrapping a {@link javax.jcr.query.QueryResult} in order to clearly separate
+ * result handling for row-oriented ({@link RowsResult}) and node-oriented ({@link NodesResult}) queries.
+ * <p>Purpose: Unifies shared convenience accessors (column and selector names) and error handling strategy used by
+ * specialized result wrappers.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Safe accessor methods for column and selector names with graceful error handling (exceptions are caught and logged).</li>
+ *   <li>Uniform API surface to be extended by concrete result wrappers.</li>
+ * </ul>
+ * <p>Null and error handling: All accessor methods return an empty array instead of {@code null}; repository exceptions
+ * are logged at WARN level to avoid disrupting calling code.</p>
+ * <p>Thread-safety: Instances are NOT thread-safe. A {@code QueryResult} is typically consumed once; do not share a
+ * single instance across threads without external synchronization.</p>
+ * <p>Usage example:</p>
+ * <pre>{@code String[] selectors = new RowsResult(query.execute()).getSelectorNames();}</pre>
  * @author wolf.bubenik@ibmix.de
  * @since 2020-08-21
  */
 public abstract class ResultWrapper {
-    private static final Logger LOG = LoggerFactory.getLogger(RowsResult.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResultWrapper.class);
 
     private final QueryResult _result;
 
+    /**
+     * Create a new wrapper around a JCR {@link QueryResult}.
+     * @param result underlying query result (must not be null for successful accessors)
+     */
     protected ResultWrapper(QueryResult result) {
         _result = result;
     }
 
+    /**
+     * Access the underlying {@link QueryResult} for subclass operations.
+     * @return non-null query result reference (as provided in constructor)
+     */
     protected QueryResult getResult() {
         return _result;
     }
 
     /**
-     * Returns an array of all the column names in the table view of this result
-     * set.
-     *
-     * @return a <code>String</code> array holding the column names or empty array when an exception occurs.
+     * Returns an array of all column names present in the tabular view of this query result.
+     * The method never returns {@code null}; in case of a repository access problem an empty array is returned and the
+     * exception is logged.
+     * @return non-null (possibly empty) array of column names
      */
     public String[] getColumnNames() {
         String[] names = ArrayUtils.EMPTY_STRING_ARRAY;
@@ -64,11 +84,9 @@ public abstract class ResultWrapper {
     }
 
     /**
-     * Returns an array of all the selector names that were used in the query
-     * that created this result. If the query did not have a selector name then
-     * an empty array is returned.
-     *
-     * @return a <code>String</code> array holding the selector names or an empty array when an exception occurs.
+     * Returns all selector names used in the underlying query. If the query did not define explicit selector names or
+     * if an error occurs, an empty array is returned and the exception is logged.
+     * @return non-null (possibly empty) array of selector names
      */
     public String[] getSelectorNames() {
         String[] names = ArrayUtils.EMPTY_STRING_ARRAY;

@@ -28,14 +28,27 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-
 import java.util.Optional;
 
 /**
- * Enhance the text field functionality by showing an additional editorial label.
+ * Custom field adding an editorial remaining-length label to a wrapped {@link AbstractTextField}.
+ * <p>
+ * The label displays <code>currentUsed/available</code> characters. The available length is derived from the smaller
+ * of configured max length and recommended length; if neither is positive the label is omitted. Value changes update
+ * the label lazily (Vaadin {@link ValueChangeMode#LAZY}).
+ * </p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Dynamic remaining length indicator.</li>
+ *   <li>Transparent delegation of value handling to inner field.</li>
+ *   <li>Focus delegation and consistent required/caption handling.</li>
+ * </ul>
+ *
+ * <p>Usage preconditions: Constructed by {@link ExtendedTextFieldFactory} only when recommended length is set and no max length configured.</p>
+ * <p>Thread-safety: Not thread-safe; UI component confined to Vaadin UI thread.</p>
  *
  * @author Janine.Kleessen
- * @since 17.02.2021
+ * @since 2021-02-17
  */
 @StyleSheet("extendedTextField.css")
 public class ExtendedTextField extends CustomField<String> {
@@ -47,6 +60,11 @@ public class ExtendedTextField extends CustomField<String> {
     private final Label _remainingLength = new Label();
     private final int _availableLength;
 
+    /**
+     * Create extended field wrapper.
+     * @param definition field definition supplying length constraints
+     * @param innerComponent underlying Vaadin text component
+     */
     public ExtendedTextField(final ExtendedTextFieldDefinition definition, final AbstractTextField innerComponent) {
         _definition = definition;
         _textField = innerComponent;
@@ -54,9 +72,8 @@ public class ExtendedTextField extends CustomField<String> {
     }
 
     /**
-     * Determines the maximum value for the label.
-     *
-     * @return second value of the label
+     * Determines the effective maximum for the remaining-length label from max/recommended lengths.
+     * @return positive length or -1 if no label needed
      */
     protected int determineLabelMaxLength() {
         int max = _definition.getMaxLength();
@@ -76,6 +93,10 @@ public class ExtendedTextField extends CustomField<String> {
         return available;
     }
 
+    /**
+     * Initialize Vaadin content structure and label setup.
+     * @return root layout component
+     */
     @Override
     public Component initContent() {
         _textField.setCaption(null);
@@ -114,39 +135,59 @@ public class ExtendedTextField extends CustomField<String> {
     }
 
     /**
-     * Update the label.
-     *
-     * @param inputValue      input value
-     * @param availableLength available length
+     * Update remaining length label with new character counts.
+     * @param inputValue current input length
+     * @param availableLength total available length
      */
     public void updateRemainingLength(int inputValue, int availableLength) {
         getRemainingLength().setValue(availableLength - inputValue + "/" + availableLength);
     }
 
+    /**
+     * Delegate setting value to inner text field.
+     * @param value new value
+     */
     @Override
     protected void doSetValue(final String value) {
         _textField.setValue(value);
     }
 
+    /**
+     * @return current value from inner field
+     */
     @Override
     public String getValue() {
         return _textField.getValue();
     }
 
+    /**
+     * @return empty value representation
+     */
     @Override
     public String getEmptyValue() {
         return _textField.getEmptyValue();
     }
 
+    /**
+     * @return whether inner field is empty
+     */
     @Override
     public boolean isEmpty() {
         return _textField.isEmpty();
     }
 
+    /**
+     * @return remaining length label component
+     */
     public Label getRemainingLength() {
         return _remainingLength;
     }
 
+    /**
+     * Register value change listener delegating to inner field.
+     * @param listener listener to register
+     * @return registration handle
+     */
     @Override
     public Registration addValueChangeListener(final ValueChangeListener<String> listener) {
         return _textField.addValueChangeListener(listener);

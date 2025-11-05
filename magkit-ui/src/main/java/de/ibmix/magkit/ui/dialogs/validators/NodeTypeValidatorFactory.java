@@ -26,9 +26,10 @@ import info.magnolia.ui.field.AbstractFieldValidatorFactory;
 import javax.jcr.Node;
 
 /**
- * Node type validator factory.
- *
+ * Factory producing {@link NodeTypeValidator} instances from a {@link NodeTypeValidatorDefinition}.
+ * <p>Stateless delegator used by Magnolia field binding.</p>
  * @author ngoc.tran
+ * @since 2024-03-22
  */
 public class NodeTypeValidatorFactory extends AbstractFieldValidatorFactory<NodeTypeValidatorDefinition, Node> {
 

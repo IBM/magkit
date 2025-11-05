@@ -50,13 +50,49 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 /**
- * Util class for handling nodes ({@link Node}).
+ * Utility class providing null-safe helper methods for working with Magnolia JCR {@link Node} instances.
+ * <p>
+ * Main functionalities and key features:
+ * </p>
+ * <ul>
+ *   <li>Node lookup by identifier or path (uuid/reference resolution)</li>
+ *   <li>Template id and template type resolution with graceful fallback when definitions are missing</li>
+ *   <li>Type checks for common Magnolia node types (page, area, component, asset, content)</li>
+ *   <li>Ancestor and self traversal using flexible {@link java.util.function.Predicate} filters</li>
+ *   <li>Child node collection with predicate-based filtering and safe iteration</li>
+ *   <li>Safe accessors for frequently used Node attributes (name, identifier, path, depth)</li>
+ *   <li>Wrapping of Java {@link java.util.function.Predicate} into Jackrabbit predicate for Magnolia utilities</li>
+ * </ul>
+ *
+ * <p>
+ * Important details:
+ * </p>
+ * <ul>
+ *   <li>All methods are defensive: NULL input parameters are accepted and result in NULL/empty outputs instead of exceptions.</li>
+ *   <li>Repository-related {@link javax.jcr.RepositoryException} instances are caught and only logged; no exceptions are propagated.</li>
+ *   <li>Logging uses INFO for functional fallbacks and DEBUG for stack traces to avoid log flooding.</li>
+ * </ul>
+ *
+ * <p><strong>Usage Preconditions:</strong> A Magnolia context with the required workspaces (e.g. "website") must be available. The Magnolia component
+ * provider must be initialized for template resolution.</p>
+ * <p><strong>Null and Error Handling:</strong> Methods return NULL (-1 for depth) or an empty collection/iterator when a node is absent or an error occurs.
+ * This allows callers to chain operations without extensive external null checks.</p>
+ * <p><strong>Side Effects:</strong> No state is mutated; only logging occurs.</p>
+ * <p><strong>Thread-Safety:</strong> The class is stateless and therefore thread-safe.</p>
+ * <p><strong>Example:</strong></p>
+ * <pre>
+ *   Node page = NodeUtils.getNodeByIdentifier("website", uuid);
+ *   Node ancestorPage = NodeUtils.getAncestorOrSelf(page, NodeUtils.IS_PAGE);
+ *   String templateId = NodeUtils.getTemplate(page);
+ *   String templateType = NodeUtils.getTemplateType(page);
+ * </pre>
  *
  * @author frank.sommer
- * @since 26.03.13
+ * @since 2026-03-13
  */
 public final class NodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeUtils.class);
+    private static final String MESSAGE_UNABLE_TO_GET_CHILDREN = "Unable to get children for node [{}]";
 
     public static final Predicate<Node> IS_FOLDER = n -> isNodeType(n, NodeTypes.Folder.NAME);
     public static final Predicate<Node> IS_PAGE = n -> isNodeType(n, NodeTypes.Page.NAME);
@@ -169,6 +205,14 @@ public final class NodeUtils {
         return getChildren(child, IS_COMPONENT).iterator().hasNext();
     }
 
+    /**
+     * Null-safe retrieval of a direct child node by relative path/name. Returns null if the parent is null,
+     * the path is blank or the child does not exist. Repository exceptions are caught and logged.
+     *
+     * @param node the potential parent node, may be null
+     * @param path the relative child path or name inside the parent, may be null or blank
+     * @return the child node or null if absent or on error
+     */
     public static Node getChildNode(@Nullable final Node node, @Nullable final String path) {
         Node result = null;
         if (node != null && isNotBlank(path)) {
@@ -200,15 +244,36 @@ public final class NodeUtils {
         return template;
     }
 
+    /**
+     * Resolves the template type for the given node using its template definition.
+     * Returns null if the node is null or no template definition can be resolved.
+     *
+     * @param node the node whose template type is requested, may be null
+     * @return the template type or null if unavailable
+     */
     public static String getTemplateType(@Nullable final Node node) {
         TemplateDefinition def = getTemplateDefinition(node);
         return def != null ? def.getType() : null;
     }
 
+    /**
+     * Resolves the {@link TemplateDefinition} for the given node by reading its template id.
+     * Returns null if the node is null or the template id is blank or no definition exists.
+     *
+     * @param node the node whose template definition is requested, may be null
+     * @return the template definition or null if not found
+     */
     public static TemplateDefinition getTemplateDefinition(@Nullable final Node node) {
         return getTemplateDefinition(getTemplate(node));
     }
 
+    /**
+     * Resolves a {@link TemplateDefinition} for the provided template id via Magnolia's registry.
+     * Returns null if the id is blank or no such definition exists.
+     *
+     * @param templateId the template id to resolve, may be null or blank
+     * @return the template definition or null if not found
+     */
     public static TemplateDefinition getTemplateDefinition(@Nullable final String templateId) {
         TemplateDefinition result = null;
         try {
@@ -222,6 +287,12 @@ public final class NodeUtils {
         return result;
     }
 
+    /**
+     * Null-safe retrieval of the parent node; returns null for root nodes, null input or on repository errors.
+     *
+     * @param node the node to get the parent for, may be null
+     * @return the parent node or null if none or error
+     */
     public static Node getParent(@Nullable final Node node) {
         Node parent = null;
         try {
@@ -398,46 +469,66 @@ public final class NodeUtils {
             try {
                 result = NodeUtil.getNodes(node, toJackRabbitPredicate(predicate));
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
         return result;
     }
 
+    /**
+     * Returns all direct child nodes of the given node or null if the node is null or an error occurs.
+     *
+     * @param node the parent node, may be null
+     * @return a {@link NodeIterator} of children or null on error
+     */
     public static NodeIterator getNodes(@Nullable final Node node) {
         NodeIterator result = null;
         if (node != null) {
             try {
                 result = node.getNodes();
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
         return result;
     }
 
+    /**
+     * Returns child nodes matching the provided JCR name pattern. Null-safe; returns null if node is null or an error occurs.
+     *
+     * @param node        the parent node, may be null
+     * @param namePattern the JCR name pattern (e.g. "foo*") to match, never null
+     * @return a {@link NodeIterator} of matching children or null on error
+     */
     public static NodeIterator getNodes(@Nullable final Node node, @Nonnull final String namePattern) {
         NodeIterator result = null;
         if (node != null) {
             try {
                 result = node.getNodes(namePattern);
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }
         return result;
     }
 
+    /**
+     * Returns child nodes matching any of the provided glob name patterns. Null-safe; returns null if node is null or an error occurs.
+     *
+     * @param node      the parent node, may be null
+     * @param nameGlobs array of glob patterns to match, never null
+     * @return a {@link NodeIterator} of matching children or null on error
+     */
     public static NodeIterator getNodes(@Nullable final Node node, @Nonnull final String[] nameGlobs) {
         NodeIterator result = null;
         if (node != null) {
             try {
                 result = node.getNodes(nameGlobs);
             } catch (RepositoryException e) {
-                LOGGER.info("Unable to get children for node [{}]", getPathIfPossible(node));
+                LOGGER.info(MESSAGE_UNABLE_TO_GET_CHILDREN, getPathIfPossible(node));
                 LOGGER.debug(e.getLocalizedMessage(), e);
             }
         }

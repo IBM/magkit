@@ -25,13 +25,31 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
- * Add support for redirect handling at headless setups.
+ * JAX-RS {@link ExceptionMapper} implementation enabling proper redirect handling for headless Magnolia setups.
+ * It converts a {@link RedirectionException} into the underlying {@link Response} object so that HTTP redirect
+ * semantics (status code + Location header) are passed through unchanged to the client. This is useful when
+ * application code deliberately throws a {@code RedirectionException} to short-circuit further processing while
+ * running in an environment where no default mapper is registered.
+ *
+ * Side effects: None (stateless, does not mutate global state).
+ * Null/Error handling: Expects a non-null exception; underlying response is returned as obtained. No additional error handling performed.
+ * Thread-safety: Stateless and therefore thread-safe.
+ * Usage example:
+ *   // Registered via JAX-RS auto-discovery or manual configuration
+ *   // Framework invokes mapper when a RedirectionException bubbles up
  *
  * @author frank.sommer
- * @since 25.09.2023
+ * @since 2023-09-25
  */
 public class RedirectionExceptionMapper implements ExceptionMapper<RedirectionException> {
 
+    /**
+     * Returns the original {@link Response} contained in the {@link RedirectionException} so that redirect
+     * status and headers propagate to the client.
+     *
+     * @param exception the redirection exception raised by application logic (must not be null)
+     * @return original response including redirect status and headers
+     */
     @Override
     public Response toResponse(RedirectionException exception) {
         return exception.getResponse();

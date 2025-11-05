@@ -32,10 +32,19 @@ import javax.jcr.Node;
 import java.util.List;
 
 /**
- * Unique value validator.
+ * Validator ensuring a string value is unique among nodes matching workspace/nodeType/property constraints.
+ * <p>Executes a query via {@link NodesByQuery} to find nodes with the same property value; allows match with itself.</p>
+ * <p>Key features:</p>
+ * <ul>
+ *   <li>Workspace-scoped uniqueness check.</li>
+ *   <li>Property-based filtering across a node type.</li>
+ *   <li>Self-update allowance (ignores the current node's own value).</li>
+ * </ul>
  *
+ * <p>Null and config handling: If mandatory config values missing, validation returns false (not valid) or treats as valid? Here it's false until properly configured.</p>
+ * <p>Item context handling: If the current item is absent, uniqueness is considered valid only when no matching nodes are found; a single found node without context counts as duplicate.</p>
  * @author frank.sommer
- * @since 12.03.2024
+ * @since 2024-03-12
  */
 @Slf4j
 public class UniqueValueValidator extends AbstractValidator<String> {
@@ -49,11 +58,22 @@ public class UniqueValueValidator extends AbstractValidator<String> {
         _itemContext = itemContext;
     }
 
+    /**
+     * Vaadin apply hook mapping uniqueness to a ValidationResult.
+     * @param value candidate value
+     * @param context value context (unused)
+     * @return validation result
+     */
     @Override
     public ValidationResult apply(String value, ValueContext context) {
         return toResult(value, isValidValue(value));
     }
 
+    /**
+     * Determine uniqueness of value among matching nodes (excluding current node).
+     * @param value candidate value (may be null)
+     * @return true if unique or only present on current node
+     */
     private boolean isValidValue(String value) {
         boolean valid = false;
         final String workspace = _definition.getWorkspace();
@@ -63,7 +83,7 @@ public class UniqueValueValidator extends AbstractValidator<String> {
             LOGGER.debug("Validate for unique value {} by query [{},{},{}].", value, workspace, nodeType, propertyName);
             final List<Node> foundNodes = new NodesByQuery(workspace, nodeType, propertyName).apply(value);
             final String currentNodeId = NodeUtils.getIdentifier((Node) _itemContext.getSingle().orElse(null));
-            valid = foundNodes.isEmpty() || foundNodes.size() == 1 && currentNodeId.equals(NodeUtils.getIdentifier(foundNodes.get(0)));
+            valid = foundNodes.isEmpty() || (foundNodes.size() == 1 && currentNodeId != null && currentNodeId.equals(NodeUtils.getIdentifier(foundNodes.get(0))));
         }
         return valid;
     }

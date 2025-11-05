@@ -31,16 +31,48 @@ import static info.magnolia.cms.cache.CacheConstants.HEADER_PRAGMA;
 import static info.magnolia.cms.cache.CacheConstants.HEADER_VALUE_NO_CACHE;
 
 /**
- * Cache util class.
+ * Utility class providing convenience methods to disable HTTP caching for Magnolia responses by setting
+ * appropriate HTTP headers (Pragma, Cache-Control and Expires). These methods ensure that dynamically generated
+ * content is not cached by Magnolia nor by upstream proxies or the browser when this is undesirable.
+ *
+ * <p>Key features:
+ * <ul>
+ *   <li>Stateless, thread-safe static methods.</li>
+ *   <li>Convenience variant operating on the current Magnolia WebContext if available.</li>
+ *   <li>Graceful handling of missing WebContext (no action performed).</li>
+ *   <li>Null-safe handling of the provided {@link HttpServletResponse}.</li>
+ * </ul>
+ *
+ * <p>Usage preconditions: The no-argument {@link #preventCaching()} method requires a Magnolia WebContext to be active;
+ * if none is present, the call is a no-op. The {@link #preventCaching(HttpServletResponse)} method expects a response
+ * object that may be null; a null value results in a no-op.
+ *
+ * <p>Side effects: The response headers "Pragma", "Cache-Control" and "Expires" are overwritten with values that
+ * disable caching. Existing header values are replaced.
+ *
+ * <p>Null and error handling: A null response is ignored silently. No exceptions are thrown by these methods.
+ *
+ * <p>Thread-safety: The class is thread-safe since it is stateless and only performs idempotent header mutations on the
+ * provided response instance.
+ *
+ * <p>Usage example:
+ * <pre>
+ *   // In a model, filter or servlet where WebContext is active:
+ *   CacheUtils.preventCaching();
+ *
+ *   // In a custom servlet with direct access to the HttpServletResponse:
+ *   CacheUtils.preventCaching(response);
+ * </pre>
  *
  * @author frank.sommer
- * @since 24.07.2017
+ * @since 2017-07-24
  */
 public final class CacheUtils {
 
     /**
-     * Sets the no cache headers in response.
-     * With this headers Magnolia does not cache such responses.
+     * Convenience method that applies no-cache HTTP headers to the current Magnolia WebContext response
+     * if a WebContext is active; otherwise this method performs no action. Headers set are: Pragma=no-cache,
+     * Cache-Control=disable-cache (Magnolia specific constant) and Expires=0 (date header).
      */
     public static void preventCaching() {
         if (MgnlContext.isWebContext()) {
@@ -49,10 +81,10 @@ public final class CacheUtils {
     }
 
     /**
-     * Sets the no cache headers in response.
-     * With this headers Magnolia does not cache such responses.
+     * Applies no-cache HTTP headers to the provided {@link HttpServletResponse}. If the response is null the method
+     * performs no action. Overwrites the following headers: Pragma, Cache-Control and sets Expires date to epoch.
      *
-     * @param response http response
+     * @param response the HTTP servlet response to modify; may be null (in which case nothing happens)
      */
     public static void preventCaching(HttpServletResponse response) {
         if (response != null) {

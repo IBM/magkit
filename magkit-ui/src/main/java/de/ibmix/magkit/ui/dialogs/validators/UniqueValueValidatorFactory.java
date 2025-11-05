@@ -27,9 +27,10 @@ import info.magnolia.ui.field.AbstractFieldValidatorFactory;
 import javax.jcr.Item;
 
 /**
- * Unique value validator factory.
- *
+ * Factory producing {@link UniqueValueValidator} using the provided {@link UniqueValueValidatorDefinition} and item context.
+ * <p>Encapsulates wiring of definition plus current item context to validator logic.</p>
  * @author frank.sommer
+ * @since 2024-03-12
  */
 public class UniqueValueValidatorFactory extends AbstractFieldValidatorFactory<UniqueValueValidatorDefinition, String> {
     private final ValueContext<Item> _valueContext;

@@ -28,8 +28,11 @@ import info.magnolia.ui.field.ConfiguredFieldValidatorDefinition;
 import javax.jcr.Node;
 
 /**
- * Basic NodeValidator that checks if the node exists.
- *
+ * Base validator ensuring a node reference is non-null.
+ * <p>Intended as superclass for specialized node validators adding further constraints (type, template).</p>
+ * <p>Key features: Simple existence check; integrates with Vaadin validation API.</p>
+ * <p>Null handling: <code>null</code> is invalid.</p>
+ * <p>Thread-safety: Stateless apart from error message.</p>
  * @author wolf.bubenik@ibmix.de
  * @since 2024-03-22
  */
@@ -44,11 +47,22 @@ public class NodeValidator extends AbstractValidator<Node> {
         super(validatorDefinition.getErrorMessage());
     }
 
+    /**
+     * Vaadin apply hook producing a result based on {@link #isValidValue(Node)}.
+     * @param value node value
+     * @param context value context
+     * @return validation result
+     */
     @Override
     public ValidationResult apply(Node value, ValueContext context) {
         return toResult(value, isValidValue(value));
     }
 
+    /**
+     * Basic non-null check; subclasses extend for additional logic.
+     * @param value node value (may be null)
+     * @return true if non-null
+     */
     public boolean isValidValue(Node value) {
         return value != null;
     };

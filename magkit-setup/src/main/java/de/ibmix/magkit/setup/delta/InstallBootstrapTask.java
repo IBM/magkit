@@ -24,9 +24,20 @@ import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.BootstrapResourcesTask;
 
 /**
- * A task to bootstrap the installation files of a module.
+ * Task that bootstraps all installation resources of the current module.
+ * <p>
+ * It filters resources located under {@code /mgnl-bootstrap/install/<moduleName>/} (including sub folders) and delegates
+ * actual bootstrapping to {@link BootstrapResourcesTask}. Both XML and YAML resources supported by Magnolia's export
+ * mechanism are accepted; other file types are rejected by the super implementation.
+ * </p>
+ * <p>Preconditions: Resources must be packaged under the installation path named after the module.</p>
+ * <p>Side Effects: Imports repository content into the respective workspaces defined by the resource files.</p>
+ * <p>Error Handling: Relies on {@link BootstrapResourcesTask} for exception handling; this class only narrows resource selection.</p>
+ * <p>Thread-Safety: Executed during single-threaded module installation.</p>
+ * <p>Usage Example: Added from a module version handler to provision initial configuration/content.</p>
  *
- * @author diana.racho (13.01.2011) Aperto AG
+ * @author diana.racho Aperto AG
+ * @since 2011-01-13
  */
 public class InstallBootstrapTask extends BootstrapResourcesTask {
 
@@ -35,7 +46,15 @@ public class InstallBootstrapTask extends BootstrapResourcesTask {
     }
 
     /**
-     * Accepts any resource under "/mgnl-bootstrap/install/moduleName" including any sub folders.
+     * Determines whether a resource should be bootstrapped.
+     * <p>
+     * Accepts any resource residing under the module-specific installation directory. Delegates further validation
+     * (like file extension) to the super class.
+     * </p>
+     *
+     * @param ctx current install context (used to obtain module name)
+     * @param resourceName classpath resource name
+     * @return true if resource is in the installation directory and accepted by super class
      */
     @Override
     protected boolean acceptResource(final InstallContext ctx, final String resourceName) {
