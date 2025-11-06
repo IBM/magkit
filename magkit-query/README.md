@@ -3,9 +3,42 @@
 <!-- TODO Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
 <!-- [![Build Status](GitHub Actions) -->
 
-## Scope
+## Overview
+Magkit-Query provides fluent, type-safe builders for composing and executing JCR SQL2 and XPath queries in Magnolia.
 
-This module provides provides builders for SQL2 and XPATH query strings.
+### Main Features
+- Unified facade `Sql2` grouping sub-facades: `Query`, `Statement`, `Condition` for clear separation of concerns.
+- SELECT statement shortcuts for common Magnolia node types: pages, components, areas, content, contentNode.
+- Rich condition DSL: path (descendant), name, template, identifier, full-text contains, null checks, date/time (created, lastModified, lastActivated, deleted), numeric (long/double) comparisons, between ranges, AND / OR grouping.
+- Convenience query helpers: `nodesFromWebsite()`, `nodesFrom(workspace)`, `nodesByIdentifiers(..)`, `nodesByTemplates(..)`, row queries, limit and offset support.
+- XPath builder (`XpathBuilder`) with ISO9075 path encoding, node type element selectors, property and ordering constraints, composable `append(...)` operations.
+- Safe string composition reducing manual SQL2 / XPath error risk; focused on read-only queries (no repository mutations).
+- Returns results as `List<Node>` via fluent terminal methods (`getResultNodes()`), or row results when using row builders.
+- Stateless builders intended for per-thread usage; easy extension for custom conditions.
+
+### Quick Examples
+Build and execute a SQL2 page query:
+```java
+List<Node> pages = Sql2.Query.nodesFromWebsite()
+    .withStatement(
+        Sql2.Statement.selectPages()
+            .whereAll(
+                Sql2.Condition.Path.isDescendant("/root"),
+                Sql2.Condition.String.templateEquals("myModule:page")
+            )
+    )
+    .withLimit(25)
+    .getResultNodes();
+```
+XPath query construction:
+```java
+String xpath = XpathBuilder.xPathBuilder()
+    .path("/root/site")
+    .type("*", "mgnl:page")
+    .property("@mgnl:template='myModule:page'")
+    .orderBy("@jcr:created descending")
+    .build();
+```
 
 ## Usage
 ### Search the JCR repository with SQL2 queries
@@ -15,7 +48,7 @@ You can execute queries using your handcrafted query string or use the builders 
 The class Sql2 serves as a facade for all the different builders.
 
 #### Execute handcrafted SQL2 query:
-```
+```Java
 // To read all page nodes from the WEBSITE repository:
 
 NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement("SELECT * FROM [mgnl:page]");
@@ -23,7 +56,7 @@ NodesQueryBuilder builder = Sql2.Query.nodesFromWebsite().withStatement("SELECT 
 List<Node> result = builder.getResultNodes();
 ```
 #### Use Statement builder to query for Nodes:
-```
+```Java
 // To read 10 page nodes from the "my-workspace" repository below the path /root starting from result node 5:
 
 List<Node> result = Sql2.Query.nodesFrom("my-workspace")
