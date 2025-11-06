@@ -24,6 +24,7 @@ import de.ibmix.magkit.test.cms.context.ContextMockUtils;
 import info.magnolia.cms.beans.config.URI2RepositoryManager;
 import info.magnolia.cms.beans.config.URI2RepositoryMapping;
 import info.magnolia.cms.core.AggregationState;
+import info.magnolia.init.MagnoliaConfigurationProperties;
 import info.magnolia.module.site.ExtendedAggregationState;
 import info.magnolia.module.site.Site;
 import info.magnolia.module.site.SiteManager;
@@ -78,6 +79,7 @@ public class ErrorEndpointTest {
         mockPageNode("/tenant/fr/error/404");
         mockPageNode("/error/500");
 
+        mockComponentInstance(MagnoliaConfigurationProperties.class);
         URI2RepositoryManager uri2RepositoryManager = mockComponentInstance(URI2RepositoryManager.class);
         when(uri2RepositoryManager.getHandle("/notfound")).thenReturn("/notfound");
         when(uri2RepositoryManager.getRepository("/notfound")).thenReturn("website");

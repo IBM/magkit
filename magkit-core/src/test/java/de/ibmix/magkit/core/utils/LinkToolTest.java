@@ -21,6 +21,7 @@ package de.ibmix.magkit.core.utils;
  */
 
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import info.magnolia.init.MagnoliaConfigurationProperties;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import static de.ibmix.magkit.core.utils.LinkTool.isUuid;
+import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
 import static de.ibmix.magkit.test.cms.context.ServerConfigurationMockUtils.mockServerConfiguration;
@@ -106,6 +108,7 @@ public class LinkToolTest {
 
     @Test
     public void createLinkForReference() throws RepositoryException {
+        mockComponentInstance(MagnoliaConfigurationProperties.class);
         assertNull(LinkTool.createLinkForReference(null, null, null, null));
         assertNull(LinkTool.createLinkForReference(null, " ", null, null));
         assertNull(LinkTool.createLinkForReference(null, "test", null, null));
@@ -138,6 +141,7 @@ public class LinkToolTest {
 
     @Test
     public void createExternalLinkForPath() throws RepositoryException {
+        mockComponentInstance(MagnoliaConfigurationProperties.class);
         mockWebContext(stubContextPath("/aperto"));
         mockServerConfiguration(stubDefaultBaseUrl("http://test.aperto.de"), stubDefaultExtension("html"));
         Node site = mockMgnlNode("test", "target", "aperto:test");

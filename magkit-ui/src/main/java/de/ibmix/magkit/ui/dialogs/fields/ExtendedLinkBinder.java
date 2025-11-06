@@ -45,8 +45,8 @@ public class ExtendedLinkBinder<T> extends FieldBinder.Default<T> {
     private final SelectFieldSupport<T> _selectFieldSupport;
 
     @Inject
-    ExtendedLinkBinder(ComponentProvider componentProvider, SelectFieldSupport<T> selectFieldSupport, UiFrameworkModule uiFrameworkModule) {
-        super(componentProvider, uiFrameworkModule);
+    ExtendedLinkBinder(ComponentProvider componentProvider, SelectFieldSupport<T> selectFieldSupport, UiFrameworkModule uiFrameworkModuleProvider) {
+        super(componentProvider, uiFrameworkModuleProvider);
         _selectFieldSupport = selectFieldSupport;
     }
 

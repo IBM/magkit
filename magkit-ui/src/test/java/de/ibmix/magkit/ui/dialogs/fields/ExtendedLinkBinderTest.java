@@ -28,7 +28,6 @@ import info.magnolia.ui.field.FieldDefinition;
 import info.magnolia.ui.field.SelectFieldSupport;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Provider;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,9 +56,8 @@ public class ExtendedLinkBinderTest {
         SelectFieldSupport<String> selectFieldSupport = mock(SelectFieldSupport.class);
         Converter<String, String> fallbackConverter = mock(Converter.class);
         when(selectFieldSupport.defaultConverter()).thenReturn(fallbackConverter);
-        Provider<UiFrameworkModule> uiModuleProvider = () -> null;
         Converter<String, String> configuredConverter = mock(Converter.class);
-        ExtendedLinkBinder<String> binder = new TestExtendedLinkBinder(configuredConverter, componentProvider, selectFieldSupport, uiModuleProvider);
+        ExtendedLinkBinder<String> binder = new TestExtendedLinkBinder(configuredConverter, componentProvider, selectFieldSupport, null);
         FieldDefinition<String> definition = mock(FieldDefinition.class);
         HasValue<?> field = mock(HasValue.class);
         Optional<Converter<String, ?>> result = binder.createConfiguredConverter(definition, field);
@@ -79,8 +77,7 @@ public class ExtendedLinkBinderTest {
         SelectFieldSupport<String> selectFieldSupport = mock(SelectFieldSupport.class);
         Converter<String, String> fallbackConverter = mock(Converter.class);
         when(selectFieldSupport.defaultConverter()).thenReturn(fallbackConverter);
-        Provider<UiFrameworkModule> uiModuleProvider = () -> null;
-        ExtendedLinkBinder<String> binder = new TestExtendedLinkBinder(null, componentProvider, selectFieldSupport, uiModuleProvider);
+        ExtendedLinkBinder<String> binder = new TestExtendedLinkBinder(null, componentProvider, selectFieldSupport, null);
         FieldDefinition<String> definition = mock(FieldDefinition.class);
         HasValue<?> field = mock(HasValue.class);
         Optional<Converter<String, ?>> result = binder.createConfiguredConverter(definition, field);
@@ -97,7 +94,7 @@ public class ExtendedLinkBinderTest {
 
         private final Converter<String, ?> _superConverter;
 
-        TestExtendedLinkBinder(Converter<String, ?> superConverter, ComponentProvider componentProvider, SelectFieldSupport<String> selectFieldSupport, Provider<UiFrameworkModule> uiFrameworkModuleProvider) {
+        TestExtendedLinkBinder(Converter<String, ?> superConverter, ComponentProvider componentProvider, SelectFieldSupport<String> selectFieldSupport, UiFrameworkModule uiFrameworkModuleProvider) {
             super(componentProvider, selectFieldSupport, uiFrameworkModuleProvider);
             _superConverter = superConverter;
         }

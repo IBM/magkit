@@ -72,19 +72,21 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
         super(definition, i18n, localeContext, datasource);
         _definition = definition;
         _i18n = i18n;
+        initMaxComponents();
+//        initContent();
     }
 
     /**
      * Apply layout and initialize max constraints and listeners.
      */
-    @Override
-    public void layout() {
-        super.layout();
-        if (_definition != null) {
-            initMaxComponents();
-            initContent();
-        }
-    }
+//    @Override
+//    public void layout() {
+//        super.layout();
+//        if (_definition != null) {
+//            initMaxComponents();
+//            initContent();
+//        }
+//    }
 
     /**
      * Initialize maximum component count from definition or fallback.
@@ -96,18 +98,19 @@ public class SpecificMultiFormView<T> extends MultiFormView<T> implements Client
         }
     }
 
+    // TODO: Do we still need this - adding listeners to layout? -> Yes, we need it to check max components limit (-> addButtonDisabled(), )
     /**
      * Initialize root layout and attach/detach listeners for dynamic component management.
      */
-    void initContent() {
-        _rootLayout = (VerticalLayout) asVaadinComponent();
-        int componentCount = _rootLayout.getComponentCount();
-        _rootLayout.addComponentAttachListener(this);
-        if (componentCount > 1) {
-            _rootLayout.addComponentDetachListener(this);
-        }
-        _rootLayout.addAttachListener(this);
-    }
+//    void initContent() {
+//        _rootLayout = (VerticalLayout) ((MultiField<T>) asVaadinComponent()).initContent();
+//        int componentCount = _rootLayout.getComponentCount();
+//        _rootLayout.addComponentAttachListener(this);
+//        if (componentCount > 1) {
+//            _rootLayout.addComponentDetachListener(this);
+//        }
+//        _rootLayout.addAttachListener(this);
+//    }
 
     /**
      * UI attach event: ensures add button state (enabled if under limit).

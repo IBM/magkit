@@ -20,6 +20,8 @@ package de.ibmix.magkit.ui.templates;
  * #L%
  */
 
+import de.ibmix.magkit.test.cms.context.ComponentsMockUtils;
+import info.magnolia.init.MagnoliaConfigurationProperties;
 import info.magnolia.rendering.template.configured.ConfiguredTemplateDefinition;
 import info.magnolia.templating.functions.TemplatingFunctions;
 import info.magnolia.cms.util.RequestDispatchUtil;
@@ -74,6 +76,7 @@ public class FolderModelTest {
         _definition = mock(ConfiguredTemplateDefinition.class);
         _templatingFunctions = mock(TemplatingFunctions.class);
         mockWebContext(stubContextPath("/context"));
+        ComponentsMockUtils.mockComponentInstance(MagnoliaConfigurationProperties.class);
     }
 
     @AfterEach
