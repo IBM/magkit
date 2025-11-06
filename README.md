@@ -12,10 +12,26 @@ The purpose of this project is to provide commonly used helper classes for magno
 * **magkit-setup:** A maven module that provides util classes to write magnolia configurations and version handler tasks.
 * **magkit-ui:** A magnolia module that provides some additional dialog fields and a folder template
 
+
+### Versions, technology stack and Maven dependency
+
+|       | Java | Magnolia | magkit-test | 
+|-------|-------------|----------|-------------|
+| 1.0.0 | 11          | 6.2.19   | 1.0.8       | 
+| 1.0.1 | 11          | 6.2.45   | 1.0.10      | 
+| 1.1.0 | 17          | 6.3.17   | 1.1.0       | 
+
+To use the magkit-core module in your Maven project, add the following dependency to your `pom.xml`:
+
+```xml
+    <dependency>
+        <artifactId>magkit-core</artifactId>
+        <groupId>de.ibmix.magkit</groupId>
+        <version>${module.version}</version>
+    </dependency>
+```
+
 ## Usage
-This project needs 
-* Java 11 or later
-* Magnolia 6.2.19 or later
 
 It contains some legacy code for Magnolia 5.x used in old projects but this is deprecated and will be deleted soon. 
 
