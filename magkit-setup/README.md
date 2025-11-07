@@ -10,7 +10,6 @@
   - `RemoveResourcesHotfixesTask`: Cleans up obsolete or hotfixed resource files from previous releases.
   - `ReplaceTemplateTask`: Replaces template definition nodes while preserving structure; generates descriptive task names automatically.
   - `RemoveTemplateNodesTask`: Bulk-removes content nodes matching template names (optionally scoped by workspace/path) using dynamically built SQL2 queries.
-  - `ScriptInstallTask`: Executes custom scripted install logic (e.g. Groovy/JavaScript) during module setup (intended for advanced migration scenarios).
 - Node Builder Utilities:
   - `NodeOperationFactory`: Fluent factory for Magnolia's `NodeOperation` (add/get nodes, ordering, properties, removal, URI pattern voters).
   - `NodeBuilderTask` / `NodeBuilderTaskFactory`: Wrap sequences of node operations inside install/update tasks, targeting config, server, or module-specific paths with error handling.
