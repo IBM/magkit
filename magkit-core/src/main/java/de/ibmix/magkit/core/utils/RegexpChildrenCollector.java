@@ -32,38 +32,35 @@ import java.util.regex.Pattern;
  * Collects child {@link Item} instances of a starting {@link Node} whose names match a provided regular expression.
  * This is an alternative to Jackrabbit's {@code org.apache.jackrabbit.util.ChildrenCollectorFilter} which uses a
  * proprietary wildcard matching; this implementation relies purely on standard {@link Pattern} regular expressions.
- * <p>
- * Main functionality:
+ * <p>Main functionality:</p>
  * <ul>
  *     <li>Traverses a node hierarchy either breadth-first or depth-first (configurable in constructor).</li>
  *     <li>Limits traversal depth via a {@code maxLevel} parameter (e.g. {@code 1} for direct children only).</li>
  *     <li>Filters collected items by both Java type ({@link Node} / {@link Property} / {@link Item}) and name pattern.</li>
  *     <li>Adds matching items to a caller-provided {@link Collection} instance.</li>
  * </ul>
- * <p>
- * Usage preconditions:
+ * <p>Usage preconditions:</p>
  * <ul>
  *     <li>The provided {@code collectedChildren} collection must not be {@code null}.</li>
  *     <li>The pattern (string or {@link Pattern}) should compile successfully; invalid regex will trigger a
  *     {@link java.util.regex.PatternSyntaxException} on construction.</li>
  *     <li>{@code maxLevel} should be {@code >= 1}; values {@code <= 0} would make traversal meaningless.</li>
  * </ul>
- * <p>
- * Side effects: The passed in collection instance is mutated by adding matching items during traversal.
- * <p>
- * Null and error handling: Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
+ * <p>Side effects:</p>
+ * The passed in collection instance is mutated by adding matching items during traversal.
+ * <p>Null and error handling:</p>
+ * Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
  * from underlying JCR operations when accessing item names. Those exceptions are propagated.
- * <p>
- * Thread-safety: Instances are not thread-safe because they mutate the externally supplied collection. Use one
+ * <p>Thread-safety:</p>
+ * Instances are not thread-safe because they mutate the externally supplied collection. Use one
  * instance per traversal thread or provide appropriate external synchronization if sharing the collection.
- * <p>
- * Example usage (multi select values):
+ * <p>Example usage (multi select values):</p>
  * <pre>
  *     RegexpChildrenCollector&lt;Property&gt; collector = new RegexpChildrenCollector&lt;&gt;(new ArrayList&lt;&gt;(), "child-property-name", false, 1, Property.class);
  *     multiselectNode.accept(collector);
  *     Collection&lt;Property&gt; valueProperties = collector.getCollectedChildren();
  * </pre>
- * <p>
+ *
  * @param <T> subclass of {@link Item} that will be collected
  * @author lars.gendner
  * @since ???

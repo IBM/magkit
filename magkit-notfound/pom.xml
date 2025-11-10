@@ -3,7 +3,7 @@
     <parent>
         <artifactId>magkit</artifactId>
         <groupId>de.ibmix.magkit</groupId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>info.magnolia.site</groupId>
-            <artifactId>magnolia-site</artifactId>
+            <artifactId>magnolia-site-jcr</artifactId>
         </dependency>
         <dependency>
             <groupId>info.magnolia.rest</groupId>

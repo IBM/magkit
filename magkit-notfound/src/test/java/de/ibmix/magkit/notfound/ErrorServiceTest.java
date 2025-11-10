@@ -22,6 +22,7 @@ package de.ibmix.magkit.notfound;
 
 import info.magnolia.cms.beans.config.URI2RepositoryManager;
 import info.magnolia.cms.beans.config.URI2RepositoryMapping;
+import info.magnolia.init.MagnoliaConfigurationProperties;
 import info.magnolia.module.site.Site;
 import info.magnolia.module.site.SiteManager;
 import org.junit.jupiter.api.AfterEach;
@@ -65,6 +66,7 @@ public class ErrorServiceTest {
     @BeforeEach
     public void setUp() throws Exception {
         cleanContext();
+        mockComponentInstance(MagnoliaConfigurationProperties.class);
         mockWebContext(stubJcrSession(WEBSITE));
         _module = new NotfoundModule();
         _siteManager = mockSiteManager();
