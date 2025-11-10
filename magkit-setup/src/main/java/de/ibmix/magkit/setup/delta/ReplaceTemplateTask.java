@@ -31,7 +31,7 @@ import javax.jcr.RepositoryException;
  * Iterates all nodes matching the query assembled by {@link RemoveTemplateNodesTask} and sets the new template id on
  * each node without altering other properties. This provides a controlled bulk template refactoring approach.
  * </p>
- * <h1>ATTENTION!</h1>
+ * <p><strong>ATTENTION!</strong></p>
  * This task may result in a heavy load on the repository, depending on the number of nodes with current template of {@link RemoveTemplateNodesTask}.
  * Especially when the project is in an "after go-live"-phase (i.e. is already in production use), think twice before renaming a template.
  * <p>Preconditions: The current template id must exist on target nodes; repository access must be available.</p>

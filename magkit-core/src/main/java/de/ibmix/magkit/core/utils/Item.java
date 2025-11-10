@@ -31,17 +31,17 @@ import org.apache.commons.lang3.math.NumberUtils;
  * {@link #compareTo(Item)}: if a position is encoded, comparison is done by raw key (thus by position first then the
  * remainder); otherwise comparison falls back to value, then key for tie-breaking.
  * </p>
- * <h3>Usage Preconditions</h3>
+ * <p>Usage Preconditions</p>
  * Keys and values should be non-null. Supplying a null key will lead to a {@link NullPointerException} in several
  * accessor methods.
- * <h3>Null Handling</h3>
+ * <p>Null Handling</p>
  * This class does not internally guard against null keys or values. Callers must ensure non-null inputs.
- * <h3>Side Effects</h3>
+ * <p>Side Effects</p>
  * The class is mutable via {@link #setKey(String)} and {@link #setValue(String)}; mutating after insertion into a sorted
  * collection may invalidate ordering assumptions.
- * <h3>Thread-Safety</h3>
+ * <p>Thread-Safety</p>
  * Not thread-safe; synchronize externally if instances are shared across threads and mutated.
- * <h3>Example</h3>
+ * <p>Example</p>
  * <pre>{@code
  * Item positioned = new Item("10#title", "Title");
  * Item plain = new Item("identifier", "Display");
