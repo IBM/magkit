@@ -166,7 +166,7 @@
             <name>Magnolia Enterprise Group</name>
             <url>https://nexus.magnolia-cms.com/repository/enterprise/</url>
         </repository>
-        <!-- required to find our own super POM-->
+        <!-- required to find our own super POM -->
         <repository>
             <id>magnolia.forge.releases</id>
             <url>https://nexus.magnolia-cms.com/repository/magnolia.forge.releases/</url>
