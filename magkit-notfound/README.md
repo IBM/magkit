@@ -20,7 +20,7 @@ Add the Maven dependency to your project. The module inherits the version from t
 <dependency>
   <groupId>de.ibmix.magkit</groupId>
   <artifactId>magkit-notfound</artifactId>
-  <version>1.1.0-SNAPSHOT</version><!-- or a released version -->
+  <version>1.1.0</version><!-- or the latest released version, e.g. 1.0.2 -->
 </dependency>
 ```
 

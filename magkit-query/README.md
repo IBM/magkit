@@ -41,6 +41,16 @@ String xpath = XpathBuilder.xPathBuilder()
 ```
 
 ## Usage
+Add the Maven dependency to your project.
+
+```xml
+<dependency>
+  <groupId>de.ibmix.magkit</groupId>
+  <artifactId>magkit-query</artifactId>
+  <version>1.1.0</version><!-- or the latest released version, e.g. 1.0.2 -->
+</dependency>
+```
+
 ### Search the JCR repository with SQL2 queries
 The package `de.ibmix.magkit.query.sql2` contains a fluent builder API for building and executing SQL2 queries and statement strings.
 You can execute queries using your handcrafted query string or use the builders to safely create them.
