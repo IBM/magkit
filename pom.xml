@@ -28,7 +28,7 @@
 
         <mockitoVersion>5.20.0</mockitoVersion>
         <juniuit.Version>5.14.0</juniuit.Version>
-        <version.magkit.test>1.1.0-SNAPSHOT</version.magkit.test>
+        <version.magkit.test>1.1.0</version.magkit.test>
         <jacocoVersion>0.8.14</jacocoVersion>
     </properties>
 
@@ -175,6 +175,11 @@
             <id>magnolia.enterprise</id>
             <name>Magnolia Enterprise Group</name>
             <url>https://nexus.magnolia-cms.com/repository/enterprise/</url>
+        </repository>
+        <!-- required to find our own super POM-->
+        <repository>
+            <id>magnolia.forge.releases</id>
+            <url>https://nexus.magnolia-cms.com/repository/magnolia.forge.releases/</url>
         </repository>
     </repositories>
 </project>
