@@ -23,11 +23,9 @@
         <version.magnolia>6.3.17</version.magnolia>
         <!-- keep in sync with corresponding versions from magnolia bundle -->
         <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
-        <!-- Updated due to security vulnerabilities in 5.2.2 -->
-        <version.poi>5.4.1</version.poi>
 
         <mockitoVersion>5.20.0</mockitoVersion>
-        <juniuit.Version>5.14.0</juniuit.Version>
+        <juniuit.version>5.14.0</juniuit.version>
         <version.magkit.test>1.1.0</version.magkit.test>
         <jacocoVersion>0.8.14</jacocoVersion>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
@@ -61,21 +59,6 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- excel creation, Updated due to security vulnerabilities in 5.2.2 -->
-            <!-- After upgrading Magnolia check if version provided by magnolia is actual -->
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${version.poi}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${version.poi}</version>
-                <scope>compile</scope>
-            </dependency>
-
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
@@ -90,6 +73,13 @@
             </dependency>
 
             <!-- Test Scope Dependencies -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${juniuit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
