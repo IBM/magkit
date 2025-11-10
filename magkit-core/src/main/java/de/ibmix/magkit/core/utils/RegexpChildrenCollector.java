@@ -46,17 +46,14 @@ import java.util.regex.Pattern;
  *     {@link java.util.regex.PatternSyntaxException} on construction.</li>
  *     <li>{@code maxLevel} should be {@code >= 1}; values {@code <= 0} would make traversal meaningless.</li>
  * </ul>
- * <p>
- * Side effects: The passed in collection instance is mutated by adding matching items during traversal.
- * </p>
- * <p>
- * Null and error handling: Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
+ * <p>Side effects:</p>
+ * The passed in collection instance is mutated by adding matching items during traversal.
+ * <p>Null and error handling:</p>
+ * Constructor parameters are assumed non-null. Traversal may throw {@link RepositoryException}
  * from underlying JCR operations when accessing item names. Those exceptions are propagated.
- * </p>
- * <p>
- * Thread-safety: Instances are not thread-safe because they mutate the externally supplied collection. Use one
+ * <p>Thread-safety:</p>
+ * Instances are not thread-safe because they mutate the externally supplied collection. Use one
  * instance per traversal thread or provide appropriate external synchronization if sharing the collection.
- * </p>
  * <p>Example usage (multi select values):</p>
  * <pre>
  *     RegexpChildrenCollector&lt;Property&gt; collector = new RegexpChildrenCollector&lt;&gt;(new ArrayList&lt;&gt;(), "child-property-name", false, 1, Property.class);
