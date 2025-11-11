@@ -30,6 +30,7 @@ import javax.jcr.Node;
 import javax.jcr.Value;
 import javax.jcr.version.Version;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
@@ -105,6 +106,7 @@ public class ImmutableNodeWrapperTest {
         Calendar cal = Calendar.getInstance();
         BigDecimal decimal = new BigDecimal("1.23");
         Node refNode = mockNode("refNode");
+        InputStream stream = new ByteArrayInputStream(new byte[0]);
 
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value));
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value, 1));
@@ -114,7 +116,7 @@ public class ImmutableNodeWrapperTest {
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}, 1));
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x"));
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x", 1));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new ByteArrayInputStream(new byte[0])));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", stream));
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", binary));
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", true));
         assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 1.0d));
