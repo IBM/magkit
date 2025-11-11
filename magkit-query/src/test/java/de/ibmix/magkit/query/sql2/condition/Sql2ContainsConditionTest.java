@@ -154,7 +154,8 @@ public class Sql2ContainsConditionTest {
 
     @Test
     public void missingSelector() {
-        assertThrows(IllegalStateException.class, () -> _containsCondition.any("first").asString());
+        Sql2Constraint condition = _containsCondition.any("first");
+        assertThrows(IllegalStateException.class, condition::asString);
     }
 
     @Test

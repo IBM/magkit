@@ -145,7 +145,8 @@ public class Sql2CalendarConditionTest {
         Calendar tooBig = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         tooBig.set(10000, Calendar.JANUARY, 1, 0, 0, 0);
         tooBig.set(Calendar.MILLISECOND, 0);
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> Sql2CalendarCondition.property("date").greaterThan().value(tooBig).asString());
+        Sql2Constraint condition = Sql2CalendarCondition.property("date").greaterThan().value(tooBig);
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, condition::asString);
         assertTrue(ex.getMessage().contains("Calendar has more than four year digits"));
     }
 
