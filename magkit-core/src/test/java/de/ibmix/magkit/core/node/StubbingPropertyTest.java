@@ -91,57 +91,73 @@ public class StubbingPropertyTest {
 
     @Test
     public void setValueStringUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue("test"));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue("test"));
     }
 
     @Test
     public void testSetValueUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(ValueMockUtils.mockValue(0L)));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        Value value = ValueMockUtils.mockValue(0L);
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(value));
     }
 
     @Test
     public void testSetValuesUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(new Value[]{ValueMockUtils.mockValue(0L)}));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        Value[] values = new Value[]{ValueMockUtils.mockValue(0L)};
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(values));
     }
 
     @Test
     public void testSetValueStringsUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(new String[]{"test"}));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        Value[] values = new Value[]{ValueMockUtils.mockValue("test")};
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(values));
     }
 
     @Test
     public void testSetValueInputStreamUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(Mockito.mock(InputStream.class)));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        InputStream stream = Mockito.mock(InputStream.class);
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(stream));
     }
 
     @Test
     public void testSetValueBinaryUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(Mockito.mock(Binary.class)));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        Binary binary = Mockito.mock(Binary.class);
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(binary));
     }
 
     @Test
     public void testSetValueLongUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(123L));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(123L));
     }
 
     @Test
     public void testSetValueDoubleUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(123.4D));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(123.4D));
     }
 
     @Test
     public void testSetValueDecimalUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(BigDecimal.ONE));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(BigDecimal.ONE));
     }
 
     @Test
     public void testSetValueCalendarUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(Calendar.getInstance()));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(Calendar.getInstance()));
     }
 
     @Test
     public void testSetValueBooleanUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(true));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(true));
     }
 
     @Test
@@ -158,7 +174,9 @@ public class StubbingPropertyTest {
 
     @Test
     public void testSetValueNodeUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").setValue(NodeMockUtils.mockNode("test")));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        Node node = NodeMockUtils.mockNode("test");
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(node));
     }
 
     @Test
@@ -253,27 +271,32 @@ public class StubbingPropertyTest {
 
     @Test
     public void getLengthsNotImplemented() throws RepositoryException {
-        assertThrows(NotImplementedException.class, () -> new StubbingProperty(_parent, "test", "value").getLengths());
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(NotImplementedException.class, () -> property.getLengths());
     }
 
     @Test
     public void acceptUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").accept(null));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.accept(null));
     }
 
     @Test
     public void saveUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").save());
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.save());
     }
 
     @Test
     public void refreshUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").refresh(true));
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.refresh(true));
     }
 
     @Test
     public void removeUnsupported() throws RepositoryException {
-        assertThrows(UnsupportedOperationException.class, () -> new StubbingProperty(_parent, "test", "value").remove());
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(UnsupportedOperationException.class, () -> property.remove());
     }
 
     @Test
@@ -293,7 +316,8 @@ public class StubbingPropertyTest {
 
     @Test
     public void getPropertyNotImplemented() throws RepositoryException {
-        assertThrows(NotImplementedException.class, () -> new StubbingProperty(_parent, "test", "value").getProperty());
+        Property property = new StubbingProperty(_parent, "test", "value");
+        assertThrows(NotImplementedException.class, () -> property.getProperty());
     }
 
     @Test
