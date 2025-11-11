@@ -48,8 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author Philipp Güttler (Aperto AG)
- * @since 03.06.2015
+ * Testing ExtendedLinkFieldHelper.
+ *
+ * @author Philipp Güttler (IBM iX)
+ * @since 2015-06-03
  */
 public class ExtendedLinkFieldHelperTest {
 
