@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Testing LocaleUtil.
  *
- * @author wolf.bubenik.ibmic.de
+ * @author wolf.bubenik.ibmix.de
  * @since 2024-01-03
  */
 public class LocaleUtilTest {
@@ -50,7 +50,6 @@ public class LocaleUtilTest {
     @Test
     public void getConfiguredLanguages() throws RepositoryException {
         assertEquals(0, LocaleUtil.getConfiguredLanguages().size());
-        LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN).of(_defaultSite.getI18n());
         assertEquals(3, LocaleUtil.getConfiguredLanguages().size());
         assertTrue(LocaleUtil.getConfiguredLanguages().contains("de"));
@@ -62,7 +61,6 @@ public class LocaleUtilTest {
     public void getSiteLocales() throws RepositoryException {
         assertEquals(0, LocaleUtil.getSiteLocales().size());
 
-        LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH).of(_defaultSite.getI18n());
         assertEquals(3, LocaleUtil.getSiteLocales().size());
     }
@@ -91,11 +89,9 @@ public class LocaleUtilTest {
         I18nContentSupportStubbingOperation.stubFallbackLocale(Locale.FRENCH).of(_defaultSite.getI18n());
         assertEquals("fr", LocaleUtil.determineLocaleFromContent(page));
 
-        LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH).of(_defaultSite.getI18n());
         assertEquals("fr", LocaleUtil.determineLocaleFromContent(page));
 
-        LocaleUtil.resetDefaultSiteLocals();
         I18nContentSupportStubbingOperation.stubLocales(Locale.GERMAN, Locale.ITALIAN, Locale.FRENCH).of(_defaultSite.getI18n());
         assertEquals("it", LocaleUtil.determineLocaleFromContent(page));
     }
@@ -123,7 +119,6 @@ public class LocaleUtilTest {
     @AfterEach
     public void tearDown() throws Exception {
         ContextMockUtils.cleanContext();
-        LocaleUtil.resetDefaultSiteLocals();
     }
 
 }
