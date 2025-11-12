@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
  *   <li>Non existing error page path returns empty string.</li>
  * </ul>
  *
- * @author wolf.bubenikLibmix.de
+ * @author wolf.bubenik@ibmix.de
  * @since 2025-10-21
  */
 public class ErrorServiceTest {
