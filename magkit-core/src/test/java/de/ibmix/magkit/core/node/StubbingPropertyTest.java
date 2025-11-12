@@ -151,7 +151,8 @@ public class StubbingPropertyTest {
     @Test
     public void testSetValueCalendarUnsupported() throws RepositoryException {
         Property property = new StubbingProperty(_parent, "test", "value");
-        assertThrows(UnsupportedOperationException.class, () -> property.setValue(Calendar.getInstance()));
+        Calendar now = Calendar.getInstance();
+        assertThrows(UnsupportedOperationException.class, () -> property.setValue(now));
     }
 
     @Test
