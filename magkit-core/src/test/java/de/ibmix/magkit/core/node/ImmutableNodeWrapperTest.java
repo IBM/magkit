@@ -95,7 +95,7 @@ public class ImmutableNodeWrapperTest {
     }
 
     @Test
-    public void setingPropertiesIsRejected() throws Exception {
+    public void settingPropertiesIsRejected() throws Exception {
         Node base = mockNode("immutBase", stubProperty("p", "v"));
         ImmutableNodeWrapper imm = new ImmutableNodeWrapper(base);
 
