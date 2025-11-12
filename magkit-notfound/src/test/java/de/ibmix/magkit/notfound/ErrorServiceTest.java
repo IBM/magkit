@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
  *   <li>Non existing error page path returns empty string.</li>
  * </ul>
  *
- * @author wolf.bubenik
+ * @author wolf.bubenikLibmix.de
  * @since 2025-10-21
  */
 public class ErrorServiceTest {
@@ -120,7 +120,7 @@ public class ErrorServiceTest {
     }
 
     @Test
-    public void errorPageNotExistingReturnsEmptyPath() throws Exception {
+    public void errorPageNotExistingReturnsEmptyPath() {
         mockUriToRepositoryManager("/de/notfound", "website");
         initSiteManagerWithSite("/de", "/de/notfound", 1);
         assertEquals("", _service.retrieveErrorPagePath(500, null, "/de/notfound"));
