@@ -65,5 +65,5 @@ public class NodeValidator extends AbstractValidator<Node> {
      */
     public boolean isValidValue(Node value) {
         return value != null;
-    };
+    }
 }
