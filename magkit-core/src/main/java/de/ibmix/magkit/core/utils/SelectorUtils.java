@@ -75,7 +75,7 @@ import static org.apache.commons.lang3.math.NumberUtils.toInt;
  *   // Result: /news.pid=3.html
  * </pre>
  *
- * @author frank.sommer (IBM-iX)
+ * @author frank.sommer (IBM iX)
  * @since 2008-05-29
  */
 public abstract class SelectorUtils {
