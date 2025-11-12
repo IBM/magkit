@@ -91,6 +91,11 @@ import static org.apache.commons.lang3.StringUtils.split;
 public final class LocaleUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocaleUtil.class);
 
+    /**
+     * Cache result of querying Magnolia config (in case Magnolia doesn't).
+     */
+    private static List<Locale> DEFAULT_LOCALS_CACHE = null;
+
     private LocaleUtil() {
         // keep checkstyle happy
     }
@@ -111,11 +116,6 @@ public final class LocaleUtil {
     }
 
     /**
-     * Cache result of querying Magnolia config (in case Magnolia doesn't).
-     */
-    private static List<Locale> c_defaultSiteLocals;
-
-    /**
      * Returns the list of {@link Locale}s configured for the default site.
      * <p>Caches the first successful lookup statically. Subsequent changes to Magnolia's configuration are ignored
      * until {@link #resetDefaultSiteLocals()} is called.</p>
@@ -124,18 +124,18 @@ public final class LocaleUtil {
      * @return list of configured site locales or {@code null} if not resolvable
      */
     public static List<Locale> getSiteLocales() {
-        if (c_defaultSiteLocals == null) {
+        if (DEFAULT_LOCALS_CACHE == null) {
             SiteManager siteManager = Components.getComponent(SiteManager.class);
             I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
             if (i18n != null) {
                 Collection<Locale> locales = i18n.getLocales();
-                c_defaultSiteLocals = new ArrayList<>(locales);
-                LOGGER.debug("Initialized site locales: {}", c_defaultSiteLocals);
+                DEFAULT_LOCALS_CACHE = new ArrayList<>(locales);
+                LOGGER.debug("Initialized site locales: {}", DEFAULT_LOCALS_CACHE);
             } else {
                 LOGGER.warn("I18nContentSupport not available - site locales remain null.");
             }
         }
-        return c_defaultSiteLocals;
+        return DEFAULT_LOCALS_CACHE;
     }
 
     /**
@@ -143,7 +143,7 @@ public final class LocaleUtil {
      * configuration. Intended for testing only.
      */
     static void resetDefaultSiteLocals() {
-        c_defaultSiteLocals = null;
+        DEFAULT_LOCALS_CACHE = null;
         LOGGER.debug("Site locales cache reset.");
     }
 
