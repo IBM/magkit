@@ -67,7 +67,6 @@ public class ImmutableNodeWrapperTest {
         Node base = mockNode("immutBase", stubProperty("p", "v"));
         ImmutableNodeWrapper imm = new ImmutableNodeWrapper(base);
 
-        Value value = Mockito.mock(Value.class);
         Version version = Mockito.mock(Version.class);
 
         assertThrows(UnsupportedOperationException.class, () -> imm.addNode("child"));
