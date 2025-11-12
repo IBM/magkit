@@ -297,9 +297,10 @@ public class AlteringNodeWrapperTest {
     public void immutablePreventsUnderlyingMutations() throws Exception {
         Node node = mockNode("immut", stubProperty("p", "v"));
         AlteringNodeWrapper wrapper = new AlteringNodeWrapper(node).immutable();
-        assertTrue(wrapper.getWrappedNode() instanceof ImmutableNodeWrapper);
+        Node wrapped = wrapper.getWrappedNode();
+        assertTrue(wrapped instanceof ImmutableNodeWrapper);
         assertEquals("v", getStringValue(wrapper.getProperty("p")));
-        assertThrows(UnsupportedOperationException.class, () -> wrapper.getWrappedNode().setProperty("x", "y"));
+        assertThrows(UnsupportedOperationException.class, () -> wrapped.setProperty("x", "y"));
     }
 
     /**

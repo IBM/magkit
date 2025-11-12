@@ -23,10 +23,11 @@ package de.ibmix.magkit.core.utils;
 import info.magnolia.cms.core.AggregationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import javax.jcr.RepositoryException;
 
-import static de.ibmix.magkit.core.utils.SelectorUtils.DEF_PAGE;
 import static de.ibmix.magkit.core.utils.SelectorUtils.SELECTOR_PAGING;
 import static de.ibmix.magkit.core.utils.SelectorUtils.updateSelectors;
 import static de.ibmix.magkit.test.cms.context.AggregationStateStubbingOperation.stubSelector;
@@ -41,8 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test of the resource utils.
  *
- * @author frank.sommer (11.12.2008)
+ * @author frank.sommer (IBM iX)
  * @see SelectorUtils
+ * @since 2008-12-11
  */
 public class SelectorUtilsTest {
 
@@ -73,90 +75,53 @@ public class SelectorUtilsTest {
         assertFalse(SelectorUtils.isPrintView());
     }
 
-    @Test
-    public void selectorContains() throws RepositoryException {
-        AggregationState aggregationState = mockAggregationState();
-        assertFalse(SelectorUtils.selectorContains("test", true));
-
-        stubSelector("key=value~other").of(aggregationState);
-        assertFalse(SelectorUtils.selectorContains("test", true));
-        assertFalse(SelectorUtils.selectorContains("test", false));
-
-        stubSelector("key=value~other~test=true").of(aggregationState);
-        assertTrue(SelectorUtils.selectorContains("test", true));
-        assertFalse(SelectorUtils.selectorContains("test", false));
-
-        stubSelector("key=value~other~test").of(aggregationState);
-        assertTrue(SelectorUtils.selectorContains("test", true));
-        assertTrue(SelectorUtils.selectorContains("test", false));
-
-        stubSelector("key=value~other~issue=test").of(aggregationState);
-        assertFalse(SelectorUtils.selectorContains("test", true));
-        assertFalse(SelectorUtils.selectorContains("test", false));
+    @ParameterizedTest
+    @CsvSource({
+        ", true, false",
+        ", false, false",
+        "key=value~other, true, false",
+        "key=value~other, false, false",
+        "key=value~other~test=true, true, true",
+        "key=value~other~test=false, false, false",
+        "key=value~other~test, true, true",
+        "key=value~other~test, false, true",
+        "key=value~other~issue=test, true, false",
+        "key=value~other~issue=test, false, false"
+    })
+    public void selectorContains(String selector, boolean startsWith, boolean isTrue) throws RepositoryException {
+        mockAggregationState(stubSelector(selector));
+        if (isTrue) {
+            assertTrue(SelectorUtils.selectorContains("test", startsWith));
+        } else {
+            assertFalse(SelectorUtils.selectorContains("test", startsWith));
+        }
     }
 
-    @Test
-    public void retrieveActivePageWithNoValue() throws RepositoryException {
-        mockWebContext(stubAttribute(SELECTOR_PAGING, null));
-        assertEquals(DEF_PAGE, SelectorUtils.retrieveActivePage());
+    @ParameterizedTest
+    @CsvSource({
+        ", 1",
+        "abc, 1",
+        "-5, 1",
+        "5, 5"
+    })
+    public void retrieveActivePage(String attribute, int expected) throws RepositoryException {
+        mockWebContext(stubAttribute(SELECTOR_PAGING, attribute));
+        assertEquals(expected, SelectorUtils.retrieveActivePage());
     }
 
-    @Test
-    public void retrieveActivePageWithLetterValue() throws RepositoryException {
-        mockWebContext(stubAttribute(SELECTOR_PAGING, "abc"));
-        assertEquals(DEF_PAGE, SelectorUtils.retrieveActivePage());
-    }
-
-    @Test
-    public void retrieveActivePageWithInvalidValue() throws RepositoryException {
-        mockWebContext(stubAttribute(SELECTOR_PAGING, "-5"));
-        assertEquals(DEF_PAGE, SelectorUtils.retrieveActivePage());
-    }
-
-    @Test
-    public void retrieveActivePageWithValidValue() throws RepositoryException {
-        mockWebContext(stubAttribute(SELECTOR_PAGING, "5"));
-        assertEquals(5, SelectorUtils.retrieveActivePage());
-    }
-
-    @Test
-    public void testWithNullUrl() {
-        assertEquals("", updateSelectors(null, "pid", "1"));
-    }
-
-    @Test
-    public void testWithEmptyUrl() {
-        assertEquals("", updateSelectors("", "pid", "1"));
-    }
-
-    @Test
-    public void testWithWhitespaceUrl() {
-        assertEquals("", updateSelectors(" \t ", "pid", "1"));
-    }
-
-    @Test
-    public void addSelectorWithNoExtension() {
-        assertEquals("/test~pid=1~.html", updateSelectors("/test", "pid", "1"));
-    }
-
-    @Test
-    public void addSelectorWithNoExtensionButQueryString() {
-        assertEquals("/test~pid=1~.html?123", updateSelectors("/test?123", "pid", "1"));
-    }
-
-    @Test
-    public void addSelectorWithExtensionAndQueryString() {
-        assertEquals("/test~pid=1~.xml?123", updateSelectors("/test.xml?123", "pid", "1"));
-    }
-
-    @Test
-    public void addSelectorWithEncoding() {
-        assertEquals("/test~pid=%C3%BC~.html", updateSelectors("/test.html", "pid", "\u00FC"));
-    }
-
-    @Test
-    public void updateSelector() {
-        assertEquals("/test~kid=1~pid=1~.html", updateSelectors("/test~kid=1~pid=2~.html", "pid", "1"));
+    @ParameterizedTest
+    @CsvSource({
+        ", pid, 1, ''",
+        "'', pid, 1, ''",
+        " \t , pid, 1, ''",
+        "/test, pid, 1, /test~pid=1~.html",
+        "/test?123, pid, 1, /test~pid=1~.html?123",
+        "/test.xml?123, pid, 1, /test~pid=1~.xml?123",
+        "/test.html, pid, \u00FC, /test~pid=%C3%BC~.html",
+        "/test~kid=1~pid=2~.html, pid, 1, /test~kid=1~pid=1~.html"
+    })
+    public void testUpdateSelectors(String uri, String id, String value, String expected) {
+        assertEquals(expected, updateSelectors(uri, id, value));
     }
 
     @Test

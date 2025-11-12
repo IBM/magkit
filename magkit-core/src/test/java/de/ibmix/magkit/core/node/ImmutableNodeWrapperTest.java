@@ -30,6 +30,7 @@ import javax.jcr.Node;
 import javax.jcr.Value;
 import javax.jcr.version.Version;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 
@@ -43,8 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Tests {@link ImmutableNodeWrapper} ensuring all mutating JCR Node operations throw UnsupportedOperationException
  * while read access is still delegated to the wrapped node.
  *
- * @author wolf.bubenik
- * @since 20.10.2025
+ * @author wolf.bubenik@ibmix.de
+ * @since 2025-10-20
  */
 public class ImmutableNodeWrapperTest {
 
@@ -62,38 +63,15 @@ public class ImmutableNodeWrapperTest {
     }
 
     @Test
-    public void allMutationsAreRejected() throws Exception {
+    public void changingNodeStateIsRejected() throws Exception {
         Node base = mockNode("immutBase", stubProperty("p", "v"));
         ImmutableNodeWrapper imm = new ImmutableNodeWrapper(base);
 
-        Value value = Mockito.mock(Value.class);
-        Value[] values = new Value[]{value};
-        Binary binary = Mockito.mock(Binary.class);
-        Calendar cal = Calendar.getInstance();
-        BigDecimal decimal = new BigDecimal("1.23");
         Version version = Mockito.mock(Version.class);
-        Node refNode = mockNode("refNode");
 
         assertThrows(UnsupportedOperationException.class, () -> imm.addNode("child"));
         assertThrows(UnsupportedOperationException.class, () -> imm.addNode("child", "nt:unstructured"));
         assertThrows(UnsupportedOperationException.class, () -> imm.orderBefore("a", "b"));
-
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value, 1));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", values));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", values, 1));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}, 1));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x"));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x", 1));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new ByteArrayInputStream(new byte[0])));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", binary));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", true));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 1.0d));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", decimal));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 2L));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", cal));
-        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", refNode));
 
         assertThrows(UnsupportedOperationException.class, () -> imm.setPrimaryType("mgnl:page"));
         assertThrows(UnsupportedOperationException.class, () -> imm.addMixin("mix:versionable"));
@@ -114,5 +92,36 @@ public class ImmutableNodeWrapperTest {
         assertThrows(UnsupportedOperationException.class, imm::save);
         assertThrows(UnsupportedOperationException.class, () -> imm.refresh(false));
         assertThrows(UnsupportedOperationException.class, imm::remove);
+    }
+
+    @Test
+    public void settingPropertiesIsRejected() throws Exception {
+        Node base = mockNode("immutBase", stubProperty("p", "v"));
+        ImmutableNodeWrapper imm = new ImmutableNodeWrapper(base);
+
+        Value value = Mockito.mock(Value.class);
+        Value[] values = new Value[]{value};
+        Binary binary = Mockito.mock(Binary.class);
+        Calendar cal = Calendar.getInstance();
+        BigDecimal decimal = new BigDecimal("1.23");
+        Node refNode = mockNode("refNode");
+        InputStream stream = new ByteArrayInputStream(new byte[0]);
+
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", value, 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", values));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", values, 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", new String[]{"x", "y"}, 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x"));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", "x", 1));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", stream));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", binary));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", true));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 1.0d));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", decimal));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", 2L));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", cal));
+        assertThrows(UnsupportedOperationException.class, () -> imm.setProperty("a", refNode));
     }
 }

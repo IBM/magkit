@@ -26,6 +26,8 @@ import info.magnolia.init.MagnoliaConfigurationProperties;
 import info.magnolia.cms.beans.config.ServerConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 
 import javax.jcr.RepositoryException;
@@ -92,35 +94,25 @@ public class AuthorFormClientCallbackTest {
     }
 
     /**
-     * Verifies that on admin servers no 404 is sent (branch uses super.handle path).
-     *
-     * @throws IOException never thrown, required for mocked sendError signature
-     */
-    @Test
-    public void handleAdminServerNo404() throws IOException, RepositoryException {
-        ServerConfiguration serverConfiguration = mockServerConfiguration(stubIsAdmin(true));
-        AuthorFormClientCallback callback = createCallback(serverConfiguration);
-        // avoid processing the login form, disable the callback
-        callback.setEnabled(false);
-        HttpServletRequest request = mockHttpServletRequest(stubContextPath("/ctx"), stubRequestUri("/ctx/somePath"));
-        HttpServletResponse response = mockHttpServletResponse();
-        callback.handle(request, response);
-        verify(response, never()).sendError(Mockito.anyInt());
-    }
-
-    /**
      * Verifies that authorized internal path (/.magnolia) on non-admin servers does not send 404.
      *
      * @throws IOException never thrown
      */
-    @Test
-    public void handleAuthorizedPathNo404() throws IOException, RepositoryException {
-        ServerConfiguration serverConfiguration = mockServerConfiguration(stubIsAdmin(false));
+    @ParameterizedTest
+    @CsvSource({
+        "true, /ctx, /ctx/somePath, false",
+        "false, /ctx, /ctx/.magnolia/login, false",
+        "false, /ctx, /ctx/other, true",
+        "false, '', /.magnolia/login, false"
+    })
+    public void handleNo404(boolean isAdmin, final String contextPath, final String requestUri, boolean isCommitedResponse) throws IOException, RepositoryException {
+        ServerConfiguration serverConfiguration = mockServerConfiguration(stubIsAdmin(isAdmin));
         AuthorFormClientCallback callback = createCallback(serverConfiguration);
         // avoid processing the login form, disable the callback
         callback.setEnabled(false);
-        HttpServletRequest request = mockHttpServletRequest(stubContextPath("/ctx"), stubRequestUri("/ctx/.magnolia/login"));
+        HttpServletRequest request = mockHttpServletRequest(stubContextPath(contextPath), stubRequestUri(requestUri));
         HttpServletResponse response = mockHttpServletResponse();
+        doReturn(isCommitedResponse).when(response).isCommitted();
         callback.handle(request, response);
         verify(response, never()).sendError(Mockito.anyInt());
     }
@@ -136,25 +128,8 @@ public class AuthorFormClientCallbackTest {
         AuthorFormClientCallback callback = createCallback(serverConfiguration);
         HttpServletRequest request = mockHttpServletRequest(stubContextPath("/ctx"), stubRequestUri("/ctx/public/page"));
         HttpServletResponse response = mockHttpServletResponse();
-        doReturn(false).when(response).isCommitted();
         callback.handle(request, response);
         verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
-
-    /**
-     * Verifies that committed response prevents sending 404.
-     *
-     * @throws IOException never thrown
-     */
-    @Test
-    public void handleUnauthorizedPathCommittedResponseNoSendError() throws IOException, RepositoryException {
-        ServerConfiguration serverConfiguration = mockServerConfiguration(stubIsAdmin(false));
-        AuthorFormClientCallback callback = createCallback(serverConfiguration);
-        HttpServletRequest request = mockHttpServletRequest(stubContextPath("/ctx"), stubRequestUri("/ctx/other"));
-        HttpServletResponse response = mockHttpServletResponse();
-        doReturn(true).when(response).isCommitted();
-        callback.handle(request, response);
-        verify(response, never()).sendError(Mockito.anyInt());
     }
 
     /**
@@ -172,22 +147,5 @@ public class AuthorFormClientCallbackTest {
         doThrow(new IOException("test")).when(response).sendError(HttpServletResponse.SC_NOT_FOUND);
         assertDoesNotThrow(() -> callback.handle(request, response));
         verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
-
-    /**
-     * Verifies that authorized internal path with empty (root) context path does not send 404.
-     *
-     * @throws IOException never thrown
-     */
-    @Test
-    public void handleAuthorizedRootContextPathNo404() throws IOException, RepositoryException {
-        ServerConfiguration serverConfiguration = mockServerConfiguration(stubIsAdmin(false));
-        AuthorFormClientCallback callback = createCallback(serverConfiguration);
-        // avoid processing the login form, disable the callback
-        callback.setEnabled(false);
-        HttpServletRequest request = mockHttpServletRequest(stubContextPath(""), stubRequestUri("/.magnolia/login"));
-        HttpServletResponse response = mockHttpServletResponse();
-        callback.handle(request, response);
-        verify(response, never()).sendError(Mockito.anyInt());
     }
 }

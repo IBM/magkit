@@ -21,6 +21,7 @@ package de.ibmix.magkit.query.sql2;
  */
 
 import de.ibmix.magkit.query.sql2.condition.Sql2JoinConstraint;
+import de.ibmix.magkit.query.sql2.statement.Sql2Builder;
 import de.ibmix.magkit.query.sql2.statement.Sql2SelectorNames;
 import info.magnolia.jcr.util.NodeTypes;
 import org.junit.jupiter.api.AfterEach;
@@ -237,7 +238,8 @@ public class Sql2FacadeTest {
      */
     @Test
     public void fullTextMissingSelector() {
-        assertThrows(IllegalStateException.class, () -> Sql2.Statement.select().whereAll(Sql2.Condition.FullText.containsAny("x")).build());
+        Sql2Builder builder = Sql2.Statement.select().whereAll(Sql2.Condition.FullText.containsAny("x"));
+        assertThrows(IllegalStateException.class, builder::build);
     }
 
     /**

@@ -24,8 +24,11 @@ import info.magnolia.context.MgnlContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import javax.servlet.http.HttpServletResponse;
+
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
+import static de.ibmix.magkit.test.servlet.ServletMockUtils.mockHttpServletResponse;
 import static info.magnolia.cms.cache.CacheConstants.HEADER_CACHE_CONTROL;
 import static info.magnolia.cms.cache.CacheConstants.HEADER_CACHE_CONTROL_VALUE_DISABLE_CACHE;
 import static info.magnolia.cms.cache.CacheConstants.HEADER_EXPIRES;
@@ -37,8 +40,8 @@ import static org.mockito.Mockito.verify;
 /**
  * Test CacheUtils.
  *
- * @author wolf.bubenik
- * @since 21.12.18.
+ * @author wolf.bubenik@ibmix.de
+ * @since 2018-12-21
  */
 public class CacheUtilsTest {
 
@@ -49,7 +52,7 @@ public class CacheUtilsTest {
 
     @Test
     public void preventCaching() throws Exception {
-        // test no web context
+        // test no web context: no NPE
         CacheUtils.preventCaching();
 
         mockWebContext();
@@ -63,5 +66,11 @@ public class CacheUtilsTest {
     public void preventCaching1() {
         // test no NPE
         CacheUtils.preventCaching(null);
+
+        HttpServletResponse response = mockHttpServletResponse();
+        CacheUtils.preventCaching(response);
+        verify(response, times(1)).setHeader(HEADER_PRAGMA, HEADER_VALUE_NO_CACHE);
+        verify(response, times(1)).setHeader(HEADER_CACHE_CONTROL, HEADER_CACHE_CONTROL_VALUE_DISABLE_CACHE);
+        verify(response, times(1)).setDateHeader(HEADER_EXPIRES, 0L);
     }
 }

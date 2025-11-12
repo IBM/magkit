@@ -47,7 +47,7 @@ public class Sql2ContainsConditionTest {
     private Sql2ContainsCondition _containsCondition;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         _containsCondition = new Sql2ContainsCondition();
     }
 
@@ -154,7 +154,8 @@ public class Sql2ContainsConditionTest {
 
     @Test
     public void missingSelector() {
-        assertThrows(IllegalStateException.class, () -> _containsCondition.any("first").asString());
+        Sql2Constraint condition = _containsCondition.any("first");
+        assertThrows(IllegalStateException.class, condition::asString);
     }
 
     @Test

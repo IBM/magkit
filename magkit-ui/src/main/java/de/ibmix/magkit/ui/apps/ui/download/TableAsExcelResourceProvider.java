@@ -59,6 +59,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -66,6 +67,7 @@ import static info.magnolia.objectfactory.Components.getComponent;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 /**
  * Helper / provider that converts a Vaadin {@link Table} (legacy v7 component) into a downloadable Excel workbook.
@@ -352,8 +354,8 @@ public class TableAsExcelResourceProvider {
      */
     String addCellString(Object value, Cell cell) {
         checkArgument(cell != null, "The Cell must not be null.");
-        String valueString = value instanceof AbstractComponent ? ((AbstractComponent) value).getCaption() : value != null ? value.toString() : EMPTY;
-        valueString = valueString == null ? EMPTY : valueString.trim();
+        String valueString = value instanceof AbstractComponent ? ((AbstractComponent) value).getCaption() : Objects.toString(value, EMPTY);
+        valueString = trimToEmpty(valueString);
         cell.setCellValue(valueString);
         return valueString;
     }

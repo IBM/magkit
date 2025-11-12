@@ -168,7 +168,10 @@ public class Sql2StringCondition extends Sql2PropertyCondition<Sql2StringConditi
         if (isAddConstraint(value)) {
             final String end = (_startsWith || _contains) ? "%'" : "'";
             final String begin = (_endsWith || _contains) ? "'%" : "'";
-            final String cleanValue = _isLike ? value.replace("'", "''").replaceAll("%", "\\\\%").replaceAll("_", "\\\\_") : value.replace("'", "''");
+            String cleanValue = value.replace("'", "''");
+            if (_isLike) {
+                cleanValue = cleanValue.replace("%", "\\%").replace("_", "\\_");
+            }
 
             if (StringUtils.isNotEmpty(_operandMethod)) {
                 sql2.append(_operandMethod).append('(');

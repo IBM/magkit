@@ -24,6 +24,8 @@ import info.magnolia.context.SystemContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
@@ -47,24 +49,26 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link NodePropertyVoter} covering configuration completeness, property matching scenarios
  * and context based path resolution.
  *
- * @author frank.sommer
- * @since 14.01.13
+ * @author frank.sommer (IBM iX)
+ * @since 2013-01-14
  */
 public class NodePropertyVoterTest {
     private NodePropertyVoter _propertyVoter;
 
-    @Test
-    public void testMissingConfig() {
-        _propertyVoter.setPropertyName("secure");
-        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertFalse(voting);
-    }
-
-    @Test
-    public void testMissingPattern() {
-        _propertyVoter.setPattern(".*");
-        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertFalse(voting);
+    @ParameterizedTest
+    @CsvSource({
+        ",",
+        "secure,",
+        ",.*",
+        "secure, false",
+        "notexists, true"
+    })
+    public void testVoteFalse(String propertyName, String pattern) {
+        _propertyVoter.setPropertyName(propertyName);
+        if (pattern != null) {
+            _propertyVoter.setPattern(pattern);
+        }
+        assertFalse(_propertyVoter.boolVote("/bs/secure.html"));
     }
 
     @Test
@@ -72,14 +76,6 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPropertyName("secure");
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/old.html");
-        assertFalse(voting);
-    }
-
-    @Test
-    public void testNodePropertyNoMatch() {
-        _propertyVoter.setPropertyName("secure");
-        _propertyVoter.setPattern("false");
-        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
         assertFalse(voting);
     }
 
@@ -98,14 +94,6 @@ public class NodePropertyVoterTest {
         _propertyVoter.setPattern("true");
         boolean voting = _propertyVoter.boolVote("/bs/secure.html");
         assertTrue(voting);
-    }
-
-    @Test
-    public void testNodePropertyNullMatch() {
-        _propertyVoter.setPropertyName("notexists");
-        _propertyVoter.setPattern("true");
-        boolean voting = _propertyVoter.boolVote("/bs/secure.html");
-        assertFalse(voting);
     }
 
     @BeforeEach

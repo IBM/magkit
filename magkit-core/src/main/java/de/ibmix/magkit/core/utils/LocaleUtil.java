@@ -23,8 +23,6 @@ package de.ibmix.magkit.core.utils;
 import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.module.site.SiteManager;
 import info.magnolia.objectfactory.Components;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import java.util.ArrayList;
@@ -55,8 +53,6 @@ import static org.apache.commons.lang3.StringUtils.split;
  *
  * <p>Important details:</p>
  * <ul>
- *   <li>The list of site locales is cached the first time {@link #getSiteLocales()} is called. Subsequent changes
- *       to Magnolia's site configuration will NOT be reflected until {@link #resetDefaultSiteLocals()} is invoked.</li>
  *   <li>If no fallback locale is configured, {@link java.util.Locale#ENGLISH} is used as default.</li>
  *   <li>Locale extraction from a path scans path segments and returns the first segment matching a configured language.</li>
  * </ul>
@@ -67,13 +63,7 @@ import static org.apache.commons.lang3.StringUtils.split;
  *   <li>{@link #determineLocaleFromContent(Node)} falls back to the default site locale when none is found in the path.</li>
  * </ul>
  * <p>
- * Thread-safety: This class is effectively thread-safe for read operations on cached data after initialization. The
- * cache initialization is not synchronized; concurrent first access may initialize the cache multiple times with the
- * same logical result. Manual reset via {@link #resetDefaultSiteLocals()} is not thread-safe and should only be used
- * in controlled test scenarios.
- * </p>
- * <p>Side effects: Calling {@link #resetDefaultSiteLocals()} clears the static cache and forces re-reading Magnolia's
- * configuration on the next {@link #getSiteLocales()} invocation.
+ * Thread-safety: This class is effectively thread-safe.
  * </p>
  * Usage example:
  * <pre>{@code
@@ -89,7 +79,6 @@ import static org.apache.commons.lang3.StringUtils.split;
  * @since 2014-05-14
  */
 public final class LocaleUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocaleUtil.class);
 
     private LocaleUtil() {
         // keep checkstyle happy
@@ -111,40 +100,15 @@ public final class LocaleUtil {
     }
 
     /**
-     * Cache result of querying Magnolia config (in case Magnolia doesn't).
-     */
-    private static List<Locale> c_defaultSiteLocals;
-
-    /**
      * Returns the list of {@link Locale}s configured for the default site.
-     * <p>Caches the first successful lookup statically. Subsequent changes to Magnolia's configuration are ignored
-     * until {@link #resetDefaultSiteLocals()} is called.</p>
      * <p>Note: The returned list may be {@code null} if the i18n configuration is not available.</p>
      *
      * @return list of configured site locales or {@code null} if not resolvable
      */
     public static List<Locale> getSiteLocales() {
-        if (c_defaultSiteLocals == null) {
-            SiteManager siteManager = Components.getComponent(SiteManager.class);
-            I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
-            if (i18n != null) {
-                Collection<Locale> locales = i18n.getLocales();
-                c_defaultSiteLocals = new ArrayList<>(locales);
-                LOGGER.debug("Initialized site locales: {}", c_defaultSiteLocals);
-            } else {
-                LOGGER.warn("I18nContentSupport not available - site locales remain null.");
-            }
-        }
-        return c_defaultSiteLocals;
-    }
-
-    /**
-     * Resets the cached site locales so that a subsequent call to {@link #getSiteLocales()} re-reads Magnolia's
-     * configuration. Intended for testing only.
-     */
-    static void resetDefaultSiteLocals() {
-        c_defaultSiteLocals = null;
-        LOGGER.debug("Site locales cache reset.");
+        SiteManager siteManager = Components.getComponent(SiteManager.class);
+        I18nContentSupport i18n = siteManager.getDefaultSite().getI18n();
+        return i18n != null ? new ArrayList<>(i18n.getLocales()) : null;
     }
 
     /**

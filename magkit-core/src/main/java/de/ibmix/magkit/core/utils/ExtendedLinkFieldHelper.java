@@ -66,8 +66,8 @@ import static org.apache.commons.lang3.StringUtils.substringBefore;
  *   // Result: /my/page.print.detail.?a=1&amp;b=2#section
  * </pre>
  *
- * @author Philipp Güttler (Aperto AG)
- * @since 03.06.2015
+ * @author Philipp Güttler (IBM iX)
+ * @since 2015-06-03
  */
 @Singleton
 public class ExtendedLinkFieldHelper {
@@ -207,7 +207,18 @@ public class ExtendedLinkFieldHelper {
      * @return URI instance or {@code null} if not interpretable
      */
     protected URI createUri(final String value) {
-        return LinkTool.isPath(value) || LinkTool.isAnchor(value) ? URI.create(value) : LinkTool.isUuid(substring(value, 0, DEFAULT_UUID_LENGTH)) ? URI.create("/" + defaultString(value)) : null;
+        return LinkTool.isPath(value) || LinkTool.isAnchor(value) ? URI.create(value) : createUuidUri(value);
+    }
+
+    /**
+     * Creates a {@link URI} from the provided value if it resembles a Magnolia UUID (followed by components).
+     * For raw UUID values a synthetic leading '/' is added to satisfy {@link URI} path requirements.
+     *
+     * @param value raw path, anchor or UUID (+ optional components)
+     * @return URI instance or {@code null} if not an UUID
+     */
+    protected URI createUuidUri(final String value) {
+        return LinkTool.isUuid(substring(value, 0, DEFAULT_UUID_LENGTH)) ? URI.create("/" + defaultString(value)) : null;
     }
 
     /**
