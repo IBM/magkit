@@ -136,30 +136,29 @@ public class Sql2StatementBuilderTest {
         String path = "/some/path";
         String property = "test";
         String value = "value";
-        String result = null;
         long start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
-            result = Sql2Statement.select().whereAny(
+            Sql2Statement.select().whereAny(
                 Sql2PathCondition.is().descendant(path),
                 Sql2StringCondition.property(property).equalsAny().values(value + i)
             ).build();
         }
         long time = System.currentTimeMillis() - start;
-        LOG.info("Time: " + time + " ms");
+        LOG.info("Statement builder: " + time + " ms");
 
         start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
-            result = "SELECT * FROM " + '[' + type + ']' + " WHERE (isdescendantnode('" + path + "') OR " + '[' + property + ']' + " = " + '\'' + value + i + '\'' + ")";
+            String result = "SELECT * FROM " + '[' + type + ']' + " WHERE (isdescendantnode('" + path + "') OR " + '[' + property + ']' + " = " + '\'' + value + i + '\'' + ")";
         }
         time = System.currentTimeMillis() - start;
-        LOG.info("Time: " + time + " ms");
+        LOG.info("String concatenation: " + time + " ms");
 
         final String template = "SELECT * FROM [%s] WHERE (isdescendantnode('%s') OR [%s] = '%s')";
         start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
-            result = String.format(template, type, path, property, value + i);
+            String.format(template, type, path, property, value + i);
         }
         time = System.currentTimeMillis() - start;
-        LOG.info("Time: " + time + " ms");
+        LOG.info("String.format : " + time + " ms");
     }
 }
