@@ -35,6 +35,7 @@ import info.magnolia.cms.core.FileSystemHelper;
 import info.magnolia.context.WebContext;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -228,7 +229,7 @@ public class TableAsExcelResourceProviderTest {
         Row row = wb.createSheet().createRow(0);
         Cell cell = row.createCell(0);
         assertEquals(EMPTY, _resourceProvider.addCellString(null, cell));
-        assertEquals("test", _resourceProvider.addCellString("test", cell));
+        assertEquals("test", _resourceProvider.addCellString("  test  ", cell));
         AbstractComponent value = mock(AbstractComponent.class);
         doReturn("  test caption  ").when(value).getCaption();
         assertEquals("test caption", _resourceProvider.addCellString(value, cell));
@@ -344,7 +345,8 @@ public class TableAsExcelResourceProviderTest {
         Sheet sheet = wb.createSheet("link");
         Link link = mock(Link.class);
         // Expect exception for null cell
-        assertThrows(IllegalArgumentException.class, () -> _resourceProvider.addCellLink(link, null, wb.getCreationHelper()));
+        CreationHelper helper = wb.getCreationHelper();
+        assertThrows(IllegalArgumentException.class, () -> _resourceProvider.addCellLink(link, null, helper));
         // Expect exception for null helper
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
