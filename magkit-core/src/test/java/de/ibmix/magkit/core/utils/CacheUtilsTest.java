@@ -40,7 +40,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Test CacheUtils.
  *
- * @author wolf.bubenikLibmix.de
+ * @author wolf.bubenik@ibmix.de
  * @since 2018-12-21
  */
 public class CacheUtilsTest {
