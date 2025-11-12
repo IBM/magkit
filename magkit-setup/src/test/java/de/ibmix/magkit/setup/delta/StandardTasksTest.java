@@ -26,6 +26,8 @@ import info.magnolia.module.model.Version;
 import info.magnolia.jcr.util.NodeNameHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -75,31 +77,17 @@ public class StandardTasksTest {
     /**
      * Creates bypass for URI pattern starting with slash and verifies non-null task instance and validated node name.
      */
-    @Test
-    public void addFilteringBypassIfMissingCreatesUriBypassTask() {
-        Task task = StandardTasks.addFilteringBypassIfMissing("/assets", "/server/filters");
-        assertNotNull(task);
-        verify(_nodeNameHelper).getValidatedName("assets");
-    }
+    @ParameterizedTest
+    @CsvSource({
+        "/assets, /server/filters, assets",
+        "/monitoring/, /server/filters, monitoring",
+        "css, /server/filters, css",
 
-    /**
-     * Creates bypass for URI pattern with trailing slash and verifies non-null task instance and stripped node name.
-     */
-    @Test
-    public void addFilteringBypassIfMissingCreatesUriBypassTaskTrailingSlash() {
-        Task task = StandardTasks.addFilteringBypassIfMissing("/monitoring/", "/server/filters");
+    })
+    public void addFilteringBypassIfMissing(String uriPattern, String filterPath, String expectedValidatedName) {
+        Task task = StandardTasks.addFilteringBypassIfMissing(uriPattern, filterPath);
         assertNotNull(task);
-        verify(_nodeNameHelper).getValidatedName("monitoring");
-    }
-
-    /**
-     * Creates bypass for extension pattern (no leading slash) and verifies non-null task instance and unchanged node name.
-     */
-    @Test
-    public void addFilteringBypassIfMissingCreatesExtensionBypassTask() {
-        Task task = StandardTasks.addFilteringBypassIfMissing("css", "/server/filters");
-        assertNotNull(task);
-        verify(_nodeNameHelper).getValidatedName("css");
+        verify(_nodeNameHelper).getValidatedName(expectedValidatedName);
     }
 
     /**
@@ -136,44 +124,17 @@ public class StandardTasksTest {
     /**
      * Returns false when versions equivalent and both have no classifier.
      */
-    @Test
-    public void hasModuleNewRevisionReturnsFalseOnSameRelease() {
-        Version fromVersion = versionMock(null);
-        Version toVersion = versionMock(null);
-        when(toVersion.isEquivalent(fromVersion)).thenReturn(true);
-        assertFalse(StandardTasks.hasModuleNewRevision(fromVersion, toVersion));
-    }
-
-    /**
-     * Returns false when installed release version updates to classified build.
-     */
-    @Test
-    public void hasModuleNewRevisionReturnsFalseOnAddingClassifier() {
-        Version fromVersion = versionMock(null);
-        Version toVersion = versionMock("ALPHA");
-        when(toVersion.isEquivalent(fromVersion)).thenReturn(true);
-        assertFalse(StandardTasks.hasModuleNewRevision(fromVersion, toVersion));
-    }
-
-    /**
-     * Returns false when numeric versions differ regardless of classifier differences.
-     */
-    @Test
-    public void hasModuleNewRevisionReturnsFalseOnDifferentNumbers() {
-        Version fromVersion = versionMock("SNAPSHOT");
-        Version toVersion = versionMock(null);
-        when(toVersion.isEquivalent(fromVersion)).thenReturn(false);
-        assertFalse(StandardTasks.hasModuleNewRevision(fromVersion, toVersion));
-    }
-
-    /**
-     * Returns false when classifier remains unchanged on equivalent versions.
-     */
-    @Test
-    public void hasModuleNewRevisionReturnsFalseOnSameClassifier() {
-        Version fromVersion = versionMock("SNAPSHOT");
-        Version toVersion = versionMock("SNAPSHOT");
-        when(toVersion.isEquivalent(fromVersion)).thenReturn(true);
+    @ParameterizedTest
+    @CsvSource({
+        ", , true",
+        ", ALPHA, true",
+        "SNAPSHOT, , false",
+        "SNAPSHOT, SNAPSHOT, true",
+    })
+    public void hasModuleNewRevisionReturnsFalseOnSameRelease(String fromClassifier, String toClassifier, boolean isEquivalent) {
+        Version fromVersion = versionMock(fromClassifier);
+        Version toVersion = versionMock(toClassifier);
+        when(toVersion.isEquivalent(fromVersion)).thenReturn(isEquivalent);
         assertFalse(StandardTasks.hasModuleNewRevision(fromVersion, toVersion));
     }
 
