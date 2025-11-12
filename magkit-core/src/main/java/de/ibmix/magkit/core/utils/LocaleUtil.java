@@ -112,10 +112,6 @@ public final class LocaleUtil {
     }
 
     /**
-     * Resets the cached site locales so that a subsequent call to {@link #getSiteLocales()} re-reads Magnolia's
-     * configuration. Intended for testing only.
-     */
-    /**
      * Returns the configured fallback {@link Locale} for the default Magnolia site.
      * <p>Falls back to {@link Locale#ENGLISH} if no fallback is defined or if i18n configuration is absent.</p>
      *
