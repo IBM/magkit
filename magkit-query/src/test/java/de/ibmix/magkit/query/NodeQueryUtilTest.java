@@ -93,7 +93,7 @@ public class NodeQueryUtilTest {
     }
 
     @Test
-    public void testReplaceStringBuilderWithXpathBuilderWithoutCustomExpression() throws Exception {
+    public void testReplaceStringBuilderWithXpathBuilderWithoutCustomExpression() {
         final ConstraintBuilder builder = new ConstraintBuilder().addTplNameConstraint(TEST_TPL_NAME);
         assertEquals("/jcr:root" + TEST_NODE_PATH + "//element(*," + TEST_TYPE + ")" + "[@mgnl:template='" + TEST_TPL_NAME + "']", new XpathBuilder().path(TEST_NODE_PATH).type(TEST_TYPE).property(builder).append("").build());
     }

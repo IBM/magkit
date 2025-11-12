@@ -47,7 +47,7 @@ public class Sql2ContainsConditionTest {
     private Sql2ContainsCondition _containsCondition;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         _containsCondition = new Sql2ContainsCondition();
     }
 

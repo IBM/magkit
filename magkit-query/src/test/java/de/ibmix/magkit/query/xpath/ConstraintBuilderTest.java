@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author philipp.guettler
- * @since 27.09.13
+ * @since 2013-09-27
  */
 public class ConstraintBuilderTest {
 
@@ -41,20 +41,20 @@ public class ConstraintBuilderTest {
     private static final String TEST_UUID = "1234567890";
 
     @Test
-    public void testOpenGroup() throws Exception {
+    public void testOpenGroup() {
         assertEquals("(", new ConstraintBuilder().openGroup().build());
         assertEquals(STRING_AND + " (", new ConstraintBuilder().openGroup(AND).build());
     }
 
     @Test
-    public void testCloseGroup() throws Exception {
+    public void testCloseGroup() {
         assertEquals(")", new ConstraintBuilder().closeGroup().build());
         assertEquals("()", new ConstraintBuilder().openGroup().closeGroup().build());
         assertEquals(STRING_AND + " ()", new ConstraintBuilder().openGroup(AND).closeGroup().build());
     }
 
     @Test
-    public void testAppend() throws Exception {
+    public void testAppend() {
         assertEquals(TEST_CONSTRAINT, new ConstraintBuilder().add(TEST_CONSTRAINT).build());
         assertEquals(STRING_AND + " " + TEST_CONSTRAINT, new ConstraintBuilder().add(AND, TEST_CONSTRAINT).build());
         assertEquals(TEST_CONSTRAINT + " " + STRING_AND + " " + TEST_CONSTRAINT, new ConstraintBuilder().add(TEST_CONSTRAINT).add(AND, TEST_CONSTRAINT).build());
@@ -62,13 +62,13 @@ public class ConstraintBuilderTest {
     }
 
     @Test
-    public void testAppendUuidConstraint() throws Exception {
+    public void testAppendUuidConstraint() {
         assertEquals(String.format("@jcr:uuid='%s'", TEST_UUID), new ConstraintBuilder().addUuidConstraint(TEST_UUID).build());
         assertEquals(STRING_AND + " " + String.format("@jcr:uuid='%s'", TEST_UUID), new ConstraintBuilder().addUuidConstraint(AND, TEST_UUID).build());
     }
 
     @Test
-    public void testTemplateName() throws Exception {
+    public void testTemplateName() {
         assertEquals(String.format("@mgnl:template='%s'", TEST_TEMPLATE_NAME), new ConstraintBuilder().addTplNameConstraint(TEST_TEMPLATE_NAME).build());
         assertEquals(STRING_AND + " " + String.format("@mgnl:template='%s'", TEST_TEMPLATE_NAME), new ConstraintBuilder().addTplNameConstraint(AND, TEST_TEMPLATE_NAME).build());
         assertEquals(STRING_AND + " " + String.format("jcr:like(@mgnl:template, '%s')", TEST_TEMPLATE_PLACEHOLDER), new ConstraintBuilder().addTplNameConstraint(AND, TEST_TEMPLATE_PLACEHOLDER).build());

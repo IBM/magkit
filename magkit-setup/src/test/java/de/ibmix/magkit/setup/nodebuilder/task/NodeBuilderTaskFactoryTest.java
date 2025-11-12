@@ -114,7 +114,7 @@ public class NodeBuilderTaskFactoryTest {
      * Creates a task for an empty or null module name resulting in IllegalArgumentException.
      */
     @Test
-    public void selectModuleConfigWithEmptyNameCreatesModulesRoot() throws Exception {
+    public void selectModuleConfigWithEmptyNameCreatesModulesRoot() {
         assertThrows(IllegalArgumentException.class, () -> NodeBuilderTaskFactory.selectModuleConfig("moduleTask", "desc", null));
         assertThrows(IllegalArgumentException.class, () -> NodeBuilderTaskFactory.selectModuleConfig("moduleTask", "desc", ""));
         assertThrows(IllegalArgumentException.class, () -> NodeBuilderTaskFactory.selectModuleConfig("moduleTask", "desc", "  "));
