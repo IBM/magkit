@@ -103,8 +103,7 @@ public class AuthorFormClientCallbackTest {
         "true, /ctx, /ctx/somePath, false",
         "false, /ctx, /ctx/.magnolia/login, false",
         "false, /ctx, /ctx/other, true",
-        "false, '', /.magnolia/login, false",
-
+        "false, '', /.magnolia/login, false"
     })
     public void handleNo404(boolean isAdmin, final String contextPath, final String requestUri, boolean isCommitedResponse) throws IOException, RepositoryException {
         ServerConfiguration serverConfiguration = mockServerConfiguration(stubIsAdmin(isAdmin));

@@ -81,8 +81,7 @@ public class StandardTasksTest {
     @CsvSource({
         "/assets, /server/filters, assets",
         "/monitoring/, /server/filters, monitoring",
-        "css, /server/filters, css",
-
+        "css, /server/filters, css"
     })
     public void addFilteringBypassIfMissing(String uriPattern, String filterPath, String expectedValidatedName) {
         Task task = StandardTasks.addFilteringBypassIfMissing(uriPattern, filterPath);
@@ -129,7 +128,7 @@ public class StandardTasksTest {
         ", , true",
         ", ALPHA, true",
         "SNAPSHOT, , false",
-        "SNAPSHOT, SNAPSHOT, true",
+        "SNAPSHOT, SNAPSHOT, true"
     })
     public void hasModuleNewRevisionReturnsFalseOnSameRelease(String fromClassifier, String toClassifier, boolean isEquivalent) {
         Version fromVersion = versionMock(fromClassifier);

@@ -102,7 +102,7 @@ public class SelectorUtilsTest {
         ", 1",
         "abc, 1",
         "-5, 1",
-        "5, 5",
+        "5, 5"
     })
     public void retrieveActivePage(String attribute, int expected) throws RepositoryException {
         mockWebContext(stubAttribute(SELECTOR_PAGING, attribute));
@@ -118,7 +118,7 @@ public class SelectorUtilsTest {
         "/test?123, pid, 1, /test~pid=1~.html?123",
         "/test.xml?123, pid, 1, /test~pid=1~.xml?123",
         "/test.html, pid, \u00FC, /test~pid=%C3%BC~.html",
-        "/test~kid=1~pid=2~.html, pid, 1, /test~kid=1~pid=1~.html",
+        "/test~kid=1~pid=2~.html, pid, 1, /test~kid=1~pid=1~.html"
     })
     public void testUpdateSelectors(String uri, String id, String value, String expected) {
         assertEquals(expected, updateSelectors(uri, id, value));
