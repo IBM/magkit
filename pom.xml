@@ -25,7 +25,7 @@
         <version.magnolia.workflow>6.0.14</version.magnolia.workflow>
 
         <mockitoVersion>5.20.0</mockitoVersion>
-        <junit.version>5.14.0</junit.version>
+        <junit.version>5.14.3</junit.version>
         <version.magkit.test>1.1.0</version.magkit.test>
         <jacocoVersion>0.8.14</jacocoVersion>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
