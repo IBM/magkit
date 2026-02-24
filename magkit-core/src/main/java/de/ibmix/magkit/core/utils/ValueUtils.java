@@ -20,10 +20,10 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.jcr.Binary;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;

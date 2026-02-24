@@ -21,11 +21,10 @@ package de.ibmix.magkit.notfound;
  */
 
 import info.magnolia.objectfactory.Components;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 /**
  * 404 Error mapping for page rendering failures producing a JAX-RS {@link Response}.

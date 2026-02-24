@@ -23,13 +23,13 @@ package de.ibmix.magkit.core.utils;
 import info.magnolia.jcr.wrapper.DelegatePropertyWrapper;
 import info.magnolia.jcr.wrapper.HTMLEscapingContentDecorator;
 import info.magnolia.jcr.wrapper.HTMLEscapingPropertyWrapper;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Property;

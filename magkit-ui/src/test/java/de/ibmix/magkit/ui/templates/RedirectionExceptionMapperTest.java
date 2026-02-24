@@ -20,10 +20,10 @@ package de.ibmix.magkit.ui.templates;
  * #L%
  */
 
+import jakarta.ws.rs.RedirectionException;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.RedirectionException;
-import javax.ws.rs.core.Response;
 import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

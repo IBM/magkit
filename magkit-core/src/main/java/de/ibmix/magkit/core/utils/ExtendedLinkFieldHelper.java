@@ -20,7 +20,8 @@ package de.ibmix.magkit.core.utils;
  * #L%
  */
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import javax.jcr.Node;
 import java.net.URI;
 

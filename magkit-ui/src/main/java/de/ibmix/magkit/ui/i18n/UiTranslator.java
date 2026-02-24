@@ -24,8 +24,8 @@ import info.magnolia.cms.i18n.I18nContentSupport;
 import info.magnolia.i18nsystem.LocaleProvider;
 import info.magnolia.i18nsystem.SimpleTranslator;
 import info.magnolia.i18nsystem.TranslationService;
+import jakarta.inject.Inject;
 
-import javax.inject.Inject;
 import java.util.Locale;
 
 /**

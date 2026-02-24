@@ -20,9 +20,9 @@ package de.ibmix.magkit.ui.templates;
  * #L%
  */
 
-import javax.ws.rs.RedirectionException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.RedirectionException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 /**
  * JAX-RS {@link ExceptionMapper} implementation enabling proper redirect handling for headless Magnolia setups.

@@ -22,11 +22,11 @@ package de.ibmix.magkit.core.utils;
 
 import info.magnolia.context.MgnlContext;
 import info.magnolia.link.LinkUtil;
+import jakarta.annotation.Nullable;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.jcr.Node;
 import java.net.URISyntaxException;
 import java.util.function.Function;

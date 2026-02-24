@@ -24,16 +24,16 @@ import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.cms.security.auth.callback.FormClientCallback;
 import info.magnolia.context.WebContext;
 import info.magnolia.init.MagnoliaConfigurationProperties;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 /**
  * Provides an author-aware Magnolia form client callback that only serves the login form when the current instance is

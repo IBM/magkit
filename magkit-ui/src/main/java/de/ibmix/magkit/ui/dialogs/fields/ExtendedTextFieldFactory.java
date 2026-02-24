@@ -24,7 +24,7 @@ import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import info.magnolia.objectfactory.ComponentProvider;
 import info.magnolia.ui.field.factory.TextFieldFactory;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Factory creating either a plain Vaadin text field or an {@link ExtendedTextField} with remaining-length indicator.

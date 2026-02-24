@@ -21,9 +21,12 @@ package de.ibmix.magkit.setup.security;
  */
 
 import de.ibmix.magkit.test.cms.context.ContextMockUtils;
+import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.context.WebContext;
 import info.magnolia.init.MagnoliaConfigurationProperties;
-import info.magnolia.cms.beans.config.ServerConfiguration;
+import jakarta.inject.Provider;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,9 +34,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 
 import javax.jcr.RepositoryException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.inject.Provider;
 import java.io.IOException;
 import java.lang.reflect.Field;
 

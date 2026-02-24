@@ -27,8 +27,8 @@ import info.magnolia.ui.UiFrameworkModule;
 import info.magnolia.ui.field.FieldBinder;
 import info.magnolia.ui.field.FieldDefinition;
 import info.magnolia.ui.field.SelectFieldSupport;
+import jakarta.inject.Inject;
 
-import javax.inject.Inject;
 import java.util.Optional;
 
 /**
