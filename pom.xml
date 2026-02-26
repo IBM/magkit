@@ -28,7 +28,7 @@
 
         <version.magkit.test>1.2.0-SNAPSHOT</version.magkit.test>
         <jacocoVersion>0.8.14</jacocoVersion>
-        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
         <jsr305.version>3.0.2</jsr305.version>
     </properties>
 
