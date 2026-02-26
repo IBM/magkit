@@ -28,12 +28,12 @@ import info.magnolia.init.MagnoliaConfigurationProperties;
 import info.magnolia.module.site.ExtendedAggregationState;
 import info.magnolia.module.site.Site;
 import info.magnolia.module.site.SiteManager;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.jcr.RepositoryException;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
 import static de.ibmix.magkit.notfound.NotfoundModule.SITE_PARAM_FRAGMENT_LENGTH;
@@ -42,16 +42,16 @@ import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponent
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockAggregationState;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.mockWebContext;
+import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubAttribute;
 import static de.ibmix.magkit.test.cms.node.MagnoliaNodeMockUtils.mockPageNode;
 import static de.ibmix.magkit.test.cms.site.SiteManagerStubbingOperation.stubAssignedSite;
 import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSite;
 import static de.ibmix.magkit.test.cms.site.SiteMockUtils.mockSiteManager;
-import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static de.ibmix.magkit.test.cms.context.WebContextStubbingOperation.stubAttribute;
+import static jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the error endpoint.

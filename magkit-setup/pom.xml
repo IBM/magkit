@@ -3,7 +3,7 @@
     <parent>
         <artifactId>magkit</artifactId>
         <groupId>de.ibmix.magkit</groupId>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,8 +23,8 @@
             <artifactId>magnolia-virtual-uri</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>info.magnolia.workflow</groupId>
@@ -39,22 +39,18 @@
         <dependency>
             <groupId>de.ibmix.magkit</groupId>
             <artifactId>magkit-test-servlet</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.ibmix.magkit</groupId>
             <artifactId>magkit-test-jcr</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

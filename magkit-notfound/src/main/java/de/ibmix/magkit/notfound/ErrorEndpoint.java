@@ -25,20 +25,20 @@ import info.magnolia.context.MgnlContext;
 import info.magnolia.module.site.ExtendedAggregationState;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.service.node.definition.ConfiguredNodeEndpointDefinition;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Optional;
 
 import static info.magnolia.cms.util.RequestDispatchUtil.FORWARD_PREFIX;
 import static info.magnolia.cms.util.RequestDispatchUtil.dispatch;
-import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
+import static jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**

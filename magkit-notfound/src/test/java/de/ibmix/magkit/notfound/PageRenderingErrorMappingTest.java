@@ -20,20 +20,20 @@ package de.ibmix.magkit.notfound;
  * #L%
  */
 
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
 import static de.ibmix.magkit.test.cms.context.ComponentsMockUtils.mockComponentInstance;
 import static de.ibmix.magkit.test.cms.context.ContextMockUtils.cleanContext;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link PageRenderingErrorMapping} covering constructor component retrieval and response mapping logic.

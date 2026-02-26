@@ -1,10 +1,13 @@
 # Magkit
 
 [![build-module](https://github.com/IBM/magkit/actions/workflows/build.yaml/badge.svg)](https://github.com/IBM/magkit/actions/workflows/build.yaml)
+[![Magnolia compatibility](https://img.shields.io/badge/magnolia-6.4-brightgreen.svg)](https://www.magnolia-cms.com)
+[![Magnolia compatibility](https://img.shields.io/badge/magnolia-6.3-brightgreen.svg)](https://www.magnolia-cms.com)
+[![Magnolia compatibility](https://img.shields.io/badge/magnolia-6.2-brightgreen.svg)](https://www.magnolia-cms.com)
 
 ## Scope
 
-The purpose of this project is to provide commonly used helper classes for magnolia projects. It contains 5 modules:
+The purpose of this project is to provide commonly used helper classes for Magnolia projects. It contains five modules:
 
 * **magkit-core:** A maven module providing utility classes for working with jcr nodes and their properties and values, cache, links... 
 * **magkit-notfound:** A magnolia module that provides improved 404 handling
@@ -15,11 +18,12 @@ The purpose of this project is to provide commonly used helper classes for magno
 
 ### Versions, technology stack and Maven dependency
 
-|       | Java | Magnolia | magkit-test | 
-|-------|-------------|----------|-------------|
-| 1.0.0 | 11          | 6.2.19   | 1.0.8       | 
-| 1.0.1 | 11          | 6.2.45   | 1.0.10      | 
-| 1.1.0 | 17          | 6.3.17   | 1.1.0       | 
+| Version | Java | Magnolia | Magkit Test | 
+|---------|------|----------|-------------|
+| 1.0.0   | 11   | 6.2.19   | 1.0.8       | 
+| 1.0.1   | 11   | 6.2.45   | 1.0.10      | 
+| 1.1.0   | 17   | 6.3.17   | 1.1.0       | 
+| 1.2.0   | 17   | 6.4.2    | 1.2.0       | 
 
 To use the magkit-core module in your Maven project, add the following dependency to your `pom.xml`:
 
@@ -33,30 +37,30 @@ To use the magkit-core module in your Maven project, add the following dependenc
 
 ## Usage
 
-It contains some legacy code for Magnolia 5.x used in old projects but this is deprecated and will be deleted soon. 
+It contains some legacy code for Magnolia 5.x used in old projects, but this is deprecated and will be deleted soon. 
 
-For the purpose of the modules and usage examples please see their module readme.md files.
+For the modules and usage examples, please see their module readme.md files.
 
 ## Notes
 
-If you have any questions or issues you can create a new [issue here][issues].
+If you have any questions or issues, you can create a new [issue here][issues].
 
 Pull requests are very welcome! Make sure your patches are well tested.
-Ideally create a topic branch for every separate change you make. For
+Ideally create a topic branch for every change you make. For
 example:
 
 1. Fork the repo
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Create a new pull request
 
 ## License
 
 All source files must include a Copyright and License header. The SPDX license header is 
 preferred because it can be easily scanned.
 
-If you would like to see the detailed LICENSE click [here](LICENSE).
+If you would like to see the detailed LICENSE, click [here](LICENSE).
 
 ```text
 #

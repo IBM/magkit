@@ -24,11 +24,13 @@ import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import info.magnolia.cms.util.SelectorUtil;
 import info.magnolia.ui.datasource.jcr.JcrDatasource;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.inject.Inject;
+
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+
 import static de.ibmix.magkit.core.utils.LinkTool.isAnchor;
 import static de.ibmix.magkit.core.utils.LinkTool.isExternalLink;
 import static de.ibmix.magkit.core.utils.LinkTool.isPath;

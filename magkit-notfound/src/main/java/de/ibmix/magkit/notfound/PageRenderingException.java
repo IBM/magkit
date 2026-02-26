@@ -20,10 +20,9 @@ package de.ibmix.magkit.notfound;
  * #L%
  */
 
+import jakarta.ws.rs.ClientErrorException;
 import lombok.Getter;
 import lombok.NonNull;
-
-import javax.ws.rs.ClientErrorException;
 
 /**
  * Exception indicating a client-side (4xx) error occurred while rendering a page through the page REST service.

@@ -28,12 +28,12 @@ import info.magnolia.objectfactory.Components;
 import info.magnolia.rendering.template.TemplateDefinition;
 import info.magnolia.rendering.template.registry.TemplateDefinitionRegistry;
 import info.magnolia.rendering.template.type.DefaultTemplateTypes;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;

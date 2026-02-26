@@ -24,7 +24,7 @@ import com.vaadin.data.Result;
 import com.vaadin.data.ValueContext;
 import info.magnolia.ui.datasource.jcr.JcrDatasource;
 import info.magnolia.ui.editor.converter.JcrPathToIdentifierConverter;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static de.ibmix.magkit.core.utils.LinkTool.isAnchor;
 import static de.ibmix.magkit.core.utils.LinkTool.isExternalLink;

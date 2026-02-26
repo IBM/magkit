@@ -21,8 +21,7 @@ package de.ibmix.magkit.core.utils;
  */
 
 import info.magnolia.context.MgnlContext;
-
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import static info.magnolia.cms.cache.CacheConstants.HEADER_CACHE_CONTROL;
 import static info.magnolia.cms.cache.CacheConstants.HEADER_CACHE_CONTROL_VALUE_DISABLE_CACHE;

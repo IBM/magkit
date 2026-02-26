@@ -2,3 +2,5 @@
 target/
 /.checkstyle
 /.classpath
+/.idea
+pom.xml.versionsBackup

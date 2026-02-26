@@ -22,8 +22,8 @@ package de.ibmix.magkit.ui.apps.ui;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Link;
+import jakarta.annotation.Nullable;
 
-import javax.annotation.Nullable;
 import java.text.Collator;
 import java.util.Locale;
 
