@@ -25,7 +25,7 @@ The purpose of this project is to provide commonly used helper classes for Magno
 | 1.1.0   | 17   | 6.3.17   | 1.1.0       | 
 | 1.2.0   | 17   | 6.4.2    | 1.2.0       | 
 
-To use the magkit-core module in your Maven project, add the following dependency to your `pom.xml`:
+To use, for example, the magkit-core module in your Maven project, add the following dependency to your `pom.xml`:
 
 ```xml
     <dependency>
