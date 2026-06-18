@@ -30,6 +30,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -42,7 +43,6 @@ import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * Central service responsible for resolving and providing error page information based on HTTP status codes
@@ -101,7 +101,7 @@ public class ErrorService {
      * If no specific error page exists an empty string is provided for the page key.
      *
      * @param statusCode the HTTP status code (e.g. 404, 500)
-     * @param nodePath the original requested content node path used for site context resolution
+     * @param nodePath   the original requested content node path used for site context resolution
      * @return a mutable map with keys: {@code status} (Integer) and {@code page} (String)
      */
     public Map<String, Object> createEntity(int statusCode, String nodePath) {
@@ -116,8 +116,8 @@ public class ErrorService {
      * by domain and original URI. It composes the candidate path from the site root, optional relative error path
      * and mapped error code name. Existence of the node is validated; otherwise an empty string is returned.
      *
-     * @param statusCode the HTTP status code to resolve
-     * @param domain the request domain used for site resolution (may be {@code null})
+     * @param statusCode  the HTTP status code to resolve
+     * @param domain      the request domain used for site resolution (may be {@code null})
      * @param originalUri the original request URI or node path
      * @return the JCR path of the error page or an empty string if not found
      */
@@ -148,8 +148,8 @@ public class ErrorService {
      * It uses Magnolia's site manager and repository mapping to determine the site root and then computes
      * additional path fragments based on configured {@code SITE_PARAM_FRAGMENT_LENGTH}.
      *
-     * @param domain the domain used for site assignment (may be {@code null})
-     * @param originalUri the original request URI or node path
+     * @param domain           the domain used for site assignment (may be {@code null})
+     * @param originalUri      the original request URI or node path
      * @param defaultErrorPath fallback path if no mapping could be resolved
      * @return the resolved site path combined with optional fragment-based base path
      */
@@ -200,8 +200,8 @@ public class ErrorService {
      * Splits the node path into site-relative fragments constrained by the specified fragment length, ensuring
      * correct removal of the site root prefix. The resulting array length is at most {@code fragmentLength + 1}.
      *
-     * @param nodePath the full repository handle
-     * @param sitePath the resolved site path (may be empty or root)
+     * @param nodePath       the full repository handle
+     * @param sitePath       the resolved site path (may be empty or root)
      * @param fragmentLength the maximum number of fragment splits (controls granularity)
      * @return an array of site-relative path fragments; possibly empty
      */
@@ -210,6 +210,6 @@ public class ErrorService {
         if (isNotEmpty(sitePath) && nodePath.startsWith(sitePath)) {
             siteRoot = sitePath;
         }
-        return removeStart(nodePath, siteRoot).split("/", fragmentLength + 1);
+        return Strings.CS.removeStart(nodePath, siteRoot).split("/", fragmentLength + 1);
     }
 }

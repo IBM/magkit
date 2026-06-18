@@ -21,6 +21,7 @@ package de.ibmix.magkit.setup.urimapping;
  */
 
 import info.magnolia.virtualuri.VirtualUriMapping;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 
 /**
  * Maps versioned URIs (containing a build or release version segment) to target URIs by stripping the version part
@@ -147,7 +147,7 @@ public class VersionNumberVirtualUriMapping implements VirtualUriMapping {
      * @param fromPrefix the source prefix (may end with or without slash)
      */
     public void setFromPrefix(String fromPrefix) {
-        _fromPrefix = removeEnd(fromPrefix, "/") + "/";
+        _fromPrefix = Strings.CS.removeEnd(fromPrefix, "/") + "/";
     }
 
     /**

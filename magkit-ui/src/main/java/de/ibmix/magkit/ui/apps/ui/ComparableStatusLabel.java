@@ -58,9 +58,11 @@ import static info.magnolia.ui.workbench.column.StatusColumnFormatter.Activation
  * Thread-safety: This component is not thread-safe and must be confined to the UI thread like any Vaadin component.
  * </p>
  *
+ * @deprecated should not use anymore with Magnolia 6.2 apps
  * @author wolf.bubenik
  * @since 2018-01-25
  */
+@Deprecated
 public class ComparableStatusLabel extends Label implements Comparable<Label> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ComparableStatusLabel.class);

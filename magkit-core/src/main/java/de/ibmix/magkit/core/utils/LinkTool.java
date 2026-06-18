@@ -23,6 +23,7 @@ package de.ibmix.magkit.core.utils;
 import info.magnolia.context.MgnlContext;
 import info.magnolia.link.LinkUtil;
 import jakarta.annotation.Nullable;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,6 @@ import java.util.regex.Pattern;
 import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-import static org.apache.commons.lang3.StringUtils.startsWith;
-import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 /**
@@ -54,7 +52,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
  * Key features and important details:
  * <ul>
  *   <li>All methods are static; the class is {@code final} and therefore stateless and thread-safe.</li>
- *   <li>Null-safe checks for link categorisation to avoid {@link NullPointerException}.</li>
+ *   <li>Null-safe checks for link categorization to avoid {@link NullPointerException}.</li>
  *   <li>Encapsulates Magnolia specific link creation logic behind simple semantic methods.</li>
  *   <li>Graceful error handling when building URIs (errors are logged; no exception propagation).</li>
  * </ul>
@@ -106,7 +104,7 @@ public final class LinkTool {
      * @return true if the value starts with {@code http://} or {@code https://}
      */
     public static boolean isExternalLink(@Nullable final String linkValue) {
-        return startsWithIgnoreCase(linkValue, HTTPS_PREFIX) || startsWithIgnoreCase(linkValue, HTTP_PREFIX);
+        return Strings.CI.startsWith(linkValue, HTTPS_PREFIX) || Strings.CI.startsWith(linkValue, HTTP_PREFIX);
     }
 
     /**
@@ -116,7 +114,7 @@ public final class LinkTool {
      * @return true if the value starts with '/'
      */
     public static boolean isPath(@Nullable final String value) {
-        return startsWith(value, "/");
+        return Strings.CS.startsWith(value, "/");
     }
 
     /**
@@ -126,7 +124,7 @@ public final class LinkTool {
      * @return true if the value starts with '#'
      */
     public static boolean isAnchor(@Nullable final String value) {
-        return startsWith(value, "#");
+        return Strings.CS.startsWith(value, "#");
     }
 
     /**
@@ -176,7 +174,7 @@ public final class LinkTool {
     public enum LinkType {
         INTERNAL(LinkUtil::createAbsoluteLink),
         EXTERNAL(LinkUtil::createExternalLink),
-        REDIRECT(n -> removeStart(LinkUtil.createAbsoluteLink(n), MgnlContext.getContextPath()));
+        REDIRECT(n -> Strings.CS.removeStart(LinkUtil.createAbsoluteLink(n), MgnlContext.getContextPath()));
 
         private final Function<Node, String> _toLinkFunction;
 

@@ -72,10 +72,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param relPath relative path of child to create
      * @return never returns (always throws)
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public Node addNode(String relPath) throws RepositoryException {
+    public Node addNode(String relPath) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -85,10 +84,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * @param relPath relative path
      * @param primaryNodeTypeName primary type name
      * @return never returns
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public Node addNode(String relPath, String primaryNodeTypeName) throws RepositoryException {
+    public Node addNode(String relPath, String primaryNodeTypeName) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -97,10 +95,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param srcChildRelPath source child relative path
      * @param destChildRelPath destination child relative path
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void orderBefore(String srcChildRelPath, String destChildRelPath) throws RepositoryException {
+    public void orderBefore(String srcChildRelPath, String destChildRelPath) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -132,7 +129,7 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Unsupported: setting multi valued property.
+     * Unsupported: setting multivalued property.
      *
      * @param name property name
      * @param values property values
@@ -145,7 +142,7 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Unsupported: setting multi valued property.
+     * Unsupported: setting multivalued property.
      *
      * @param name property name
      * @param values property values
@@ -159,7 +156,7 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Unsupported: setting multi valued String property.
+     * Unsupported: setting multivalued String property.
      *
      * @param name property name
      * @param values string values
@@ -172,7 +169,7 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Unsupported: setting multi valued String property with type.
+     * Unsupported: setting multivalued String property with type.
      *
      * @param name property name
      * @param values string values
@@ -320,10 +317,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: setting primary type.
      *
      * @param nodeTypeName primary node type name
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void setPrimaryType(String nodeTypeName) throws RepositoryException {
+    public void setPrimaryType(String nodeTypeName) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -331,10 +327,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: adding mixin.
      *
      * @param mixinName mixin name
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void addMixin(String mixinName) throws RepositoryException {
+    public void addMixin(String mixinName) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -342,10 +337,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: removing mixin.
      *
      * @param mixinName mixin name
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void removeMixin(String mixinName) throws RepositoryException {
+    public void removeMixin(String mixinName) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -353,20 +347,17 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: version checkin.
      *
      * @return never returns
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public Version checkin() throws RepositoryException {
+    public Version checkin() {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
     /**
      * Unsupported: version checkout.
-     *
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void checkout() throws RepositoryException {
+    public void checkout() {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -374,10 +365,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: merge completion.
      *
      * @param version version
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void doneMerge(Version version) throws RepositoryException {
+    public void doneMerge(Version version) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -385,10 +375,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: merge cancel.
      *
      * @param version version
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void cancelMerge(Version version) throws RepositoryException {
+    public void cancelMerge(Version version) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -396,10 +385,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: workspace update.
      *
      * @param srcWorkspace source workspace name
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void update(String srcWorkspace) throws RepositoryException {
+    public void update(String srcWorkspace) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -409,10 +397,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * @param srcWorkspace source workspace
      * @param bestEffort flag
      * @return never returns
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public NodeIterator merge(String srcWorkspace, boolean bestEffort) throws RepositoryException {
+    public NodeIterator merge(String srcWorkspace, boolean bestEffort) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -421,10 +408,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param versionName version name
      * @param removeExisting flag remove existing
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void restore(String versionName, boolean removeExisting) throws RepositoryException {
+    public void restore(String versionName, boolean removeExisting) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -433,10 +419,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param version version instance
      * @param removeExisting flag
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void restore(Version version, boolean removeExisting) throws RepositoryException {
+    public void restore(Version version, boolean removeExisting) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -446,10 +431,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * @param version version instance
      * @param relPath relative path
      * @param removeExisting flag
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void restore(Version version, String relPath, boolean removeExisting) throws RepositoryException {
+    public void restore(Version version, String relPath, boolean removeExisting) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -458,10 +442,9 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param versionLabel label
      * @param removeExisting flag
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void restoreByLabel(String versionLabel, boolean removeExisting) throws RepositoryException {
+    public void restoreByLabel(String versionLabel, boolean removeExisting) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
@@ -479,20 +462,18 @@ public class ImmutableNodeWrapper extends NullableDelegateNodeWrapper {
      * Unsupported: refresh node state.
      *
      * @param keepChanges keep changes flag
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void refresh(boolean keepChanges) throws RepositoryException {
+    public void refresh(boolean keepChanges) {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 
     /**
      * Unsupported: remove node.
      *
-     * @throws RepositoryException declared by interface
      */
     @Override
-    public void remove() throws RepositoryException {
+    public void remove() {
         throw new UnsupportedOperationException(UNSUPPORTED_METHOD_MESSAGE);
     }
 }

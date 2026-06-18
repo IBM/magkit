@@ -30,7 +30,7 @@ import javax.jcr.RepositoryException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.Validate.notNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A {@link NullableDelegateNodeWrapper} that lets callers define an artificial parent for a wrapped {@link Node}.
@@ -60,17 +60,17 @@ import static org.apache.commons.lang3.Validate.notNull;
  */
 public class DefineParentNodeWrapper extends NullableDelegateNodeWrapper {
 
-    private Node _parent;
+    private final Node _parent;
 
     /**
      * Create a wrapper with a synthetic parent reference.
      *
      * @param parent the parent node to be reported by hierarchy related methods (must not be null)
-     * @param node the actual node being wrapped (may not be null, validated by super)
+     * @param node   the actual node being wrapped (may not be null, validated by super)
      */
     public DefineParentNodeWrapper(final Node parent, final Node node) {
         super(node);
-        notNull(parent);
+        requireNonNull(parent);
         _parent = parent;
     }
 
@@ -89,10 +89,9 @@ public class DefineParentNodeWrapper extends NullableDelegateNodeWrapper {
      * Returns the defined synthetic parent.
      *
      * @return defined parent node
-     * @throws RepositoryException if underlying parent access fails
      */
     @Override
-    public Node getParent() throws RepositoryException {
+    public Node getParent() {
         return _parent;
     }
 
@@ -113,7 +112,7 @@ public class DefineParentNodeWrapper extends NullableDelegateNodeWrapper {
      * @param relPath relative path to the child
      * @return wrapped child with this instance as synthetic parent
      * @throws PathNotFoundException if child cannot be found
-     * @throws RepositoryException on other repository access problems
+     * @throws RepositoryException   on other repository access problems
      */
     @Override
     public Node getNode(String relPath) throws PathNotFoundException, RepositoryException {

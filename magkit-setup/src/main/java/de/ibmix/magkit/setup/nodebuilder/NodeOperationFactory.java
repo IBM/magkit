@@ -29,6 +29,7 @@ import info.magnolia.jcr.util.NodeTypes;
 import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.jcr.util.PropertyUtil;
 import info.magnolia.voting.voters.URIPatternVoter;
+import org.apache.commons.lang3.Strings;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -36,7 +37,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.strip;
 
@@ -100,7 +100,7 @@ public abstract class NodeOperationFactory extends Ops {
      * primary type than specified, a {@link RepositoryException} is raised.
      *
      * @param relPath relative path ("segment/segment"), trimmed of leading/trailing slashes
-     * @param type optional expected node type; if null Magnolia's {@link NodeTypes.Content#NAME} is used for creation
+     * @param type    optional expected node type; if null Magnolia's {@link NodeTypes.Content#NAME} is used for creation
      * @return node operation producing the final node
      */
     public static NodeOperation addOrGetNode(final String relPath, final String type) {
@@ -110,7 +110,7 @@ public abstract class NodeOperationFactory extends Ops {
     /**
      * Orders a sibling so that the node named {@code nodeName} appears directly before {@code orderBeforeNodeName}.
      *
-     * @param nodeName name of node to move
+     * @param nodeName            name of node to move
      * @param orderBeforeNodeName name of sibling that will follow the moved node
      * @return ordering operation
      */
@@ -127,7 +127,7 @@ public abstract class NodeOperationFactory extends Ops {
     /**
      * Orders a sibling so that the node named {@code nodeName} appears directly after {@code orderAfterNodeName}.
      *
-     * @param nodeName name of node to move
+     * @param nodeName           name of node to move
      * @param orderAfterNodeName name of sibling that will precede the moved node
      * @return ordering operation
      */
@@ -144,7 +144,7 @@ public abstract class NodeOperationFactory extends Ops {
     /**
      * Sets or creates a property with the provided value regardless of any existing value.
      *
-     * @param name property name
+     * @param name     property name
      * @param newValue value to set (converted via Magnolia PropertyUtil)
      * @return operation performing mutation
      */
@@ -170,7 +170,7 @@ public abstract class NodeOperationFactory extends Ops {
             @Override
             protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
                 if (context.hasProperty(name) || context.hasNode(name)) {
-                    context.getSession().removeItem(removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR + name);
+                    context.getSession().removeItem(Strings.CS.removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR + name);
                 }
                 return context;
             }
@@ -187,7 +187,7 @@ public abstract class NodeOperationFactory extends Ops {
             @Override
             protected Node doExec(Node context, ErrorHandler errorHandler) throws RepositoryException {
                 Session session = context.getSession();
-                String parentPath = removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR;
+                String parentPath = Strings.CS.removeEnd(context.getPath(), PATH_SEPARATOR) + PATH_SEPARATOR;
                 NodeIterator nodes = context.getNodes();
                 while (nodes.hasNext()) {
                     Node nodeToRemove = nodes.nextNode();
@@ -202,7 +202,7 @@ public abstract class NodeOperationFactory extends Ops {
      * Adds a URI pattern voter configuration node with a pattern.
      *
      * @param voterName node name for voter configuration
-     * @param pattern matching pattern string
+     * @param pattern   matching pattern string
      * @return operation building voter node
      */
     public static NodeOperation addUriPatternVoter(final String voterName, final String pattern) {
@@ -212,9 +212,9 @@ public abstract class NodeOperationFactory extends Ops {
     /**
      * Adds a generic pattern voter configuration node.
      *
-     * @param voterName node name
+     * @param voterName  node name
      * @param voterClass fully qualified voter implementation class name
-     * @param pattern matching pattern string
+     * @param pattern    matching pattern string
      * @return operation building voter node
      */
     public static NodeOperation addPatternVoter(final String voterName, final String voterClass, final String pattern) {
