@@ -65,7 +65,6 @@
         <dependency>
             <groupId>de.ibmix.magkit</groupId>
             <artifactId>magkit-test-cms</artifactId>
-            <scope>test</scope>
         </dependency>
         <!-- Migrated tests use JUnit Jupiter API and Engine -->
         <dependency>
