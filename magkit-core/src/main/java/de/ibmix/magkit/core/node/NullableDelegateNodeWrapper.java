@@ -24,25 +24,29 @@ import info.magnolia.jcr.wrapper.DelegateNodeWrapper;
 import org.apache.jackrabbit.commons.iterator.NodeIteratorAdapter;
 import org.apache.jackrabbit.commons.iterator.PropertyIteratorAdapter;
 
-import javax.jcr.*;
+import javax.jcr.Binary;
+import javax.jcr.Item;
+import javax.jcr.ItemVisitor;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Value;
 import javax.jcr.lock.Lock;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.nodetype.NodeDefinition;
 import javax.jcr.nodetype.NodeType;
-import javax.jcr.version.ActivityViolationException;
 import javax.jcr.version.Version;
-import javax.jcr.version.VersionException;
 import javax.jcr.version.VersionHistory;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collections;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.Validate.notEmpty;
-import static org.apache.commons.lang3.Validate.notNull;
 
 /**
  * Abstract base for Node wrappers that MAY wrap a real JCR {@link Node} but can also operate without one (nullable).
@@ -80,7 +84,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
      * Construct a purely synthetic wrapper without a backing node. Name and primary node type are mandatory so that
      * hierarchy and type related JCR API calls can respond safely.
      *
-     * @param name synthetic node name (must not be empty)
+     * @param name            synthetic node name (must not be empty)
      * @param primaryNodeType technical name of the primary node type (must not be empty)
      */
     protected NullableDelegateNodeWrapper(String name, String primaryNodeType) {
@@ -98,9 +102,9 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
      */
     protected NullableDelegateNodeWrapper(Node node) {
         super(node);
-        notNull(node);
+        requireNonNull(node);
     }
-    
+
     /**
      * Indicates whether a real wrapped node exists. Useful for subclasses deciding delegation or fallback logic.
      *
@@ -109,7 +113,6 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     public boolean hasWrappedNode() {
         return getWrappedNode() != null;
     }
-
 
     @Override
     public String toString() {
@@ -120,75 +123,76 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     //
     //  Delegating method stubs
     //
-    /////////////
+
+    /// //////////
 
     @Override
-    public void addMixin(String mixinName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException {
+    public void addMixin(String mixinName) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().addMixin(mixinName);
         }
     }
 
     @Override
-    public Node addNode(String relPath) throws ItemExistsException, PathNotFoundException, VersionException, ConstraintViolationException, LockException, RepositoryException {
+    public Node addNode(String relPath) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().addNode(relPath) : null;
     }
 
     @Override
-    public Node addNode(String relPath, String primaryNodeTypeName) throws ItemExistsException, PathNotFoundException, NoSuchNodeTypeException, LockException, VersionException, ConstraintViolationException, RepositoryException {
+    public Node addNode(String relPath, String primaryNodeTypeName) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().addNode(relPath, primaryNodeTypeName) : null;
     }
 
     @Override
-    public boolean canAddMixin(String mixinName) throws NoSuchNodeTypeException, RepositoryException {
+    public boolean canAddMixin(String mixinName) throws RepositoryException {
         return hasWrappedNode() && getWrappedNode().canAddMixin(mixinName);
     }
 
     @Override
-    public void cancelMerge(Version version) throws VersionException, InvalidItemStateException, UnsupportedRepositoryOperationException, RepositoryException {
+    public void cancelMerge(Version version) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().cancelMerge(version);
         }
     }
 
     @Override
-    public Version checkin() throws VersionException, UnsupportedRepositoryOperationException, InvalidItemStateException, LockException, RepositoryException {
+    public Version checkin() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().checkin() : null;
     }
 
     @Override
-    public void checkout() throws UnsupportedRepositoryOperationException, LockException, ActivityViolationException, RepositoryException {
+    public void checkout() throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().checkout();
         }
     }
 
     @Override
-    public void doneMerge(Version version) throws VersionException, InvalidItemStateException, UnsupportedRepositoryOperationException, RepositoryException {
+    public void doneMerge(Version version) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().doneMerge(version);
         }
     }
 
     @Override
-    public void followLifecycleTransition(String transition) throws UnsupportedRepositoryOperationException, InvalidLifecycleTransitionException, RepositoryException {
+    public void followLifecycleTransition(String transition) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().followLifecycleTransition(transition);
-        }   
+        }
     }
 
     @Override
-    public String[] getAllowedLifecycleTransistions() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public String[] getAllowedLifecycleTransistions() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getAllowedLifecycleTransistions() : null;
     }
 
     @Override
-    public Version getBaseVersion() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public Version getBaseVersion() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getBaseVersion() : null;
     }
 
     @Override
-    public String getCorrespondingNodePath(String workspaceName) throws ItemNotFoundException, NoSuchWorkspaceException, AccessDeniedException, RepositoryException {
+    public String getCorrespondingNodePath(String workspaceName) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getCorrespondingNodePath(workspaceName) : null;
     }
 
@@ -208,7 +212,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Lock getLock() throws UnsupportedRepositoryOperationException, LockException, AccessDeniedException, RepositoryException {
+    public Lock getLock() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getLock() : null;
     }
 
@@ -218,7 +222,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Node getNode(String relPath) throws PathNotFoundException, RepositoryException {
+    public Node getNode(String relPath) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getNode(relPath) : null;
     }
 
@@ -238,7 +242,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Item getPrimaryItem() throws ItemNotFoundException, RepositoryException {
+    public Item getPrimaryItem() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getPrimaryItem() : null;
     }
 
@@ -263,7 +267,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Property getProperty(String relPath) throws PathNotFoundException, RepositoryException {
+    public Property getProperty(String relPath) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getProperty(relPath) : null;
     }
 
@@ -283,12 +287,12 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public String getUUID() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public String getUUID() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getUUID() : EMPTY;
     }
 
     @Override
-    public VersionHistory getVersionHistory() throws UnsupportedRepositoryOperationException, RepositoryException {
+    public VersionHistory getVersionHistory() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getVersionHistory() : null;
     }
 
@@ -343,167 +347,167 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Lock lock(boolean isDeep, boolean isSessionScoped) throws UnsupportedRepositoryOperationException, LockException, AccessDeniedException, InvalidItemStateException, RepositoryException {
+    public Lock lock(boolean isDeep, boolean isSessionScoped) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().lock(isDeep, isSessionScoped) : null;
     }
 
     @Override
-    public NodeIterator merge(String srcWorkspace, boolean bestEffort) throws NoSuchWorkspaceException, AccessDeniedException, MergeException, LockException, InvalidItemStateException, RepositoryException {
+    public NodeIterator merge(String srcWorkspace, boolean bestEffort) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().merge(srcWorkspace, bestEffort) : new NodeIteratorAdapter(Collections.emptyList());
     }
 
     @Override
-    public void orderBefore(String srcChildRelPath, String destChildRelPath) throws UnsupportedRepositoryOperationException, VersionException, ConstraintViolationException, ItemNotFoundException, LockException, RepositoryException {
+    public void orderBefore(String srcChildRelPath, String destChildRelPath) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().orderBefore(srcChildRelPath, destChildRelPath);
         }
     }
 
     @Override
-    public void removeMixin(String mixinName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException {
+    public void removeMixin(String mixinName) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().removeMixin(mixinName);
         }
     }
 
     @Override
-    public void removeShare() throws VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public void removeShare() throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().removeShare();
         }
     }
 
     @Override
-    public void removeSharedSet() throws VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public void removeSharedSet() throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().removeSharedSet();
         }
     }
 
     @Override
-    public void restore(String versionName, boolean removeExisting) throws VersionException, ItemExistsException, UnsupportedRepositoryOperationException, LockException, InvalidItemStateException, RepositoryException {
+    public void restore(String versionName, boolean removeExisting) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().restore(versionName, removeExisting);
         }
     }
 
     @Override
-    public void restore(Version version, boolean removeExisting) throws VersionException, ItemExistsException, InvalidItemStateException, UnsupportedRepositoryOperationException, LockException, RepositoryException {
+    public void restore(Version version, boolean removeExisting) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().restore(version, removeExisting);
         }
     }
 
     @Override
-    public void restore(Version version, String relPath, boolean removeExisting) throws PathNotFoundException, ItemExistsException, VersionException, ConstraintViolationException, UnsupportedRepositoryOperationException, LockException, InvalidItemStateException, RepositoryException {
+    public void restore(Version version, String relPath, boolean removeExisting) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().restore(version, relPath, removeExisting);
         }
     }
 
     @Override
-    public void restoreByLabel(String versionLabel, boolean removeExisting) throws VersionException, ItemExistsException, UnsupportedRepositoryOperationException, LockException, InvalidItemStateException, RepositoryException {
+    public void restoreByLabel(String versionLabel, boolean removeExisting) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().restoreByLabel(versionLabel, removeExisting);
         }
     }
 
     @Override
-    public void setPrimaryType(String nodeTypeName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException {
+    public void setPrimaryType(String nodeTypeName) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().setPrimaryType(nodeTypeName);
         }
     }
 
     @Override
-    public Property setProperty(String name, Value value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Value value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, Value[] values) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Value[] values) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, values) : null;
     }
 
     @Override
-    public Property setProperty(String name, String[] values) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, String[] values) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, values) : null;
     }
 
     @Override
-    public Property setProperty(String name, String value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, String value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, InputStream value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, InputStream value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, Binary value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Binary value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, boolean value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, boolean value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, double value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, double value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, BigDecimal value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, BigDecimal value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, long value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, long value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, Calendar value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Calendar value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, Node value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Node value) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value) : null;
     }
 
     @Override
-    public Property setProperty(String name, Value value, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Value value, int type) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value, type) : null;
     }
 
     @Override
-    public Property setProperty(String name, Value[] values, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, Value[] values, int type) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, values, type) : null;
     }
 
     @Override
-    public Property setProperty(String name, String[] values, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, String[] values, int type) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, values, type) : null;
     }
 
     @Override
-    public Property setProperty(String name, String value, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException {
+    public Property setProperty(String name, String value, int type) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().setProperty(name, value, type) : null;
     }
 
     @Override
-    public void unlock() throws UnsupportedRepositoryOperationException, LockException, AccessDeniedException, InvalidItemStateException, RepositoryException {
+    public void unlock() throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().unlock();
         }
     }
 
     @Override
-    public void update(String srcWorkspace) throws NoSuchWorkspaceException, AccessDeniedException, LockException, InvalidItemStateException, RepositoryException {
+    public void update(String srcWorkspace) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().update(srcWorkspace);
         }
@@ -517,7 +521,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Item getAncestor(int depth) throws ItemNotFoundException, AccessDeniedException, RepositoryException {
+    public Item getAncestor(int depth) throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getAncestor(depth) : null;
     }
 
@@ -532,7 +536,7 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public Node getParent() throws ItemNotFoundException, AccessDeniedException, RepositoryException {
+    public Node getParent() throws RepositoryException {
         return hasWrappedNode() ? getWrappedNode().getParent() : null;
     }
 
@@ -575,21 +579,21 @@ public abstract class NullableDelegateNodeWrapper extends DelegateNodeWrapper {
     }
 
     @Override
-    public void refresh(boolean keepChanges) throws InvalidItemStateException, RepositoryException {
+    public void refresh(boolean keepChanges) throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().refresh(keepChanges);
         }
     }
 
     @Override
-    public void remove() throws VersionException, LockException, ConstraintViolationException, AccessDeniedException, RepositoryException {
+    public void remove() throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().remove();
         }
     }
 
     @Override
-    public void save() throws AccessDeniedException, ItemExistsException, ConstraintViolationException, InvalidItemStateException, ReferentialIntegrityException, VersionException, LockException, NoSuchNodeTypeException, RepositoryException {
+    public void save() throws RepositoryException {
         if (hasWrappedNode()) {
             getWrappedNode().save();
         }

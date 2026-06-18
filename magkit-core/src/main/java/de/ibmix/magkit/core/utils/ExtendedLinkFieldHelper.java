@@ -21,20 +21,16 @@ package de.ibmix.magkit.core.utils;
  */
 
 import jakarta.inject.Singleton;
+import org.apache.commons.lang3.Strings;
 
 import javax.jcr.Node;
 import java.net.URI;
 
 import static info.magnolia.cms.util.SelectorUtil.SELECTOR_DELIMITER;
 import static info.magnolia.jcr.util.PropertyUtil.getString;
-import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.lastIndexOf;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.substring;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
@@ -92,7 +88,7 @@ public class ExtendedLinkFieldHelper {
         String result = null;
         if (uri != null) {
             result = substringBefore(uri.getPath(), SELECTOR_DELIMITER) + substringAfterLast(uri.getPath(), SELECTOR_DELIMITER);
-            final String identifier = removeStart(result, "/");
+            final String identifier = Strings.CS.removeStart(result, "/");
             if (LinkTool.isUuid(identifier)) {
                 result = identifier;
             }
@@ -126,7 +122,7 @@ public class ExtendedLinkFieldHelper {
                 selectors.append(substringBefore(nodePath, SELECTOR_DELIMITER)).append(SELECTOR_DELIMITER);
             }
         }
-        return selectors.length() == 0 ? null : removeEnd(selectors.toString(), SELECTOR_DELIMITER);
+        return selectors.length() == 0 ? null : Strings.CS.removeEnd(selectors.toString(), SELECTOR_DELIMITER);
     }
 
     /**
@@ -156,16 +152,16 @@ public class ExtendedLinkFieldHelper {
      * Selector chain is inserted before the last file extension dot if present, or appended at end otherwise.
      * Null or blank components are ignored.
      *
-     * @param base base path or UUID (may be {@code null})
+     * @param base     base path or UUID (may be {@code null})
      * @param selector selector chain (dot separated) or {@code null}
-     * @param query query string without leading '?' or {@code null}
-     * @param anchor anchor fragment without leading '#' or {@code null}
+     * @param query    query string without leading '?' or {@code null}
+     * @param anchor   anchor fragment without leading '#' or {@code null}
      * @return composed extended link string (never {@code null})
      */
     public String mergeComponents(final String base, final String selector, final String query, final String anchor) {
         StringBuilder result = new StringBuilder(defaultString(base));
         if (isNotBlank(selector)) {
-            int extIndex = lastIndexOf(result, TAG_FILE_EXTENSION);
+            int extIndex = Strings.CS.lastIndexOf(result, TAG_FILE_EXTENSION);
             if (extIndex == -1) {
                 extIndex = result.length();
             }
@@ -183,10 +179,10 @@ public class ExtendedLinkFieldHelper {
     /**
      * Creates an extended link for a JCR node reference, augmenting a base link with optional anchor, query and selectors stored in suffixed properties.
      *
-     * @param source node containing the link reference and optional suffixed properties
+     * @param source           node containing the link reference and optional suffixed properties
      * @param linkPropertyName base property name holding the reference target
-     * @param workspace target workspace name for internal link resolution
-     * @param linkType type of link to create (internal/external/redirect)
+     * @param workspace        target workspace name for internal link resolution
+     * @param linkType         type of link to create (internal/external/redirect)
      * @return composed URL or {@code null} if base link cannot be resolved or is empty
      */
     public String createExtendedLink(Node source, String linkPropertyName, String workspace, LinkTool.LinkType linkType) {
@@ -230,6 +226,6 @@ public class ExtendedLinkFieldHelper {
      * @return {@code true} if another selector segment can be parsed; otherwise {@code false}
      */
     protected boolean containsMoreSelectors(final String uri) {
-        return !startsWith(uri, TAG_FILE_EXTENSION) && contains(uri, SELECTOR_DELIMITER);
+        return !Strings.CS.startsWith(uri, TAG_FILE_EXTENSION) && Strings.CS.contains(uri, SELECTOR_DELIMITER);
     }
 }

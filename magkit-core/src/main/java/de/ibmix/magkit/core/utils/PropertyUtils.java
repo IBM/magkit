@@ -118,8 +118,8 @@ public final class PropertyUtils {
      * Safely retrieves a property by relative path without pre-checking its existence.
      * Exceptions are swallowed and logged to avoid double repository access.
      *
-     * @param node    node to read from (may be {@code null})
-     * @param relPath relative path to the property (may be {@code null} or empty)
+     * @param node    node to read from (maybe {@code null})
+     * @param relPath relative path to the property (maybe {@code null} or empty)
      * @return the property or {@code null} if unavailable
      */
     public static Property getProperty(@Nullable final Node node, @Nullable final String relPath) {
@@ -137,7 +137,7 @@ public final class PropertyUtils {
     /**
      * Retrieves all properties of the given node.
      *
-     * @param node source node (may be {@code null})
+     * @param node source node (maybe {@code null})
      * @return iterator over properties or {@code null} if node is {@code null} or access failed
      */
     public static PropertyIterator getProperties(@Nullable final Node node) {
@@ -155,7 +155,7 @@ public final class PropertyUtils {
     /**
      * Retrieves properties matching a name pattern (JCR glob-style) from the node.
      *
-     * @param node        source node (may be {@code null})
+     * @param node        source node (maybe {@code null})
      * @param namePattern glob-like pattern (non-null)
      * @return iterator over matching properties or {@code null} if node is {@code null} or access failed
      */
@@ -174,7 +174,7 @@ public final class PropertyUtils {
     /**
      * Retrieves properties matching one of several glob name patterns.
      *
-     * @param node      source node (may be {@code null})
+     * @param node      source node (maybe {@code null})
      * @param nameGlobs array of glob patterns (non-null)
      * @return iterator over matching properties or {@code null} if node is {@code null} or access failed
      */
@@ -194,13 +194,13 @@ public final class PropertyUtils {
      * Returns all values of a property as a list. For single-valued properties a singleton list is returned.
      * Preserves Magnolia HTML escaping when the property is a {@link HTMLEscapingPropertyWrapper}.
      *
-     * @param input property (may be {@code null})
+     * @param input property (maybe {@code null})
      * @return list of values, never {@code null}
      */
     public static List<Value> getValues(@Nullable final Property input) {
         Value[] values = getUnwrappedValues(input);
         if (input instanceof HTMLEscapingPropertyWrapper) {
-            // We are bypassing the magnolia html encoding of nodes if we work on values instead of the node properties.
+            // We are bypassing the magnolia HTML encoding of nodes if we work on values instead of the node properties.
             // Here we provide an HTML escaping Value wrapper to overcome this limitation.
             HTMLEscapingContentDecorator decorator = ((HTMLEscapingPropertyWrapper) input).getContentDecorator();
             for (int i = 0; i < values.length; i++) {
@@ -223,16 +223,16 @@ public final class PropertyUtils {
     }
 
     /**
-     * Retrieves the first value of a property (for multi-valued properties) or the single value.
+     * Retrieves the first value of a property (for multivalued properties) or the single value.
      * Preserves Magnolia HTML escaping when applicable.
      *
-     * @param input property (may be {@code null})
+     * @param input property (maybe {@code null})
      * @return first value or {@code null} if unavailable
      */
     public static Value getValue(@Nullable final Property input) {
         Value result = getUnwrappedValue(input);
         if (input instanceof HTMLEscapingPropertyWrapper) {
-            // We are bypassing the magnolia html encoding of nodes if we work on values instead of the node properties.
+            // We are bypassing the magnolia HTML encoding of nodes if we work on values instead of the node properties.
             // Here we provide an HTML escaping Value wrapper to overcome this limitation.
             HTMLEscapingContentDecorator decorator = ((HTMLEscapingPropertyWrapper) input).getContentDecorator();
             result = new HtmlEscapingValueDecorator(result, decorator);
@@ -253,9 +253,9 @@ public final class PropertyUtils {
     }
 
     /**
-     * Retrieves string values of a potentially multi-valued property via node path.
+     * Retrieves string values of a potentially multivalued property via node path.
      *
-     * @param node    node containing the property (may be {@code null})
+     * @param node    node containing the property (maybe {@code null})
      * @param relPath relative property path
      * @return list of string representations; empty if unavailable
      */
@@ -267,7 +267,7 @@ public final class PropertyUtils {
     /**
      * Retrieves the string representation of a property's first value.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return string value or {@code null}
      */
     public static String getStringValue(final Property property) {
@@ -277,7 +277,7 @@ public final class PropertyUtils {
     /**
      * Retrieves the string representation of a property's first value with fallback.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @param fallback value returned when inaccessible
      * @return string value or fallback
      */
@@ -288,7 +288,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a string value of a property by path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return string value or {@code null}
      */
@@ -299,7 +299,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a string value of a property by path with fallback.
      *
-     * @param node     node (may be {@code null})
+     * @param node     node (maybe {@code null})
      * @param relPath  relative path
      * @param fallback fallback value
      * @return string value or fallback
@@ -311,7 +311,7 @@ public final class PropertyUtils {
     /**
      * Returns all string values of a property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return list of string values; empty if none
      */
     public static List<String> getStringValues(final Property property) {
@@ -325,7 +325,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a calendar value from the property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return calendar or {@code null}
      */
     public static Calendar getCalendarValue(final Property property) {
@@ -335,7 +335,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a calendar value with fallback.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @param fallback fallback calendar value
      * @return calendar or fallback
      */
@@ -346,7 +346,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a calendar value by node and path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return calendar or {@code null}
      */
@@ -357,7 +357,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a calendar value by node and path with fallback.
      *
-     * @param node     node (may be {@code null})
+     * @param node     node (maybe {@code null})
      * @param relPath  relative path
      * @param fallback fallback value
      * @return calendar or fallback
@@ -369,7 +369,7 @@ public final class PropertyUtils {
     /**
      * Returns all calendar values of a property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return list of calendar values; empty if none
      */
     public static List<Calendar> getCalendarValues(final Property property) {
@@ -383,7 +383,7 @@ public final class PropertyUtils {
     /**
      * Returns all calendar values of a property by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return list of calendar values; empty if none
      */
@@ -394,7 +394,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a long value from the property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return long value or {@code null}
      */
     public static Long getLongValue(final Property property) {
@@ -404,7 +404,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a long value with fallback.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @param fallback fallback value
      * @return long value or fallback
      */
@@ -415,7 +415,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a long value by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return long value or {@code null}
      */
@@ -426,7 +426,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a long value by node path with fallback.
      *
-     * @param node     node (may be {@code null})
+     * @param node     node (maybe {@code null})
      * @param relPath  relative path
      * @param fallback fallback value
      * @return long value or fallback
@@ -438,7 +438,7 @@ public final class PropertyUtils {
     /**
      * Returns all long values of a property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return list of long values; empty if none
      */
     public static List<Long> getLongValues(final Property property) {
@@ -452,7 +452,7 @@ public final class PropertyUtils {
     /**
      * Returns all long values of a property by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return list of long values; empty if none
      */
@@ -463,7 +463,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a double value from the property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return double value or {@code null}
      */
     public static Double getDoubleValue(final Property property) {
@@ -473,7 +473,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a double value with fallback.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @param fallback fallback value
      * @return double value or fallback
      */
@@ -484,7 +484,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a double value by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return double value or {@code null}
      */
@@ -495,7 +495,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a double value by node path with fallback.
      *
-     * @param node     node (may be {@code null})
+     * @param node     node (maybe {@code null})
      * @param relPath  relative path
      * @param fallback fallback value
      * @return double value or fallback
@@ -507,7 +507,7 @@ public final class PropertyUtils {
     /**
      * Returns all double values of a property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return list of double values; empty if none
      */
     public static List<Double> getDoubleValues(final Property property) {
@@ -521,7 +521,7 @@ public final class PropertyUtils {
     /**
      * Returns all double values of a property by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return list of double values; empty if none
      */
@@ -532,7 +532,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a boolean value from the property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return boolean value or {@code null}
      */
     public static Boolean getBooleanValue(final Property property) {
@@ -542,7 +542,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a boolean value with fallback.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @param fallback fallback value
      * @return boolean value or fallback
      */
@@ -553,7 +553,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a boolean value by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return boolean value or {@code null}
      */
@@ -564,7 +564,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a boolean value by node path with fallback.
      *
-     * @param node     node (may be {@code null})
+     * @param node     node (maybe {@code null})
      * @param relPath  relative path
      * @param fallback fallback value
      * @return boolean value or fallback
@@ -576,7 +576,7 @@ public final class PropertyUtils {
     /**
      * Returns all boolean values of a property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return list of boolean values; empty if none
      */
     public static List<Boolean> getBooleanValues(final Property property) {
@@ -590,7 +590,7 @@ public final class PropertyUtils {
     /**
      * Returns all boolean values of a property by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return list of boolean values; empty if none
      */
@@ -601,7 +601,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a binary value from the property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return binary value or {@code null}
      */
     public static Binary getBinaryValue(final Property property) {
@@ -611,7 +611,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a binary value with fallback.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @param fallback fallback value
      * @return binary value or fallback
      */
@@ -622,7 +622,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a binary value by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return binary value or {@code null}
      */
@@ -633,7 +633,7 @@ public final class PropertyUtils {
     /**
      * Retrieves a binary value by node path with fallback.
      *
-     * @param node     node (may be {@code null})
+     * @param node     node (maybe {@code null})
      * @param relPath  relative path
      * @param fallback fallback value
      * @return binary value or fallback
@@ -645,7 +645,7 @@ public final class PropertyUtils {
     /**
      * Returns all binary values of a property.
      *
-     * @param property property (may be {@code null})
+     * @param property property (maybe {@code null})
      * @return list of binary values; empty if none
      */
     public static List<Binary> getBinaryValues(final Property property) {
@@ -659,7 +659,7 @@ public final class PropertyUtils {
     /**
      * Returns all binary values of a property by node path.
      *
-     * @param node    node (may be {@code null})
+     * @param node    node (maybe {@code null})
      * @param relPath relative path
      * @return list of binary values; empty if none
      */
@@ -671,7 +671,7 @@ public final class PropertyUtils {
      * Retrieves the properties created by Magnolia MultiSelect under the given node.
      * Filtered by numeric property names ("\\d+").
      *
-     * @param multiSelectNode node containing multi-select properties (may be {@code null})
+     * @param multiSelectNode node containing multi-select properties (maybe {@code null})
      * @return collection of properties; empty if none
      */
     public static Collection<Property> retrieveMultiSelectProperties(Node multiSelectNode) {
@@ -691,7 +691,7 @@ public final class PropertyUtils {
     /**
      * Retrieves Magnolia MultiSelect properties by parent node and child node name.
      *
-     * @param baseNode parent node (may be {@code null})
+     * @param baseNode parent node (maybe {@code null})
      * @param nodeName multi select child node name
      * @return collection of properties; empty if none
      */
@@ -711,9 +711,9 @@ public final class PropertyUtils {
     /**
      * Retrieves string values from Magnolia MultiSelect node.
      * Missing or empty properties produce empty strings.
-     * <p>Public API method may be unused internally but provided for external consumers.</p>
+     * <p>Public API method maybe unused internally but provided for external consumers.</p>
      *
-     * @param multiSelectNode node holding multi-select properties (may be {@code null})
+     * @param multiSelectNode node holding multi-select properties (maybe {@code null})
      * @return collection of string values; never {@code null}
      */
     @SuppressWarnings("unused")
@@ -725,9 +725,9 @@ public final class PropertyUtils {
 
     /**
      * Retrieves string values from Magnolia MultiSelect by parent node and child name.
-     * <p>Public API method may be unused internally but provided for external consumers.</p>
+     * <p>Public API method maybe unused internally but provided for external consumers.</p>
      *
-     * @param baseNode parent node (may be {@code null})
+     * @param baseNode parent node (maybe {@code null})
      * @param nodeName multi select child name
      * @return collection of string values; never {@code null}
      */
@@ -741,7 +741,7 @@ public final class PropertyUtils {
     /**
      * Retrieves ordered string values (ascending numeric-like property names) from a Magnolia MultiSelect node.
      *
-     * @param multiSelectNode node holding multi-select properties (may be {@code null})
+     * @param multiSelectNode node holding multi-select properties (maybe {@code null})
      * @return ordered collection of string values; never {@code null}
      */
     public static Collection<String> retrieveOrderedMultiSelectValues(Node multiSelectNode) {
@@ -755,7 +755,7 @@ public final class PropertyUtils {
     /**
      * Retrieves ordered string values from Magnolia MultiSelect by parent node and child name.
      *
-     * @param baseNode parent node (may be {@code null})
+     * @param baseNode parent node (maybe {@code null})
      * @param nodeName multi select child name
      * @return ordered collection of string values; never {@code null}
      */
@@ -769,7 +769,7 @@ public final class PropertyUtils {
     /**
      * Checks for existence of a property handling Magnolia delegate wrappers that may mask null.
      *
-     * @param p property (may be {@code null})
+     * @param p property (maybe {@code null})
      * @return {@code true} if property appears to exist
      */
     public static boolean exists(Property p) {

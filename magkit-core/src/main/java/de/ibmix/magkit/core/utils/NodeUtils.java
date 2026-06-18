@@ -30,7 +30,7 @@ import info.magnolia.rendering.template.registry.TemplateDefinitionRegistry;
 import info.magnolia.rendering.template.type.DefaultTemplateTypes;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,6 @@ import static info.magnolia.repository.RepositoryConstants.WEBSITE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-import static org.apache.commons.lang3.StringUtils.startsWith;
 
 /**
  * Utility class providing null-safe helper methods for working with Magnolia JCR {@link Node} instances.
@@ -102,13 +100,13 @@ public final class NodeUtils {
     public static final Predicate<Node> IS_CONTENT_NODE = n -> isNodeType(n, NodeTypes.ContentNode.NAME);
     public static final Predicate<Node> IS_ASSET = n -> isNodeType(n, "mgnl:asset");
 
-    public static final Predicate<Node> HAS_HOME_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.HOME, getTemplateType(node));
-    public static final Predicate<Node> HAS_SECTION_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.SECTION, getTemplateType(node));
-    public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.FEATURE, getTemplateType(node));
-    public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.CONTENT, getTemplateType(node));
-    public static final Predicate<Node> HAS_FUNCTIONAL_TEMPLATE = node -> StringUtils.equals(DefaultTemplateTypes.FUNCTIONAL, getTemplateType(node));
+    public static final Predicate<Node> HAS_HOME_TEMPLATE = node -> Strings.CS.equals(DefaultTemplateTypes.HOME, getTemplateType(node));
+    public static final Predicate<Node> HAS_SECTION_TEMPLATE = node -> Strings.CS.equals(DefaultTemplateTypes.SECTION, getTemplateType(node));
+    public static final Predicate<Node> HAS_FEATURE_TEMPLATE = node -> Strings.CS.equals(DefaultTemplateTypes.FEATURE, getTemplateType(node));
+    public static final Predicate<Node> HAS_CONTENT_TEMPLATE = node -> Strings.CS.equals(DefaultTemplateTypes.CONTENT, getTemplateType(node));
+    public static final Predicate<Node> HAS_FUNCTIONAL_TEMPLATE = node -> Strings.CS.equals(DefaultTemplateTypes.FUNCTIONAL, getTemplateType(node));
 
-    public static final Predicate<Node> IS_MAGKIT_FOLDER = node -> StringUtils.equals("magkit:pages/folder", getTemplate(node));
+    public static final Predicate<Node> IS_MAGKIT_FOLDER = node -> Strings.CS.equals("magkit:pages/folder", getTemplate(node));
 
     /**
      * Determines the path to given workspace and node identifier.
@@ -163,11 +161,11 @@ public final class NodeUtils {
      */
     public static Node getNodeByReference(final String workspace, final String reference) {
         // asset node reference values have identifier prefixed with "jcr:"
-        String ref = removeStart(reference, "jcr:");
+        String ref = Strings.CS.removeStart(reference, "jcr:");
         Node result = null;
         if (LinkTool.isUuid(ref)) {
             result = getNodeByIdentifier(workspace, ref);
-        } else if (startsWith(reference, "/")) {
+        } else if (Strings.CS.startsWith(reference, "/")) {
             result = SessionUtil.getNode(workspace, reference);
         }
         return result;
@@ -364,7 +362,7 @@ public final class NodeUtils {
      * @return the first ancestor node with the provided template id or NULL if the input node is NULL or no such ancestor exists.
      */
     public static Node getAncestorOrSelfWithTemplate(@Nullable final Node content, @Nullable final String templateId) {
-        return getAncestorOrSelf(content, node -> StringUtils.equals(getTemplate(node), templateId));
+        return getAncestorOrSelf(content, node -> Strings.CS.equals(getTemplate(node), templateId));
     }
 
     /**

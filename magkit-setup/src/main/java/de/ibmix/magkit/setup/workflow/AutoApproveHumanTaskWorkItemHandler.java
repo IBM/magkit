@@ -69,8 +69,8 @@ import java.util.Map;
 public class AutoApproveHumanTaskWorkItemHandler extends HumanTaskWorkItemHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoApproveHumanTaskWorkItemHandler.class);
 
-    private TasksManager _tasksManager;
-    private KieSession _kieSession;
+    private final TasksManager _tasksManager;
+    private final KieSession _kieSession;
 
     /**
      * Constructs a handler that auto-approves all human tasks created from incoming work items.

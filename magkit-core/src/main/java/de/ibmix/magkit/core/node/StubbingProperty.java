@@ -57,7 +57,7 @@ import java.util.function.Function;
  * <p>Key features:</p>
  * <ul>
  *   <li>Supports stubbing of multiple JCR value types (String, Boolean, Long, Double, Date, Binary, Reference, Decimal).</li>
- *   <li>Automatically exposes multi-valued property semantics when more than one value is provided.</li>
+ *   <li>Automatically exposes multivalued property semantics when more than one value is provided.</li>
  *   <li>Maintains parent hierarchy metadata (path, depth, ancestor traversal).</li>
  *   <li>Strictly read-only: all mutating operations throw {@link UnsupportedOperationException}.</li>
  *   <li>Convenience constructors for each supported type.</li>
@@ -92,11 +92,11 @@ public class StubbingProperty implements Property {
     private final Node _parent;
 
     /**
-     * Create a reference property stubbing node references (single or multi valued).
+     * Create a reference property stubbing node references (single or multivalued).
      *
      * @param parent parent node (must not be null)
      * @param name property name
-     * @param values referenced nodes (may be empty)
+     * @param values referenced nodes (maybe empty)
      */
     public StubbingProperty(Node parent, String name, Node... values) {
         this(parent, name);
@@ -116,7 +116,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a boolean property (single or multi valued).
+     * Create a boolean property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -128,7 +128,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a long property (single or multi valued).
+     * Create a long property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -140,7 +140,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a double property (single or multi valued).
+     * Create a double property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -152,7 +152,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a date property (single or multi valued).
+     * Create a date property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -164,7 +164,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a string property (single or multi valued).
+     * Create a string property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -176,7 +176,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a binary property (single or multi valued).
+     * Create a binary property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -188,7 +188,7 @@ public class StubbingProperty implements Property {
     }
 
     /**
-     * Create a decimal property (single or multi valued).
+     * Create a decimal property (single or multivalued).
      *
      * @param parent parent node
      * @param name property name
@@ -203,7 +203,7 @@ public class StubbingProperty implements Property {
      * Internal base constructor storing parent and property name. All public constructors delegate here.
      * Avoids duplication of assignment logic.
      *
-     * @param parent parent node (may be null for some synthetic scenarios but usually non-null)
+     * @param parent parent node (maybe null for some synthetic scenarios but usually non-null)
      * @param name property name
      */
     private StubbingProperty(Node parent, String name) {
@@ -225,10 +225,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value new value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(Value value) throws RepositoryException {
+    public void setValue(Value value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -236,10 +235,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param values new values
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(Value[] values) throws RepositoryException {
+    public void setValue(Value[] values) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -247,10 +245,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value new string value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(String value) throws RepositoryException {
+    public void setValue(String value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -258,10 +255,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param values new string values
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(String[] values) throws RepositoryException {
+    public void setValue(String[] values) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -269,10 +265,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value input stream value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(InputStream value) throws RepositoryException {
+    public void setValue(InputStream value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -280,10 +275,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value binary value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(Binary value) throws RepositoryException {
+    public void setValue(Binary value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -291,10 +285,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value long value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(long value) throws RepositoryException {
+    public void setValue(long value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -302,10 +295,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value double value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(double value) throws RepositoryException {
+    public void setValue(double value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -313,10 +305,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value decimal value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(BigDecimal value) throws RepositoryException {
+    public void setValue(BigDecimal value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -324,10 +315,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value calendar value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(Calendar value) throws RepositoryException {
+    public void setValue(Calendar value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -335,10 +325,9 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only.
      *
      * @param value boolean value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(boolean value) throws RepositoryException {
+    public void setValue(boolean value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -357,21 +346,19 @@ public class StubbingProperty implements Property {
      * Unsupported write: property is read-only (node reference).
      *
      * @param value node value
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void setValue(Node value) throws RepositoryException {
+    public void setValue(Node value) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
     /**
-     * Return all stubbed values (multi-valued) or array containing single value.
+     * Return all stubbed values (multivalued) or array containing single value.
      *
      * @return array of values (never null if at least one value was provided)
-     * @throws RepositoryException on access issues
      */
     @Override
-    public Value[] getValues() throws RepositoryException {
+    public Value[] getValues() {
         return _values != null ? _values : new Value[]{_value};
     }
 
@@ -510,10 +497,9 @@ public class StubbingProperty implements Property {
      * Unsupported multi-length operation.
      *
      * @return never returns normally
-     * @throws NotImplementedException always
      */
     @Override
-    public long[] getLengths() throws RepositoryException {
+    public long[] getLengths() {
         throw new NotImplementedException();
     }
 
@@ -523,7 +509,7 @@ public class StubbingProperty implements Property {
      * @return null always
      */
     @Override
-    public PropertyDefinition getDefinition() throws RepositoryException {
+    public PropertyDefinition getDefinition() {
         return null;
     }
 
@@ -531,21 +517,19 @@ public class StubbingProperty implements Property {
      * Return JCR type of first value.
      *
      * @return type id
-     * @throws RepositoryException on access errors
      */
     @Override
-    public int getType() throws RepositoryException {
+    public int getType() {
         return _value.getType();
     }
 
     /**
      * Indicates whether multiple values exist.
      *
-     * @return true if multi valued
-     * @throws RepositoryException on access errors
+     * @return true if multivalued
      */
     @Override
-    public boolean isMultiple() throws RepositoryException {
+    public boolean isMultiple() {
         return _values != null && _values.length > 1;
     }
 
@@ -581,12 +565,12 @@ public class StubbingProperty implements Property {
     @Override
     public Item getAncestor(int depth) throws RepositoryException {
         Item result = null;
-        if (depth > getDepth()) {
-            result = null;
-        } else if (depth == getDepth()) {
-            result = this;
-        } else if (depth >= 0) {
-            result = _parent.getAncestor(depth);
+        if (depth <= getDepth()) {
+            if (depth == getDepth()) {
+                result = this;
+            } else if (depth >= 0) {
+                result = _parent.getAncestor(depth);
+            }
         }
         return result;
     }
@@ -595,10 +579,9 @@ public class StubbingProperty implements Property {
      * Parent node.
      *
      * @return parent node
-     * @throws RepositoryException on access errors
      */
     @Override
-    public Node getParent() throws RepositoryException {
+    public Node getParent() {
         return _parent;
     }
 
@@ -670,10 +653,9 @@ public class StubbingProperty implements Property {
      * Unsupported visitor: read-only.
      *
      * @param visitor item visitor
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void accept(ItemVisitor visitor) throws RepositoryException {
+    public void accept(ItemVisitor visitor) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
@@ -691,20 +673,18 @@ public class StubbingProperty implements Property {
      * Unsupported refresh: read-only.
      *
      * @param keepChanges ignored
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void refresh(boolean keepChanges) throws RepositoryException {
+    public void refresh(boolean keepChanges) {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 
     /**
      * Unsupported remove: read-only.
      *
-     * @throws RepositoryException always (unsupported)
      */
     @Override
-    public void remove() throws RepositoryException {
+    public void remove() {
         throw new UnsupportedOperationException(READ_ONLY_MESSAGE);
     }
 

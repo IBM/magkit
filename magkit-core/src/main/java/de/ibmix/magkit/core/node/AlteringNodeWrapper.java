@@ -40,15 +40,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.Validate.notEmpty;
-import static org.apache.commons.lang3.Validate.notNull;
 
 /**
  * A flexible {@link NullableDelegateNodeWrapper} allowing callers to overlay (override, hide, add) properties
  * and child nodes on top of a real wrapped JCR {@link Node} without persisting changes to the repository.
  * <p>Key features:</p>
  * <ul>
- *   <li>Programmatic stubbing of single- or multi-valued properties across supported JCR types.</li>
+ *   <li>Programmatic stubbing of single- or multivalued properties across supported JCR types.</li>
  *   <li>Ability to hide existing properties or child nodes from read operations.</li>
  *   <li>Injection of synthetic child nodes while preserving hierarchical semantics via {@link DefineParentNodeWrapper}.</li>
  *   <li>Fallback chaining to ancestor or referenced nodes for graceful content resolution.</li>
@@ -86,7 +86,7 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
      */
     public AlteringNodeWrapper(Node nodeToWrap) {
         super(nodeToWrap);
-        notNull(nodeToWrap);
+        requireNonNull(nodeToWrap);
         _properties = new LinkedHashMap<>();
         _childNodes = new LinkedHashMap<>();
         _hiddenProperties = new HashSet<>();
@@ -96,7 +96,7 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     /**
      * Construct a purely synthetic node wrapper using a given name and primary node type.
      *
-     * @param name node name
+     * @param name            node name
      * @param primaryNodeType primary node type name
      */
     public AlteringNodeWrapper(String name, String primaryNodeType) {
@@ -108,10 +108,10 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Stub a String property (single or multi valued).
+     * Stub a String property (single or multivalued).
      *
-     * @param name property name (must not be blank)
-     * @param value values to expose (multi-valued if length &gt; 1)
+     * @param name  property name (must not be blank)
+     * @param value values to expose (multivalued if length &gt; 1)
      * @return this for fluent chaining
      */
     public AlteringNodeWrapper withProperty(String name, String... value) {
@@ -122,9 +122,9 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Stub a Boolean property (single or multi valued).
+     * Stub a Boolean property (single or multivalued).
      *
-     * @param name property name
+     * @param name  property name
      * @param value boolean values
      * @return fluent API instance
      */
@@ -136,9 +136,9 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Stub a Long property (single or multi valued).
+     * Stub a Long property (single or multivalued).
      *
-     * @param name property name
+     * @param name  property name
      * @param value long values
      * @return fluent API instance
      */
@@ -150,9 +150,9 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Stub a Double property (single or multi valued).
+     * Stub a Double property (single or multivalued).
      *
-     * @param name property name
+     * @param name  property name
      * @param value double values
      * @return fluent API instance
      */
@@ -164,9 +164,9 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     }
 
     /**
-     * Stub a Calendar property (single or multi valued).
+     * Stub a Calendar property (single or multivalued).
      *
-     * @param name property name
+     * @param name  property name
      * @param value calendar values
      * @return fluent API instance
      */
@@ -203,13 +203,13 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     /**
      * Inject a synthetic child node (wrapped to maintain hierarchy semantics).
      *
-     * @param name child node name
+     * @param name      child node name
      * @param childNode real JCR node to wrap
      * @return fluent API instance
      */
     public AlteringNodeWrapper withChildNode(String name, Node childNode) {
         notEmpty(name);
-        notNull(childNode);
+        requireNonNull(childNode);
         _childNodes.put(name, new DefineParentNodeWrapper(this, childNode));
         return this;
     }
@@ -260,7 +260,7 @@ public class AlteringNodeWrapper extends NullableDelegateNodeWrapper {
     /**
      * Configure fallback chain using a referenced node id stored in a property.
      *
-     * @param workspace Magnolia workspace name of the reference
+     * @param workspace        Magnolia workspace name of the reference
      * @param linkPropertyName property holding the referenced node identifier
      * @return configured fallback wrapper
      */

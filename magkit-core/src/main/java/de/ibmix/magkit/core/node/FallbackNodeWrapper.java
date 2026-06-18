@@ -44,6 +44,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A {@link NullableDelegateNodeWrapper} that transparently resolves properties and child nodes from a primary wrapped
  * {@link Node} with graceful fallback to a chain of alternative nodes. This enables dynamic content resolution where
@@ -81,7 +83,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
     private List<Node> _fallbackNodes;
     private Predicate<Property> _propertyCondition;
     private Predicate<Iterator<?>> _iteratorCondition;
-    private Map<String, String[]> _propertyNameFallbacks;
+    private final Map<String, String[]> _propertyNameFallbacks;
 
     /**
      * Factory creating a fallback wrapper for a given primary node.
@@ -127,20 +129,20 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      * @return fluent API instance
      */
     public FallbackNodeWrapper withPropertyCondition(Predicate<Property> predicate) {
-        Validate.notNull(predicate);
+        requireNonNull(predicate);
         _propertyCondition = predicate;
         return this;
     }
 
     /**
-     * Replace the iterator condition (used to decide whether to fallback to next node). Condition applied to the
+     * Replace the iterator condition (used to decide whether to fall back to next node). Condition applied to the
      * iterator before evaluating fallback chain.
      *
      * @param predicate iterator evaluation function (must not be null)
      * @return fluent API instance
      */
     public FallbackNodeWrapper withIteratorCondition(Predicate<Iterator<?>> predicate) {
-        Validate.notNull(predicate);
+        requireNonNull(predicate);
         _iteratorCondition = predicate;
         return this;
     }
@@ -152,7 +154,7 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      * @return fluent API instance
      */
     public FallbackNodeWrapper withFallbackNodes(Node... fallbackNodes) {
-        Validate.notNull(fallbackNodes);
+        requireNonNull(fallbackNodes);
         _fallbackNodes = Arrays.stream(fallbackNodes).filter(Objects::nonNull).collect(Collectors.toList());
         return this;
     }
@@ -283,10 +285,9 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      * Return property iterator; fallback to next node if iterator fails condition.
      *
      * @return property iterator (possibly empty)
-     * @throws RepositoryException on repository access issues
      */
     @Override
-    public PropertyIterator getProperties() throws RepositoryException {
+    public PropertyIterator getProperties() {
         return getProperties(PropertyUtils::getProperties);
     }
 
@@ -295,10 +296,9 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param namePattern property name pattern
      * @return property iterator (possibly empty)
-     * @throws RepositoryException on repository access issues
      */
     @Override
-    public PropertyIterator getProperties(String namePattern) throws RepositoryException {
+    public PropertyIterator getProperties(String namePattern) {
         return getProperties(n-> PropertyUtils.getProperties(n, namePattern));
     }
 
@@ -307,10 +307,9 @@ public class FallbackNodeWrapper extends NullableDelegateNodeWrapper {
      *
      * @param nameGlobs glob patterns
      * @return property iterator (possibly empty)
-     * @throws RepositoryException on repository access issues
      */
     @Override
-    public PropertyIterator getProperties(String[] nameGlobs) throws RepositoryException {
+    public PropertyIterator getProperties(String[] nameGlobs) {
         return getProperties(n-> PropertyUtils.getProperties(n, nameGlobs));
     }
 
